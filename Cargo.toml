@@ -1,0 +1,26 @@
+[package]
+name          = "safe_launcher"
+version       = "0.0.1"
+authors       = ["MaidSafe Developers <dev@maidsafe.net>"]
+description   = "SAFE Launcher library"
+documentation = "http://maidsafe.github.io/safe_launcher/latest/"
+repository    = "https://github.com/maidsafe/safe_launcher"
+readme        = "README.md"
+license       = "GPL-3.0"
+homepage      = "http://maidsafe.net"
+
+[dependencies]
+# ---- Maidsafe ----
+routing     = "0.4.*"
+safe_nfs    = "0.2.*"
+safe_dns    = "0.2.*"
+safe_client = "0.2.*"
+
+# ---- Others ----
+sodiumoxide = "*"
+
+[dev-dependencies]
+env_logger = "*"
+
+[features]
+use-mock-routing = []
