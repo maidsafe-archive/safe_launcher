@@ -9,6 +9,10 @@ readme        = "README.md"
 license       = "GPL-3.0"
 homepage      = "http://maidsafe.net"
 
+[lib]
+name       = "safe_launcher"
+crate_type = ["staticlib", "dylib", "rlib"]
+
 [dependencies]
 # ---- Maidsafe ----
 routing     = "0.4.*"
@@ -23,4 +27,6 @@ sodiumoxide = "*"
 env_logger = "*"
 
 [features]
-use-mock-routing = []
+use-mock-routing = ["safe_dns/use-mock-routing",
+                    "safe_nfs/use-mock-routing",
+                    "safe_client/use-mock-routing"]
