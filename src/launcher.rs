@@ -21,6 +21,7 @@ pub struct ApplicationEncryptionKey (::sodiumoxide::crypto::secretbox::Nonce,
 
 /// Launcher struct will hold the engine and app data based on the current login session
 /// It will hold the Symmetric Encryption keys for the applications that are launched from the launcher and in running state.
+#[allow(unused)]
 pub struct Launcher {
     engine                      : Option<::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>>,
     application_encryption_key  : ::std::collections::HashMap<::routing::NameType, ApplicationEncryptionKey>,
@@ -29,7 +30,7 @@ pub struct Launcher {
 impl Launcher {
 
     /// Invoked to register a new user with the SafeNetwork
-    /// Initialises the Launcher for the registerd user and returns the Launcher instance if the login is successful
+    /// Initialises the Launcher for the registerd user and returns the Launcher instance, if successful
     /// Else the corresponding reason for failure is returned as error::LauncherError
     pub fn register(keyword: String, pin: String, password: String) -> Result<Launcher, ::errors::LauncherError> {
         let client = try!(::safe_core::client::Client::log_in(keyword, pin, password));

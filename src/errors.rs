@@ -21,6 +21,7 @@
 pub const LAUNCHER_ERROR_START_RANGE: i32 = ::safe_core::errors::CLIENT_ERROR_START_RANGE - 600;
 
 /// Launcher Errors
+#[allow(variant_size_differences)]
 pub enum LauncherError {
     /// Client Error
     CoreError(::safe_core::errors::CoreError),
