@@ -16,11 +16,12 @@ crate_type = ["staticlib", "dylib", "rlib"]
 [dependencies]
 # ---- Maidsafe ----
 routing     = "0.4.*"
-safe_nfs    = "0.2.*"
-safe_dns    = "0.2.*"
-safe_client = "0.2.*"
+safe_nfs    = "0.3.*"
+safe_dns    = "0.3.*"
+safe_core   = "0.3.*"
 
 # ---- Others ----
+log         = "*"
 sodiumoxide = "*"
 
 [dev-dependencies]
@@ -29,4 +30,4 @@ env_logger = "*"
 [features]
 use-mock-routing = ["safe_dns/use-mock-routing",
                     "safe_nfs/use-mock-routing",
-                    "safe_client/use-mock-routing"]
+                    "safe_core/use-mock-routing"]
