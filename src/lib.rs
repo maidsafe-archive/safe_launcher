@@ -37,11 +37,12 @@
 #![allow(box_pointers, fat_ptr_transmutes, missing_copy_implementations,
          missing_debug_implementations)]
 
-extern crate safe_core;
+#[macro_use] extern crate safe_core;
 extern crate routing;
 extern crate sodiumoxide;
 
 mod launcher;
 mod errors;
+mod util;
 
 pub use launcher::Launcher;

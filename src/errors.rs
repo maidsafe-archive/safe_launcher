@@ -25,6 +25,12 @@ pub const LAUNCHER_ERROR_START_RANGE: i32 = ::safe_core::errors::CLIENT_ERROR_ST
 pub enum LauncherError {
     /// Client Error
     CoreError(::safe_core::errors::CoreError),
+    /// Empty Keyword
+    EmptyKeyword,
+    /// Empty password
+    EmptyPassword,
+    /// Invalid Pin Number
+    InvalidPin,
     /// Unexpected error
     Unexpected(String),
 }
@@ -45,7 +51,10 @@ impl Into<i32> for LauncherError {
     fn into(self) -> i32 {
         match self {
             LauncherError::CoreError(error) => error.into(),
-            LauncherError::Unexpected(_)    => LAUNCHER_ERROR_START_RANGE - 1,
+            LauncherError::InvalidPin       => LAUNCHER_ERROR_START_RANGE - 1,
+            LauncherError::EmptyKeyword     => LAUNCHER_ERROR_START_RANGE - 2,
+            LauncherError::EmptyPassword    => LAUNCHER_ERROR_START_RANGE - 3,
+            LauncherError::Unexpected(_)    => LAUNCHER_ERROR_START_RANGE - 4,
         }
     }
 }
@@ -54,6 +63,9 @@ impl ::std::fmt::Debug for LauncherError {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         match *self {
             LauncherError::CoreError(ref error)     => write!(f, "LauncherError::CoreError -> {:?}", error),
+            LauncherError::EmptyKeyword             => write!(f, "LauncherError::EmptyKeyword -> Keyword cannot be empty"),
+            LauncherError::EmptyPassword            => write!(f, "LauncherError::EmptyPassword -> Password cannot be empty"),
+            LauncherError::InvalidPin               => write!(f, "LauncherError::InvalidPin -> PinNumber must be 4 digits"),
             LauncherError::Unexpected(ref error)    => write!(f, "LauncherError::Unexpected -> {:?}", error),
         }
     }

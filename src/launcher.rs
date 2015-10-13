@@ -33,6 +33,9 @@ impl Launcher {
     /// Initialises the Launcher for the registerd user and returns the Launcher instance, if successful
     /// Else the corresponding reason for failure is returned as error::LauncherError
     pub fn register(keyword: String, pin: String, password: String) -> Result<Launcher, ::errors::LauncherError> {
+        let keyword = try!(::util::validate_keyword(&keyword));
+        let pin = try!(::util::validate_pin(&pin));
+        let password = try!(::util::validate_password(&password));
         let client = try!(::safe_core::client::Client::create_account(keyword, pin, password));
         Ok(Launcher {
             engine                      : Some(::std::sync::Arc::new(::std::sync::Mutex::new(client))),
@@ -49,6 +52,33 @@ impl Launcher {
             engine                      : Some(::std::sync::Arc::new(::std::sync::Mutex::new(client))),
             application_encryption_key  : ::std::collections::HashMap::new()
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    #[test]
+    pub fn register_account() {
+        let result = ::Launcher::register("test".to_string(), "1234".to_string(), "1234".to_string());
+        assert!(result.is_ok());
+        let result = ::Launcher::register("test".to_string(), "123".to_string(), "1234".to_string());
+        assert!(result.is_err());
+        let result = ::Launcher::register("test".to_string(), "123".to_string(), "123".to_string());
+        assert!(result.is_err());
+        let result = ::Launcher::register("".to_string(), "123".to_string(), "123".to_string());
+        assert!(result.is_err());
+        // 4 spaces
+        let result = ::Launcher::register("    ".to_string(), "    ".to_string(), "    ".to_string());
+        assert!(result.is_err());
+    }
+
+    #[test]
+    pub fn login() {
+        let result = ::Launcher::register("test".to_string(), "1234".to_string(), "1234".to_string());
+        assert!(result.is_ok());
+        let result = ::Launcher::log_in("test".to_string(), "1234".to_string(), "1234".to_string());
+        assert!(result.is_ok());
     }
 
 }
