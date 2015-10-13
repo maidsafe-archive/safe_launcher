@@ -15,6 +15,8 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+mod events;
+
 const LISTENER_PORT_RESET: u16 = 30000;
 const LISTENER_OCTATE_START: u8 = 9;
 const IPC_SERVER_THREAD_NAME: &'static str = "IpcServerThread";
@@ -23,19 +25,41 @@ const IPC_LISTENER_THREAD_NAME: &'static str = "IpcListenerThread";
 pub struct IpcServer {
     client            : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
     _raii_joiner      : ::safe_core::utility::RAIIThreadJoiner,
+    session_event_rx  : ::std::sync::mpsc::Receiver<events::IpcSessionEvent>,
+    listener_event_rx : ::std::sync::mpsc::Receiver<events::IpcListenerEvent>,
+    external_event_rx : ::std::sync::mpsc::Receiver<events::ExternalEvent>,
+    event_catagory_rx : ::std::sync::mpsc::Receiver<events::IpcServerEventCategory>,
+    event_catagory_tx : ::std::sync::mpsc::Sender<events::IpcServerEventCategory>,
+    listener_endpoint : String,
     listener_stop_flag: ::std::sync::Arc<::std::sync::atomic::AtomicBool>,
 }
 
 impl IpcServer {
     pub fn new(client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>) -> Result<(::safe_core::utility::RAIIThreadJoiner,
-                                                                                                     ::std::sync::mpsc::Sender<::events::IpcServerEvent>),
+                                                                                                     ::std::sync::mpsc::Sender<events::IpcServerEventCategory>,
+                                                                                                     ::std::sync::mpsc::Sender<events::ExternalEvent>),
                                                                                                     ::errors::LauncherError> {
-        let (tx, rx) = ::std::sync::mpsc::channel();
+        let (session_event_tx, session_event_rx) = ::std::sync::mpsc::channel();
+        let (listener_event_tx, listener_event_rx) = ::std::sync::mpsc::channel();
+        let (external_event_tx, external_event_rx) = ::std::sync::mpsc::channel();
+        let (event_catagory_tx, event_catagory_rx) = ::std::sync::mpsc::channel();
+
         let stop_flag = ::std::sync::Arc::new(::std::sync::atomic::AtomicBool::new(false));
-        let (joiner, endpoint) = try!(IpcServer::spawn_acceptor(client.clone(), stop_flag.clone(), tx.clone()));
+
+        let (joiner, endpoint) = try!(IpcServer::spawn_acceptor(client.clone(),
+                                                                stop_flag.clone(),
+                                                                event_catagory_tx.clone(),
+                                                                listener_event_tx));
+
         let ipc_server = IpcServer {
-            client: client,
-            _raii_joiner: joiner,
+            client            : client,
+            _raii_joiner      : joiner,
+            session_event_rx  : session_event_rx,
+            listener_event_rx : listener_event_rx,
+            external_event_rx : external_event_rx,
+            event_catagory_rx : event_catagory_rx,
+            event_catagory_tx : event_catagory_tx.clone(),
+            listener_endpoint : endpoint,
             listener_stop_flag: stop_flag,
         };
 
@@ -44,17 +68,55 @@ impl IpcServer {
             IpcServer::activate_ipc_server(ipc_server);
         }));
 
-        Ok((::safe_core::utility::RAIIThreadJoiner::new(ipc_server_joiner), tx))
+        Ok((::safe_core::utility::RAIIThreadJoiner::new(ipc_server_joiner), event_catagory_tx, external_event_tx))
     }
 
     fn activate_ipc_server(ipc_server: IpcServer) {
+        for event_category in ipc_server.event_catagory_rx.iter() {
+            match event_category {
+                events::IpcServerEventCategory::IpcListenerEvent => {
+                    if let Ok(listner_event) = ipc_server.listener_event_rx.try_recv() {
+                        match listner_event {
+                           events::IpcListenerEvent::IpcListenerAborted(error) => {
+                               ;
+                           },
+                           events::IpcListenerEvent::SpawnIpcSession(tcp_stream) => {
+                               ;
+                           },
+                        }
+                    }
+                },
+                events::IpcServerEventCategory::IpcSessionEvent => {
+                    if let Ok(session_event) = ipc_server.session_event_rx.try_recv() {
+                        match session_event {
+                            events::IpcSessionEvent::IpcSessionWriteFailed(app_id) => {
+                                ;
+                            },
+                        }
+                    }
+                },
+                events::IpcServerEventCategory::ExternalEvent => {
+                    if let Ok(external_event) = ipc_server.external_event_rx.try_recv() {
+                        match external_event {
+                            events::ExternalEvent::ChangeSafeDriveAccess(app_id, is_allowed) => {
+                                ;
+                            },
+                            events::ExternalEvent::Terminate => {
+                                ;
+                            },
+                        }
+                    }
+                },
+            }
+        }
     }
 
-    fn spawn_acceptor(client        : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-                      stop_flag     : ::std::sync::Arc<::std::sync::atomic::AtomicBool>,
-                      event_notifier: ::std::sync::mpsc::Sender<::events::IpcServerEvent>) -> Result<(::safe_core::utility::RAIIThreadJoiner,
-                                                                                                      String),
-                                                                                                     ::errors::LauncherError> {
+    fn spawn_acceptor(client           : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+                      stop_flag        : ::std::sync::Arc<::std::sync::atomic::AtomicBool>,
+                      event_catagory_tx: ::std::sync::mpsc::Sender<events::IpcServerEventCategory>,
+                      listener_event_tx: ::std::sync::mpsc::Sender<events::IpcListenerEvent>) -> Result<(::safe_core::utility::RAIIThreadJoiner,
+                                                                                                         String),
+                                                                                                        ::errors::LauncherError> {
         let mut port = LISTENER_PORT_RESET;
         let mut third_octate = LISTENER_OCTATE_START;
         let mut fourth_octate = LISTENER_OCTATE_START;
@@ -93,10 +155,12 @@ impl IpcServer {
             }
         }
 
-        let stop_flag_clone = stop_flag.clone();
         let joiner = eval_result!(::std::thread::Builder::new().name(IPC_LISTENER_THREAD_NAME.to_string())
                                                                .spawn(move || {
-            IpcServer::handle_accept(client, stop_flag_clone, ipc_listener, event_notifier);
+            IpcServer::handle_accept(ipc_listener,
+                                     stop_flag,
+                                     event_catagory_tx,
+                                     listener_event_tx);
         }));
 
         let ep_string = format!("{}.{}.{}.{}:{}", 127u8.to_string(),
@@ -108,25 +172,31 @@ impl IpcServer {
         Ok((::safe_core::utility::RAIIThreadJoiner::new(joiner), ep_string))
     }
 
-    fn handle_accept(client        : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-                     stop_flag     : ::std::sync::Arc<::std::sync::atomic::AtomicBool>,
-                     ipc_listener  : ::std::net::TcpListener,
-                     event_notifier: ::std::sync::mpsc::Sender<::events::IpcServerEvent>) {
+    fn handle_accept(ipc_listener     : ::std::net::TcpListener,
+                     stop_flag        : ::std::sync::Arc<::std::sync::atomic::AtomicBool>,
+                     event_catagory_tx: ::std::sync::mpsc::Sender<events::IpcServerEventCategory>,
+                     listener_event_tx: ::std::sync::mpsc::Sender<events::IpcListenerEvent>) {
         loop  {
             match ipc_listener.accept() {
                 Ok((ipc_stream, _)) => {
                     if stop_flag.load(::std::sync::atomic::Ordering::SeqCst) {
                         break;
                     } else {
-                        //let ipc_session = ::launcher::ipc::ipc_session::IpcSession::new(ipc_stream);
+                        if let Err(error) = listener_event_tx.send(events::IpcListenerEvent::SpawnIpcSession(ipc_stream)) {
+                            debug!("IPC Listener unable to send a listener event: {:?}", error);
+                        }
+                        if let Err(error) = event_catagory_tx.send(events::IpcServerEventCategory::IpcListenerEvent) {
+                            debug!("IPC Listener unable to send a category event: {:?}", error);
+                        }
                     }
                 },
-                Err(error) => {
+                Err(accept_error) => {
                     debug!("IPC Listener aborted !!");
-                    let event = ::events::IpcServerEvent::IpcListenerError(::errors::LauncherError::IpcListenerAborted(error));
-                    match event_notifier.send(event) {
-                        Ok(_) => (),
-                        Err(error) => debug!("Ipc Listener channel error: {:?}", error),
+                    if let Err(error) = listener_event_tx.send(events::IpcListenerEvent::IpcListenerAborted(accept_error)) {
+                        debug!("IPC Listener unable to send a listener event: {:?}", error);
+                    }
+                    if let Err(error) = event_catagory_tx.send(events::IpcServerEventCategory::IpcListenerEvent) {
+                        debug!("IPC Listener unable to send a category event: {:?}", error);
                     }
                     break;
                 },

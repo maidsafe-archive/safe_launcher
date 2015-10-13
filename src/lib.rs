@@ -37,6 +37,7 @@
 // #![allow(box_pointers, fat_ptr_transmutes, missing_copy_implementations,
 //          missing_debug_implementations)]
 
+extern crate routing;
 // extern crate safe_dns;
 // extern crate safe_nfs;
 #[macro_use] extern crate log;
@@ -44,6 +45,5 @@
 
 /// Safe-Launcher Errors
 pub mod errors;
-pub mod events;
 /// The main launcher module
 pub mod launcher;

@@ -15,6 +15,25 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-pub enum IpcServerEvent {
-    IpcListenerError(::errors::LauncherError),
+pub enum IpcServerEventCategory {
+    IpcListenerEvent,
+    IpcSessionEvent,
+    ExternalEvent,
+}
+
+pub enum IpcListenerEvent {
+    IpcListenerAborted(::std::io::Error),
+    SpawnIpcSession(::std::net::TcpStream),
+}
+
+pub enum IpcSessionEvent {
+    IpcSessionWriteFailed(Option<::routing::NameType>),
+//    IpcSessionReadFailed,
+//    GetAppId(String, ::std::sync::mpsc::Sender<::routing::NameType>),
+//    GetSafeDriveAccess(::routing::NameType, ::std::sync::mpsc::Sender<bool>),
+}
+
+pub enum ExternalEvent {
+    ChangeSafeDriveAccess(::routing::NameType, bool),
+    Terminate,
 }
