@@ -39,14 +39,18 @@
 
 #![allow(dead_code, unused)] // TODO(Spandan) Remove this once code base in sufficient
 
+extern crate libc;
 extern crate routing;
-extern crate sodiumoxide;
-// extern crate safe_dns;
+extern crate safe_dns;
 // extern crate safe_nfs;
+extern crate sodiumoxide;
 #[macro_use] extern crate log;
 #[macro_use] extern crate safe_core;
 
-mod util;
+#[macro_use] mod macros;
+
+/// FFI interface
+pub mod ffi;
 /// Safe-Launcher Errors
 pub mod errors;
 /// The main launcher module

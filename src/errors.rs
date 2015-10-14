@@ -15,6 +15,8 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+const LAUNCHER_ERROR_START_RANGE: i32 = ::safe_dns::errors::DNS_ERROR_START_RANGE - 200;
+
 /// Launcher Errors
 #[allow(variant_size_differences)]
 pub enum LauncherError {
@@ -48,6 +50,23 @@ impl<'a> From<&'a str> for LauncherError {
 impl From<::safe_core::errors::CoreError> for LauncherError {
     fn from(error: ::safe_core::errors::CoreError) -> LauncherError {
         LauncherError::CoreError(Box::new(error))
+    }
+}
+
+
+impl Into<i32> for LauncherError {
+    fn into(self) -> i32 {
+        match self {
+            LauncherError::CoreError(ref error)            => LAUNCHER_ERROR_START_RANGE - 1,
+            LauncherError::EmptyKeyword                    => LAUNCHER_ERROR_START_RANGE - 2,
+            LauncherError::EmptyPassword                   => LAUNCHER_ERROR_START_RANGE - 3,
+            LauncherError::InvalidPin                      => LAUNCHER_ERROR_START_RANGE - 4,
+            LauncherError::IpcListenerCouldNotBeBound      => LAUNCHER_ERROR_START_RANGE - 5,
+            LauncherError::IpcListenerAborted(ref error)   => LAUNCHER_ERROR_START_RANGE - 6,
+            LauncherError::IpcStreamCloneError(ref error)  => LAUNCHER_ERROR_START_RANGE - 7,
+            LauncherError::ReceiverChannelDisconnected     => LAUNCHER_ERROR_START_RANGE - 8,
+            LauncherError::Unexpected(ref error)           => LAUNCHER_ERROR_START_RANGE - 9,
+        }
     }
 }
 
