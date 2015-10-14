@@ -15,3 +15,21 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+pub struct SecureCommunication {
+    ipc_stream       : ::std::net::TcpStream,
+    safe_drive_access: bool,
+}
+
+impl SecureCommunication {
+    pub fn new(ipc_stream       : ::std::net::TcpStream,
+               safe_drive_access: bool) -> SecureCommunication {
+        SecureCommunication {
+            ipc_stream       : ipc_stream,
+            safe_drive_access: safe_drive_access,
+        }
+    }
+
+    pub fn start(&self) {
+        ;
+    }
+}

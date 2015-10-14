@@ -44,3 +44,36 @@ pub fn validate_password(password: &String) -> Result<String, ::errors::Launcher
        Err(::errors::LauncherError::EmptyPassword)
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    #[test]
+    pub fn validate_keyword() {
+        assert!(::util::validate_keyword(&"".to_string()).is_err());
+        assert!(::util::validate_keyword(&"    ".to_string()).is_err());
+        assert!(::util::validate_keyword(&"aaa".to_string()).is_ok());
+        assert!(::util::validate_keyword(&" ss   ".to_string()).is_ok());
+        assert_eq!(eval_result!(::util::validate_keyword(&" ss   ".to_string())), "ss".to_string());
+    }
+
+    #[test]
+    pub fn validate_password() {
+        assert!(::util::validate_password(&"".to_string()).is_err());
+        assert!(::util::validate_password(&"    ".to_string()).is_err());
+        assert!(::util::validate_password(&"aaa".to_string()).is_ok());
+        assert!(::util::validate_password(&" ss   ".to_string()).is_ok());
+        assert_eq!(eval_result!(::util::validate_password(&" ss   ".to_string())), "ss".to_string());
+    }
+
+    #[test]
+    pub fn validate_pin() {
+        assert!(::util::validate_pin(&"".to_string()).is_err());
+        assert!(::util::validate_pin(&"    ".to_string()).is_err());
+        assert!(::util::validate_pin(&"1234".to_string()).is_ok());
+        assert!(::util::validate_pin(&" 1234   ".to_string()).is_ok());
+        assert!(::util::validate_pin(&"1e34".to_string()).is_err());
+        assert_eq!(eval_result!(::util::validate_pin(&" 1234   ".to_string())), "1234".to_string());
+    }
+
+}

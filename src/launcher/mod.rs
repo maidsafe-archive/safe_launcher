@@ -18,14 +18,14 @@
 mod ipc_server;
 
 /// Symmetric Key used by application for transfering data over the IPC
-// pub struct ApplicationEncryptionKey (::sodiumoxide::crypto::secretbox::Nonce,
-//                                      ::sodiumoxide::crypto::secretbox::Key);
+pub struct ApplicationEncryptionKey (::sodiumoxide::crypto::secretbox::Nonce,
+                                     ::sodiumoxide::crypto::secretbox::Key);
 
 /// Launcher struct will hold the safe_core engine and application data based on the current login session
 /// It will hold the Symmetric Encryption keys for the applications that are launched from the launcher and in running state.
 pub struct Launcher {
     engine                      : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-    // application_encryption_key  : ::std::collections::HashMap<::routing::NameType, ApplicationEncryptionKey>,
+    application_encryption_key  : ::std::collections::HashMap<::routing::NameType, ApplicationEncryptionKey>,
 }
 
 impl Launcher {
@@ -42,7 +42,7 @@ impl Launcher {
         debug!("Account Registered with SafeNetwork");
         Ok(Launcher {
             engine                      : ::std::sync::Arc::new(::std::sync::Mutex::new(client)),
-            // application_encryption_key  : ::std::collections::HashMap::new(),
+            application_encryption_key  : ::std::collections::HashMap::new(),
         })
     }
 
@@ -53,7 +53,7 @@ impl Launcher {
         let client = try!(::safe_core::client::Client::log_in(keyword, pin, password));
         Ok(Launcher {
             engine                      : ::std::sync::Arc::new(::std::sync::Mutex::new(client)),
-            // application_encryption_key  : ::std::collections::HashMap::new()
+            application_encryption_key  : ::std::collections::HashMap::new()
         })
     }
 }

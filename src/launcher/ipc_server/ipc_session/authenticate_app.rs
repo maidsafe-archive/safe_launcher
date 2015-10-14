@@ -15,24 +15,18 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-#[derive(Clone, Debug)]
-pub enum IpcServerEventCategory {
-    IpcListenerEvent,
-    IpcSessionEvent,
-    ExternalEvent,
+pub struct AuthenticateApp {
+    ipc_stream: ::std::net::TcpStream,
 }
 
-pub enum IpcListenerEvent {
-    IpcListenerAborted(::std::io::Error),
-    SpawnIpcSession(::std::net::TcpStream),
-}
+impl AuthenticateApp {
+    pub fn new(ipc_stream: ::std::net::TcpStream) -> AuthenticateApp {
+        AuthenticateApp {
+            ipc_stream: ipc_stream,
+        }
+    }
 
-pub enum IpcSessionEvent {
-    IpcSessionWriteFailed(Option<::routing::NameType>),
-}
-
-pub enum ExternalEvent {
-    ChangeSafeDriveAccess(::routing::NameType, bool),
-    GetListenerEndpoint(::std::sync::mpsc::Sender<String>),
-    Terminate,
+    pub fn authenticate(&self) -> String {
+        unimplemented!()
+    }
 }
