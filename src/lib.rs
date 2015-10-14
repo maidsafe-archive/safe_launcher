@@ -49,5 +49,3 @@ mod util;
 pub mod errors;
 /// The main launcher module
 pub mod launcher;
-
-pub use launcher::Launcher;

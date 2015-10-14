@@ -32,7 +32,7 @@ impl Launcher {
 
     /// Invoked to register a new user with the SafeNetwork
     /// Initialises the Launcher for the registerd user and returns the Launcher instance, if successful
-    /// Else the corresponding reason for failure is returned as error::LauncherError
+    /// Else the corresponding reason for failure is returned as error::launcher::LauncherError
     pub fn register(keyword: String, pin: String, password: String) -> Result<Launcher, ::errors::LauncherError> {
         let keyword = try!(::util::validate_keyword(&keyword));
         let pin = try!(::util::validate_pin(&pin));
@@ -48,7 +48,7 @@ impl Launcher {
 
     /// Invoked to Login a already registerd user using self-authentication mechanism to the SafeNetwork
     /// Initialises the Launcher for the logged in user and returns the Launcher instance if the login is successful
-    /// Else the corresponding reason for failure is returned as error::LauncherError
+    /// Else the corresponding reason for failure is returned as error::launcher::LauncherError
     pub fn log_in(keyword: String, pin: String, password: String) -> Result<Launcher, ::errors::LauncherError> {
         let client = try!(::safe_core::client::Client::log_in(keyword, pin, password));
         Ok(Launcher {
@@ -64,23 +64,23 @@ mod tests {
     #[test]
     pub fn register_account() {
         let empty_spaces = "    ";
-        let result = ::Launcher::register("test".to_string(), "1234".to_string(), "1234".to_string());
+        let result = ::launcher::Launcher::register("test".to_string(), "1234".to_string(), "1234".to_string());
         assert!(result.is_ok());
-        let result = ::Launcher::register("test".to_string(), "123".to_string(), "1234".to_string());
+        let result = ::launcher::Launcher::register("test".to_string(), "123".to_string(), "1234".to_string());
         assert!(result.is_err());
-        let result = ::Launcher::register("test".to_string(), "123".to_string(), "123".to_string());
+        let result = ::launcher::Launcher::register("test".to_string(), "123".to_string(), "123".to_string());
         assert!(result.is_err());
-        let result = ::Launcher::register("".to_string(), "1234".to_string(), "1234".to_string());
+        let result = ::launcher::Launcher::register("".to_string(), "1234".to_string(), "1234".to_string());
         assert!(result.is_err());
-        let result = ::Launcher::register(empty_spaces.to_string(), empty_spaces.to_string(), empty_spaces.to_string());
+        let result = ::launcher::Launcher::register(empty_spaces.to_string(), empty_spaces.to_string(), empty_spaces.to_string());
         assert!(result.is_err());
     }
 
     #[test]
     pub fn login() {
-        let result = ::Launcher::register("test".to_string(), "1234".to_string(), "1234".to_string());
+        let result = ::launcher::Launcher::register("test".to_string(), "1234".to_string(), "1234".to_string());
         assert!(result.is_ok());
-        let result = ::Launcher::log_in("test".to_string(), "1234".to_string(), "1234".to_string());
+        let result = ::launcher::Launcher::log_in("test".to_string(), "1234".to_string(), "1234".to_string());
         assert!(result.is_ok());
     }
 
