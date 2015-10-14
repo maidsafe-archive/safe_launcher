@@ -15,39 +15,15 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-#[derive(Clone, Debug)]
-pub enum IpcSessionEventCategory {
-    AppAuthenticationEvent,
-    RsaKeyExchangeEvent,
-    SecureCommunicationEvent,
-    ExternalEvent,
+pub struct SessionInfo {
+    pub _raii_joiner: ::safe_core::utility::RAIIThreadJoiner,
+    pub event_sender: ::event_sender::EventSender<::launcher::ipc_server::ipc_session
+                                                            ::events::IpcSessionEventCategory,
+                                                  ::launcher::ipc_server::ipc_session
+                                                            ::events::ExternalEvent>,
 }
 
-pub enum AppAuthenticationEvent {
-    ReceivedNonce(String),
-    Failed,
-}
-
-pub enum RsaKeyExchangeEvent {
-    SymmetricCipher(Box<(::sodiumoxide::crypto::secretbox::Key,
-                         ::sodiumoxide::crypto::secretbox::Nonce)>),
-    Failed,
-}
-
-pub enum SecureCommunicationEvent {
-    PlaceHolder, // TODO
-}
-
-pub enum ExternalEvent {
-    AppDetailReceived(Box<event_data::AppDetail>),
-    ChangeSafeDriveAccess(bool),
-    Terminate,
-}
-
-pub mod event_data {
-    pub struct AppDetail {
-        pub client           : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-        pub app_id           : ::routing::NameType,
-        pub safe_drive_access: bool,
-    }
+pub struct AppInfo {
+    pub app_id           : ::routing::NameType,
+    pub safe_drive_access: bool,
 }

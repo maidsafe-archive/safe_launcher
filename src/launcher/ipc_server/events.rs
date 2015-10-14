@@ -28,6 +28,7 @@ pub enum IpcListenerEvent {
 }
 
 pub enum IpcSessionEvent {
+    VerifySession(u32, String),
     IpcSessionWriteFailed(Option<::routing::NameType>),
 }
 

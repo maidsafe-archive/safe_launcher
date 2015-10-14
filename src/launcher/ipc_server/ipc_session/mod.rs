@@ -15,7 +15,8 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-mod events;
+pub mod events;
+
 mod authenticate_app;
 mod rsa_key_exchange;
 mod secure_communication;
@@ -25,6 +26,7 @@ const IPC_SESSION_THREAD_NAME: &'static str = "IpcSessionThread";
 
 pub struct IpcSession {
     app_id                 : Option<::routing::NameType>,
+    temp_id                : u32,
     ipc_stream             : ::std::net::TcpStream,
     _raii_joiner           : ::safe_core::utility::RAIIThreadJoiner,
     safe_drive_access      : Option<::std::sync::Arc<::std::sync::Mutex<bool>>>, // TODO(Spandan) change to 3-level permission instead of 2
@@ -36,14 +38,18 @@ pub struct IpcSession {
     key_exchange_event_rx  : ::std::sync::mpsc::Receiver<events::RsaKeyExchangeEvent>,
     key_exchange_event_tx  : ::std::sync::mpsc::Sender<events::RsaKeyExchangeEvent>,
     authentication_event_rx: ::std::sync::mpsc::Receiver<events::AppAuthenticationEvent>,
+    ipc_server_event_sender: ::event_sender::EventSender<::launcher::ipc_server::events::IpcServerEventCategory,
+                                                         ::launcher::ipc_server::events::IpcSessionEvent>,
 }
 
 impl IpcSession {
-    pub fn new(client    : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-               ipc_stream: ::std::net::TcpStream) -> Result<(::safe_core::utility::RAIIThreadJoiner,
-                                                             ::event_sender::EventSender<events::IpcSessionEventCategory,
-                                                                                         events::ExternalEvent>),
-                                                            ::errors::LauncherError> {
+    pub fn new(server_event_sender: ::event_sender::EventSender<::launcher::ipc_server::events::IpcServerEventCategory,
+                                                         ::launcher::ipc_server::events::IpcSessionEvent>,
+               temp_id            : u32,
+               ipc_stream         : ::std::net::TcpStream) -> Result<(::safe_core::utility::RAIIThreadJoiner,
+                                                                      ::event_sender::EventSender<events::IpcSessionEventCategory,
+                                                                                                  events::ExternalEvent>),
+                                                                     ::errors::LauncherError> {
         let (event_catagory_tx, event_catagory_rx) = ::std::sync::mpsc::channel();
         let (external_event_tx, external_event_rx) = ::std::sync::mpsc::channel();
         let (secure_comm_event_tx, secure_comm_event_rx) = ::std::sync::mpsc::channel();
@@ -65,6 +71,7 @@ impl IpcSession {
 
         let ipc_session = IpcSession {
             app_id                 : None,
+            temp_id                : temp_id,
             ipc_stream             : ipc_stream,
             _raii_joiner           : joiner,
             safe_drive_access      : None,
@@ -76,6 +83,7 @@ impl IpcSession {
             key_exchange_event_rx  : key_exchange_event_rx,
             key_exchange_event_tx  : key_exchange_event_tx,
             authentication_event_rx: authentication_event_rx,
+            ipc_server_event_sender: server_event_sender,
         };
 
         let ipc_session_joiner = eval_result!(::std::thread::Builder::new().name(IPC_SESSION_THREAD_NAME.to_string())
@@ -100,6 +108,7 @@ impl IpcSession {
                 events::IpcSessionEventCategory::AppAuthenticationEvent => {
                     if let Ok(authentication_event) = ipc_session.authentication_event_rx.try_recv() {
                         match authentication_event {
+                            events::AppAuthenticationEvent::ReceivedNonce(nonce) => ipc_session.on_received_nonce(nonce),
                             _ => unimplemented!(),
                         }
                     }
@@ -121,13 +130,25 @@ impl IpcSession {
                 events::IpcSessionEventCategory::ExternalEvent => {
                     if let Ok(external_event) = ipc_session.external_event_rx.try_recv() {
                         match external_event {
+                            events::ExternalEvent::AppDetailReceived(app_detail) => ipc_session.on_app_detail_received(app_detail),
                             events::ExternalEvent::ChangeSafeDriveAccess(is_allowed) => ipc_session.on_change_safe_drive_access(is_allowed),
                             events::ExternalEvent::Terminate => break,
                         }
                     }
-                }, // ExternalEvent
+                },
             }
         }
+    }
+
+    fn on_received_nonce(&self, nonce: String) {
+        self.ipc_server_event_sender.send(::launcher
+                                          ::ipc_server
+                                          ::events
+                                          ::IpcSessionEvent::VerifySession(self.temp_id, nonce));
+    }
+
+    fn on_app_detail_received(&self, app_detail: Box<events::event_data::AppDetail>) {
+        ;
     }
 
     fn on_change_safe_drive_access(&self, is_allowed: bool) {

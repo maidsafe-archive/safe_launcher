@@ -15,6 +15,7 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+mod misc;
 mod events;
 mod ipc_session;
 
@@ -24,15 +25,18 @@ const IPC_SERVER_THREAD_NAME: &'static str = "IpcServerThread";
 const IPC_LISTENER_THREAD_NAME: &'static str = "IpcListenerThread";
 
 pub struct IpcServer {
-    client            : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-    _raii_joiner      : ::safe_core::utility::RAIIThreadJoiner,
-    session_event_rx  : ::std::sync::mpsc::Receiver<events::IpcSessionEvent>,
-    listener_event_rx : ::std::sync::mpsc::Receiver<events::IpcListenerEvent>,
-    external_event_rx : ::std::sync::mpsc::Receiver<events::ExternalEvent>,
-    event_catagory_rx : ::std::sync::mpsc::Receiver<events::IpcServerEventCategory>,
-    event_catagory_tx : ::std::sync::mpsc::Sender<events::IpcServerEventCategory>,
-    listener_endpoint : String,
-    listener_stop_flag: ::std::sync::Arc<::std::sync::atomic::AtomicBool>,
+    client               : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+    _raii_joiner         : ::safe_core::utility::RAIIThreadJoiner,
+    session_event_rx     : ::std::sync::mpsc::Receiver<events::IpcSessionEvent>,
+    listener_event_rx    : ::std::sync::mpsc::Receiver<events::IpcListenerEvent>,
+    external_event_rx    : ::std::sync::mpsc::Receiver<events::ExternalEvent>,
+    event_catagory_rx    : ::std::sync::mpsc::Receiver<events::IpcServerEventCategory>,
+    event_catagory_tx    : ::std::sync::mpsc::Sender<events::IpcServerEventCategory>,
+    listener_endpoint    : String,
+    listener_stop_flag   : ::std::sync::Arc<::std::sync::atomic::AtomicBool>,
+    verified_sessions    : ::std::collections::HashMap<::routing::NameType, misc::SessionInfo>,
+    unverified_sessions  : ::std::collections::HashMap<u32, misc::SessionInfo>,
+    pending_verifications: ::std::collections::HashMap<String, misc::AppInfo>,
 }
 
 impl IpcServer {
@@ -59,15 +63,18 @@ impl IpcServer {
                                                                 stop_flag.clone()));
 
         let ipc_server = IpcServer {
-            client            : client,
-            _raii_joiner      : joiner,
-            session_event_rx  : session_event_rx,
-            listener_event_rx : listener_event_rx,
-            external_event_rx : external_event_rx,
-            event_catagory_rx : event_catagory_rx,
-            event_catagory_tx : event_catagory_tx.clone(),
-            listener_endpoint : endpoint,
-            listener_stop_flag: stop_flag,
+            client               : client,
+            _raii_joiner         : joiner,
+            session_event_rx     : session_event_rx,
+            listener_event_rx    : listener_event_rx,
+            external_event_rx    : external_event_rx,
+            event_catagory_rx    : event_catagory_rx,
+            event_catagory_tx    : event_catagory_tx.clone(),
+            listener_endpoint    : endpoint,
+            listener_stop_flag   : stop_flag,
+            verified_sessions    : ::std::collections::HashMap::new(),
+            unverified_sessions  : ::std::collections::HashMap::new(),
+            pending_verifications: ::std::collections::HashMap::new(),
         };
 
         let ipc_server_joiner = eval_result!(::std::thread::Builder::new().name(IPC_SERVER_THREAD_NAME.to_string())
@@ -100,6 +107,7 @@ impl IpcServer {
                 events::IpcServerEventCategory::IpcSessionEvent => {
                     if let Ok(session_event) = ipc_server.session_event_rx.try_recv() {
                         match session_event {
+                            events::IpcSessionEvent::VerifySession(temp_id, nonce) => ipc_server.on_verify_session(temp_id, nonce),
                             events::IpcSessionEvent::IpcSessionWriteFailed(app_id) => ipc_server.on_ipc_session_write_failed(app_id),
                         }
                     }
@@ -122,6 +130,10 @@ impl IpcServer {
     }
 
     fn on_ipc_listener_aborted(&self, error: ::std::io::Error) {
+        ;
+    }
+
+    fn on_verify_session(&self, temp_id: u32, nonce: String) {
         ;
     }
 
