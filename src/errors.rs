@@ -17,12 +17,15 @@
 
 /// Launcher Errors
 pub enum LauncherError {
-    /// Error from safe_core
-    CoreError(::safe_core::errors::CoreError),
+    /// Error from safe_core. Boxed to hold a pointer instead of value so that this enum variant is
+    /// not insanely bigger than others.
+    CoreError(Box<::safe_core::errors::CoreError>),
     /// Ipc Listener could not be bound to an endpoint
     IpcListenerCouldNotBeBound,
     /// The Ipc Listener has errored out. New apps will no longer be able to connect to Launcher
     IpcListenerAborted(::std::io::Error),
+    /// The Ipc Stream could not be cloned
+    IpcStreamCloneError(::std::io::Error),
     /// mpsc receiver has hung up
     ReceiverChannelDisconnected,
     /// Unexpected - Probably a Logic error
@@ -37,15 +40,19 @@ impl<'a> From<&'a str> for LauncherError {
 
 impl From<::safe_core::errors::CoreError> for LauncherError {
     fn from(error: ::safe_core::errors::CoreError) -> LauncherError {
-        LauncherError::CoreError(error)
+        LauncherError::CoreError(Box::new(error))
     }
 }
 
-//impl ::std::fmt::Debug for LauncherError {
-//    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-//        match *self {
-//            LauncherError::CoreError(ref error)  => write!(f, "LauncherError::CoreError -> {:?}", error),
-//            LauncherError::Unexpected(ref error) => write!(f, "LauncherError::Unexpected{{{:?}}}", error),
-//        }
-//    }
-//}
+impl ::std::fmt::Debug for LauncherError {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        match *self {
+            LauncherError::CoreError(ref error)            => write!(f, "LauncherError::CoreError -> {:?}", error),
+            LauncherError::IpcListenerCouldNotBeBound      => write!(f, "LauncherError::IpcListenerCouldNotBeBound"),
+            LauncherError::IpcListenerAborted(ref error)   => write!(f, "LauncherError::IpcListenerAborted -> {:?}", error),
+            LauncherError::IpcStreamCloneError(ref error)  => write!(f, "LauncherError::IpcStreamCloneError -> {:?}", error),
+            LauncherError::ReceiverChannelDisconnected     => write!(f, "LauncherError::ReceiverChannelDisconnected"),
+            LauncherError::Unexpected(ref error)           => write!(f, "LauncherError::Unexpected{{{:?}}}", error),
+        }
+    }
+}

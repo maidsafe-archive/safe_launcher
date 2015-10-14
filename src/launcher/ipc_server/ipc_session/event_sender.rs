@@ -17,14 +17,14 @@
 
 pub struct EventSender<T> {
     event_tx         : ::std::sync::mpsc::Sender<T>,
-    event_category   : ::launcher::ipc_server::events::IpcServerEventCategory,
-    event_category_tx: ::std::sync::mpsc::Sender<::launcher::ipc_server::events::IpcServerEventCategory>,
+    event_category   : ::launcher::ipc_server::ipc_session::events::IpcSessionEventCategory,
+    event_category_tx: ::std::sync::mpsc::Sender<::launcher::ipc_server::ipc_session::events::IpcSessionEventCategory>,
 }
 
 impl<T> EventSender<T> {
     pub fn new(event_tx         : ::std::sync::mpsc::Sender<T>,
-               event_category   : ::launcher::ipc_server::events::IpcServerEventCategory,
-               event_category_tx: ::std::sync::mpsc::Sender<::launcher::ipc_server::events::IpcServerEventCategory>) -> EventSender<T> {
+               event_category   : ::launcher::ipc_server::ipc_session::events::IpcSessionEventCategory,
+               event_category_tx: ::std::sync::mpsc::Sender<::launcher::ipc_server::ipc_session::events::IpcSessionEventCategory>) -> EventSender<T> {
         EventSender {
             event_tx         : event_tx,
             event_category   : event_category,
@@ -34,11 +34,11 @@ impl<T> EventSender<T> {
 
     pub fn send(&self, event: T) -> Result<(), ::errors::LauncherError> {
         if let Err(error) = self.event_tx.send(event) {
-            debug!("Unable to send an event to Ipc Server: {:?}", error);
+            debug!("Unable to send an event to Ipc Session: {:?}", error);
             return Err(::errors::LauncherError::ReceiverChannelDisconnected)
         }
         if let Err(error) = self.event_category_tx.send(self.event_category.clone()) {
-            debug!("Unable to send a category event to Ipc Server: {:?}", error);
+            debug!("Unable to send a category event to Ipc Session: {:?}", error);
             return Err(::errors::LauncherError::ReceiverChannelDisconnected)
         }
 

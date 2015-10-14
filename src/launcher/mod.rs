@@ -17,6 +17,7 @@
 
 mod ipc_server;
 
-// pub struct Launcher {
-//     client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-// }
+/// TODO(Spandan) This will be documeted once this task is done.
+pub struct Launcher {
+    client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+}

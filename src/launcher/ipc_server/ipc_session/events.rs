@@ -16,23 +16,16 @@
 // relating to use of the SAFE Network Software.
 
 #[derive(Clone, Debug)]
-pub enum IpcServerEventCategory {
-    IpcListenerEvent,
-    IpcSessionEvent,
+pub enum IpcSessionEventCategory {
+    IpcStreamEvent,
     ExternalEvent,
 }
 
-pub enum IpcListenerEvent {
-    IpcListenerAborted(::std::io::Error),
-    SpawnIpcSession(::std::net::TcpStream),
-}
-
-pub enum IpcSessionEvent {
-    IpcSessionWriteFailed(Option<::routing::NameType>),
+pub enum IpcStreamEvent {
+    Placeholder, // TODO
 }
 
 pub enum ExternalEvent {
-    ChangeSafeDriveAccess(::routing::NameType, bool),
-    GetListenerEndpoint(::std::sync::mpsc::Sender<String>),
+    ChangeSafeDriveAccess(bool),
     Terminate,
 }
