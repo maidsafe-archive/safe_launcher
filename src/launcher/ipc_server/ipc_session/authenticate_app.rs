@@ -15,18 +15,30 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-pub struct AuthenticateApp {
-    ipc_stream: ::std::net::TcpStream,
-}
+const NONCE_VERIFIER_THREAD_NAME: &'static str = "LauncherNonceVerifierThread";
 
-impl AuthenticateApp {
-    pub fn new(ipc_stream: ::std::net::TcpStream) -> AuthenticateApp {
-        AuthenticateApp {
-            ipc_stream: ipc_stream,
+pub fn verify_launcher_nonce(ipc_stream  : ::std::net::TcpStream,
+                             event_sender: ::event_sender
+                                           ::EventSender<::launcher::ipc_server::ipc_session
+                                                                               ::events
+                                                                               ::IpcSessionEventCategory,
+                                                         ::launcher::ipc_server::ipc_session
+                                                                               ::events
+                                                                               ::AppAuthenticationEvent>) -> ::safe_core
+                                                                                                             ::utility
+                                                                                                             ::RAIIThreadJoiner {
+    let joiner = eval_result!(::std::thread::Builder::new().name(NONCE_VERIFIER_THREAD_NAME.to_string())
+                                                       .spawn(move || {
+        let nonce = "TemporaryCode".to_string();
+        if let Err(err) = event_sender.send(::launcher
+                                            ::ipc_server
+                                            ::ipc_session
+                                            ::events::AppAuthenticationEvent::ReceivedNonce(nonce)) {
+            debug!("Error sending event {:?}", err);
         }
-    }
 
-    pub fn authenticate(&self) -> String {
-        unimplemented!()
-    }
+        debug!("Exiting thread {:?}", NONCE_VERIFIER_THREAD_NAME);
+    }));
+
+    ::safe_core::utility::RAIIThreadJoiner::new(joiner)
 }

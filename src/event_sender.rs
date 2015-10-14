@@ -15,16 +15,16 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-pub struct EventSender<T> {
-    event_tx         : ::std::sync::mpsc::Sender<T>,
-    event_category   : ::launcher::ipc_server::ipc_session::events::IpcSessionEventCategory,
-    event_category_tx: ::std::sync::mpsc::Sender<::launcher::ipc_server::ipc_session::events::IpcSessionEventCategory>,
+pub struct EventSender<Category, EventSubset> {
+    event_tx         : ::std::sync::mpsc::Sender<EventSubset>,
+    event_category   : Category,
+    event_category_tx: ::std::sync::mpsc::Sender<Category>,
 }
 
-impl<T> EventSender<T> {
-    pub fn new(event_tx         : ::std::sync::mpsc::Sender<T>,
-               event_category   : ::launcher::ipc_server::ipc_session::events::IpcSessionEventCategory,
-               event_category_tx: ::std::sync::mpsc::Sender<::launcher::ipc_server::ipc_session::events::IpcSessionEventCategory>) -> EventSender<T> {
+impl<Category: ::std::fmt::Debug + Clone, EventSubset> EventSender<Category, EventSubset> {
+    pub fn new(event_tx         : ::std::sync::mpsc::Sender<EventSubset>,
+               event_category   : Category,
+               event_category_tx: ::std::sync::mpsc::Sender<Category>) -> EventSender<Category, EventSubset> {
         EventSender {
             event_tx         : event_tx,
             event_category   : event_category,
@@ -32,13 +32,13 @@ impl<T> EventSender<T> {
         }
     }
 
-    pub fn send(&self, event: T) -> Result<(), ::errors::LauncherError> {
+    pub fn send(&self, event: EventSubset) -> Result<(), ::errors::LauncherError> {
         if let Err(error) = self.event_tx.send(event) {
-            debug!("Unable to send an event to Ipc Session: {:?}", error);
+            debug!("Unable to send event: {:?}", error);
             return Err(::errors::LauncherError::ReceiverChannelDisconnected)
         }
         if let Err(error) = self.event_category_tx.send(self.event_category.clone()) {
-            debug!("Unable to send a category event to Ipc Session: {:?}", error);
+            debug!("Unable to send event {:?} :: Error: {:?}", self.event_category, error);
             return Err(::errors::LauncherError::ReceiverChannelDisconnected)
         }
 

@@ -17,7 +17,6 @@
 
 mod events;
 mod ipc_session;
-mod event_sender;
 
 const LISTENER_PORT_RESET: u16 = 30000;
 const LISTENER_OCTATE_START: u8 = 9;
@@ -38,7 +37,9 @@ pub struct IpcServer {
 
 impl IpcServer {
     pub fn new(client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>) -> Result<(::safe_core::utility::RAIIThreadJoiner,
-                                                                                                     event_sender::EventSender<events::ExternalEvent>),
+                                                                                                     ::event_sender
+                                                                                                     ::EventSender<events::IpcServerEventCategory,
+                                                                                                                   events::ExternalEvent>),
                                                                                                     ::errors::LauncherError> {
         let (session_event_tx, session_event_rx) = ::std::sync::mpsc::channel();
         let (listener_event_tx, listener_event_rx) = ::std::sync::mpsc::channel();
@@ -47,9 +48,12 @@ impl IpcServer {
 
         let stop_flag = ::std::sync::Arc::new(::std::sync::atomic::AtomicBool::new(false));
 
-        let listener_event_sender = event_sender::EventSender::<events::IpcListenerEvent>::new(listener_event_tx,
-                                                                                               events::IpcServerEventCategory::IpcListenerEvent,
-                                                                                               event_catagory_tx.clone());
+        let listener_event_sender = ::event_sender
+                                    ::EventSender
+                                    ::<events::IpcServerEventCategory, events::IpcListenerEvent>
+                                    ::new(listener_event_tx,
+                                          events::IpcServerEventCategory::IpcListenerEvent,
+                                          event_catagory_tx.clone());
 
         let (joiner, endpoint) = try!(IpcServer::spawn_acceptor(listener_event_sender,
                                                                 stop_flag.clone()));
@@ -72,9 +76,13 @@ impl IpcServer {
             debug!("Exiting Thread {:?}", IPC_SERVER_THREAD_NAME.to_string());
         }));
 
-        let external_event_sender = event_sender::EventSender::<events::ExternalEvent>::new(external_event_tx,
-                                                                                            events::IpcServerEventCategory::ExternalEvent,
-                                                                                            event_catagory_tx);
+        let external_event_sender = ::event_sender
+                                    ::EventSender
+                                    ::<events::IpcServerEventCategory, events::ExternalEvent>
+                                    ::new(external_event_tx,
+                                          events::IpcServerEventCategory::ExternalEvent,
+                                          event_catagory_tx);
+
         Ok((::safe_core::utility::RAIIThreadJoiner::new(ipc_server_joiner), external_event_sender))
     }
 
@@ -131,7 +139,7 @@ impl IpcServer {
         }
     }
 
-    fn spawn_acceptor(event_sender: event_sender::EventSender<events::IpcListenerEvent>,
+    fn spawn_acceptor(event_sender: ::event_sender::EventSender<events::IpcServerEventCategory, events::IpcListenerEvent>,
                       stop_flag   : ::std::sync::Arc<::std::sync::atomic::AtomicBool>) -> Result<(::safe_core::utility::RAIIThreadJoiner,
                                                                                                   String),
                                                                                                  ::errors::LauncherError> {
@@ -192,7 +200,7 @@ impl IpcServer {
     }
 
     fn handle_accept(ipc_listener: ::std::net::TcpListener,
-                     event_sender: event_sender::EventSender<events::IpcListenerEvent>,
+                     event_sender: ::event_sender::EventSender<events::IpcServerEventCategory, events::IpcListenerEvent>,
                      stop_flag   : ::std::sync::Arc<::std::sync::atomic::AtomicBool>) {
         loop  {
             match ipc_listener.accept() {

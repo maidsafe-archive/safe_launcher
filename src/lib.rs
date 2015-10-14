@@ -42,10 +42,10 @@
 extern crate routing;
 // extern crate safe_dns;
 // extern crate safe_nfs;
+extern crate sodiumoxide;
 #[macro_use] extern crate log;
 #[macro_use] extern crate safe_core;
 
-/// Safe-Launcher Errors
-pub mod errors;
-/// The main launcher module
-pub mod launcher;
+mod errors;
+mod launcher;
+mod event_sender;

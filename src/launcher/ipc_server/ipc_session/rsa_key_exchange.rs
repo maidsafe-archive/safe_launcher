@@ -15,30 +15,18 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-#[derive(Clone, Debug)]
-pub enum IpcSessionEventCategory {
-    AppAuthenticationEvent,
-    RsaKeyExchangeEvent,
-    SecureCommunicationEvent,
-    ExternalEvent,
+pub struct AuthenticateApp {
+    ipc_stream: ::std::net::TcpStream,
 }
 
-pub enum AppAuthenticationEvent {
-    ReceivedNonce(String),
-    Failed,
-}
+impl AuthenticateApp {
+    pub fn new(ipc_stream: ::std::net::TcpStream) -> AuthenticateApp {
+        AuthenticateApp {
+            ipc_stream: ipc_stream,
+        }
+    }
 
-pub enum RsaKeyExchangeEvent {
-    SymmetricCipher(Box<(::sodiumoxide::crypto::secretbox::Key,
-                         ::sodiumoxide::crypto::secretbox::Nonce)>),
-    Failed,
-}
-
-pub enum SecureCommunicationEvent {
-    PlaceHolder, // TODO
-}
-
-pub enum ExternalEvent {
-    ChangeSafeDriveAccess(bool),
-    Terminate,
+    pub fn authenticate(&self) -> String {
+        unimplemented!()
+    }
 }
