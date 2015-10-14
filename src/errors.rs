@@ -15,7 +15,6 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-
 /// Intended for converting NFS Errors into numeric codes for propagating some error information
 /// across FFI boundaries and specially to C.
 pub const LAUNCHER_ERROR_START_RANGE: i32 = ::safe_core::errors::CLIENT_ERROR_START_RANGE - 600;
@@ -31,6 +30,10 @@ pub enum LauncherError {
     EmptyPassword,
     /// Invalid Pin Number
     InvalidPin,
+    /// Ipc Listener could not be bound to an endpoint
+    IpcListenerCouldNotBeBound,
+    /// The Ipc Listener has errored out. New apps will no longer be able to connect to Launcher
+    IpcListenerAborted(::std::io::Error),
     /// Unexpected error
     Unexpected(String),
 }
@@ -50,11 +53,13 @@ impl<'a> From<&'a str> for LauncherError {
 impl Into<i32> for LauncherError {
     fn into(self) -> i32 {
         match self {
-            LauncherError::CoreError(error) => error.into(),
-            LauncherError::InvalidPin       => LAUNCHER_ERROR_START_RANGE - 1,
-            LauncherError::EmptyKeyword     => LAUNCHER_ERROR_START_RANGE - 2,
-            LauncherError::EmptyPassword    => LAUNCHER_ERROR_START_RANGE - 3,
-            LauncherError::Unexpected(_)    => LAUNCHER_ERROR_START_RANGE - 4,
+            LauncherError::CoreError(error)             => error.into(),
+            LauncherError::InvalidPin                   => LAUNCHER_ERROR_START_RANGE - 1,
+            LauncherError::EmptyKeyword                 => LAUNCHER_ERROR_START_RANGE - 2,
+            LauncherError::EmptyPassword                => LAUNCHER_ERROR_START_RANGE - 3,
+            LauncherError::IpcListenerCouldNotBeBound   => LAUNCHER_ERROR_START_RANGE - 4,
+            LauncherError::IpcListenerAborted(_)        => LAUNCHER_ERROR_START_RANGE - 5,
+            LauncherError::Unexpected(_)                => LAUNCHER_ERROR_START_RANGE - 6,
         }
     }
 }
@@ -62,11 +67,13 @@ impl Into<i32> for LauncherError {
 impl ::std::fmt::Debug for LauncherError {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         match *self {
-            LauncherError::CoreError(ref error)     => write!(f, "LauncherError::CoreError -> {:?}", error),
-            LauncherError::EmptyKeyword             => write!(f, "LauncherError::EmptyKeyword -> Keyword cannot be empty"),
-            LauncherError::EmptyPassword            => write!(f, "LauncherError::EmptyPassword -> Password cannot be empty"),
-            LauncherError::InvalidPin               => write!(f, "LauncherError::InvalidPin -> PinNumber must be 4 digits"),
-            LauncherError::Unexpected(ref error)    => write!(f, "LauncherError::Unexpected -> {:?}", error),
+            LauncherError::CoreError(ref error)             => write!(f, "LauncherError::CoreError -> {:?}", error),
+            LauncherError::EmptyKeyword                     => write!(f, "LauncherError::EmptyKeyword -> Keyword cannot be empty"),
+            LauncherError::EmptyPassword                    => write!(f, "LauncherError::EmptyPassword -> Password cannot be empty"),
+            LauncherError::InvalidPin                       => write!(f, "LauncherError::InvalidPin -> PinNumber must be 4 digits"),
+            LauncherError::IpcListenerCouldNotBeBound       => write!(f, "LauncherError::IpcListenerCouldNotBeBound"),
+            LauncherError::IpcListenerAborted(ref error)    => write!(f, "LauncherError::IpcListenerAborted -> {:?}", error),
+            LauncherError::Unexpected(ref error)            => write!(f, "LauncherError::Unexpected -> {:?}", error),
         }
     }
 }

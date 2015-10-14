@@ -15,16 +15,17 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-/// Symmetric Key used by application for transfering data over the IPC
-pub struct ApplicationEncryptionKey (::sodiumoxide::crypto::secretbox::Nonce,
-                                     ::sodiumoxide::crypto::secretbox::Key);
+mod ipc_server;
 
-/// Launcher struct will hold the engine and app data based on the current login session
+/// Symmetric Key used by application for transfering data over the IPC
+// pub struct ApplicationEncryptionKey (::sodiumoxide::crypto::secretbox::Nonce,
+//                                      ::sodiumoxide::crypto::secretbox::Key);
+
+/// Launcher struct will hold the safe_core engine and application data based on the current login session
 /// It will hold the Symmetric Encryption keys for the applications that are launched from the launcher and in running state.
-#[allow(unused)]
 pub struct Launcher {
-    engine                      : Option<::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>>,
-    application_encryption_key  : ::std::collections::HashMap<::routing::NameType, ApplicationEncryptionKey>,
+    engine                      : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+    // application_encryption_key  : ::std::collections::HashMap<::routing::NameType, ApplicationEncryptionKey>,
 }
 
 impl Launcher {
@@ -36,10 +37,12 @@ impl Launcher {
         let keyword = try!(::util::validate_keyword(&keyword));
         let pin = try!(::util::validate_pin(&pin));
         let password = try!(::util::validate_password(&password));
+        debug!("Registering Account with SafeNetwork...");
         let client = try!(::safe_core::client::Client::create_account(keyword, pin, password));
+        debug!("Account Registered with SafeNetwork");
         Ok(Launcher {
-            engine                      : Some(::std::sync::Arc::new(::std::sync::Mutex::new(client))),
-            application_encryption_key  : ::std::collections::HashMap::new(),
+            engine                      : ::std::sync::Arc::new(::std::sync::Mutex::new(client)),
+            // application_encryption_key  : ::std::collections::HashMap::new(),
         })
     }
 
@@ -49,8 +52,8 @@ impl Launcher {
     pub fn log_in(keyword: String, pin: String, password: String) -> Result<Launcher, ::errors::LauncherError> {
         let client = try!(::safe_core::client::Client::log_in(keyword, pin, password));
         Ok(Launcher {
-            engine                      : Some(::std::sync::Arc::new(::std::sync::Mutex::new(client))),
-            application_encryption_key  : ::std::collections::HashMap::new()
+            engine                      : ::std::sync::Arc::new(::std::sync::Mutex::new(client)),
+            // application_encryption_key  : ::std::collections::HashMap::new()
         })
     }
 }
@@ -60,16 +63,16 @@ mod tests {
 
     #[test]
     pub fn register_account() {
+        let empty_spaces = "    ";
         let result = ::Launcher::register("test".to_string(), "1234".to_string(), "1234".to_string());
         assert!(result.is_ok());
         let result = ::Launcher::register("test".to_string(), "123".to_string(), "1234".to_string());
         assert!(result.is_err());
         let result = ::Launcher::register("test".to_string(), "123".to_string(), "123".to_string());
         assert!(result.is_err());
-        let result = ::Launcher::register("".to_string(), "123".to_string(), "123".to_string());
+        let result = ::Launcher::register("".to_string(), "1234".to_string(), "1234".to_string());
         assert!(result.is_err());
-        // 4 spaces
-        let result = ::Launcher::register("    ".to_string(), "    ".to_string(), "    ".to_string());
+        let result = ::Launcher::register(empty_spaces.to_string(), empty_spaces.to_string(), empty_spaces.to_string());
         assert!(result.is_err());
     }
 

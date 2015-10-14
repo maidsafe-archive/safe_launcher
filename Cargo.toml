@@ -15,12 +15,13 @@ crate_type = ["staticlib", "dylib", "rlib"]
 
 [dependencies]
 # ---- Maidsafe ----
-routing   = "0.4.*"
-safe_nfs  = "0.2.*"
-safe_dns  = "0.2.*"
-safe_core = "0.3.*"
+routing     = "0.4.*"
+safe_nfs    = "0.3.*"
+safe_dns    = "0.3.*"
+safe_core   = "0.3.*"
 
 # ---- Others ----
+log         = "*"
 sodiumoxide = "*"
 
 [dev-dependencies]
