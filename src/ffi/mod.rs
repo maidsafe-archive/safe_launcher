@@ -80,3 +80,66 @@ fn cast_from_launcher_ffi_handle(launcher_handle: *const ::libc::c_void) -> ::st
 
     launcher
 }
+
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use ::std::error::Error;
+
+    fn generate_random_cstring(len: usize) -> Result<::std::ffi::CString, ::ffi::errors::FfiError> {
+        let mut cstring_vec = eval_result!(::safe_core::utility::generate_random_vector::<u8>(len));
+        // Avoid internal nulls and ensure valid ASCII (thus valid utf8)
+        for it in cstring_vec.iter_mut() {
+            *it %= 128;
+            if *it == 0 {
+                *it += 1;
+            }
+        }
+
+        ::std::ffi::CString::new(cstring_vec).map_err(|error| ::ffi::errors::FfiError::from(error.description()))
+    }
+
+    #[test]
+    fn account_creation_and_login() {
+        let cstring_pin = eval_result!(generate_random_cstring(10));
+        let cstring_keyword = eval_result!(generate_random_cstring(10));
+        let cstring_password = eval_result!(generate_random_cstring(10));
+
+        {
+            let mut launcher_handle = 0 as *const ::libc::c_void;
+            assert_eq!(launcher_handle, 0 as *const ::libc::c_void);
+
+            {
+                let ptr_to_launcher_handle = &mut launcher_handle;
+
+                let _ = assert_eq!(create_account(cstring_keyword.as_ptr(),
+                                                  cstring_pin.as_ptr(),
+                                                  cstring_password.as_ptr(),
+                                                  ptr_to_launcher_handle),
+                                   0);
+            }
+
+            assert!(launcher_handle != 0 as *const ::libc::c_void);
+            drop_launcher(launcher_handle);
+        }
+
+        {
+            let mut launcher_handle = 0 as *const ::libc::c_void;
+            assert_eq!(launcher_handle, 0 as *const ::libc::c_void);
+
+            {
+                let ptr_to_launcher_handle = &mut launcher_handle;
+
+                let _ = assert_eq!(log_in(cstring_keyword.as_ptr(),
+                                          cstring_pin.as_ptr(),
+                                          cstring_password.as_ptr(),
+                                          ptr_to_launcher_handle),
+                                   0);
+            }
+
+            assert!(launcher_handle != 0 as *const ::libc::c_void);
+            drop_launcher(launcher_handle);
+        }
+    }
+}
