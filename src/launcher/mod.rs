@@ -17,6 +17,6 @@
 
 mod ipc_server;
 
-pub struct Launcher {
-    client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-}
+// pub struct Launcher {
+//     client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+// }

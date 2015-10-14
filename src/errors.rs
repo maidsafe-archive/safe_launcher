@@ -23,6 +23,8 @@ pub enum LauncherError {
     IpcListenerCouldNotBeBound,
     /// The Ipc Listener has errored out. New apps will no longer be able to connect to Launcher
     IpcListenerAborted(::std::io::Error),
+    /// mpsc receiver has hung up
+    ReceiverChannelDisconnected,
     /// Unexpected - Probably a Logic error
     Unexpected(String),
 }
