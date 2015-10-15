@@ -18,12 +18,11 @@
 const FFI_ERROR_START_RANGE: i32 = ::errors::LAUNCHER_ERROR_START_RANGE - 500;
 
 /// Errors during FFI operations
-#[allow(variant_size_differences)]
 pub enum FfiError {
     /// Errors from Safe Core
-    CoreError(::safe_core::errors::CoreError),
+    CoreError(Box<::safe_core::errors::CoreError>),
     /// Errors from Launcher
-    LauncherError(::errors::LauncherError),
+    LauncherError(Box<::errors::LauncherError>),
     /// Unexpected or some programming error
     Unexpected(String),
 }
@@ -40,13 +39,13 @@ impl ::std::fmt::Debug for FfiError {
 
 impl From<::errors::LauncherError> for FfiError {
     fn from(error: ::errors::LauncherError) -> FfiError {
-        FfiError::LauncherError(error)
+        FfiError::LauncherError(Box::new(error))
     }
 }
 
 impl From<::safe_core::errors::CoreError> for FfiError {
     fn from(error: ::safe_core::errors::CoreError) -> FfiError {
-        FfiError::CoreError(error)
+        FfiError::CoreError(Box::new(error))
     }
 }
 
@@ -59,8 +58,8 @@ impl<'a> From<&'a str> for FfiError {
 impl Into<i32> for FfiError {
     fn into(self) -> i32 {
         match self {
-            FfiError::CoreError(error)      => error.into(),
-            FfiError::LauncherError(error)  => error.into(),
+            FfiError::CoreError(error)      => (*error).into(),
+            FfiError::LauncherError(error)  => (*error).into(),
             FfiError::Unexpected(_)         => FFI_ERROR_START_RANGE - 1,
         }
     }
