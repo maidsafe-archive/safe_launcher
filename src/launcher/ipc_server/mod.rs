@@ -15,30 +15,36 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+pub type EventSenderToServer<EventSubset> = ::event_sender::EventSender<events::IpcServerEventCategory, EventSubset>;
+
+mod misc;
 mod events;
 mod ipc_session;
-mod event_sender;
 
-const LISTENER_PORT_RESET: u16 = 30000;
-const LISTENER_OCTATE_START: u8 = 9;
 const IPC_SERVER_THREAD_NAME: &'static str = "IpcServerThread";
 const IPC_LISTENER_THREAD_NAME: &'static str = "IpcListenerThread";
+const LISTENER_THIRD_OCTATE_START: u8 = 0;
+const LISTENER_FOURTH_OCTATE_START: u8 = 1;
 
 pub struct IpcServer {
-    client            : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-    _raii_joiner      : ::safe_core::utility::RAIIThreadJoiner,
-    session_event_rx  : ::std::sync::mpsc::Receiver<events::IpcSessionEvent>,
-    listener_event_rx : ::std::sync::mpsc::Receiver<events::IpcListenerEvent>,
-    external_event_rx : ::std::sync::mpsc::Receiver<events::ExternalEvent>,
-    event_catagory_rx : ::std::sync::mpsc::Receiver<events::IpcServerEventCategory>,
-    event_catagory_tx : ::std::sync::mpsc::Sender<events::IpcServerEventCategory>,
-    listener_endpoint : String,
-    listener_stop_flag: ::std::sync::Arc<::std::sync::atomic::AtomicBool>,
+    client               : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+    temp_id              : u32,
+    _raii_joiner         : ::safe_core::utility::RAIIThreadJoiner,
+    session_event_tx     : ::std::sync::mpsc::Sender<events::IpcSessionEvent>,
+    session_event_rx     : ::std::sync::mpsc::Receiver<events::IpcSessionEvent>,
+    listener_event_rx    : ::std::sync::mpsc::Receiver<events::IpcListenerEvent>,
+    external_event_rx    : ::std::sync::mpsc::Receiver<events::ExternalEvent>,
+    event_catagory_tx    : ::std::sync::mpsc::Sender<events::IpcServerEventCategory>,
+    listener_endpoint    : String,
+    listener_stop_flag   : ::std::sync::Arc<::std::sync::atomic::AtomicBool>,
+    verified_sessions    : ::std::collections::HashMap<::routing::NameType, misc::SessionInfo>,
+    unverified_sessions  : ::std::collections::HashMap<u32, misc::SessionInfo>,
+    pending_verifications: ::std::collections::HashMap<String, misc::AppInfo>,
 }
 
 impl IpcServer {
     pub fn new(client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>) -> Result<(::safe_core::utility::RAIIThreadJoiner,
-                                                                                                     event_sender::EventSender<events::ExternalEvent>),
+                                                                                                     EventSenderToServer<events::ExternalEvent>),
                                                                                                     ::errors::LauncherError> {
         let (session_event_tx, session_event_rx) = ::std::sync::mpsc::channel();
         let (listener_event_tx, listener_event_rx) = ::std::sync::mpsc::channel();
@@ -47,39 +53,46 @@ impl IpcServer {
 
         let stop_flag = ::std::sync::Arc::new(::std::sync::atomic::AtomicBool::new(false));
 
-        let listener_event_sender = event_sender::EventSender::<events::IpcListenerEvent>::new(listener_event_tx,
-                                                                                               events::IpcServerEventCategory::IpcListenerEvent,
-                                                                                               event_catagory_tx.clone());
+        let listener_event_sender = EventSenderToServer::<events::IpcListenerEvent>
+                                                       ::new(listener_event_tx,
+                                                             events::IpcServerEventCategory::IpcListenerEvent,
+                                                             event_catagory_tx.clone());
 
         let (joiner, endpoint) = try!(IpcServer::spawn_acceptor(listener_event_sender,
                                                                 stop_flag.clone()));
 
         let ipc_server = IpcServer {
-            client            : client,
-            _raii_joiner      : joiner,
-            session_event_rx  : session_event_rx,
-            listener_event_rx : listener_event_rx,
-            external_event_rx : external_event_rx,
-            event_catagory_rx : event_catagory_rx,
-            event_catagory_tx : event_catagory_tx.clone(),
-            listener_endpoint : endpoint,
-            listener_stop_flag: stop_flag,
+            client               : client,
+            temp_id              : 0,
+            _raii_joiner         : joiner,
+            session_event_tx     : session_event_tx,
+            session_event_rx     : session_event_rx,
+            listener_event_rx    : listener_event_rx,
+            external_event_rx    : external_event_rx,
+            event_catagory_tx    : event_catagory_tx.clone(),
+            listener_endpoint    : endpoint,
+            listener_stop_flag   : stop_flag,
+            verified_sessions    : ::std::collections::HashMap::new(),
+            unverified_sessions  : ::std::collections::HashMap::new(),
+            pending_verifications: ::std::collections::HashMap::new(),
         };
 
         let ipc_server_joiner = eval_result!(::std::thread::Builder::new().name(IPC_SERVER_THREAD_NAME.to_string())
                                                                           .spawn(move || {
-            IpcServer::activate_ipc_server(ipc_server);
+            IpcServer::activate_ipc_server(ipc_server, event_catagory_rx);
             debug!("Exiting Thread {:?}", IPC_SERVER_THREAD_NAME.to_string());
         }));
 
-        let external_event_sender = event_sender::EventSender::<events::ExternalEvent>::new(external_event_tx,
-                                                                                            events::IpcServerEventCategory::ExternalEvent,
-                                                                                            event_catagory_tx);
+        let external_event_sender = EventSenderToServer::<events::ExternalEvent>
+                                                       ::new(external_event_tx,
+                                                             events::IpcServerEventCategory::ExternalEvent,
+                                                             event_catagory_tx);
+
         Ok((::safe_core::utility::RAIIThreadJoiner::new(ipc_server_joiner), external_event_sender))
     }
 
-    fn activate_ipc_server(mut ipc_server: IpcServer) {
-        for event_category in ipc_server.event_catagory_rx.iter() {
+    fn activate_ipc_server(mut ipc_server: IpcServer, event_catagory_rx: ::std::sync::mpsc::Receiver<events::IpcServerEventCategory>) {
+        for event_category in event_catagory_rx.iter() {
             match event_category {
                 events::IpcServerEventCategory::IpcListenerEvent => {
                     if let Ok(listner_event) = ipc_server.listener_event_rx.try_recv() {
@@ -88,14 +101,15 @@ impl IpcServer {
                            events::IpcListenerEvent::SpawnIpcSession(tcp_stream) => ipc_server.on_spawn_ipc_session(tcp_stream),
                         }
                     }
-                }, // IpcListenerEvent
+                },
                 events::IpcServerEventCategory::IpcSessionEvent => {
                     if let Ok(session_event) = ipc_server.session_event_rx.try_recv() {
                         match session_event {
+                            events::IpcSessionEvent::VerifySession(temp_id, nonce) => ipc_server.on_verify_session(temp_id, nonce),
                             events::IpcSessionEvent::IpcSessionWriteFailed(app_id) => ipc_server.on_ipc_session_write_failed(app_id),
                         }
                     }
-                }, // IpcSessionEvent
+                },
                 events::IpcServerEventCategory::ExternalEvent => {
                     if let Ok(external_event) = ipc_server.external_event_rx.try_recv() {
                         match external_event {
@@ -104,17 +118,55 @@ impl IpcServer {
                             events::ExternalEvent::Terminate => break,
                         }
                     }
-                }, // ExternalEvent
+                },
             }
         }
     }
 
-    fn on_spawn_ipc_session(&self, ipc_stream: ::std::net::TcpStream) {
+    fn on_spawn_ipc_session(&mut self, ipc_stream: ::std::net::TcpStream) {
+        let event_sender = EventSenderToServer::<events::IpcSessionEvent>
+                                              ::new(self.session_event_tx.clone(),
+                                                    events::IpcServerEventCategory::IpcSessionEvent,
+                                                    self.event_catagory_tx.clone());
+        match ipc_session::IpcSession::new(event_sender,
+                                           self.temp_id,
+                                           ipc_stream) {
+            Ok((raii_joiner, event_sender)) => {
+                if let Some(_) = self.unverified_sessions.insert(self.temp_id,
+                                                                 misc::SessionInfo::new(raii_joiner,
+                                                                                        event_sender)) {
+                    debug!("Unverified session existed even after all temporary ids are exhausted. Terminating session ...");
+                }
+            },
+            Err(err) => debug!("IPC Session spawning failed for peer {:?}", err),
+        }
+        self.temp_id = self.temp_id.wrapping_add(1);
+    }
+
+    fn on_ipc_listener_aborted(&self, error_str: String) {
         ;
     }
 
-    fn on_ipc_listener_aborted(&self, error: ::std::io::Error) {
-        ;
+    fn on_verify_session(&mut self, temp_id: u32, nonce: String) {
+        match (self.unverified_sessions.remove(&temp_id), self.pending_verifications.remove(&nonce)) {
+            (Some(session_info), Some(app_info)) => {
+                let app_detail = Box::new(ipc_session::events::event_data::AppDetail {
+                    client: self.client.clone(),
+                    app_id: app_info.app_id.clone(),
+                    safe_drive_access: app_info.safe_drive_access,
+                });
+
+                let event_sender = session_info.event_sender.clone();
+
+                if session_info.event_sender.send(ipc_session::events::ExternalEvent::AppDetailReceived(app_detail)).is_err() {
+                    debug!("Unable to communicate with the session via channel. Session will be terminated.");
+                } else if let Some(_) = self.verified_sessions.insert(app_info.app_id, session_info) {
+                    debug!("Detected an attempt by an app to connect twice. Previous instance will be terminated.");
+                }
+            },
+            _ => debug!("Temp Id {:?} and/or Nonce {:?} invalid. Possible security breach - situation salvaged.",
+                        temp_id, nonce),
+        }
     }
 
     fn on_ipc_session_write_failed(&self, app_id: Option<::routing::NameType>) {
@@ -131,19 +183,18 @@ impl IpcServer {
         }
     }
 
-    fn spawn_acceptor(event_sender: event_sender::EventSender<events::IpcListenerEvent>,
+    fn spawn_acceptor(event_sender: EventSenderToServer<events::IpcListenerEvent>,
                       stop_flag   : ::std::sync::Arc<::std::sync::atomic::AtomicBool>) -> Result<(::safe_core::utility::RAIIThreadJoiner,
                                                                                                   String),
                                                                                                  ::errors::LauncherError> {
-        let mut port = LISTENER_PORT_RESET;
-        let mut third_octate = LISTENER_OCTATE_START;
-        let mut fourth_octate = LISTENER_OCTATE_START;
+        let mut third_octate = LISTENER_THIRD_OCTATE_START;
+        let mut fourth_octate = LISTENER_FOURTH_OCTATE_START;
 
         let ipc_listener;
 
         loop {
             let local_ip = ::std::net::Ipv4Addr::new(127, 0, third_octate, fourth_octate);
-            let local_endpoint = (local_ip, port);
+            let local_endpoint = (local_ip, 0);
             
             match ::std::net::TcpListener::bind(local_endpoint) {
                 Ok(listener) => {
@@ -151,27 +202,24 @@ impl IpcServer {
                     break;
                 },
                 Err(err) => {
-                    debug!("Failed binding IPC Server: {:?}", err);
+                    debug!("Failed binding IPC Server on 127.0.{}.{} with error {:?}. Trying net IP...",
+                           third_octate, fourth_octate, err);
 
-                    if port == 65535 {
-                        if fourth_octate == 255 {
-                            if third_octate == 255 {
-                                return Err(::errors::LauncherError::IpcListenerCouldNotBeBound)
-                            } else {
-                                third_octate += 1;
-                                fourth_octate = 0;
-                            }
+                    if fourth_octate == 255 {
+                        if third_octate == 255 {
+                            return Err(::errors::LauncherError::IpcListenerCouldNotBeBound)
                         } else {
-                            fourth_octate += 1;
+                            third_octate += 1;
+                            fourth_octate = LISTENER_FOURTH_OCTATE_START;
                         }
-
-                        port = LISTENER_PORT_RESET;
                     } else {
-                        port += 1;
+                        fourth_octate += 1;
                     }
-                }
+                },
             }
         }
+
+        let local_endpoint = format!("{}", eval_result!(ipc_listener.local_addr()));
 
         let joiner = eval_result!(::std::thread::Builder::new().name(IPC_LISTENER_THREAD_NAME.to_string())
                                                                .spawn(move || {
@@ -182,17 +230,11 @@ impl IpcServer {
             debug!("Exiting Thread {:?}", IPC_LISTENER_THREAD_NAME.to_string());
         }));
 
-        let ep_string = format!("{}.{}.{}.{}:{}", 127u8.to_string(),
-                                                  0u8.to_string(),
-                                                  third_octate.to_string(),
-                                                  fourth_octate.to_string(),
-                                                  port.to_string());
-
-        Ok((::safe_core::utility::RAIIThreadJoiner::new(joiner), ep_string))
+        Ok((::safe_core::utility::RAIIThreadJoiner::new(joiner), local_endpoint))
     }
 
     fn handle_accept(ipc_listener: ::std::net::TcpListener,
-                     event_sender: event_sender::EventSender<events::IpcListenerEvent>,
+                     event_sender: EventSenderToServer<events::IpcListenerEvent>,
                      stop_flag   : ::std::sync::Arc<::std::sync::atomic::AtomicBool>) {
         loop  {
             match ipc_listener.accept() {
@@ -207,7 +249,7 @@ impl IpcServer {
                 },
                 Err(accept_error) => {
                     debug!("IPC Listener aborted !!");
-                    let _ = event_sender.send(events::IpcListenerEvent::IpcListenerAborted(accept_error));
+                    let _ = event_sender.send(events::IpcListenerEvent::IpcListenerAborted(format!("{:?}", accept_error)));
                     break;
                 },
             }

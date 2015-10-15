@@ -15,22 +15,18 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-mod ipc_server;
-mod app_handler;
-
-/// Launcher exposes API for managing applications
-#[derive(Clone)]
-pub struct Launcher {
-    client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+pub struct AuthenticateApp {
+    ipc_stream: ::std::net::TcpStream,
 }
 
-impl Launcher {
-
-    /// Creates a new Launcher instance
-    pub fn new(client: ::safe_core::client::Client) -> Launcher {
-        Launcher {
-            client: ::std::sync::Arc::new(::std::sync::Mutex::new(engine)),
+impl AuthenticateApp {
+    pub fn new(ipc_stream: ::std::net::TcpStream) -> AuthenticateApp {
+        AuthenticateApp {
+            ipc_stream: ipc_stream,
         }
     }
 
+    pub fn authenticate(&self) -> String {
+        unimplemented!()
+    }
 }
