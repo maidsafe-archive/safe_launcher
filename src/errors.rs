@@ -76,9 +76,9 @@ impl ::std::fmt::Debug for LauncherError {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         match *self {
             LauncherError::CoreError(ref error)            => write!(f, "LauncherError::CoreError -> {:?}", error),
-            LauncherError::EmptyKeyword                     => write!(f, "LauncherError::EmptyKeyword -> Keyword cannot be empty"),
-            LauncherError::EmptyPassword                    => write!(f, "LauncherError::EmptyPassword -> Password cannot be empty"),
-            LauncherError::InvalidPin                       => write!(f, "LauncherError::InvalidPin -> PinNumber must be 4 digits"),
+            LauncherError::EmptyKeyword                    => write!(f, "LauncherError::EmptyKeyword -> Keyword cannot be empty"),
+            LauncherError::EmptyPassword                   => write!(f, "LauncherError::EmptyPassword -> Password cannot be empty"),
+            LauncherError::InvalidPin                      => write!(f, "LauncherError::InvalidPin -> PinNumber must be 4 digits"),
             LauncherError::IpcListenerCouldNotBeBound      => write!(f, "LauncherError::IpcListenerCouldNotBeBound"),
             LauncherError::IpcListenerAborted(ref error)   => write!(f, "LauncherError::IpcListenerAborted -> {:?}", error),
             LauncherError::IpcStreamCloneError(ref error)  => write!(f, "LauncherError::IpcStreamCloneError -> {:?}", error),
