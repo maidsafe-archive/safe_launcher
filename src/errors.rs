@@ -31,6 +31,8 @@ pub enum LauncherError {
     IpcListenerAborted(::std::io::Error),
     /// The Ipc Stream could not be cloned
     IpcStreamCloneError(::std::io::Error),
+    /// Errors from safe_nfs
+    NfsError(Box<::safe_nfs::errors::NfsError>),
     /// mpsc receiver has hung up
     ReceiverChannelDisconnected,
     /// Unexpected - Probably a Logic error
@@ -49,16 +51,22 @@ impl From<::safe_core::errors::CoreError> for LauncherError {
     }
 }
 
+impl From<::safe_nfs::errors::NfsError> for LauncherError {
+    fn from(error: ::safe_nfs::errors::NfsError) -> LauncherError {
+        LauncherError::NfsError(Box::new(error))
+    }
+}
 
 impl Into<i32> for LauncherError {
     fn into(self) -> i32 {
         match self {
-            LauncherError::CoreError(ref error)            => LAUNCHER_ERROR_START_RANGE - 1,
-            LauncherError::IpcListenerCouldNotBeBound      => LAUNCHER_ERROR_START_RANGE - 2,
-            LauncherError::IpcListenerAborted(ref error)   => LAUNCHER_ERROR_START_RANGE - 3,
-            LauncherError::IpcStreamCloneError(ref error)  => LAUNCHER_ERROR_START_RANGE - 4,
-            LauncherError::ReceiverChannelDisconnected     => LAUNCHER_ERROR_START_RANGE - 5,
-            LauncherError::Unexpected(ref error)           => LAUNCHER_ERROR_START_RANGE - 6,
+            LauncherError::CoreError(ref error)             => LAUNCHER_ERROR_START_RANGE - 1,
+            LauncherError::IpcListenerCouldNotBeBound       => LAUNCHER_ERROR_START_RANGE - 2,
+            LauncherError::IpcListenerAborted(ref error)    => LAUNCHER_ERROR_START_RANGE - 3,
+            LauncherError::IpcStreamCloneError(ref error)   => LAUNCHER_ERROR_START_RANGE - 4,
+            LauncherError::NfsError(ref error)              => LAUNCHER_ERROR_START_RANGE - 5,
+            LauncherError::ReceiverChannelDisconnected      => LAUNCHER_ERROR_START_RANGE - 6,
+            LauncherError::Unexpected(ref error)            => LAUNCHER_ERROR_START_RANGE - 7,
         }
     }
 }
@@ -66,12 +74,13 @@ impl Into<i32> for LauncherError {
 impl ::std::fmt::Debug for LauncherError {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         match *self {
-            LauncherError::CoreError(ref error)            => write!(f, "LauncherError::CoreError -> {:?}", error),            
-            LauncherError::IpcListenerCouldNotBeBound      => write!(f, "LauncherError::IpcListenerCouldNotBeBound"),
-            LauncherError::IpcListenerAborted(ref error)   => write!(f, "LauncherError::IpcListenerAborted -> {:?}", error),
-            LauncherError::IpcStreamCloneError(ref error)  => write!(f, "LauncherError::IpcStreamCloneError -> {:?}", error),
-            LauncherError::ReceiverChannelDisconnected     => write!(f, "LauncherError::ReceiverChannelDisconnected"),
-            LauncherError::Unexpected(ref error)           => write!(f, "LauncherError::Unexpected{{{:?}}}", error),
+            LauncherError::CoreError(ref error)             => write!(f, "LauncherError::CoreError -> {:?}", error),
+            LauncherError::IpcListenerCouldNotBeBound       => write!(f, "LauncherError::IpcListenerCouldNotBeBound"),
+            LauncherError::IpcListenerAborted(ref error)    => write!(f, "LauncherError::IpcListenerAborted -> {:?}", error),
+            LauncherError::IpcStreamCloneError(ref error)   => write!(f, "LauncherError::IpcStreamCloneError -> {:?}", error),
+            LauncherError::NfsError(ref error)              => write!(f, "LauncherError::NfsError -> {:?}", error),
+            LauncherError::ReceiverChannelDisconnected      => write!(f, "LauncherError::ReceiverChannelDisconnected"),
+            LauncherError::Unexpected(ref error)            => write!(f, "LauncherError::Unexpected{{{:?}}}", error),
         }
     }
 }

@@ -42,7 +42,7 @@
 extern crate libc;
 extern crate routing;
 extern crate safe_dns;
-// extern crate safe_nfs;
+extern crate safe_nfs;
 // extern crate sodiumoxide;
 #[macro_use] extern crate log;
 #[macro_use] extern crate safe_core;
@@ -55,3 +55,5 @@ pub mod ffi;
 pub mod errors;
 /// The main launcher module
 pub mod launcher;
+/// Configurable Constant values are defined in configuration.
+pub mod configuration;

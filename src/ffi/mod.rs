@@ -31,7 +31,7 @@ pub extern fn create_account(c_keyword      : *const ::libc::c_char,
     let client = ffi_try!(::safe_core::client::Client::create_account(ffi_try!(implementation::c_char_ptr_to_string(c_keyword)),
                                                                       ffi_try!(implementation::c_char_ptr_to_string(c_pin)),
                                                                       ffi_try!(implementation::c_char_ptr_to_string(c_password))));
-    let launcher = ::launcher::Launcher::new(client);
+    let launcher = ffi_try!(::launcher::Launcher::new(client));
     unsafe { *launcher_handle = cast_to_launcher_ffi_handle(launcher); }
 
     0
@@ -50,7 +50,7 @@ pub extern fn log_in(c_keyword      : *const ::libc::c_char,
     let client = ffi_try!(::safe_core::client::Client::log_in(ffi_try!(implementation::c_char_ptr_to_string(c_keyword)),
                                                               ffi_try!(implementation::c_char_ptr_to_string(c_pin)),
                                                               ffi_try!(implementation::c_char_ptr_to_string(c_password))));
-    let launcher = ::launcher::Launcher::new(client);
+    let launcher = ffi_try!(::launcher::Launcher::new(client));
     unsafe { *launcher_handle = cast_to_launcher_ffi_handle(launcher); }
 
     0
