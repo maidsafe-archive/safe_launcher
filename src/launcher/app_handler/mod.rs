@@ -106,6 +106,7 @@ impl AppHandler {
 
         let mut tokens: Vec<String> = app_detail.absolute_path
                                                 .split(|element| element == '/')
+                                                .filter(|token| token.len() != 0)
                                                 .map(|token| token.to_string())
                                                 .collect();
 
