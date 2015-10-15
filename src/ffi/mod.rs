@@ -28,9 +28,10 @@ pub extern fn create_account(c_keyword      : *const ::libc::c_char,
                              c_pin          : *const ::libc::c_char,
                              c_password     : *const ::libc::c_char,
                              launcher_handle: *mut *const ::libc::c_void) -> ::libc::int32_t {
-    let launcher = ffi_try!(::launcher::Launcher::create_account(ffi_try!(implementation::c_char_ptr_to_string(c_keyword)),
-                                                                 ffi_try!(implementation::c_char_ptr_to_string(c_pin)),
-                                                                 ffi_try!(implementation::c_char_ptr_to_string(c_password))));
+    let client = ffi_try!(::safe_core::client::Client::create_account(ffi_try!(implementation::c_char_ptr_to_string(c_keyword)),
+                                                                      ffi_try!(implementation::c_char_ptr_to_string(c_pin)),
+                                                                      ffi_try!(implementation::c_char_ptr_to_string(c_password))));
+    let launcher = ::launcher::Launcher::new(client);
     unsafe { *launcher_handle = cast_to_launcher_ffi_handle(launcher); }
 
     0
@@ -46,9 +47,10 @@ pub extern fn log_in(c_keyword      : *const ::libc::c_char,
                      c_pin          : *const ::libc::c_char,
                      c_password     : *const ::libc::c_char,
                      launcher_handle: *mut *const ::libc::c_void) -> ::libc::int32_t {
-    let launcher = ffi_try!(::launcher::Launcher::log_in(ffi_try!(implementation::c_char_ptr_to_string(c_keyword)),
-                                                         ffi_try!(implementation::c_char_ptr_to_string(c_pin)),
-                                                         ffi_try!(implementation::c_char_ptr_to_string(c_password))));
+    let client = ffi_try!(::safe_core::client::Client::log_in(ffi_try!(implementation::c_char_ptr_to_string(c_keyword)),
+                                                              ffi_try!(implementation::c_char_ptr_to_string(c_pin)),
+                                                              ffi_try!(implementation::c_char_ptr_to_string(c_password))));
+    let launcher = ::launcher::Launcher::new(client);
     unsafe { *launcher_handle = cast_to_launcher_ffi_handle(launcher); }
 
     0
@@ -60,18 +62,18 @@ pub extern fn log_in(c_keyword      : *const ::libc::c_char,
 #[no_mangle]
 #[allow(unsafe_code)]
 pub extern fn drop_launcher(launcher_handle: *const ::libc::c_void) {
-    let _ = unsafe { ::std::mem::transmute::<_, Box<::std::sync::Arc<::std::sync::Mutex<::launcher::Launcher>>>>(launcher_handle) };
+    let _ = unsafe { ::std::mem::transmute::<_, Box<::launcher::Launcher>>(launcher_handle) };
 }
 
 #[allow(unsafe_code)]
 fn cast_to_launcher_ffi_handle(launcher: ::launcher::Launcher) -> *const ::libc::c_void {
-    let boxed_launcher = Box::new(::std::sync::Arc::new(::std::sync::Mutex::new(launcher)));
+    let boxed_launcher = Box::new(launcher);
     unsafe { ::std::mem::transmute(boxed_launcher) }
 }
 
 #[allow(unsafe_code)]
-fn cast_from_launcher_ffi_handle(launcher_handle: *const ::libc::c_void) -> ::std::sync::Arc<::std::sync::Mutex<::launcher::Launcher>> {
-    let boxed_launcher: Box<::std::sync::Arc<::std::sync::Mutex<::launcher::Launcher>>> = unsafe {
+fn cast_from_launcher_ffi_handle(launcher_handle: *const ::libc::c_void) -> ::launcher::Launcher {
+    let boxed_launcher: Box<::launcher::Launcher> = unsafe {
         ::std::mem::transmute(launcher_handle)
     };
 

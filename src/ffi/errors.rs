@@ -15,10 +15,13 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-const FFI_ERROR_START_RANGE: i32 = ::safe_dns::errors::DNS_ERROR_START_RANGE - 500;
+const FFI_ERROR_START_RANGE: i32 = ::errors::LAUNCHER_ERROR_START_RANGE - 500;
 
 /// Errors during FFI operations
+#[allow(variant_size_differences)]
 pub enum FfiError {
+    /// Errors from Safe Core
+    CoreError(::safe_core::errors::CoreError),
     /// Errors from Launcher
     LauncherError(::errors::LauncherError),
     /// Unexpected or some programming error
@@ -28,6 +31,7 @@ pub enum FfiError {
 impl ::std::fmt::Debug for FfiError {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         match *self {
+            FfiError::CoreError(ref error)      => write!(f, "FfiError::CoreError -> {:?}", error),
             FfiError::LauncherError(ref error)  => write!(f, "FfiError::LauncherError -> {:?}", error),
             FfiError::Unexpected(ref error)     => write!(f, "FfiError::Unexpected::{{{:?}}}", error),
         }
@@ -40,6 +44,12 @@ impl From<::errors::LauncherError> for FfiError {
     }
 }
 
+impl From<::safe_core::errors::CoreError> for FfiError {
+    fn from(error: ::safe_core::errors::CoreError) -> FfiError {
+        FfiError::CoreError(error)
+    }
+}
+
 impl<'a> From<&'a str> for FfiError {
     fn from(error: &'a str) -> FfiError {
         FfiError::Unexpected(error.to_string())
@@ -49,6 +59,7 @@ impl<'a> From<&'a str> for FfiError {
 impl Into<i32> for FfiError {
     fn into(self) -> i32 {
         match self {
+            FfiError::CoreError(error)      => error.into(),
             FfiError::LauncherError(error)  => error.into(),
             FfiError::Unexpected(_)         => FFI_ERROR_START_RANGE - 1,
         }

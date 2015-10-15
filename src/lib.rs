@@ -43,7 +43,7 @@ extern crate libc;
 extern crate routing;
 extern crate safe_dns;
 // extern crate safe_nfs;
-extern crate sodiumoxide;
+// extern crate sodiumoxide;
 #[macro_use] extern crate log;
 #[macro_use] extern crate safe_core;
 

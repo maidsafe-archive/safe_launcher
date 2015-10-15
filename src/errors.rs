@@ -15,7 +15,9 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-const LAUNCHER_ERROR_START_RANGE: i32 = ::safe_dns::errors::DNS_ERROR_START_RANGE - 200;
+/// Intended for converting Launcher Errors into numeric codes for propagating some error information
+/// across FFI boundaries and specially to C.
+pub const LAUNCHER_ERROR_START_RANGE: i32 = ::safe_dns::errors::DNS_ERROR_START_RANGE - 500;
 
 /// Launcher Errors
 #[allow(variant_size_differences)]
