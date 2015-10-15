@@ -21,7 +21,6 @@ mod misc;
 mod events;
 mod ipc_session;
 
-const LISTENER_PORT_RESET: u16 = 30000;
 const IPC_SERVER_THREAD_NAME: &'static str = "IpcServerThread";
 const IPC_LISTENER_THREAD_NAME: &'static str = "IpcListenerThread";
 const LISTENER_THIRD_OCTATE_START: u8 = 0;
@@ -188,7 +187,6 @@ impl IpcServer {
                       stop_flag   : ::std::sync::Arc<::std::sync::atomic::AtomicBool>) -> Result<(::safe_core::utility::RAIIThreadJoiner,
                                                                                                   String),
                                                                                                  ::errors::LauncherError> {
-        let mut port = LISTENER_PORT_RESET;
         let mut third_octate = LISTENER_THIRD_OCTATE_START;
         let mut fourth_octate = LISTENER_FOURTH_OCTATE_START;
 
@@ -196,7 +194,7 @@ impl IpcServer {
 
         loop {
             let local_ip = ::std::net::Ipv4Addr::new(127, 0, third_octate, fourth_octate);
-            let local_endpoint = (local_ip, port);
+            let local_endpoint = (local_ip, 0);
             
             match ::std::net::TcpListener::bind(local_endpoint) {
                 Ok(listener) => {
@@ -204,27 +202,24 @@ impl IpcServer {
                     break;
                 },
                 Err(err) => {
-                    debug!("Failed binding IPC Server: {:?}", err);
+                    debug!("Failed binding IPC Server on 127.0.{}.{} with error {:?}. Trying net IP...",
+                           third_octate, fourth_octate, err);
 
-                    if port == 65535 {
-                        if fourth_octate == 255 {
-                            if third_octate == 255 {
-                                return Err(::errors::LauncherError::IpcListenerCouldNotBeBound)
-                            } else {
-                                third_octate += 1;
-                                fourth_octate = LISTENER_FOURTH_OCTATE_START;
-                            }
+                    if fourth_octate == 255 {
+                        if third_octate == 255 {
+                            return Err(::errors::LauncherError::IpcListenerCouldNotBeBound)
                         } else {
-                            fourth_octate += 1;
+                            third_octate += 1;
+                            fourth_octate = LISTENER_FOURTH_OCTATE_START;
                         }
-
-                        port = LISTENER_PORT_RESET;
                     } else {
-                        port += 1;
+                        fourth_octate += 1;
                     }
-                }
+                },
             }
         }
+
+        let local_endpoint = format!("{}", eval_result!(ipc_listener.local_addr()));
 
         let joiner = eval_result!(::std::thread::Builder::new().name(IPC_LISTENER_THREAD_NAME.to_string())
                                                                .spawn(move || {
@@ -235,13 +230,7 @@ impl IpcServer {
             debug!("Exiting Thread {:?}", IPC_LISTENER_THREAD_NAME.to_string());
         }));
 
-        let ep_string = format!("{}.{}.{}.{}:{}", 127u8.to_string(),
-                                                  0u8.to_string(),
-                                                  third_octate.to_string(),
-                                                  fourth_octate.to_string(),
-                                                  port.to_string());
-
-        Ok((::safe_core::utility::RAIIThreadJoiner::new(joiner), ep_string))
+        Ok((::safe_core::utility::RAIIThreadJoiner::new(joiner), local_endpoint))
     }
 
     fn handle_accept(ipc_listener: ::std::net::TcpListener,
