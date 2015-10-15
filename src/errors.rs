@@ -20,7 +20,6 @@
 pub const LAUNCHER_ERROR_START_RANGE: i32 = ::safe_dns::errors::DNS_ERROR_START_RANGE - 500;
 
 /// Launcher Errors
-#[allow(variant_size_differences)]
 pub enum LauncherError {
     /// Error from safe_core. Boxed to hold a pointer instead of value so that this enum variant is
     /// not insanely bigger than others.
@@ -66,7 +65,7 @@ impl Into<i32> for LauncherError {
 impl ::std::fmt::Debug for LauncherError {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         match *self {
-            LauncherError::CoreError(ref error)            => write!(f, "LauncherError::CoreError -> {:?}", error),            
+            LauncherError::CoreError(ref error)            => write!(f, "LauncherError::CoreError -> {:?}", error),
             LauncherError::IpcListenerCouldNotBeBound      => write!(f, "LauncherError::IpcListenerCouldNotBeBound"),
             LauncherError::IpcListenerAborted(ref error)   => write!(f, "LauncherError::IpcListenerAborted -> {:?}", error),
             LauncherError::IpcStreamCloneError(ref error)  => write!(f, "LauncherError::IpcStreamCloneError -> {:?}", error),

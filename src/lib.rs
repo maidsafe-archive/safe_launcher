@@ -48,6 +48,11 @@ extern crate sodiumoxide;
 #[macro_use] extern crate log;
 #[macro_use] extern crate safe_core;
 
+#[macro_use] mod macros;
+
 mod errors;
 mod launcher;
 mod event_sender;
+
+/// FFI interface
+pub mod ffi;
