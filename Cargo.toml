@@ -21,8 +21,9 @@ safe_dns    = "0.3.*"
 safe_core   = "0.3.*"
 
 # ---- Others ----
-log         = "*"
-sodiumoxide = "*"
+log             = "*"
+sodiumoxide     = "*"
+rustc-serialize = "*"
 
 [dev-dependencies]
 env_logger = "*"
