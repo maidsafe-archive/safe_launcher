@@ -17,13 +17,43 @@
 
 pub struct SessionInfo {
     pub _raii_joiner: ::safe_core::utility::RAIIThreadJoiner,
-    pub event_sender: ::event_sender::EventSender<::launcher::ipc_server::ipc_session
-                                                            ::events::IpcSessionEventCategory,
-                                                  ::launcher::ipc_server::ipc_session
-                                                            ::events::ExternalEvent>,
+    pub event_sender: ::launcher
+                      ::ipc_server
+                      ::ipc_session::EventSenderToSession<::launcher::ipc_server::ipc_session
+                                                          ::events::ExternalEvent>,
+}
+
+impl SessionInfo {
+    pub fn new(raii_joiner : ::safe_core::utility::RAIIThreadJoiner,
+               event_sender: ::launcher::ipc_server
+                                       ::ipc_session
+                                       ::EventSenderToSession<::launcher::ipc_server::ipc_session
+                                                              ::events::ExternalEvent>) -> SessionInfo {
+        SessionInfo {
+            _raii_joiner: raii_joiner,
+            event_sender: event_sender,
+        }
+    }
+}
+
+impl Drop for SessionInfo {
+    fn drop(&mut self) {
+        if let Err(err) = self.event_sender.send(::launcher::ipc_server::ipc_session::events::ExternalEvent::Terminate) {
+            debug!("Failed to send terminate event to session {:?}", err);
+        }
+    }
 }
 
 pub struct AppInfo {
     pub app_id           : ::routing::NameType,
     pub safe_drive_access: bool,
+}
+
+impl AppInfo {
+    pub fn new(app_id: ::routing::NameType, safe_drive_access: bool) -> AppInfo {
+        AppInfo {
+            app_id           : app_id,
+            safe_drive_access: safe_drive_access,
+        }
+    }
 }

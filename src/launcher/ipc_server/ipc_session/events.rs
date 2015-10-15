@@ -23,31 +23,53 @@ pub enum IpcSessionEventCategory {
     ExternalEvent,
 }
 
+// --------------------------------------------------------------------------------------
+
+#[derive(Clone, Debug)]
 pub enum AppAuthenticationEvent {
     ReceivedNonce(String),
     Failed,
 }
 
+// --------------------------------------------------------------------------------------
+
+#[derive(Clone, Debug)]
 pub enum RsaKeyExchangeEvent {
     SymmetricCipher(Box<(::sodiumoxide::crypto::secretbox::Key,
                          ::sodiumoxide::crypto::secretbox::Nonce)>),
     Failed,
 }
 
+// --------------------------------------------------------------------------------------
+
+#[derive(Clone, Debug)]
 pub enum SecureCommunicationEvent {
     PlaceHolder, // TODO
 }
 
+// --------------------------------------------------------------------------------------
+
+#[derive(Clone, Debug)]
 pub enum ExternalEvent {
     AppDetailReceived(Box<event_data::AppDetail>),
     ChangeSafeDriveAccess(bool),
     Terminate,
 }
 
+// --------------------------------------------------------------------------------------
+
 pub mod event_data {
+    #[derive(Clone)]
     pub struct AppDetail {
         pub client           : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
         pub app_id           : ::routing::NameType,
         pub safe_drive_access: bool,
+    }
+
+    impl ::std::fmt::Debug for AppDetail {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+            write!(f, "AppDetail {{ client: Arc<Mutex<Client>>, app_id: {:?}, safe_drive_access: {:?}, }}",
+                   self.app_id, self.safe_drive_access)
+        }
     }
 }

@@ -15,13 +15,15 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+#[derive(Clone)]
 pub struct EventSender<Category, EventSubset> {
     event_tx         : ::std::sync::mpsc::Sender<EventSubset>,
     event_category   : Category,
     event_category_tx: ::std::sync::mpsc::Sender<Category>,
 }
 
-impl<Category: ::std::fmt::Debug + Clone, EventSubset> EventSender<Category, EventSubset> {
+impl<Category   : ::std::fmt::Debug + Clone,
+     EventSubset: ::std::fmt::Debug + Clone> EventSender<Category, EventSubset> {
     pub fn new(event_tx         : ::std::sync::mpsc::Sender<EventSubset>,
                event_category   : Category,
                event_category_tx: ::std::sync::mpsc::Sender<Category>) -> EventSender<Category, EventSubset> {
@@ -34,11 +36,11 @@ impl<Category: ::std::fmt::Debug + Clone, EventSubset> EventSender<Category, Eve
 
     pub fn send(&self, event: EventSubset) -> Result<(), ::errors::LauncherError> {
         if let Err(error) = self.event_tx.send(event) {
-            debug!("Unable to send event: {:?}", error);
+            debug!("Error {:?} sending event {:?}", error, error.0);
             return Err(::errors::LauncherError::ReceiverChannelDisconnected)
         }
         if let Err(error) = self.event_category_tx.send(self.event_category.clone()) {
-            debug!("Unable to send event {:?} :: Error: {:?}", self.event_category, error);
+            debug!("Error {:?} sending event {:?}", error, error.0);
             return Err(::errors::LauncherError::ReceiverChannelDisconnected)
         }
 

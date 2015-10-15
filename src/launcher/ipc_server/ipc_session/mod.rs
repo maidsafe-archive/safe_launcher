@@ -17,6 +17,8 @@
 
 pub mod events;
 
+pub type EventSenderToSession<EventSubset> = ::event_sender::EventSender<events::IpcSessionEventCategory, EventSubset>;
+
 mod authenticate_app;
 mod rsa_key_exchange;
 mod secure_communication;
@@ -38,17 +40,14 @@ pub struct IpcSession {
     key_exchange_event_rx  : ::std::sync::mpsc::Receiver<events::RsaKeyExchangeEvent>,
     key_exchange_event_tx  : ::std::sync::mpsc::Sender<events::RsaKeyExchangeEvent>,
     authentication_event_rx: ::std::sync::mpsc::Receiver<events::AppAuthenticationEvent>,
-    ipc_server_event_sender: ::event_sender::EventSender<::launcher::ipc_server::events::IpcServerEventCategory,
-                                                         ::launcher::ipc_server::events::IpcSessionEvent>,
+    ipc_server_event_sender: ::launcher::ipc_server::EventSenderToServer<::launcher::ipc_server::events::IpcSessionEvent>,
 }
 
 impl IpcSession {
-    pub fn new(server_event_sender: ::event_sender::EventSender<::launcher::ipc_server::events::IpcServerEventCategory,
-                                                         ::launcher::ipc_server::events::IpcSessionEvent>,
+    pub fn new(server_event_sender: ::launcher::ipc_server::EventSenderToServer<::launcher::ipc_server::events::IpcSessionEvent>,
                temp_id            : u32,
                ipc_stream         : ::std::net::TcpStream) -> Result<(::safe_core::utility::RAIIThreadJoiner,
-                                                                      ::event_sender::EventSender<events::IpcSessionEventCategory,
-                                                                                                  events::ExternalEvent>),
+                                                                      EventSenderToSession<events::ExternalEvent>),
                                                                      ::errors::LauncherError> {
         let (event_catagory_tx, event_catagory_rx) = ::std::sync::mpsc::channel();
         let (external_event_tx, external_event_rx) = ::std::sync::mpsc::channel();
@@ -56,12 +55,10 @@ impl IpcSession {
         let (key_exchange_event_tx, key_exchange_event_rx) = ::std::sync::mpsc::channel();
         let (authentication_event_tx, authentication_event_rx) = ::std::sync::mpsc::channel();
 
-        let authentication_event_sender = ::event_sender
-                                          ::EventSender
-                                          ::<events::IpcSessionEventCategory, events::AppAuthenticationEvent>
-                                          ::new(authentication_event_tx,
-                                                events::IpcSessionEventCategory::AppAuthenticationEvent,
-                                                event_catagory_tx.clone());
+        let authentication_event_sender = EventSenderToSession::<events::AppAuthenticationEvent>
+                                                              ::new(authentication_event_tx,
+                                                                    events::IpcSessionEventCategory::AppAuthenticationEvent,
+                                                                    event_catagory_tx.clone());
 
         let joiner = authenticate_app::verify_launcher_nonce(try!(ipc_stream.try_clone()
                                                                             .map_err(|err| ::errors
@@ -92,12 +89,10 @@ impl IpcSession {
             debug!("Exiting Thread {:?}", IPC_SESSION_THREAD_NAME.to_string());
         }));
 
-        let external_event_sender = ::event_sender
-                                    ::EventSender
-                                    ::<events::IpcSessionEventCategory, events::ExternalEvent>
-                                    ::new(external_event_tx,
-                                          events::IpcSessionEventCategory::ExternalEvent,
-                                          event_catagory_tx);
+        let external_event_sender = EventSenderToSession::<events::ExternalEvent>
+                                                        ::new(external_event_tx,
+                                                              events::IpcSessionEventCategory::ExternalEvent,
+                                                              event_catagory_tx);
 
         Ok((::safe_core::utility::RAIIThreadJoiner::new(ipc_session_joiner), external_event_sender))
     }

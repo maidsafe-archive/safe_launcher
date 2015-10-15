@@ -18,15 +18,11 @@
 const NONCE_VERIFIER_THREAD_NAME: &'static str = "LauncherNonceVerifierThread";
 
 pub fn verify_launcher_nonce(ipc_stream  : ::std::net::TcpStream,
-                             event_sender: ::event_sender
-                                           ::EventSender<::launcher::ipc_server::ipc_session
-                                                                               ::events
-                                                                               ::IpcSessionEventCategory,
-                                                         ::launcher::ipc_server::ipc_session
-                                                                               ::events
-                                                                               ::AppAuthenticationEvent>) -> ::safe_core
-                                                                                                             ::utility
-                                                                                                             ::RAIIThreadJoiner {
+                             event_sender: ::launcher::ipc_server::ipc_session
+                                           ::EventSenderToSession<::launcher::ipc_server::ipc_session
+                                                                  ::events::AppAuthenticationEvent>) -> ::safe_core
+                                                                                                        ::utility
+                                                                                                        ::RAIIThreadJoiner {
     let joiner = eval_result!(::std::thread::Builder::new().name(NONCE_VERIFIER_THREAD_NAME.to_string())
                                                        .spawn(move || {
         let nonce = "TemporaryCode".to_string();

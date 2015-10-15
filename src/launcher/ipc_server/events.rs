@@ -22,18 +22,48 @@ pub enum IpcServerEventCategory {
     ExternalEvent,
 }
 
+// --------------------------------------------------------------------------------------
+
+#[derive(Debug)]
 pub enum IpcListenerEvent {
-    IpcListenerAborted(::std::io::Error),
+    IpcListenerAborted(String),
     SpawnIpcSession(::std::net::TcpStream),
 }
 
+impl Clone for IpcListenerEvent {
+    fn clone(&self) -> IpcListenerEvent {
+        match *self {
+            IpcListenerEvent::IpcListenerAborted(ref err) => IpcListenerEvent::IpcListenerAborted(err.clone()),
+            IpcListenerEvent::SpawnIpcSession(ref stream) => IpcListenerEvent::SpawnIpcSession(eval_result!(stream.try_clone())),
+        }
+    }
+}
+
+// --------------------------------------------------------------------------------------
+
+#[derive(Clone, Debug)]
 pub enum IpcSessionEvent {
     VerifySession(u32, String),
     IpcSessionWriteFailed(Option<::routing::NameType>),
 }
 
+// --------------------------------------------------------------------------------------
+
+#[derive(Clone)]
 pub enum ExternalEvent {
     ChangeSafeDriveAccess(::routing::NameType, bool),
     GetListenerEndpoint(::std::sync::mpsc::Sender<String>),
     Terminate,
 }
+
+impl ::std::fmt::Debug for ExternalEvent {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        if let ExternalEvent::GetListenerEndpoint(_) = *self {
+            write!(f, "ExternalEvent::GetListenerEndpoint")
+        } else {
+            write!(f, "{:?}", *self)
+        }
+    }
+}
+
+// --------------------------------------------------------------------------------------
