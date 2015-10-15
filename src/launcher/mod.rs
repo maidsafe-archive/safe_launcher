@@ -28,7 +28,7 @@ impl Launcher {
     /// Creates a new Launcher instance
     pub fn new(client: ::safe_core::client::Client) -> Launcher {
         Launcher {
-            client: ::std::sync::Arc::new(::std::sync::Mutex::new(engine)),
+            client: ::std::sync::Arc::new(::std::sync::Mutex::new(client)),
         }
     }
 
