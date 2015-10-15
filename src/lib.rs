@@ -36,3 +36,16 @@
         unused_qualifications, unused_results, variant_size_differences)]
 #![allow(box_pointers, fat_ptr_transmutes, missing_copy_implementations,
          missing_debug_implementations)]
+
+#![allow(dead_code, unused)] // TODO(Spandan) Remove this once code base in sufficient
+
+extern crate routing;
+// extern crate safe_dns;
+// extern crate safe_nfs;
+extern crate sodiumoxide;
+#[macro_use] extern crate log;
+#[macro_use] extern crate safe_core;
+
+mod errors;
+mod launcher;
+mod event_sender;
