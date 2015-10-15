@@ -17,19 +17,18 @@
 
 mod ipc_server;
 
-/// Launcher struct will hold the safe_core engine and application data based on the current login session
-/// It will hold the Symmetric Encryption keys for the applications that are launched from the launcher and in running state.
+/// Launcher exposes API for managing applications
 #[derive(Clone)]
 pub struct Launcher {
-    engine: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+    client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
 }
 
 impl Launcher {
 
     /// Creates a new Launcher instance
-    pub fn new(engine: ::safe_core::client::Client) -> Launcher {
+    pub fn new(client: ::safe_core::client::Client) -> Launcher {
         Launcher {
-            engine: ::std::sync::Arc::new(::std::sync::Mutex::new(engine)),
+            client: ::std::sync::Arc::new(::std::sync::Mutex::new(engine)),
         }
     }
 

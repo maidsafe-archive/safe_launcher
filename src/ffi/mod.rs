@@ -18,8 +18,8 @@
 mod errors;
 mod implementation;
 
-/// Create a registered client. This or any one of the other companion functions to get a
-/// client must be called before initiating any operation allowed by this crate. `client_handle` is
+/// Create an account with SafeNetwork. This or any one of the other companion functions to get a
+/// launcher must be called before initiating any operation allowed by this crate. `launcher_handle` is
 /// a pointer to a pointer and must point to a valid pointer not junk, else the consequences are
 /// undefined.
 #[no_mangle]

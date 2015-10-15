@@ -25,12 +25,6 @@ pub enum LauncherError {
     /// Error from safe_core. Boxed to hold a pointer instead of value so that this enum variant is
     /// not insanely bigger than others.
     CoreError(Box<::safe_core::errors::CoreError>),
-    /// Empty Keyword
-    EmptyKeyword,
-    /// Empty password
-    EmptyPassword,
-    /// Invalid Pin Number
-    InvalidPin,
     /// Ipc Listener could not be bound to an endpoint
     IpcListenerCouldNotBeBound,
     /// The Ipc Listener has errored out. New apps will no longer be able to connect to Launcher
@@ -60,14 +54,11 @@ impl Into<i32> for LauncherError {
     fn into(self) -> i32 {
         match self {
             LauncherError::CoreError(ref error)            => LAUNCHER_ERROR_START_RANGE - 1,
-            LauncherError::EmptyKeyword                    => LAUNCHER_ERROR_START_RANGE - 2,
-            LauncherError::EmptyPassword                   => LAUNCHER_ERROR_START_RANGE - 3,
-            LauncherError::InvalidPin                      => LAUNCHER_ERROR_START_RANGE - 4,
-            LauncherError::IpcListenerCouldNotBeBound      => LAUNCHER_ERROR_START_RANGE - 5,
-            LauncherError::IpcListenerAborted(ref error)   => LAUNCHER_ERROR_START_RANGE - 6,
-            LauncherError::IpcStreamCloneError(ref error)  => LAUNCHER_ERROR_START_RANGE - 7,
-            LauncherError::ReceiverChannelDisconnected     => LAUNCHER_ERROR_START_RANGE - 8,
-            LauncherError::Unexpected(ref error)           => LAUNCHER_ERROR_START_RANGE - 9,
+            LauncherError::IpcListenerCouldNotBeBound      => LAUNCHER_ERROR_START_RANGE - 2,
+            LauncherError::IpcListenerAborted(ref error)   => LAUNCHER_ERROR_START_RANGE - 3,
+            LauncherError::IpcStreamCloneError(ref error)  => LAUNCHER_ERROR_START_RANGE - 4,
+            LauncherError::ReceiverChannelDisconnected     => LAUNCHER_ERROR_START_RANGE - 5,
+            LauncherError::Unexpected(ref error)           => LAUNCHER_ERROR_START_RANGE - 6,
         }
     }
 }
@@ -75,10 +66,7 @@ impl Into<i32> for LauncherError {
 impl ::std::fmt::Debug for LauncherError {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         match *self {
-            LauncherError::CoreError(ref error)            => write!(f, "LauncherError::CoreError -> {:?}", error),
-            LauncherError::EmptyKeyword                    => write!(f, "LauncherError::EmptyKeyword -> Keyword cannot be empty"),
-            LauncherError::EmptyPassword                   => write!(f, "LauncherError::EmptyPassword -> Password cannot be empty"),
-            LauncherError::InvalidPin                      => write!(f, "LauncherError::InvalidPin -> PinNumber must be 4 digits"),
+            LauncherError::CoreError(ref error)            => write!(f, "LauncherError::CoreError -> {:?}", error),            
             LauncherError::IpcListenerCouldNotBeBound      => write!(f, "LauncherError::IpcListenerCouldNotBeBound"),
             LauncherError::IpcListenerAborted(ref error)   => write!(f, "LauncherError::IpcListenerAborted -> {:?}", error),
             LauncherError::IpcStreamCloneError(ref error)  => write!(f, "LauncherError::IpcStreamCloneError -> {:?}", error),
