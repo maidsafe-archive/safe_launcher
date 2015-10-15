@@ -22,9 +22,10 @@ mod events;
 mod ipc_session;
 
 const LISTENER_PORT_RESET: u16 = 30000;
-const LISTENER_OCTATE_START: u8 = 9;
 const IPC_SERVER_THREAD_NAME: &'static str = "IpcServerThread";
 const IPC_LISTENER_THREAD_NAME: &'static str = "IpcListenerThread";
+const LISTENER_THIRD_OCTATE_START: u8 = 0;
+const LISTENER_FOURTH_OCTATE_START: u8 = 1;
 
 pub struct IpcServer {
     client               : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
@@ -188,8 +189,8 @@ impl IpcServer {
                                                                                                   String),
                                                                                                  ::errors::LauncherError> {
         let mut port = LISTENER_PORT_RESET;
-        let mut third_octate = LISTENER_OCTATE_START;
-        let mut fourth_octate = LISTENER_OCTATE_START;
+        let mut third_octate = LISTENER_THIRD_OCTATE_START;
+        let mut fourth_octate = LISTENER_FOURTH_OCTATE_START;
 
         let ipc_listener;
 
@@ -211,7 +212,7 @@ impl IpcServer {
                                 return Err(::errors::LauncherError::IpcListenerCouldNotBeBound)
                             } else {
                                 third_octate += 1;
-                                fourth_octate = 0;
+                                fourth_octate = LISTENER_FOURTH_OCTATE_START;
                             }
                         } else {
                             fourth_octate += 1;

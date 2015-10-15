@@ -49,6 +49,7 @@ pub enum SecureCommunicationEvent {
 
 // --------------------------------------------------------------------------------------
 
+#[allow(variant_size_differences)]
 #[derive(Clone, Debug)]
 pub enum ExternalEvent {
     AppDetailReceived(Box<event_data::AppDetail>),

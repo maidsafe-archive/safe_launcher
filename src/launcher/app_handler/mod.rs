@@ -15,10 +15,4 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-mod ipc_server;
-mod app_handler;
-
-/// TODO(Spandan) This will be documeted once this task is done.
-pub struct Launcher {
-    client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-}
+mod events;
