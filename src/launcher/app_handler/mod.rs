@@ -102,10 +102,14 @@ impl AppHandler {
 
         let app_id = ::routing::NameType::new(eval_result!(::safe_core::utility::generate_random_array_u8_64()));
 
-        let _ = self.local_config_data.insert(app_id, app_detail.absolute_path.clone()); //TODO see why clone()
+        let _ = self.local_config_data.insert(app_id, app_detail.absolute_path.clone());
 
-        let mut tokens = Vec::<String>::new(); //eval_result!(AppHandler::tokenise_path(&app_detail.absolute_path)); TODO
-        let app_name = eval_option!(tokens.pop(), "TODO");
+        let mut tokens: Vec<String> = app_detail.absolute_path
+                                                .split(|element| element == '/')
+                                                .map(|token| token.to_string())
+                                                .collect();
+
+        let app_name = eval_option!(tokens.pop(), ""); // TODO(Spandan) don't use eval_option here
 
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
@@ -133,7 +137,11 @@ impl AppHandler {
 
         let file = {
             // TODO(Spandan) Is this a rust bug ? `else` branch should not consider the borrow of
-            //               variable in `if` branch but it does
+            //               variable in `if` branch but it does.
+            //               Update: It indeed is a bug:
+            //               - https://users.rust-lang.org/t/curious-scope-rules-when-using-if-let/1858
+            //               - https://github.com/rust-lang/rfcs/issues/811
+            //               Uncomment the following once the issue above is closed.
             // let file = if let Some(existing_file) = dir_listing.get_files().iter().find(|file| file.get_name() == LAUNCHER_CONFIG_FILE_NAME) {
             //     existing_file
             // } else {
@@ -142,14 +150,17 @@ impl AppHandler {
             //     eval_option!(dir_listing.get_files().iter().find(|file| file.get_name() == LAUNCHER_CONFIG_FILE_NAME), "Should Exist")
             // };
 
-            let mut dir_listing_clone = dir_listing.clone(); // TODO This should not be required
-            let file = if let Some(existing_file) = dir_listing.get_files().iter().find(|file| file.get_name() == LAUNCHER_CONFIG_FILE_NAME) {
-                existing_file
-            } else {
-                let writer = eval_result!(file_helper.create(LAUNCHER_CONFIG_FILE_NAME.to_string(), vec![], dir_listing_clone));
-                dir_listing_clone = eval_result!(writer.close()).0;
-                eval_option!(dir_listing_clone.get_files().iter().find(|file| file.get_name() == LAUNCHER_CONFIG_FILE_NAME), "Should Exist")
-            };
+            let is_present = dir_listing.get_files().iter().find(|file| file.get_name() == LAUNCHER_CONFIG_FILE_NAME).is_some();
+
+            if !is_present {
+                let writer = eval_result!(file_helper.create(LAUNCHER_CONFIG_FILE_NAME.to_string(), vec![], dir_listing));
+                dir_listing= eval_result!(writer.close()).0;
+            }
+
+            let file = eval_option!(dir_listing.get_files()
+                                               .iter()
+                                               .find(|file| file.get_name() == LAUNCHER_CONFIG_FILE_NAME),
+                                    "Logic Error - Report as bug.");
 
             let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
             let mut reader = file_helper.read(file);
