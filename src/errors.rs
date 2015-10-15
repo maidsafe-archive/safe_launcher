@@ -59,7 +59,7 @@ impl From<::safe_nfs::errors::NfsError> for LauncherError {
 impl Into<i32> for LauncherError {
     fn into(self) -> i32 {
         match self {
-            LauncherError::CoreError(ref error)             => (*error).into(),,
+            LauncherError::CoreError(error)                 => (*error).into(),
             LauncherError::IpcListenerCouldNotBeBound       => LAUNCHER_ERROR_START_RANGE - 1,
             LauncherError::IpcListenerAborted(ref error)    => LAUNCHER_ERROR_START_RANGE - 2,
             LauncherError::IpcStreamCloneError(ref error)   => LAUNCHER_ERROR_START_RANGE - 3,
