@@ -20,7 +20,6 @@
 pub const LAUNCHER_ERROR_START_RANGE: i32 = ::safe_dns::errors::DNS_ERROR_START_RANGE - 500;
 
 /// Launcher Errors
-#[allow(variant_size_differences)]
 pub enum LauncherError {
     /// Error from safe_core. Boxed to hold a pointer instead of value so that this enum variant is
     /// not insanely bigger than others.

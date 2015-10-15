@@ -16,6 +16,7 @@
 // relating to use of the SAFE Network Software.
 
 mod ipc_server;
+mod app_handler;
 
 /// Launcher exposes API for managing applications
 #[derive(Clone)]
