@@ -37,7 +37,7 @@ cargo test
 ## TODO
 ### [0.1.0]
 - [ ] [MAID-1401](https://maidsafe.atlassian.net/browse/MAID-1401) Launcher Start-up
-  - [ ] [MAID-1402](https://maidsafe.atlassian.net/browse/MAID-1402) Self-Authenticate
+  - [X] [MAID-1402](https://maidsafe.atlassian.net/browse/MAID-1402) Self-Authenticate
   - [ ] [MAID-1403](https://maidsafe.atlassian.net/browse/MAID-1403) Handle Session Packet
   - [X] [MAID-1404](https://maidsafe.atlassian.net/browse/MAID-1404) Threaded TCP server, Design
   - [ ] [MAID-1405](https://maidsafe.atlassian.net/browse/MAID-1405) Implement Threaded TCP server

@@ -15,6 +15,10 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+/// Intended for converting Launcher Errors into numeric codes for propagating some error information
+/// across FFI boundaries and specially to C.
+pub const LAUNCHER_ERROR_START_RANGE: i32 = ::safe_dns::errors::DNS_ERROR_START_RANGE - 500;
+
 /// Launcher Errors
 pub enum LauncherError {
     /// Error from safe_core. Boxed to hold a pointer instead of value so that this enum variant is
@@ -41,6 +45,20 @@ impl<'a> From<&'a str> for LauncherError {
 impl From<::safe_core::errors::CoreError> for LauncherError {
     fn from(error: ::safe_core::errors::CoreError) -> LauncherError {
         LauncherError::CoreError(Box::new(error))
+    }
+}
+
+
+impl Into<i32> for LauncherError {
+    fn into(self) -> i32 {
+        match self {
+            LauncherError::CoreError(error)                 => (*error).into(),
+            LauncherError::IpcListenerCouldNotBeBound       => LAUNCHER_ERROR_START_RANGE - 1,
+            LauncherError::IpcListenerAborted(_)            => LAUNCHER_ERROR_START_RANGE - 2,
+            LauncherError::IpcStreamCloneError(_)           => LAUNCHER_ERROR_START_RANGE - 3,
+            LauncherError::ReceiverChannelDisconnected      => LAUNCHER_ERROR_START_RANGE - 4,
+            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 5,
+        }
     }
 }
 

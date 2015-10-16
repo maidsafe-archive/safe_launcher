@@ -15,22 +15,17 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-mod ipc_server;
-mod app_handler;
+use ::std::error::Error;
 
-/// Launcher exposes API for managing applications
-#[derive(Clone)]
-pub struct Launcher {
-    client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+/// Converts int array of u8 from c to Rust Vec
+#[allow(unsafe_code)]
+pub fn c_uint8_ptr_to_vec(c_uint8_ptr: *const ::libc::uint8_t, c_size: ::libc::size_t) -> Vec<u8> {
+    unsafe { ::std::slice::from_raw_parts(c_uint8_ptr, c_size as usize).to_vec() }
 }
 
-impl Launcher {
-
-    /// Creates a new Launcher instance
-    pub fn new(client: ::safe_core::client::Client) -> Launcher {
-        Launcher {
-            client: ::std::sync::Arc::new(::std::sync::Mutex::new(client)),
-        }
-    }
-
+/// Converts c character pointer into Rust String
+#[allow(unsafe_code)]
+pub fn c_char_ptr_to_string(c_char_ptr: *const ::libc::c_char) -> Result<String, ::ffi::errors::FfiError> {
+    let cstr = unsafe { ::std::ffi::CStr::from_ptr(c_char_ptr) };
+    Ok(try!(String::from_utf8(cstr.to_bytes().iter().map(|a| *a).collect()).map_err(|error| ::ffi::errors::FfiError::from(error.description()))))
 }

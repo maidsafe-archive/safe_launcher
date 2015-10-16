@@ -15,22 +15,34 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-mod ipc_server;
-mod app_handler;
-
-/// Launcher exposes API for managing applications
-#[derive(Clone)]
-pub struct Launcher {
-    client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-}
-
-impl Launcher {
-
-    /// Creates a new Launcher instance
-    pub fn new(client: ::safe_core::client::Client) -> Launcher {
-        Launcher {
-            client: ::std::sync::Arc::new(::std::sync::Mutex::new(client)),
+/// This macro is intended to be used in all cases where we get Result<T, U> and want to convert it
+/// to C friendly error code to inform about error conditions accross library boundaries
+///
+/// #Examples
+///
+/// ```
+/// # #[macro_use] extern crate safe_launcher;
+/// # #[macro_use] extern crate safe_core;
+/// fn f() -> i32 {
+///     let some_result: Result<String, safe_core::errors::CoreError> = Ok("Hello".to_string());
+///     let string_length = ffi_try!(some_result).len();
+///     assert_eq!(string_length, 5);
+///     0
+/// }
+/// # fn main() {
+/// # let _error_code = f();
+/// # }
+/// ```
+#[macro_export]
+macro_rules! ffi_try {
+    ($result:expr) => {
+        match $result {
+            Ok(value)  => value,
+            Err(error) => {
+                let decorator = ::std::iter::repeat('-').take(50).collect::<String>();
+                println!("\n\n {}\n| {:?}\n {}\n\n", decorator, error, decorator);
+                return error.into()
+            },
         }
     }
-
 }
