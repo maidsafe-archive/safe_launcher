@@ -15,24 +15,11 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-#[derive(Debug, Clone)]
-pub enum AppHandlerEvent {
-    AddApp(Box<event_data::AppDetail>),
-    Terminate,
-}
-
-pub mod event_data {
-    #[derive(Clone)]
-    pub struct AppDetail {
-        pub result           : ::std::sync::mpsc::Sender<bool>,
-        pub absolute_path    : String,
-        pub safe_drive_access: bool,
-    }
-
-    impl ::std::fmt::Debug for AppDetail {
-        fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-            write!(f, "AppDetail {{ result: Sender<bool>, absolute_path: {:?}, safe_drive_access: {:?} }}",
-                   self.absolute_path, self.safe_drive_access)
-        }
-    }
+#[derive(Clone, Debug, RustcEncodable, RustcDecodable)]
+pub struct LauncherConfiguration {
+    pub app_id           : ::routing::NameType,
+    pub app_name         : String,
+    pub refernece_count  : u32,
+    pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
+    pub safe_drive_access: bool,
 }
