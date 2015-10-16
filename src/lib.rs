@@ -45,16 +45,15 @@ extern crate safe_dns;
 extern crate safe_nfs;
 extern crate sodiumoxide;
 extern crate rustc_serialize;
-
 #[macro_use] extern crate log;
 #[macro_use] extern crate safe_core;
 
 #[macro_use] mod macros;
 
 mod errors;
+mod config;
 mod launcher;
 mod event_sender;
-mod configuration;
 
 /// FFI interface
 pub mod ffi;

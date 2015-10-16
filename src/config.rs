@@ -15,8 +15,7 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-/// Directory name of SAFEDrive
 pub const SAFE_DRIVE_DIR_NAME: &'static str = "SAFEDrive";
-/// Directory Name of the Directory where the Launcher data is stored in the
-/// configuration root directory of the user
-pub const LAUNCHER_DIR_NAME: &'static str = "LauncherReservedDirectory";
+pub const LAUNCHER_GLOBAL_DIRECTORY_NAME: &'static str = "LauncherReservedDirectory";
+pub const LAUNCHER_LOCAL_CONFIG_FILE_NAME: &'static str = "launcher.config";
+pub const LAUNCHER_GLOBAL_CONFIG_FILE_NAME: &'static str = "LauncherSpecificConfigurationFile";

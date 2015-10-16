@@ -22,9 +22,6 @@ pub mod events;
 mod misc;
 
 const APP_HANDLER_THREAD_NAME: &'static str = "launcher.config";
-const LAUNCHER_CONFIG_FILE_NAME: &'static str = "LauncherSpecificConfigurationFile";
-const LAUNCHER_CONFIG_DIRECTORY_NAME: &'static str = "LauncherSpecificConfigurationDir";
-const LAUNCHER_LOCAL_CONFIG_FILE_NAME: &'static str = "launcher.config";
 
 pub struct AppHandler {
     client                 : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
@@ -48,7 +45,7 @@ impl AppHandler {
         let joiner = eval_result!(::std::thread::Builder::new().name(APP_HANDLER_THREAD_NAME.to_string())
                                                                .spawn(move || {
             let mut temp_dir_pathbuf = ::std::env::temp_dir();
-            temp_dir_pathbuf.push(LAUNCHER_LOCAL_CONFIG_FILE_NAME);
+            temp_dir_pathbuf.push(::config::LAUNCHER_LOCAL_CONFIG_FILE_NAME);
 
             let mut local_config_data = ::std::collections::HashMap::with_capacity(10);
 
@@ -115,7 +112,7 @@ impl AppHandler {
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
 
-        let mut dir_listing = eval_result!(dir_helper.get_configuration_directory_listing(LAUNCHER_CONFIG_DIRECTORY_NAME.to_string()));
+        let mut dir_listing = eval_result!(dir_helper.get_configuration_directory_listing(::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string()));
         let mut root_dir_listing = eval_result!(dir_helper.get_user_root_directory_listing());
 
         // TODO check first if it exists. Then follow the logic in RFC
@@ -143,24 +140,24 @@ impl AppHandler {
             //               - https://users.rust-lang.org/t/curious-scope-rules-when-using-if-let/1858
             //               - https://github.com/rust-lang/rfcs/issues/811
             //               Uncomment the following once the issue above is closed.
-            // let file = if let Some(existing_file) = dir_listing.get_files().iter().find(|file| file.get_name() == LAUNCHER_CONFIG_FILE_NAME) {
+            // let file = if let Some(existing_file) = dir_listing.get_files().iter().find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME) {
             //     existing_file
             // } else {
-            //     let writer = eval_result!(file_helper.create(LAUNCHER_CONFIG_FILE_NAME.to_string(), vec![], dir_listing));
+            //     let writer = eval_result!(file_helper.create(::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string(), vec![], dir_listing));
             //     dir_listing = eval_result!(writer.close()).0;
-            //     eval_option!(dir_listing.get_files().iter().find(|file| file.get_name() == LAUNCHER_CONFIG_FILE_NAME), "Should Exist")
+            //     eval_option!(dir_listing.get_files().iter().find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME), "Should Exist")
             // };
 
-            let is_present = dir_listing.get_files().iter().find(|file| file.get_name() == LAUNCHER_CONFIG_FILE_NAME).is_some();
+            let is_present = dir_listing.get_files().iter().find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME).is_some();
 
             if !is_present {
-                let writer = eval_result!(file_helper.create(LAUNCHER_CONFIG_FILE_NAME.to_string(), vec![], dir_listing));
+                let writer = eval_result!(file_helper.create(::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string(), vec![], dir_listing));
                 dir_listing= eval_result!(writer.close()).0;
             }
 
             let file = eval_option!(dir_listing.get_files()
                                                .iter()
-                                               .find(|file| file.get_name() == LAUNCHER_CONFIG_FILE_NAME),
+                                               .find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME),
                                     "Logic Error - Report as bug.");
 
             let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
@@ -187,7 +184,7 @@ impl AppHandler {
 impl Drop for AppHandler {
     fn drop(&mut self) {
         let mut temp_dir_pathbuf = ::std::env::temp_dir();
-        temp_dir_pathbuf.push(LAUNCHER_LOCAL_CONFIG_FILE_NAME);
+        temp_dir_pathbuf.push(::config::LAUNCHER_LOCAL_CONFIG_FILE_NAME);
 
         let mut file = eval_result!(::std::fs::File::create(temp_dir_pathbuf));
         let plain_text = eval_result!(::safe_core::utility::serialise(&self.local_config_data));
