@@ -18,22 +18,15 @@
 #[derive(Debug, Clone)]
 pub enum AppHandlerEvent {
     AddApp(Box<event_data::AppDetail>),
-    RemoveApp(Box<event_data::AppDetail>),    
+    RemoveApp(Box<event_data::AppDetail>),
+    ActivateApp(Box<::routing::NameType>),
     Terminate,
 }
 
 pub mod event_data {
-    #[derive(Clone)]
+    #[derive(Debug, Clone)]
     pub struct AppDetail {
-        pub result           : ::std::sync::mpsc::Sender<bool>,
         pub absolute_path    : String,
         pub safe_drive_access: bool,
-    }
-
-    impl ::std::fmt::Debug for AppDetail {
-        fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-            write!(f, "AppDetail {{ result: Sender<bool>, absolute_path: {:?}, safe_drive_access: {:?} }}",
-                   self.absolute_path, self.safe_drive_access)
-        }
     }
 }
