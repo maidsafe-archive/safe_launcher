@@ -15,10 +15,11 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+pub mod events;
+
 pub type EventSenderToServer<EventSubset> = ::event_sender::EventSender<events::IpcServerEventCategory, EventSubset>;
 
 mod misc;
-mod events;
 mod ipc_session;
 
 const IPC_SERVER_THREAD_NAME: &'static str = "IpcServerThread";
@@ -113,6 +114,7 @@ impl IpcServer {
                 events::IpcServerEventCategory::ExternalEvent => {
                     if let Ok(external_event) = ipc_server.external_event_rx.try_recv() {
                         match external_event {
+                            events::ExternalEvent::AppActivated(activation_detail) => ipc_server.on_app_activated(activation_detail),
                             events::ExternalEvent::ChangeSafeDriveAccess(app_id, is_allowed) => ipc_server.on_change_safe_drive_access(app_id, is_allowed),
                             events::ExternalEvent::GetListenerEndpoint(sender) => ipc_server.on_get_listener_endpoint(sender),
                             events::ExternalEvent::Terminate => break,
@@ -170,6 +172,10 @@ impl IpcServer {
     }
 
     fn on_ipc_session_write_failed(&self, app_id: Option<::routing::NameType>) {
+        ;
+    }
+
+    fn on_app_activated(&self, activation_detail: Box<events::event_data::ActivationDetail>) {
         ;
     }
 
