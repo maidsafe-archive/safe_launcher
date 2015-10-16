@@ -78,7 +78,8 @@ impl AppHandler {
     fn run(mut app_handler: AppHandler, event_rx: ::std::sync::mpsc::Receiver<events::AppHandlerEvent>) {
         for event in event_rx.iter() {
             match event {
-                events::AppHandlerEvent::AddApp(app_detail) => app_handler.on_add_app(app_detail),
+                events::AppHandlerEvent::AddApp(app_detail)     => app_handler.on_add_app(app_detail),
+                events::AppHandlerEvent::RemoveApp(app_detail)  => app_handler.on_remove_app(app_detail),
                 events::AppHandlerEvent::Terminate => break,
             }
         }
@@ -157,7 +158,7 @@ impl AppHandler {
             let config_file_name = ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string();
             let fetched_file = dir_listing.find_file(&config_file_name).map(|file| file.clone());
 
-            if !fetched_file.is_some() {
+            if fetched_file.is_none() {
                 let writer = eval_result!(file_helper.create(config_file_name.clone(), vec![], dir_listing));
                 dir_listing = eval_result!(writer.close()).0
             };
@@ -185,6 +186,71 @@ impl AppHandler {
         if let Err(err) = app_detail.result.send(true) {
             debug!("{:?} -> Error sending result", err);
         }
+    }
+
+    fn on_remove_app(&mut self, app_detail: Box<events::event_data::AppDetail>) {
+        // TODO(Krishna) Send terminate app event to IPC Server
+
+        // remove/update from launcher_configurations
+        let config_file_name = ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string();
+        let mut tokens: Vec<String> = app_detail.absolute_path
+                                                .split(|element| element == '/')
+                                                .filter(|token| token.len() != 0)
+                                                .map(|token| token.to_string())
+                                                .collect();
+        let mut app_name = eval_option!(tokens.pop(), ""); // TODO(Spandan) don't use eval_option here
+
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
+        let mut dir_listing = eval_result!(dir_helper.get_configuration_directory_listing(::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string()));
+
+        let fetched_file = dir_listing.find_file(&config_file_name).map(|file| file.clone());
+        if fetched_file.is_none() {
+            debug!("Launcher Configuration could not be located");
+            if let Err(err) = app_detail.result.send(false) {
+                debug!("{:?} -> Error sending result", err);
+            }
+            return;
+        }
+
+        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
+        let file = eval_option!(fetched_file, "Logic Error - Report as bug.");
+        let mut reader = file_helper.read(&file);
+        let size = reader.size();
+        let mut launcher_configurations: Vec<misc::LauncherConfiguration> = if size != 0 {
+            eval_result!(::safe_core::utility::deserialise(&eval_result!(reader.read(0, size))))
+        } else {
+            Vec::new()
+        };
+
+        let app_id;
+        if let Some(mut app_config) = launcher_configurations.iter().find(|config| config.app_name == app_name).map(|config| config.clone()) {
+            app_id = app_config.app_id;
+            let position = eval_option!(launcher_configurations.iter().position(|config| config.app_name == app_name), "Logic Error - Report as bug.");
+            if app_config.refernece_count == 1 {
+                let _ = launcher_configurations.remove(position);
+                let mut root_dir_listing = eval_result!(dir_helper.get_user_root_directory_listing());
+                let app_id_string = eval_result!(String::from_utf8(app_id.0.iter().map(|x| *x).collect()));
+                let app_dir_name = format!("{}-{}", &app_name, app_id_string);
+                let _ = eval_result!(dir_helper.delete(&mut root_dir_listing, &app_dir_name));
+            } else {
+                app_config.refernece_count -= 1;
+                launcher_configurations[position] = app_config;
+            }
+            let file = eval_option!(dir_listing.find_file(&config_file_name).map(|file| file.clone()), "Logic Error - Report as bug.");
+            let mut writer = eval_result!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, dir_listing));
+            writer.write(&eval_result!(::safe_core::utility::serialise(&launcher_configurations)), 0);
+            let _ = eval_result!(writer.close());
+
+        } else {
+            debug!("Application name not found in launcher configuration");
+            if let Err(err) = app_detail.result.send(false) {
+                debug!("{:?} -> Error sending result", err);
+            }
+            return;
+        }
+
+        // remove from local config
+        let _ = self.local_config_data.remove(&app_id);
     }
 }
 
