@@ -24,7 +24,7 @@ pub fn verify_launcher_nonce(ipc_stream  : ::std::net::TcpStream,
                                                                                                         ::utility
                                                                                                         ::RAIIThreadJoiner {
     let joiner = eval_result!(::std::thread::Builder::new().name(NONCE_VERIFIER_THREAD_NAME.to_string())
-                                                       .spawn(move || {
+                                                           .spawn(move || {
         let nonce = "TemporaryCode".to_string();
         if let Err(err) = event_sender.send(::launcher
                                             ::ipc_server

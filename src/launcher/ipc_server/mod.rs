@@ -81,7 +81,7 @@ impl IpcServer {
         let ipc_server_joiner = eval_result!(::std::thread::Builder::new().name(IPC_SERVER_THREAD_NAME.to_string())
                                                                           .spawn(move || {
             IpcServer::activate_ipc_server(ipc_server, event_catagory_rx);
-            debug!("Exiting Thread {:?}", IPC_SERVER_THREAD_NAME.to_string());
+            debug!("Exiting Thread {:?}", IPC_SERVER_THREAD_NAME);
         }));
 
         let external_event_sender = EventSenderToServer::<events::ExternalEvent>
@@ -175,8 +175,16 @@ impl IpcServer {
         ;
     }
 
-    fn on_app_activated(&self, activation_detail: Box<events::event_data::ActivationDetail>) {
-        ;
+    fn on_app_activated(&mut self, activation_detail: Box<events::event_data::ActivationDetail>) {
+        let detail = *activation_detail;
+        if let Some(info) = self.pending_verifications.insert(detail.nonce,
+                                                              misc::AppInfo::new(detail.app_id,
+                                                                                 detail.app_root_dir_key,
+                                                                                 detail.safe_drive_access)) {
+            // TODO(Spandan) handle this security hole.
+            debug!("Same nonce was already given to an app pending verification. This is a security hole not fixed in this iteration.");
+            debug!("Dropping the previous app information and re-assigning nonce to a new app");
+        }
     }
 
     fn on_change_safe_drive_access(&self, app_id: ::routing::NameType, is_allowed: bool) {
@@ -233,7 +241,7 @@ impl IpcServer {
                                      event_sender,
                                      stop_flag);
 
-            debug!("Exiting Thread {:?}", IPC_LISTENER_THREAD_NAME.to_string());
+            debug!("Exiting Thread {:?}", IPC_LISTENER_THREAD_NAME);
         }));
 
         Ok((::safe_core::utility::RAIIThreadJoiner::new(joiner), local_endpoint))
@@ -305,6 +313,7 @@ mod test {
             assert_eq!(eval_result!(stream.read(&mut buffer)), 0);
         })));
 
+        ::std::thread::sleep_ms(3000);
         // Terminate to exit this test - otherwise the raii_joiners will hang this test - this is
         // by design. So there is no way out but graceful termination which is what this entire
         // design strives for.

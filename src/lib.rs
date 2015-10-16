@@ -43,6 +43,8 @@ extern crate libc;
 extern crate routing;
 extern crate safe_dns;
 extern crate safe_nfs;
+extern crate byteorder;
+extern crate bufstream;
 extern crate sodiumoxide;
 extern crate rustc_serialize;
 #[macro_use] extern crate log;

@@ -23,6 +23,8 @@ safe_core   = "0.3.*"
 # ---- Others ----
 log             = "*"
 libc            = "*"
+byteorder       = "*"
+bufstream       = "*"
 sodiumoxide     = "*"
 rustc-serialize = "*"
 

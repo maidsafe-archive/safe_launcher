@@ -72,8 +72,9 @@ impl ::std::fmt::Debug for ExternalEvent {
 pub mod event_data {
     #[derive(Debug, Clone)]
     pub struct ActivationDetail {
-        nonce            : String,
-        app_id           : ::routing::NameType,
-        safe_drive_access: bool,
+        pub nonce            : String,
+        pub app_id           : ::routing::NameType,
+        pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
+        pub safe_drive_access: bool,
     }
 }

@@ -34,6 +34,12 @@ pub enum LauncherError {
     NfsError(Box<::safe_nfs::errors::NfsError>),
     /// mpsc receiver has hung up
     ReceiverChannelDisconnected,
+    /// IpcSession has been terminated due to either graceful shutdown or some error as indicated
+    IpcSessionTerminated(Option<::std::io::Error>),
+    /// Could not read the payload size from stream
+    FailedReadingStreamPayloadSize,
+    /// Could not write the payload size to stream
+    FailedWritingStreamPayloadSize,
     /// Unexpected - Probably a Logic error
     Unexpected(String),
 }
@@ -65,7 +71,10 @@ impl Into<i32> for LauncherError {
             LauncherError::IpcStreamCloneError(_)           => LAUNCHER_ERROR_START_RANGE - 3,
             LauncherError::NfsError(_)                      => LAUNCHER_ERROR_START_RANGE - 4,
             LauncherError::ReceiverChannelDisconnected      => LAUNCHER_ERROR_START_RANGE - 5,
-            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 6,
+            LauncherError::IpcSessionTerminated(_)          => LAUNCHER_ERROR_START_RANGE - 6,
+            LauncherError::FailedReadingStreamPayloadSize   => LAUNCHER_ERROR_START_RANGE - 7,
+            LauncherError::FailedWritingStreamPayloadSize   => LAUNCHER_ERROR_START_RANGE - 8,
+            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 9,
         }
     }
 }
@@ -79,6 +88,9 @@ impl ::std::fmt::Debug for LauncherError {
             LauncherError::IpcStreamCloneError(ref error)   => write!(f, "LauncherError::IpcStreamCloneError -> {:?}", error),
             LauncherError::NfsError(ref error)              => write!(f, "LauncherError::NfsError -> {:?}", error),
             LauncherError::ReceiverChannelDisconnected      => write!(f, "LauncherError::ReceiverChannelDisconnected"),
+            LauncherError::IpcSessionTerminated(ref error)  => write!(f, "LauncherError::IpcSessionTerminated -> {:?}", error),
+            LauncherError::FailedReadingStreamPayloadSize   => write!(f, "LauncherError::FailedReadingStreamPayloadSize"),
+            LauncherError::FailedWritingStreamPayloadSize   => write!(f, "LauncherError::FailedWritingStreamPayloadSize"),
             LauncherError::Unexpected(ref error)            => write!(f, "LauncherError::Unexpected{{{:?}}}", error),
         }
     }

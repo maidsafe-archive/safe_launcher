@@ -19,6 +19,7 @@ pub mod events;
 
 pub type EventSenderToSession<EventSubset> = ::event_sender::EventSender<events::IpcSessionEventCategory, EventSubset>;
 
+mod stream;
 mod authenticate_app;
 mod rsa_key_exchange;
 mod secure_communication;
@@ -86,7 +87,7 @@ impl IpcSession {
         let ipc_session_joiner = eval_result!(::std::thread::Builder::new().name(IPC_SESSION_THREAD_NAME.to_string())
                                                                            .spawn(move || {
             IpcSession::activate_ipc_session(ipc_session);
-            debug!("Exiting Thread {:?}", IPC_SESSION_THREAD_NAME.to_string());
+            debug!("Exiting Thread {:?}", IPC_SESSION_THREAD_NAME);
         }));
 
         let external_event_sender = EventSenderToSession::<events::ExternalEvent>
