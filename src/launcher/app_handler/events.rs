@@ -17,7 +17,7 @@
 
 #[derive(Debug, Clone)]
 pub enum AppHandlerEvent {
-    AddApp(Box<event_data::AppDetail>),
+    AddApp(Box<event_data::AppDetail>),    
     Terminate,
 }
 

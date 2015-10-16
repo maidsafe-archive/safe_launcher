@@ -107,7 +107,7 @@ impl AppHandler {
                                                 .map(|token| token.to_string())
                                                 .collect();
 
-        let app_name = eval_option!(tokens.pop(), ""); // TODO(Spandan) don't use eval_option here
+        let mut app_name = eval_option!(tokens.pop(), ""); // TODO(Spandan) don't use eval_option here
 
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
@@ -115,13 +115,19 @@ impl AppHandler {
         let mut dir_listing = eval_result!(dir_helper.get_configuration_directory_listing(::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string()));
         let mut root_dir_listing = eval_result!(dir_helper.get_user_root_directory_listing());
 
-        // TODO check first if it exists. Then follow the logic in RFC
-        let app_root_dir_key = eval_result!(dir_helper.create(app_name.clone(),
-                                                              100,
-                                                              Vec::new(),
-                                                              false,
-                                                              ::safe_nfs::AccessLevel::Private,
-                                                              Some(&mut root_dir_listing))).0.get_key().clone();
+        let app_id_string = eval_result!(String::from_utf8(app_id.0.iter().map(|x| *x).collect()));
+        let app_dir_name = format!("{}-{}", &app_name, app_id_string);
+        let app_root_dir_key = match root_dir_listing.find_sub_directory(&app_dir_name).map(|dir| dir.clone()) {
+            Some(app_dir) => app_dir.get_key().clone(),
+            None => {
+                eval_result!(dir_helper.create(app_dir_name,
+                                               ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
+                                               Vec::new(),
+                                               false,
+                                               ::safe_nfs::AccessLevel::Private,
+                                               Some(&mut root_dir_listing))).0.get_key().clone()
+            },
+        };
 
         let launcher_config = misc::LauncherConfiguration {
             app_id           : app_id,
@@ -148,20 +154,18 @@ impl AppHandler {
             //     eval_option!(dir_listing.get_files().iter().find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME), "Should Exist")
             // };
 
-            let is_present = dir_listing.get_files().iter().find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME).is_some();
+            let config_file_name = ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string();
+            let fetched_file = dir_listing.find_file(&config_file_name).map(|file| file.clone());
 
-            if !is_present {
-                let writer = eval_result!(file_helper.create(::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string(), vec![], dir_listing));
-                dir_listing= eval_result!(writer.close()).0;
-            }
+            if !fetched_file.is_some() {
+                let writer = eval_result!(file_helper.create(config_file_name.clone(), vec![], dir_listing));
+                dir_listing = eval_result!(writer.close()).0
+            };
 
-            let file = eval_option!(dir_listing.get_files()
-                                               .iter()
-                                               .find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME),
-                                    "Logic Error - Report as bug.");
+            let file = eval_option!(fetched_file, "Logic Error - Report as bug.");
 
             let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
-            let mut reader = file_helper.read(file);
+            let mut reader = file_helper.read(&file);
             let size = reader.size();
 
             launcher_configurations = if size != 0 {
@@ -178,6 +182,9 @@ impl AppHandler {
         let mut writer = eval_result!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, dir_listing));
         writer.write(&eval_result!(::safe_core::utility::serialise(&launcher_configurations)), 0);
         let _ = eval_result!(writer.close()); // TODO use result
+        if let Err(err) = app_detail.result.send(true) {
+            debug!("{:?} -> Error sending result", err);
+        }
     }
 }
 
