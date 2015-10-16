@@ -51,6 +51,7 @@ pub enum IpcSessionEvent {
 
 #[derive(Clone)]
 pub enum ExternalEvent {
+    AppActivated(Box<event_data::ActivationDetail>),
     ChangeSafeDriveAccess(::routing::NameType, bool),
     GetListenerEndpoint(::std::sync::mpsc::Sender<String>),
     Terminate,
@@ -67,3 +68,12 @@ impl ::std::fmt::Debug for ExternalEvent {
 }
 
 // --------------------------------------------------------------------------------------
+
+pub mod event_data {
+    #[derive(Debug, Clone)]
+    pub struct ActivationDetail {
+        nonce            : String,
+        app_id           : ::routing::NameType,
+        safe_drive_access: bool,
+    }
+}
