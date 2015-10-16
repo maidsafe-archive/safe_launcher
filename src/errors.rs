@@ -61,11 +61,11 @@ impl Into<i32> for LauncherError {
         match self {
             LauncherError::CoreError(error)                 => (*error).into(),
             LauncherError::IpcListenerCouldNotBeBound       => LAUNCHER_ERROR_START_RANGE - 1,
-            LauncherError::IpcListenerAborted(ref error)    => LAUNCHER_ERROR_START_RANGE - 2,
-            LauncherError::IpcStreamCloneError(ref error)   => LAUNCHER_ERROR_START_RANGE - 3,
-            LauncherError::NfsError(ref error)              => LAUNCHER_ERROR_START_RANGE - 4,
+            LauncherError::IpcListenerAborted(_)            => LAUNCHER_ERROR_START_RANGE - 2,
+            LauncherError::IpcStreamCloneError(_)           => LAUNCHER_ERROR_START_RANGE - 3,
+            LauncherError::NfsError(_)                      => LAUNCHER_ERROR_START_RANGE - 4,
             LauncherError::ReceiverChannelDisconnected      => LAUNCHER_ERROR_START_RANGE - 5,
-            LauncherError::Unexpected(ref error)            => LAUNCHER_ERROR_START_RANGE - 6,
+            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 6,
         }
     }
 }
