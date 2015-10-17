@@ -30,7 +30,7 @@ const IPC_SESSION_THREAD_NAME: &'static str = "IpcSessionThread";
 pub struct IpcSession {
     app_id                 : Option<::routing::NameType>,
     temp_id                : u32,
-    ipc_stream             : ::std::net::TcpStream,
+    stream                 : ::std::net::TcpStream,
     _raii_joiner           : ::safe_core::utility::RAIIThreadJoiner,
     safe_drive_access      : Option<::std::sync::Arc<::std::sync::Mutex<bool>>>, // TODO(Spandan) change to 3-level permission instead of 2
     event_catagory_tx      : ::std::sync::mpsc::Sender<events::IpcSessionEventCategory>,
@@ -47,7 +47,7 @@ pub struct IpcSession {
 impl IpcSession {
     pub fn new(server_event_sender: ::launcher::ipc_server::EventSenderToServer<::launcher::ipc_server::events::IpcSessionEvent>,
                temp_id            : u32,
-               ipc_stream         : ::std::net::TcpStream) -> Result<(::safe_core::utility::RAIIThreadJoiner,
+               stream             : ::std::net::TcpStream) -> Result<(::safe_core::utility::RAIIThreadJoiner,
                                                                       EventSenderToSession<events::ExternalEvent>),
                                                                      ::errors::LauncherError> {
         let (event_catagory_tx, event_catagory_rx) = ::std::sync::mpsc::channel();
@@ -61,16 +61,16 @@ impl IpcSession {
                                                                     events::IpcSessionEventCategory::AppAuthenticationEvent,
                                                                     event_catagory_tx.clone());
 
-        let joiner = authenticate_app::verify_launcher_nonce(try!(ipc_stream.try_clone()
-                                                                            .map_err(|err| ::errors
-                                                                                           ::LauncherError
-                                                                                           ::IpcStreamCloneError(err))),
-                                                             authentication_event_sender);
+        let ipc_stream = try!(stream::IpcStream::new(try!(stream.try_clone()
+                                                                .map_err(|err| ::errors
+                                                                               ::LauncherError
+                                                                               ::IpcStreamCloneError(err)))));
+        let joiner = authenticate_app::verify_launcher_nonce(ipc_stream, authentication_event_sender);
 
         let ipc_session = IpcSession {
             app_id                 : None,
             temp_id                : temp_id,
-            ipc_stream             : ipc_stream,
+            stream                 : stream,
             _raii_joiner           : joiner,
             safe_drive_access      : None,
             event_catagory_tx      : event_catagory_tx.clone(),
@@ -154,7 +154,7 @@ impl IpcSession {
 
 impl Drop for IpcSession {
     fn drop(&mut self) {
-        if let Err(err) = self.ipc_stream.shutdown(::std::net::Shutdown::Both) {
+        if let Err(err) = self.stream.shutdown(::std::net::Shutdown::Both) {
             debug!("Failed to gracefully shutdown session for app-id {:?} with error {:?}",
                    self.app_id, err);
         }

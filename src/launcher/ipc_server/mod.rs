@@ -125,14 +125,14 @@ impl IpcServer {
         }
     }
 
-    fn on_spawn_ipc_session(&mut self, ipc_stream: ::std::net::TcpStream) {
+    fn on_spawn_ipc_session(&mut self, stream: ::std::net::TcpStream) {
         let event_sender = EventSenderToServer::<events::IpcSessionEvent>
                                               ::new(self.session_event_tx.clone(),
                                                     events::IpcServerEventCategory::IpcSessionEvent,
                                                     self.event_catagory_tx.clone());
         match ipc_session::IpcSession::new(event_sender,
                                            self.temp_id,
-                                           ipc_stream) {
+                                           stream) {
             Ok((raii_joiner, event_sender)) => {
                 if let Some(_) = self.unverified_sessions.insert(self.temp_id,
                                                                  misc::SessionInfo::new(raii_joiner,
@@ -252,11 +252,11 @@ impl IpcServer {
                      stop_flag   : ::std::sync::Arc<::std::sync::atomic::AtomicBool>) {
         loop  {
             match ipc_listener.accept() {
-                Ok((ipc_stream, _)) => {
+                Ok((stream, _)) => {
                     if stop_flag.load(::std::sync::atomic::Ordering::SeqCst) {
                         break;
                     } else {
-                        if let Err(_) = event_sender.send(events::IpcListenerEvent::SpawnIpcSession(ipc_stream)) {
+                        if let Err(_) = event_sender.send(events::IpcListenerEvent::SpawnIpcSession(stream)) {
                             break;
                         }
                     }

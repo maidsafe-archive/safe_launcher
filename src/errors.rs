@@ -24,14 +24,14 @@ pub enum LauncherError {
     /// Error from safe_core. Boxed to hold a pointer instead of value so that this enum variant is
     /// not insanely bigger than others.
     CoreError(Box<::safe_core::errors::CoreError>),
+    /// Errors from safe_nfs
+    NfsError(Box<::safe_nfs::errors::NfsError>),
     /// Ipc Listener could not be bound to an endpoint
     IpcListenerCouldNotBeBound,
     /// The Ipc Listener has errored out. New apps will no longer be able to connect to Launcher
     IpcListenerAborted(::std::io::Error),
     /// The Ipc Stream could not be cloned
     IpcStreamCloneError(::std::io::Error),
-    /// Errors from safe_nfs
-    NfsError(Box<::safe_nfs::errors::NfsError>),
     /// mpsc receiver has hung up
     ReceiverChannelDisconnected,
     /// IpcSession has been terminated due to either graceful shutdown or some error as indicated
@@ -66,10 +66,10 @@ impl Into<i32> for LauncherError {
     fn into(self) -> i32 {
         match self {
             LauncherError::CoreError(error)                 => (*error).into(),
+            LauncherError::NfsError(_)                      => LAUNCHER_ERROR_START_RANGE - 4,
             LauncherError::IpcListenerCouldNotBeBound       => LAUNCHER_ERROR_START_RANGE - 1,
             LauncherError::IpcListenerAborted(_)            => LAUNCHER_ERROR_START_RANGE - 2,
             LauncherError::IpcStreamCloneError(_)           => LAUNCHER_ERROR_START_RANGE - 3,
-            LauncherError::NfsError(_)                      => LAUNCHER_ERROR_START_RANGE - 4,
             LauncherError::ReceiverChannelDisconnected      => LAUNCHER_ERROR_START_RANGE - 5,
             LauncherError::IpcSessionTerminated(_)          => LAUNCHER_ERROR_START_RANGE - 6,
             LauncherError::FailedReadingStreamPayloadSize   => LAUNCHER_ERROR_START_RANGE - 7,
@@ -83,10 +83,10 @@ impl ::std::fmt::Debug for LauncherError {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         match *self {
             LauncherError::CoreError(ref error)             => write!(f, "LauncherError::CoreError -> {:?}", error),
+            LauncherError::NfsError(ref error)              => write!(f, "LauncherError::NfsError -> {:?}", error),
             LauncherError::IpcListenerCouldNotBeBound       => write!(f, "LauncherError::IpcListenerCouldNotBeBound"),
             LauncherError::IpcListenerAborted(ref error)    => write!(f, "LauncherError::IpcListenerAborted -> {:?}", error),
             LauncherError::IpcStreamCloneError(ref error)   => write!(f, "LauncherError::IpcStreamCloneError -> {:?}", error),
-            LauncherError::NfsError(ref error)              => write!(f, "LauncherError::NfsError -> {:?}", error),
             LauncherError::ReceiverChannelDisconnected      => write!(f, "LauncherError::ReceiverChannelDisconnected"),
             LauncherError::IpcSessionTerminated(ref error)  => write!(f, "LauncherError::IpcSessionTerminated -> {:?}", error),
             LauncherError::FailedReadingStreamPayloadSize   => write!(f, "LauncherError::FailedReadingStreamPayloadSize"),

@@ -17,7 +17,7 @@
 
 const NONCE_VERIFIER_THREAD_NAME: &'static str = "LauncherNonceVerifierThread";
 
-pub fn verify_launcher_nonce(ipc_stream  : ::std::net::TcpStream,
+pub fn verify_launcher_nonce(ipc_stream  : ::launcher::ipc_server::ipc_session::stream::IpcStream,
                              event_sender: ::launcher::ipc_server::ipc_session
                                            ::EventSenderToSession<::launcher::ipc_server::ipc_session
                                                                   ::events::AppAuthenticationEvent>) -> ::safe_core

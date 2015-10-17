@@ -16,12 +16,12 @@
 // relating to use of the SAFE Network Software.
 
 pub struct SecureCommunication {
-    ipc_stream       : ::std::net::TcpStream,
+    ipc_stream       : ::launcher::ipc_server::ipc_session::stream::IpcStream,
     safe_drive_access: bool,
 }
 
 impl SecureCommunication {
-    pub fn new(ipc_stream       : ::std::net::TcpStream,
+    pub fn new(ipc_stream       : ::launcher::ipc_server::ipc_session::stream::IpcStream,
                safe_drive_access: bool) -> SecureCommunication {
         SecureCommunication {
             ipc_stream       : ipc_stream,

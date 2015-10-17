@@ -81,9 +81,9 @@ impl IpcStream {
                                  })))
     }
 
-    // This will exit on any error condition the stream writer encounters. However the stream reads
-    // can continue. The next write event will however will immediately notify the caller about
-    // the writer channel being hung-up so that IPC Session can be terminated gracefully.
+    // This will exit on any error condition the stream writer encounters. The stream reads can
+    // continue. The next write event will however immediately notify the caller about the
+    // writer channel being hung-up so that IPC Session can be terminated gracefully.
     fn handle_write(rx: ::std::sync::mpsc::Receiver<WriterEvent>, mut stream: ::std::net::TcpStream) {
         use ::std::io::Write;
         use ::byteorder::WriteBytesExt;
