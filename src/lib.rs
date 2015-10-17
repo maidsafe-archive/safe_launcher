@@ -52,7 +52,8 @@ extern crate rustc_serialize;
 
 #[macro_use] mod macros;
 
-mod errors;
+/// Safe-Launcher Errors
+pub mod errors;
 mod config;
 mod launcher;
 mod event_sender;
