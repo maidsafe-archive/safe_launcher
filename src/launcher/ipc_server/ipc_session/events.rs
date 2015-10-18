@@ -25,24 +25,15 @@ pub enum IpcSessionEventCategory {
 
 // --------------------------------------------------------------------------------------
 
-#[derive(Clone, Debug)]
-pub enum AppAuthenticationEvent {
-    ReceivedNonce(String),
-    Failed,
-}
+pub type AppAuthenticationEvent = Result<event_data::AuthData, ::errors::LauncherError>;
 
 // --------------------------------------------------------------------------------------
 
-#[derive(Clone, Debug)]
-pub enum RsaKeyExchangeEvent {
-    SymmetricCipher(Box<(::sodiumoxide::crypto::secretbox::Key,
-                         ::sodiumoxide::crypto::secretbox::Nonce)>),
-    Failed,
-}
+pub type RsaKeyExchangeEvent = Result<event_data::RsaData, ::errors::LauncherError>;
 
 // --------------------------------------------------------------------------------------
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub enum SecureCommunicationEvent {
     PlaceHolder, // TODO
 }
@@ -50,7 +41,7 @@ pub enum SecureCommunicationEvent {
 // --------------------------------------------------------------------------------------
 
 #[allow(variant_size_differences)]
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub enum ExternalEvent {
     AppDetailReceived(Box<event_data::AppDetail>),
     ChangeSafeDriveAccess(bool),
@@ -60,7 +51,6 @@ pub enum ExternalEvent {
 // --------------------------------------------------------------------------------------
 
 pub mod event_data {
-    #[derive(Clone)]
     pub struct AppDetail {
         pub client           : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
         pub app_id           : ::routing::NameType,
@@ -72,5 +62,18 @@ pub mod event_data {
             write!(f, "AppDetail {{ client: Arc<Mutex<Client>>, app_id: {:?}, safe_drive_access: {:?}, }}",
                    self.app_id, self.safe_drive_access)
         }
+    }
+
+    #[derive(Debug)]
+    pub struct AuthData {
+        pub str_nonce    : String,
+        pub asymm_nonce  : ::sodiumoxide::crypto::box_::Nonce,
+        pub asymm_pub_key: ::sodiumoxide::crypto::box_::PublicKey,
+    }
+
+    #[derive(Debug)]
+    pub struct RsaData {
+        pub symm_key  : ::sodiumoxide::crypto::secretbox::Key,
+        pub symm_nonce: ::sodiumoxide::crypto::secretbox::Nonce,
     }
 }

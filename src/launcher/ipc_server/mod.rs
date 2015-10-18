@@ -158,8 +158,6 @@ impl IpcServer {
                     safe_drive_access: app_info.safe_drive_access,
                 });
 
-                let event_sender = session_info.event_sender.clone();
-
                 if session_info.event_sender.send(ipc_session::events::ExternalEvent::AppDetailReceived(app_detail)).is_err() {
                     debug!("Unable to communicate with the session via channel. Session will be terminated.");
                 } else if let Some(_) = self.verified_sessions.insert(app_info.app_id, session_info) {

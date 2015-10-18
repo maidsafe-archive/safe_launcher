@@ -119,7 +119,6 @@ macro_rules! group_send {
 /// #Examples
 ///
 /// ```
-/// # #[macro_use] extern crate log;
 /// # #[macro_use] extern crate safe_core;
 /// # #[macro_use] extern crate safe_launcher;
 /// struct DataType {
@@ -167,6 +166,79 @@ macro_rules! eval_send {
                 return
             },
         }
+    }
+}
+
+/// This macro is intended to be used in all cases where we get an Err out of Result<T, U> and
+/// want to send it to a group (Vector) of `std::sync::mpsc::Sender<Event(Result<T, U>)>`, for
+/// e.g.  an observer pattern with senders, and subsequently return from the function.
+/// Additionally it will purge all the dead observers (i.e. those no longer existing or
+/// interested in observing).
+///
+/// #Examples
+///
+/// ```
+/// # #[macro_use] extern crate safe_core;
+/// # #[macro_use] extern crate safe_launcher;
+/// struct DataType {
+///     field: String,
+/// }
+///
+/// enum EventSet {
+///     SomeEvent(Result<DataType, safe_launcher::errors::LauncherError>),
+///     SomeOtherEvent,
+/// }
+///
+/// fn g() -> Result<String, safe_launcher::errors::LauncherError> {
+///     Err(safe_launcher::errors::LauncherError::from("An Example Error"))
+/// }
+///
+/// fn f(mut senders: Vec<std::sync::mpsc::Sender<EventSet>>) {
+///     let some_val = eval_send_event!(g(), &mut senders, EventSet::SomeEvent);
+///
+///     let data = DataType {
+///         field: some_val,
+///     };
+///
+///     group_send!(EventSet::SomeEvent(Ok(data)), &mut senders);
+/// }
+///
+/// fn main() {
+///     let (tx, rx) = std::sync::mpsc::channel();
+///     let joiner = eval_result!(std::thread::Builder::new()
+///                                           .name("Doc-eval_send-thread".to_string())
+///                                           .spawn(move || {
+///         match eval_result!(rx.recv()) {
+///             EventSet::SomeEvent(result) => assert!(result.is_err()),
+///             EventSet::SomeOtherEvent => panic!("This is not what it should be !!"),
+///         }
+///     }));
+///
+///     let observers = vec![tx];
+///     f(observers);
+///
+///     eval_result!(joiner.join());
+/// }
+/// ```
+#[macro_export]
+macro_rules! eval_send_event {
+    ($result:expr, $senders:expr, $event:expr) => {
+        match $result {
+            Ok(value)  => value,
+            Err(error) => {
+                let converted_err = Err(::std::convert::From::from(error));
+                let event = $event(converted_err);
+                group_send!(event, $senders);
+                return
+            },
+        }
+    }
+}
+
+#[macro_export]
+macro_rules! parse_result {
+    ($output:expr, $err_statement:expr) => {
+        $output.ok_or(::errors::LauncherError::SpecificParseError($err_statement.to_string()))
     }
 }
 

@@ -31,10 +31,11 @@ pub struct IpcSession {
     app_id                 : Option<::routing::NameType>,
     temp_id                : u32,
     stream                 : ::std::net::TcpStream,
+    app_nonce              : Option<::sodiumoxide::crypto::box_::Nonce>,
+    app_pub_key            : Option<::sodiumoxide::crypto::box_::PublicKey>,
     _raii_joiner           : ::safe_core::utility::RAIIThreadJoiner,
     safe_drive_access      : Option<::std::sync::Arc<::std::sync::Mutex<bool>>>, // TODO(Spandan) change to 3-level permission instead of 2
     event_catagory_tx      : ::std::sync::mpsc::Sender<events::IpcSessionEventCategory>,
-    event_catagory_rx      : ::std::sync::mpsc::Receiver<events::IpcSessionEventCategory>,
     external_event_rx      : ::std::sync::mpsc::Receiver<events::ExternalEvent>,
     secure_comm_event_rx   : ::std::sync::mpsc::Receiver<events::SecureCommunicationEvent>,
     secure_comm_event_tx   : ::std::sync::mpsc::Sender<events::SecureCommunicationEvent>,
@@ -71,10 +72,11 @@ impl IpcSession {
             app_id                 : None,
             temp_id                : temp_id,
             stream                 : stream,
+            app_nonce              : None,
+            app_pub_key            : None,
             _raii_joiner           : joiner,
             safe_drive_access      : None,
             event_catagory_tx      : event_catagory_tx.clone(),
-            event_catagory_rx      : event_catagory_rx,
             external_event_rx      : external_event_rx,
             secure_comm_event_rx   : secure_comm_event_rx,
             secure_comm_event_tx   : secure_comm_event_tx,
@@ -86,7 +88,7 @@ impl IpcSession {
 
         let ipc_session_joiner = eval_result!(::std::thread::Builder::new().name(IPC_SESSION_THREAD_NAME.to_string())
                                                                            .spawn(move || {
-            IpcSession::activate_ipc_session(ipc_session);
+            IpcSession::activate_ipc_session(ipc_session, event_catagory_rx);
             debug!("Exiting Thread {:?}", IPC_SESSION_THREAD_NAME);
         }));
 
@@ -98,13 +100,13 @@ impl IpcSession {
         Ok((::safe_core::utility::RAIIThreadJoiner::new(ipc_session_joiner), external_event_sender))
     }
 
-    fn activate_ipc_session(mut ipc_session: IpcSession) {
-        for event_category in ipc_session.event_catagory_rx.iter() {
+    fn activate_ipc_session(mut ipc_session: IpcSession, event_catagory_rx: ::std::sync::mpsc::Receiver<events::IpcSessionEventCategory>) {
+        for event_category in event_catagory_rx.iter() {
             match event_category {
                 events::IpcSessionEventCategory::AppAuthenticationEvent => {
                     if let Ok(authentication_event) = ipc_session.authentication_event_rx.try_recv() {
                         match authentication_event {
-                            events::AppAuthenticationEvent::ReceivedNonce(nonce) => ipc_session.on_received_nonce(nonce),
+                            Ok(nonce) => ipc_session.on_auth_data_received(nonce),
                             _ => unimplemented!(),
                         }
                     }
@@ -136,11 +138,14 @@ impl IpcSession {
         }
     }
 
-    fn on_received_nonce(&self, nonce: String) {
+    fn on_auth_data_received(&mut self, auth_data: events::event_data::AuthData) {
+        self.app_nonce = Some(auth_data.asymm_nonce);
+        self.app_pub_key = Some(auth_data.asymm_pub_key);
+
         self.ipc_server_event_sender.send(::launcher
                                           ::ipc_server
                                           ::events
-                                          ::IpcSessionEvent::VerifySession(self.temp_id, nonce));
+                                          ::IpcSessionEvent::VerifySession(self.temp_id, auth_data.str_nonce));
     }
 
     fn on_app_detail_received(&self, app_detail: Box<events::event_data::AppDetail>) {
