@@ -30,6 +30,7 @@ pub fn verify_launcher_nonce(mut ipc_stream  : ::launcher::ipc_server::ipc_sessi
         use rustc_serialize::base64::FromBase64;
 
         let mut senders = vec![event_sender];
+
         let payload = eval_send!(ipc_stream.read_payload(), &mut senders);
         let payload_as_str = eval_send!(String::from_utf8(payload).map_err(|err| ::errors
                                                                                  ::LauncherError
@@ -44,9 +45,8 @@ pub fn verify_launcher_nonce(mut ipc_stream  : ::launcher::ipc_server::ipc_sessi
                                   &mut senders);
 
         if endpoint != APP_AUTHENTICATION_ENDPOINT {
-            group_send!(Err(::errors::LauncherError::SpecificParseError("Invalid endpoint for app-auhtentication".to_string())),
-                        &mut senders);
-            return
+            eval_send!(Err(::errors::LauncherError::SpecificParseError("Invalid endpoint for app-auhtentication".to_string())),
+                       &mut senders);
         }
 
         let json_data = eval_send!(parse_result!(json_obj.get("data"), "Expected \"data\" token not present."),
@@ -75,9 +75,8 @@ pub fn verify_launcher_nonce(mut ipc_stream  : ::launcher::ipc_server::ipc_sessi
                                                                                ::SpecificParseError(format!("{:?}", err))),
                                    &mut senders);
         if vec_nonce.len() != ::sodiumoxide::crypto::box_::NONCEBYTES {
-            group_send!(Err(::errors::LauncherError::SpecificParseError("Invalid nonce length.".to_string())),
-                        &mut senders);
-            return
+            eval_send!(Err(::errors::LauncherError::SpecificParseError("Invalid nonce length.".to_string())),
+                       &mut senders);
         }
 
         let vec_pub_key = eval_send!(str_asymm_pub_key.from_base64().map_err(|err| ::errors
@@ -85,9 +84,8 @@ pub fn verify_launcher_nonce(mut ipc_stream  : ::launcher::ipc_server::ipc_sessi
                                                                                    ::SpecificParseError(format!("{:?}", err))),
                                      &mut senders);
         if vec_pub_key.len() != ::sodiumoxide::crypto::box_::PUBLICKEYBYTES {
-            group_send!(Err(::errors::LauncherError::SpecificParseError("Invalid public encryption key length.".to_string())),
-                        &mut senders);
-            return
+            eval_send!(Err(::errors::LauncherError::SpecificParseError("Invalid public encryption key length.".to_string())),
+                       &mut senders);
         }
 
         let mut asymm_nonce = ::sodiumoxide::crypto::box_::Nonce([0; ::sodiumoxide::crypto::box_::NONCEBYTES]);
