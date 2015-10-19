@@ -26,6 +26,7 @@ mod modify_file_v1_0;
 
 pub fn action_dispatcher<D>(client          : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
                             remaining_tokens: Vec<String>,
+                            version         : f32,
                             decoder         : &mut D) -> ::launcher::parser::ResponseType
                                                          where D: ::rustc_serialize::Decoder {
     unimplemented!()
