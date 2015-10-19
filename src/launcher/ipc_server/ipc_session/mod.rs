@@ -19,6 +19,7 @@ pub mod events;
 
 pub type EventSenderToSession<EventSubset> = ::event_sender::EventSender<events::IpcSessionEventCategory, EventSubset>;
 
+mod stream;
 mod authenticate_app;
 mod rsa_key_exchange;
 mod secure_communication;
@@ -29,11 +30,12 @@ const IPC_SESSION_THREAD_NAME: &'static str = "IpcSessionThread";
 pub struct IpcSession {
     app_id                 : Option<::routing::NameType>,
     temp_id                : u32,
-    ipc_stream             : ::std::net::TcpStream,
+    stream                 : ::std::net::TcpStream,
+    app_nonce              : Option<::sodiumoxide::crypto::box_::Nonce>,
+    app_pub_key            : Option<::sodiumoxide::crypto::box_::PublicKey>,
     _raii_joiner           : ::safe_core::utility::RAIIThreadJoiner,
     safe_drive_access      : Option<::std::sync::Arc<::std::sync::Mutex<bool>>>, // TODO(Spandan) change to 3-level permission instead of 2
     event_catagory_tx      : ::std::sync::mpsc::Sender<events::IpcSessionEventCategory>,
-    event_catagory_rx      : ::std::sync::mpsc::Receiver<events::IpcSessionEventCategory>,
     external_event_rx      : ::std::sync::mpsc::Receiver<events::ExternalEvent>,
     secure_comm_event_rx   : ::std::sync::mpsc::Receiver<events::SecureCommunicationEvent>,
     secure_comm_event_tx   : ::std::sync::mpsc::Sender<events::SecureCommunicationEvent>,
@@ -46,7 +48,7 @@ pub struct IpcSession {
 impl IpcSession {
     pub fn new(server_event_sender: ::launcher::ipc_server::EventSenderToServer<::launcher::ipc_server::events::IpcSessionEvent>,
                temp_id            : u32,
-               ipc_stream         : ::std::net::TcpStream) -> Result<(::safe_core::utility::RAIIThreadJoiner,
+               stream             : ::std::net::TcpStream) -> Result<(::safe_core::utility::RAIIThreadJoiner,
                                                                       EventSenderToSession<events::ExternalEvent>),
                                                                      ::errors::LauncherError> {
         let (event_catagory_tx, event_catagory_rx) = ::std::sync::mpsc::channel();
@@ -60,20 +62,21 @@ impl IpcSession {
                                                                     events::IpcSessionEventCategory::AppAuthenticationEvent,
                                                                     event_catagory_tx.clone());
 
-        let joiner = authenticate_app::verify_launcher_nonce(try!(ipc_stream.try_clone()
-                                                                            .map_err(|err| ::errors
-                                                                                           ::LauncherError
-                                                                                           ::IpcStreamCloneError(err))),
-                                                             authentication_event_sender);
+        let ipc_stream = try!(stream::IpcStream::new(try!(stream.try_clone()
+                                                                .map_err(|err| ::errors
+                                                                               ::LauncherError
+                                                                               ::IpcStreamCloneError(err)))));
+        let joiner = authenticate_app::verify_launcher_nonce(ipc_stream, authentication_event_sender);
 
         let ipc_session = IpcSession {
             app_id                 : None,
             temp_id                : temp_id,
-            ipc_stream             : ipc_stream,
+            stream                 : stream,
+            app_nonce              : None,
+            app_pub_key            : None,
             _raii_joiner           : joiner,
             safe_drive_access      : None,
             event_catagory_tx      : event_catagory_tx.clone(),
-            event_catagory_rx      : event_catagory_rx,
             external_event_rx      : external_event_rx,
             secure_comm_event_rx   : secure_comm_event_rx,
             secure_comm_event_tx   : secure_comm_event_tx,
@@ -85,8 +88,8 @@ impl IpcSession {
 
         let ipc_session_joiner = eval_result!(::std::thread::Builder::new().name(IPC_SESSION_THREAD_NAME.to_string())
                                                                            .spawn(move || {
-            IpcSession::activate_ipc_session(ipc_session);
-            debug!("Exiting Thread {:?}", IPC_SESSION_THREAD_NAME.to_string());
+            IpcSession::activate_ipc_session(ipc_session, event_catagory_rx);
+            debug!("Exiting Thread {:?}", IPC_SESSION_THREAD_NAME);
         }));
 
         let external_event_sender = EventSenderToSession::<events::ExternalEvent>
@@ -97,13 +100,13 @@ impl IpcSession {
         Ok((::safe_core::utility::RAIIThreadJoiner::new(ipc_session_joiner), external_event_sender))
     }
 
-    fn activate_ipc_session(mut ipc_session: IpcSession) {
-        for event_category in ipc_session.event_catagory_rx.iter() {
+    fn activate_ipc_session(mut ipc_session: IpcSession, event_catagory_rx: ::std::sync::mpsc::Receiver<events::IpcSessionEventCategory>) {
+        for event_category in event_catagory_rx.iter() {
             match event_category {
                 events::IpcSessionEventCategory::AppAuthenticationEvent => {
                     if let Ok(authentication_event) = ipc_session.authentication_event_rx.try_recv() {
                         match authentication_event {
-                            events::AppAuthenticationEvent::ReceivedNonce(nonce) => ipc_session.on_received_nonce(nonce),
+                            Ok(nonce) => ipc_session.on_auth_data_received(nonce),
                             _ => unimplemented!(),
                         }
                     }
@@ -135,11 +138,14 @@ impl IpcSession {
         }
     }
 
-    fn on_received_nonce(&self, nonce: String) {
+    fn on_auth_data_received(&mut self, auth_data: events::event_data::AuthData) {
+        self.app_nonce = Some(auth_data.asymm_nonce);
+        self.app_pub_key = Some(auth_data.asymm_pub_key);
+
         self.ipc_server_event_sender.send(::launcher
                                           ::ipc_server
                                           ::events
-                                          ::IpcSessionEvent::VerifySession(self.temp_id, nonce));
+                                          ::IpcSessionEvent::VerifySession(self.temp_id, auth_data.str_nonce));
     }
 
     fn on_app_detail_received(&self, app_detail: Box<events::event_data::AppDetail>) {
@@ -153,7 +159,7 @@ impl IpcSession {
 
 impl Drop for IpcSession {
     fn drop(&mut self) {
-        if let Err(err) = self.ipc_stream.shutdown(::std::net::Shutdown::Both) {
+        if let Err(err) = self.stream.shutdown(::std::net::Shutdown::Both) {
             debug!("Failed to gracefully shutdown session for app-id {:?} with error {:?}",
                    self.app_id, err);
         }

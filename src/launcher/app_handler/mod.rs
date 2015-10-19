@@ -15,19 +15,17 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-use std::io::{Read, Write};
-
 pub mod events;
+
+use std::io::{Read, Write};
 
 mod misc;
 
 const APP_HANDLER_THREAD_NAME: &'static str = "launcher.config";
-const LAUNCHER_CONFIG_FILE_NAME: &'static str = "LauncherSpecificConfigurationFile";
-const LAUNCHER_CONFIG_DIRECTORY_NAME: &'static str = "LauncherSpecificConfigurationDir";
-const LAUNCHER_LOCAL_CONFIG_FILE_NAME: &'static str = "launcher.config";
 
 pub struct AppHandler {
     client                 : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+    launcher_endpoint      : String,
     local_config_data      : ::std::collections::HashMap<::routing::NameType, String>,
     ipc_server_event_sender: ::launcher
                              ::ipc_server
@@ -48,7 +46,7 @@ impl AppHandler {
         let joiner = eval_result!(::std::thread::Builder::new().name(APP_HANDLER_THREAD_NAME.to_string())
                                                                .spawn(move || {
             let mut temp_dir_pathbuf = ::std::env::temp_dir();
-            temp_dir_pathbuf.push(LAUNCHER_LOCAL_CONFIG_FILE_NAME);
+            temp_dir_pathbuf.push(::config::LAUNCHER_LOCAL_CONFIG_FILE_NAME);
 
             let mut local_config_data = ::std::collections::HashMap::with_capacity(10);
 
@@ -64,8 +62,13 @@ impl AppHandler {
                 }
             }
 
+            let (tx, rx) = ::std::sync::mpsc::channel();
+            eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::GetListenerEndpoint(tx)));
+            let launcher_endpoint = eval_result!(rx.recv());
+
             let app_handler = AppHandler {
                 client                 : client,
+                launcher_endpoint      : launcher_endpoint,
                 local_config_data      : local_config_data,
                 ipc_server_event_sender: event_sender,
             };
@@ -82,20 +85,18 @@ impl AppHandler {
         for event in event_rx.iter() {
             match event {
                 events::AppHandlerEvent::AddApp(app_detail) => app_handler.on_add_app(app_detail),
+                events::AppHandlerEvent::ActivateApp(app_id) => app_handler.on_activate_app(app_id),
                 events::AppHandlerEvent::Terminate => break,
             }
         }
     }
 
-    //TODO instead of eval_result! retun error to asker
+    //TODO instead of eval_result! retun error to asker - also unbox app_detail to avoid clone()
     fn on_add_app(&mut self, app_detail: Box<events::event_data::AppDetail>) {
         {
             let mut paths = self.local_config_data.values();
             if let Some(_) = paths.find(|stored_path| **stored_path == app_detail.absolute_path) {
                 debug!("App already added");
-                if let Err(err) = app_detail.result.send(false) {
-                    debug!("{:?} -> Error sending result", err);
-                }
                 return
             }
         }
@@ -104,18 +105,11 @@ impl AppHandler {
 
         let _ = self.local_config_data.insert(app_id, app_detail.absolute_path.clone());
 
-        let mut tokens: Vec<String> = app_detail.absolute_path
-                                                .split(|element| element == '/')
-                                                .filter(|token| token.len() != 0)
-                                                .map(|token| token.to_string())
-                                                .collect();
+        let mut tokens = AppHandler::tokenise_string(&app_detail.absolute_path);
 
         let app_name = eval_option!(tokens.pop(), ""); // TODO(Spandan) don't use eval_option here
 
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
-        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
-
-        let mut dir_listing = eval_result!(dir_helper.get_configuration_directory_listing(LAUNCHER_CONFIG_DIRECTORY_NAME.to_string()));
         let mut root_dir_listing = eval_result!(dir_helper.get_user_root_directory_listing());
 
         // TODO check first if it exists. Then follow the logic in RFC
@@ -126,7 +120,7 @@ impl AppHandler {
                                                               ::safe_nfs::AccessLevel::Private,
                                                               Some(&mut root_dir_listing))).0.get_key().clone();
 
-        let launcher_config = misc::LauncherConfiguration {
+        let new_launcher_config = misc::LauncherConfiguration {
             app_id           : app_id,
             app_name         : app_name,
             refernece_count  : 1,
@@ -134,60 +128,107 @@ impl AppHandler {
             safe_drive_access: app_detail.safe_drive_access,
         };
 
-        let mut launcher_configurations: Vec<misc::LauncherConfiguration>;
+        eval_result!(self.upsert_to_launcher_global_config(new_launcher_config));
+    }
 
-        let file = {
-            // TODO(Spandan) Is this a rust bug ? `else` branch should not consider the borrow of
-            //               variable in `if` branch but it does.
-            //               Update: It indeed is a bug:
-            //               - https://users.rust-lang.org/t/curious-scope-rules-when-using-if-let/1858
-            //               - https://github.com/rust-lang/rfcs/issues/811
-            //               Uncomment the following once the issue above is closed.
-            // let file = if let Some(existing_file) = dir_listing.get_files().iter().find(|file| file.get_name() == LAUNCHER_CONFIG_FILE_NAME) {
-            //     existing_file
-            // } else {
-            //     let writer = eval_result!(file_helper.create(LAUNCHER_CONFIG_FILE_NAME.to_string(), vec![], dir_listing));
-            //     dir_listing = eval_result!(writer.close()).0;
-            //     eval_option!(dir_listing.get_files().iter().find(|file| file.get_name() == LAUNCHER_CONFIG_FILE_NAME), "Should Exist")
-            // };
+    fn on_activate_app(&mut self, app_id: Box<::routing::NameType>) {
+        let global_configs = eval_result!(self.get_launcher_global_config());
 
-            let is_present = dir_listing.get_files().iter().find(|file| file.get_name() == LAUNCHER_CONFIG_FILE_NAME).is_some();
+        if let Some(app_info) = global_configs.iter().find(|config| config.app_id == *app_id) {
+            if let Some(app_binary_path) = self.local_config_data.get(&app_info.app_id) {
+                let str_nonce = eval_result!(::safe_core::utility::generate_random_string(::config::LAUNCHER_NONCE_LENGTH));
+                let activation_detail = ::launcher::ipc_server::events::event_data::ActivationDetail {
+                    nonce            : str_nonce.clone(),
+                    app_id           : app_info.app_id.clone(),
+                    app_root_dir_key : app_info.app_root_dir_key.clone(),
+                    safe_drive_access: app_info.safe_drive_access,
+                };
 
-            if !is_present {
-                let writer = eval_result!(file_helper.create(LAUNCHER_CONFIG_FILE_NAME.to_string(), vec![], dir_listing));
-                dir_listing= eval_result!(writer.close()).0;
+                eval_result!(self.ipc_server_event_sender.send(::launcher
+                                                               ::ipc_server
+                                                               ::events
+                                                               ::ExternalEvent::AppActivated(Box::new(activation_detail))));
+
+                let command_line_arg = format!("tcp:{}:{}", self.launcher_endpoint, str_nonce);
+                
+                let _app_process_handle = eval_result!(::std::process::Command::new(app_binary_path)
+                                                                               .arg("--launcher")
+                                                                               .arg(command_line_arg)
+                                                                               .spawn());
             }
+        }
+    }
 
+    fn tokenise_string(source: &str) -> Vec<String> {
+        source .split(|element| element == '/')
+               .filter(|token| token.len() != 0)
+               .map(|token| token.to_string())
+               .collect()
+    }
+
+    fn get_launcher_global_config(&self) -> Result<Vec<misc::LauncherConfiguration>, ::errors::LauncherError> {
+        Ok(try!(self.get_launcher_global_config_and_dir()).0)
+    }
+
+    fn upsert_to_launcher_global_config(&self, config: misc::LauncherConfiguration) -> Result<(), ::errors::LauncherError> {
+        let (mut global_configs, dir_listing) = try!(self.get_launcher_global_config_and_dir());
+
+        // TODO(Spandan) Due to bug in the language, unable to use `if let Some() .. else` logic to
+        // upsert to a vector. Once the bug is resolved
+        // - https://github.com/rust-lang/rust/issues/28449
+        // then modify the following to use it.
+        if let Some(pos) = global_configs.iter().position(|existing_config| existing_config.app_id == config.app_id) {
+            let existing_config = eval_option!(global_configs.get_mut(pos), "Logic Error - Report bug.");
+            *existing_config = config;
+        } else {
+            global_configs.push(config);
+        }
+
+        let file = eval_option!(dir_listing.get_files()
+                                           .iter()
+                                           .find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME),
+                                "Logic Error - Launcher start-up should ensure the file must be present at this stage - Report bug.").clone();
+
+        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
+        let mut writer = try!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, dir_listing));
+        writer.write(&try!(::safe_core::utility::serialise(&global_configs)), 0);
+        let _ = try!(writer.close()); // TODO use result
+
+        Ok(())
+    }
+
+    fn get_launcher_global_config_and_dir(&self) -> Result<(Vec<misc::LauncherConfiguration>,
+                                                            ::safe_nfs::directory_listing::DirectoryListing),
+                                                           ::errors::LauncherError> {
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
+        let dir_listing = try!(dir_helper.get_configuration_directory_listing(::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string()));
+
+        let global_configs = {
             let file = eval_option!(dir_listing.get_files()
                                                .iter()
-                                               .find(|file| file.get_name() == LAUNCHER_CONFIG_FILE_NAME),
-                                    "Logic Error - Report as bug.");
+                                               .find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME),
+                                    "Logic Error - Launcher start-up should ensure the file must be present at this stage - Report bug.");
 
             let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
             let mut reader = file_helper.read(file);
+
             let size = reader.size();
 
-            launcher_configurations = if size != 0 {
-                eval_result!(::safe_core::utility::deserialise(&eval_result!(reader.read(0, size))))
+            if size != 0 {
+                try!(::safe_core::utility::deserialise(&try!(reader.read(0, size))))
             } else {
                 Vec::new()
-            };
-
-            launcher_configurations.push(launcher_config);
-
-            file.clone()
+            }
         };
 
-        let mut writer = eval_result!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, dir_listing));
-        writer.write(&eval_result!(::safe_core::utility::serialise(&launcher_configurations)), 0);
-        let _ = eval_result!(writer.close()); // TODO use result
+        Ok((global_configs, dir_listing))
     }
 }
 
 impl Drop for AppHandler {
     fn drop(&mut self) {
         let mut temp_dir_pathbuf = ::std::env::temp_dir();
-        temp_dir_pathbuf.push(LAUNCHER_LOCAL_CONFIG_FILE_NAME);
+        temp_dir_pathbuf.push(::config::LAUNCHER_LOCAL_CONFIG_FILE_NAME);
 
         let mut file = eval_result!(::std::fs::File::create(temp_dir_pathbuf));
         let plain_text = eval_result!(::safe_core::utility::serialise(&self.local_config_data));

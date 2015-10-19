@@ -46,13 +46,17 @@ impl Drop for SessionInfo {
 
 pub struct AppInfo {
     pub app_id           : ::routing::NameType,
+    pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
     pub safe_drive_access: bool,
 }
 
 impl AppInfo {
-    pub fn new(app_id: ::routing::NameType, safe_drive_access: bool) -> AppInfo {
+    pub fn new(app_id           : ::routing::NameType,
+               app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
+               safe_drive_access: bool) -> AppInfo {
         AppInfo {
             app_id           : app_id,
+            app_root_dir_key : app_root_dir_key,
             safe_drive_access: safe_drive_access,
         }
     }

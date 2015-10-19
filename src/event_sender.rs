@@ -23,7 +23,7 @@ pub struct EventSender<Category, EventSubset> {
 }
 
 impl<Category   : ::std::fmt::Debug + Clone,
-     EventSubset: ::std::fmt::Debug + Clone> EventSender<Category, EventSubset> {
+     EventSubset: ::std::fmt::Debug> EventSender<Category, EventSubset> {
     pub fn new(event_tx         : ::std::sync::mpsc::Sender<EventSubset>,
                event_category   : Category,
                event_category_tx: ::std::sync::mpsc::Sender<Category>) -> EventSender<Category, EventSubset> {
