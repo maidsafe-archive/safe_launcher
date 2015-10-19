@@ -16,11 +16,11 @@
 // relating to use of the SAFE Network Software.
 
 pub struct AuthenticateApp {
-    ipc_stream: ::std::net::TcpStream,
+    ipc_stream: ::launcher::ipc_server::ipc_session::stream::IpcStream,
 }
 
 impl AuthenticateApp {
-    pub fn new(ipc_stream: ::std::net::TcpStream) -> AuthenticateApp {
+    pub fn new(ipc_stream: ::launcher::ipc_server::ipc_session::stream::IpcStream) -> AuthenticateApp {
         AuthenticateApp {
             ipc_stream: ipc_stream,
         }

@@ -25,6 +25,7 @@ const APP_HANDLER_THREAD_NAME: &'static str = "launcher.config";
 
 pub struct AppHandler {
     client                 : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+    launcher_endpoint      : String,
     local_config_data      : ::std::collections::HashMap<::routing::NameType, String>,
     ipc_server_event_sender: ::launcher
                              ::ipc_server
@@ -61,8 +62,13 @@ impl AppHandler {
                 }
             }
 
+            let (tx, rx) = ::std::sync::mpsc::channel();
+            eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::GetListenerEndpoint(tx)));
+            let launcher_endpoint = eval_result!(rx.recv());
+
             let app_handler = AppHandler {
                 client                 : client,
+                launcher_endpoint      : launcher_endpoint,
                 local_config_data      : local_config_data,
                 ipc_server_event_sender: event_sender,
             };
@@ -208,6 +214,31 @@ impl AppHandler {
     }
 
     fn on_activate_app(&mut self, app_id: Box<::routing::NameType>) {
+        let global_configs = eval_result!(self.get_launcher_global_config());
+
+        if let Some(app_info) = global_configs.iter().find(|config| config.app_id == *app_id) {
+            if let Some(app_binary_path) = self.local_config_data.get(&app_info.app_id) {
+                let str_nonce = eval_result!(::safe_core::utility::generate_random_string(::config::LAUNCHER_NONCE_LENGTH));
+                let activation_detail = ::launcher::ipc_server::events::event_data::ActivationDetail {
+                    nonce            : str_nonce.clone(),
+                    app_id           : app_info.app_id.clone(),
+                    app_root_dir_key : app_info.app_root_dir_key.clone(),
+                    safe_drive_access: app_info.safe_drive_access,
+                };
+
+                eval_result!(self.ipc_server_event_sender.send(::launcher
+                                                               ::ipc_server
+                                                               ::events
+                                                               ::ExternalEvent::AppActivated(Box::new(activation_detail))));
+
+                let command_line_arg = format!("tcp:{}:{}", self.launcher_endpoint, str_nonce);
+
+                let _app_process_handle = eval_result!(::std::process::Command::new(app_binary_path)
+                                                                               .arg("--launcher")
+                                                                               .arg(command_line_arg)
+                                                                               .spawn());
+            }
+        }
     }
 
     fn on_remove_app(&mut self, app_detail: Box<events::event_data::AppDetail>) {

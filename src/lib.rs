@@ -43,6 +43,8 @@ extern crate libc;
 extern crate routing;
 extern crate safe_dns;
 extern crate safe_nfs;
+extern crate byteorder;
+extern crate bufstream;
 extern crate sodiumoxide;
 extern crate rustc_serialize;
 #[macro_use] extern crate log;
@@ -50,7 +52,8 @@ extern crate rustc_serialize;
 
 #[macro_use] mod macros;
 
-mod errors;
+/// Safe-Launcher Errors
+pub mod errors;
 mod config;
 mod launcher;
 mod event_sender;

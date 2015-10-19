@@ -81,7 +81,7 @@ impl IpcServer {
         let ipc_server_joiner = eval_result!(::std::thread::Builder::new().name(IPC_SERVER_THREAD_NAME.to_string())
                                                                           .spawn(move || {
             IpcServer::activate_ipc_server(ipc_server, event_catagory_rx);
-            debug!("Exiting Thread {:?}", IPC_SERVER_THREAD_NAME.to_string());
+            debug!("Exiting Thread {:?}", IPC_SERVER_THREAD_NAME);
         }));
 
         let external_event_sender = EventSenderToServer::<events::ExternalEvent>
@@ -125,14 +125,14 @@ impl IpcServer {
         }
     }
 
-    fn on_spawn_ipc_session(&mut self, ipc_stream: ::std::net::TcpStream) {
+    fn on_spawn_ipc_session(&mut self, stream: ::std::net::TcpStream) {
         let event_sender = EventSenderToServer::<events::IpcSessionEvent>
                                               ::new(self.session_event_tx.clone(),
                                                     events::IpcServerEventCategory::IpcSessionEvent,
                                                     self.event_catagory_tx.clone());
         match ipc_session::IpcSession::new(event_sender,
                                            self.temp_id,
-                                           ipc_stream) {
+                                           stream) {
             Ok((raii_joiner, event_sender)) => {
                 if let Some(_) = self.unverified_sessions.insert(self.temp_id,
                                                                  misc::SessionInfo::new(raii_joiner,
@@ -158,8 +158,6 @@ impl IpcServer {
                     safe_drive_access: app_info.safe_drive_access,
                 });
 
-                let event_sender = session_info.event_sender.clone();
-
                 if session_info.event_sender.send(ipc_session::events::ExternalEvent::AppDetailReceived(app_detail)).is_err() {
                     debug!("Unable to communicate with the session via channel. Session will be terminated.");
                 } else if let Some(_) = self.verified_sessions.insert(app_info.app_id, session_info) {
@@ -175,8 +173,16 @@ impl IpcServer {
         ;
     }
 
-    fn on_app_activated(&self, activation_detail: Box<events::event_data::ActivationDetail>) {
-        ;
+    fn on_app_activated(&mut self, activation_detail: Box<events::event_data::ActivationDetail>) {
+        let detail = *activation_detail;
+        if let Some(info) = self.pending_verifications.insert(detail.nonce,
+                                                              misc::AppInfo::new(detail.app_id,
+                                                                                 detail.app_root_dir_key,
+                                                                                 detail.safe_drive_access)) {
+            // TODO(Spandan) handle this security hole.
+            debug!("Same nonce was already given to an app pending verification. This is a security hole not fixed in this iteration.");
+            debug!("Dropping the previous app information and re-assigning nonce to a new app");
+        }
     }
 
     fn on_change_safe_drive_access(&self, app_id: ::routing::NameType, is_allowed: bool) {
@@ -233,7 +239,7 @@ impl IpcServer {
                                      event_sender,
                                      stop_flag);
 
-            debug!("Exiting Thread {:?}", IPC_LISTENER_THREAD_NAME.to_string());
+            debug!("Exiting Thread {:?}", IPC_LISTENER_THREAD_NAME);
         }));
 
         Ok((::safe_core::utility::RAIIThreadJoiner::new(joiner), local_endpoint))
@@ -244,11 +250,11 @@ impl IpcServer {
                      stop_flag   : ::std::sync::Arc<::std::sync::atomic::AtomicBool>) {
         loop  {
             match ipc_listener.accept() {
-                Ok((ipc_stream, _)) => {
+                Ok((stream, _)) => {
                     if stop_flag.load(::std::sync::atomic::Ordering::SeqCst) {
                         break;
                     } else {
-                        if let Err(_) = event_sender.send(events::IpcListenerEvent::SpawnIpcSession(ipc_stream)) {
+                        if let Err(_) = event_sender.send(events::IpcListenerEvent::SpawnIpcSession(stream)) {
                             break;
                         }
                     }
@@ -305,6 +311,7 @@ mod test {
             assert_eq!(eval_result!(stream.read(&mut buffer)), 0);
         })));
 
+        ::std::thread::sleep_ms(3000);
         // Terminate to exit this test - otherwise the raii_joiners will hang this test - this is
         // by design. So there is no way out but graceful termination which is what this entire
         // design strives for.
