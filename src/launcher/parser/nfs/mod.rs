@@ -28,6 +28,6 @@ pub fn action_dispatcher<D>(client          : ::std::sync::Arc<::std::sync::Mute
                             remaining_tokens: Vec<String>,
                             version         : f32,
                             decoder         : &mut D) -> ::launcher::parser::ResponseType
-                                                         where D: ::rustc_serialize::Decoder {
+                                                         where D: ::rustc_serialize::Decoder, D::Error: ::std::fmt::Debug {
     unimplemented!()
 }
