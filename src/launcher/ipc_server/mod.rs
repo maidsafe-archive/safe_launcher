@@ -207,7 +207,7 @@ impl IpcServer {
         loop {
             let local_ip = ::std::net::Ipv4Addr::new(127, 0, third_octate, fourth_octate);
             let local_endpoint = (local_ip, 0);
-            
+
             match ::std::net::TcpListener::bind(local_endpoint) {
                 Ok(listener) => {
                     ipc_listener = listener;
@@ -315,6 +315,40 @@ mod test {
         // Terminate to exit this test - otherwise the raii_joiners will hang this test - this is
         // by design. So there is no way out but graceful termination which is what this entire
         // design strives for.
+        eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::Terminate));
+    }
+
+    #[test]
+    fn application_handshake() {
+        let client = ::std
+                     ::sync
+                     ::Arc::new(::std
+                                ::sync
+                                ::Mutex::new(eval_result!(::safe_core::utility::test_utils::get_client())));
+
+        let (_raii_joiner_0, event_sender) = eval_result!(IpcServer::new(client));
+
+        let (tx, rx) = ::std::sync::mpsc::channel();
+        eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::GetListenerEndpoint(tx)));
+        let listener_ep = eval_result!(rx.recv());
+
+        let mut stream = eval_result!(::std::net::TcpStream::connect(&listener_ep[..]));
+
+        // create ExternalEvent::AppActivated
+        // send the AppActivation details -> event_sender.send(ExternalEvent::AppActivated)
+
+        let _raii_joiner_1 = ::safe_core
+                             ::utility
+                             ::RAIIThreadJoiner
+                             ::new(eval_result!(::std
+                                                ::thread
+                                                ::Builder::new().name("TCPClientThread".to_string())
+                                                                .spawn(move || {
+                // create IPCstream
+                // write the Application keys in JSON specified in the RFC
+                // read the response
+        })));
+        ::std::thread::sleep_ms(3000);
         eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::Terminate));
     }
 }

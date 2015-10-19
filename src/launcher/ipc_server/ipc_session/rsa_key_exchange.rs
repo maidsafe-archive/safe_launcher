@@ -15,18 +15,56 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-pub struct AuthenticateApp {
-    ipc_stream: ::launcher::ipc_server::ipc_session::stream::IpcStream,
+use rustc_serialize::base64::ToBase64;
+
+#[derive(Debug, RustcEncodable)]
+struct KeyExchangeData {
+    pub public_key: String,
+    pub cipher       : String,
 }
 
-impl AuthenticateApp {
-    pub fn new(ipc_stream: ::launcher::ipc_server::ipc_session::stream::IpcStream) -> AuthenticateApp {
-        AuthenticateApp {
-            ipc_stream: ipc_stream,
-        }
-    }
 
-    pub fn authenticate(&self) -> String {
-        unimplemented!()
+#[derive(Debug, RustcEncodable)]
+struct HandshakeResponse {
+    pub id  : Vec<u8>,
+    pub data: KeyExchangeData,
+}
+
+
+pub fn perform_key_exchange(mut ipc_stream: ::launcher::ipc_server::ipc_session::stream::IpcStream,
+                            app_nonce     : ::sodiumoxide::crypto::box_::Nonce,
+                            app_pub_key   : ::sodiumoxide::crypto::box_::PublicKey) -> Result<(::sodiumoxide::crypto::secretbox::Nonce,
+                                                                                              ::sodiumoxide::crypto::secretbox::Key),
+                                                                                             ::errors::LauncherError> {
+    let config = ::rustc_serialize::base64::Config {
+        char_set   : ::rustc_serialize::base64::CharacterSet::Standard,
+        newline    : ::rustc_serialize::base64::Newline::LF,
+        pad        : true,
+        line_length: None,
+    };
+    // generate nonce and symmtric key
+    let nonce = ::sodiumoxide::crypto::secretbox::gen_nonce();
+    let key = ::sodiumoxide::crypto::secretbox::gen_key();
+    let (launcher_public_key, launcher_secret_key) = ::sodiumoxide::crypto::box_::gen_keypair();
+    // Pack it into single [u8; NONCEBYTES+KEYBYTES] -> [nonce+key]
+    let mut data = [0u8; 36];
+    let mut pos = 0;
+    for i in nonce.0.iter().chain(key.0.iter()) {
+      data[0] = *i;
+      pos += 1;
     }
+    // encrypt above by box_::seal to get Vec<u8>
+    let encrypted_data = ::sodiumoxide::crypto::box_::seal(&data, &app_nonce, &app_pub_key, &launcher_secret_key);
+    // Create the JSON as specified in the RFC
+    let response = KeyExchangeData {
+      public_key: launcher_public_key.0.to_base64(config),
+      cipher: encrypted_data.to_base64(config),
+    };
+    let payload = HandshakeResponse {
+      id: vec![],
+      data: response,
+    };
+    // write the data through the stream
+    ipc_stream.write(try!(::safe_core::utility::serialise(&payload)));
+    Ok((nonce, key))
 }

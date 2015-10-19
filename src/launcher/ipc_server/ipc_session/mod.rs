@@ -148,8 +148,16 @@ impl IpcSession {
                                           ::IpcSessionEvent::VerifySession(self.temp_id, auth_data.str_nonce));
     }
 
-    fn on_app_detail_received(&self, app_detail: Box<events::event_data::AppDetail>) {
-        ;
+    fn on_app_detail_received(&mut self, app_detail: Box<events::event_data::AppDetail>) {
+        let mut ipc_stream = eval_result!(stream::IpcStream::new(eval_result!(self.stream.try_clone()
+                                                                                         .map_err(|err| ::errors
+                                                                                                        ::LauncherError
+                                                                                                        ::IpcStreamCloneError(err)))));
+        let (nonce, symmetric_key_key) = eval_result!(rsa_key_exchange::perform_key_exchange(ipc_stream,
+                                                                                             eval_option!(self.app_nonce, ""),
+                                                                                             eval_option!(self.app_pub_key, "")));
+        // Asign to self
+        // TODO (Krishna) send => events::IpcSessionEventCategory::SecureCommunicationEvent
     }
 
     fn on_change_safe_drive_access(&self, is_allowed: bool) {
