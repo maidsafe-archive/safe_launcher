@@ -246,7 +246,7 @@ impl AppHandler {
 
         // remove/update from launcher_configurations
         let config_file_name = ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string();
-        let mut tokens: Vec<String> = AppHandler::tokenise_string(&app_detail.absolute_path);
+        let mut tokens = AppHandler::tokenise_string(&app_detail.absolute_path);
         let mut app_name = eval_option!(tokens.pop(), ""); // TODO(Spandan) don't use eval_option here
 
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
