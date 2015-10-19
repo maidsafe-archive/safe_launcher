@@ -318,8 +318,22 @@ mod test {
         eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::Terminate));
     }
 
+    #[derive(RustcEncodable)]
+    struct HandshakeRequest {
+        pub end_point: String,
+        pub data: HandshakePayload,
+    }
+
+    #[derive(RustcEncodable)]
+    struct HandshakePayload {
+        pub launcher_string: String,
+        pub nonce: String,
+        pub public_encryption_key: String,
+    }
+
     #[test]
     fn application_handshake() {
+
         let client = ::std
                      ::sync
                      ::Arc::new(::std
@@ -356,9 +370,29 @@ mod test {
                                                 ::thread
                                                 ::Builder::new().name("TCPClientThread".to_string())
                                                                 .spawn(move || {
-                // create IPCstream
-                // write the Application keys in JSON specified in the RFC
-                // read the response
+                use rustc_serialize::base64::ToBase64;
+
+                let mut ipc_stream = eval_result!(::launcher
+                                                  ::ipc_server
+                                                  ::ipc_session
+                                                  ::stream
+                                                  ::IpcStream::new(eval_result!(stream.try_clone())));
+                let app_nonce = ::sodiumoxide::crypto::box_::gen_nonce();
+                let (app_public_key, app_seccret_key) = ::sodiumoxide::crypto::box_::gen_keypair();
+                let payload = HandshakePayload {
+                    launcher_string      : "mock_nonce_string".to_string(),
+                    nonce                : app_nonce.0.to_base64(::config::get_base64_config()),
+                    public_encryption_key: app_public_key.0.to_base64(::config::get_base64_config()),
+                };
+                let request = HandshakeRequest {
+                    end_point: "safe-api/v1.0/handshake/authenticate-app".to_string(),
+                    data     : payload,
+                };
+
+                ipc_stream.write(eval_result!(::safe_core::utility::serialise(&eval_result!(::rustc_serialize::json::encode(&request)))));
+                
+                let mut buffer = [0; 1024];
+                assert_eq!(eval_result!(stream.read(&mut buffer)), 1024);
         })));
         ::std::thread::sleep_ms(3000);
         eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::Terminate));

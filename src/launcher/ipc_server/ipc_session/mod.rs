@@ -16,10 +16,10 @@
 // relating to use of the SAFE Network Software.
 
 pub mod events;
+pub mod stream;
 
 pub type EventSenderToSession<EventSubset> = ::event_sender::EventSender<events::IpcSessionEventCategory, EventSubset>;
 
-mod stream;
 mod authenticate_app;
 mod rsa_key_exchange;
 mod secure_communication;

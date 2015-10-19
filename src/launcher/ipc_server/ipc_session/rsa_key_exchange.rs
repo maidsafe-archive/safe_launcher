@@ -59,6 +59,6 @@ pub fn perform_key_exchange(mut ipc_stream: ::launcher::ipc_server::ipc_session:
       data: response,
     };
     // write the data through the stream
-    ipc_stream.write(try!(::safe_core::utility::serialise(&payload)));
+    ipc_stream.write(try!(::safe_core::utility::serialise(&eval_result!(::rustc_serialize::json::encode(&payload)))));
     Ok((nonce, key))
 }
