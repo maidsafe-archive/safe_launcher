@@ -176,7 +176,7 @@ impl AppHandler {
 
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
         let mut root_dir_listing = eval_result!(dir_helper.get_user_root_directory_listing());
-        
+
         let app_dir_name = AppHandler::get_app_dir_name(&app_id, &app_name);
         let app_root_dir_key = match root_dir_listing.find_sub_directory(&app_dir_name).map(|dir| dir.clone()) {
             Some(app_dir) => app_dir.get_key().clone(),
@@ -193,7 +193,7 @@ impl AppHandler {
         let new_launcher_config = misc::LauncherConfiguration {
             app_id           : app_id,
             app_name         : app_name,
-            refernece_count  : 1,
+            reference_count  : 1,
             app_root_dir_key : app_root_dir_key,
             safe_drive_access: app_detail.safe_drive_access,
         };
@@ -215,31 +215,25 @@ impl AppHandler {
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
         let (mut launcher_configurations, dir_listing) = eval_result!(self.get_launcher_global_config_and_dir());
 
-        let app_id;
-        if let Some(mut app_config) = launcher_configurations.iter().find(|config| config.app_name == app_name).map(|config| config.clone()) {
-            app_id = app_config.app_id;
-            let position = eval_option!(launcher_configurations.iter().position(|config| config.app_name == app_name), "Logic Error - Report as bug.");
-            if app_config.refernece_count == 1 {
-                let _ = launcher_configurations.remove(position);
-                let mut root_dir_listing = eval_result!(dir_helper.get_user_root_directory_listing());
-                let app_dir_name = AppHandler::get_app_dir_name(&app_id, &app_config.app_name);
-                let _ = eval_result!(dir_helper.delete(&mut root_dir_listing, &app_dir_name));
-            } else {
-                app_config.refernece_count -= 1;
-                launcher_configurations[position] = app_config;
-            }
-            let file = eval_option!(dir_listing.find_file(&config_file_name).map(|file| file.clone()), "Logic Error - Report as bug.");
-            let mut writer = eval_result!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, dir_listing));
-            writer.write(&eval_result!(::safe_core::utility::serialise(&launcher_configurations)), 0);
-            let _ = eval_result!(writer.close());
+        let position = eval_option!(launcher_configurations.iter().position(|config| config.app_name == app_name), "Logic Error - Report as bug.");
+        let app_id = launcher_configurations[position].app_id;
+        let reference_count = launcher_configurations[position].reference_count;
+        if reference_count == 1 {
+            let _ = launcher_configurations.remove(position);
+            let mut root_dir_listing = eval_result!(dir_helper.get_user_root_directory_listing());
+            let app_dir_name = AppHandler::get_app_dir_name(&app_id, &app_name);
+            let _ = eval_result!(dir_helper.delete(&mut root_dir_listing, &app_dir_name));
         } else {
-            debug!("Application name not found in launcher configuration");
-            return;
+             let config = eval_option!(launcher_configurations.get_mut(position), "Logic Error - Report as bug.");
+             config.reference_count -= 1;
         }
+        let file = eval_option!(dir_listing.find_file(&config_file_name).map(|file| file.clone()), "Logic Error - Report as bug.");
+        let mut writer = eval_result!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, dir_listing));
+        writer.write(&eval_result!(::safe_core::utility::serialise(&launcher_configurations)), 0);
+        let _ = eval_result!(writer.close());
 
         // remove from local config
         let _ = self.local_config_data.remove(&app_id);
-        // TODO(Krishna) save the local config file to temp directory
     }
 }
 
