@@ -84,79 +84,24 @@ impl AppHandler {
     fn run(mut app_handler: AppHandler, event_rx: ::std::sync::mpsc::Receiver<events::AppHandlerEvent>) {
         for event in event_rx.iter() {
             match event {
-                events::AppHandlerEvent::AddApp(app_detail) => app_handler.on_add_app(app_detail),
-                events::AppHandlerEvent::ActivateApp(app_id) => app_handler.on_activate_app(app_id),
+                events::AppHandlerEvent::AddApp(app_detail)     => app_handler.on_add_app(app_detail),
+                events::AppHandlerEvent::RemoveApp(app_detail)  => app_handler.on_remove_app(app_detail),
+                events::AppHandlerEvent::ActivateApp(app_id)    => app_handler.on_activate_app(app_id),
                 events::AppHandlerEvent::Terminate => break,
             }
         }
     }
 
-    //TODO instead of eval_result! retun error to asker - also unbox app_detail to avoid clone()
-    fn on_add_app(&mut self, app_detail: Box<events::event_data::AppDetail>) {
-        {
-            let mut paths = self.local_config_data.values();
-            if let Some(_) = paths.find(|stored_path| **stored_path == app_detail.absolute_path) {
-                debug!("App already added");
-                return
+    fn get_app_dir_name(id: &::routing::NameType, app_name: &String) -> String {
+        let mut app_id_string: String = String::new();
+        let mut temp;
+        for i in &id.0[..] {
+            temp = i.to_string();
+            for c in temp.chars() {
+                app_id_string.push(c);
             }
         }
-
-        let app_id = ::routing::NameType::new(eval_result!(::safe_core::utility::generate_random_array_u8_64()));
-
-        let _ = self.local_config_data.insert(app_id, app_detail.absolute_path.clone());
-
-        let mut tokens = AppHandler::tokenise_string(&app_detail.absolute_path);
-
-        let app_name = eval_option!(tokens.pop(), ""); // TODO(Spandan) don't use eval_option here
-
-        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
-        let mut root_dir_listing = eval_result!(dir_helper.get_user_root_directory_listing());
-
-        // TODO check first if it exists. Then follow the logic in RFC
-        let app_root_dir_key = eval_result!(dir_helper.create(app_name.clone(),
-                                                              100,
-                                                              Vec::new(),
-                                                              false,
-                                                              ::safe_nfs::AccessLevel::Private,
-                                                              Some(&mut root_dir_listing))).0.get_key().clone();
-
-        let new_launcher_config = misc::LauncherConfiguration {
-            app_id           : app_id,
-            app_name         : app_name,
-            refernece_count  : 1,
-            app_root_dir_key : app_root_dir_key,
-            safe_drive_access: app_detail.safe_drive_access,
-        };
-
-        eval_result!(self.upsert_to_launcher_global_config(new_launcher_config));
-    }
-
-    fn on_activate_app(&mut self, app_id: Box<::routing::NameType>) {
-        let global_configs = eval_result!(self.get_launcher_global_config());
-
-        if let Some(app_info) = global_configs.iter().find(|config| config.app_id == *app_id) {
-            if let Some(app_binary_path) = self.local_config_data.get(&app_info.app_id) {
-                let str_nonce = eval_result!(::safe_core::utility::generate_random_string(::config::LAUNCHER_NONCE_LENGTH));
-                let activation_detail = ::launcher::ipc_server::events::event_data::ActivationDetail {
-                    nonce            : str_nonce.clone(),
-                    app_id           : app_info.app_id.clone(),
-                    app_root_dir_key : app_info.app_root_dir_key.clone(),
-                    safe_drive_access: app_info.safe_drive_access,
-                };
-
-                eval_result!(self.ipc_server_event_sender.send(::launcher
-                                                               ::ipc_server
-                                                               ::events
-                                                               ::ExternalEvent::AppActivated(Box::new(activation_detail))));
-
-                let command_line_arg = format!("tcp:{}:{}", self.launcher_endpoint, str_nonce);
-                
-                let _app_process_handle = eval_result!(::std::process::Command::new(app_binary_path)
-                                                                               .arg("--launcher")
-                                                                               .arg(command_line_arg)
-                                                                               .spawn());
-            }
-        }
+        format!("{}-{}", &app_name, app_id_string)
     }
 
     fn tokenise_string(source: &str) -> Vec<String> {
@@ -199,7 +144,7 @@ impl AppHandler {
 
     fn get_launcher_global_config_and_dir(&self) -> Result<(Vec<misc::LauncherConfiguration>,
                                                             ::safe_nfs::directory_listing::DirectoryListing),
-                                                           ::errors::LauncherError> {
+                                                            ::errors::LauncherError> {
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
         let dir_listing = try!(dir_helper.get_configuration_directory_listing(::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string()));
 
@@ -222,6 +167,111 @@ impl AppHandler {
         };
 
         Ok((global_configs, dir_listing))
+    }
+
+    //TODO instead of eval_result! retun error to asker
+    fn on_add_app(&mut self, app_detail: Box<events::event_data::AppDetail>) {
+        {
+            let mut paths = self.local_config_data.values();
+            if let Some(_) = paths.find(|stored_path| **stored_path == app_detail.absolute_path) {
+                debug!("App already added");
+                return
+            }
+        }
+
+        let app_id = ::routing::NameType::new(eval_result!(::safe_core::utility::generate_random_array_u8_64()));
+
+        let _ = self.local_config_data.insert(app_id, app_detail.absolute_path.clone());
+
+        let mut tokens = AppHandler::tokenise_string(&app_detail.absolute_path);
+
+        let mut app_name = eval_option!(tokens.pop(), ""); // TODO(Spandan) don't use eval_option here
+
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
+        let mut root_dir_listing = eval_result!(dir_helper.get_user_root_directory_listing());
+
+        let app_dir_name = AppHandler::get_app_dir_name(&app_id, &app_name);
+        let app_root_dir_key = match root_dir_listing.find_sub_directory(&app_dir_name).map(|dir| dir.clone()) {
+            Some(app_dir) => app_dir.get_key().clone(),
+            None => {
+                eval_result!(dir_helper.create(app_dir_name,
+                                               ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
+                                               Vec::new(),
+                                               false,
+                                               ::safe_nfs::AccessLevel::Private,
+                                               Some(&mut root_dir_listing))).0.get_key().clone()
+            },
+        };
+
+        let new_launcher_config = misc::LauncherConfiguration {
+            app_id           : app_id,
+            app_name         : app_name,
+            reference_count  : 1,
+            app_root_dir_key : app_root_dir_key,
+            safe_drive_access: app_detail.safe_drive_access,
+        };
+        eval_result!(self.upsert_to_launcher_global_config(new_launcher_config));
+    }
+
+    fn on_activate_app(&mut self, app_id: Box<::routing::NameType>) {
+        let global_configs = eval_result!(self.get_launcher_global_config());
+
+        if let Some(app_info) = global_configs.iter().find(|config| config.app_id == *app_id) {
+            if let Some(app_binary_path) = self.local_config_data.get(&app_info.app_id) {
+                let str_nonce = eval_result!(::safe_core::utility::generate_random_string(::config::LAUNCHER_NONCE_LENGTH));
+                let activation_detail = ::launcher::ipc_server::events::event_data::ActivationDetail {
+                    nonce            : str_nonce.clone(),
+                    app_id           : app_info.app_id.clone(),
+                    app_root_dir_key : app_info.app_root_dir_key.clone(),
+                    safe_drive_access: app_info.safe_drive_access,
+                };
+
+                eval_result!(self.ipc_server_event_sender.send(::launcher
+                                                               ::ipc_server
+                                                               ::events
+                                                               ::ExternalEvent::AppActivated(Box::new(activation_detail))));
+
+                let command_line_arg = format!("tcp:{}:{}", self.launcher_endpoint, str_nonce);
+
+                let _app_process_handle = eval_result!(::std::process::Command::new(app_binary_path)
+                                                                               .arg("--launcher")
+                                                                               .arg(command_line_arg)
+                                                                               .spawn());
+            }
+        }
+    }
+
+    fn on_remove_app(&mut self, app_detail: Box<events::event_data::AppDetail>) {
+        // TODO(Krishna) Send terminate app event to IPC Server
+
+        // remove/update from launcher_configurations
+        let config_file_name = ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string();
+        let mut tokens = AppHandler::tokenise_string(&app_detail.absolute_path);
+        let mut app_name = eval_option!(tokens.pop(), ""); // TODO(Spandan) don't use eval_option here
+
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
+        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
+        let (mut launcher_configurations, dir_listing) = eval_result!(self.get_launcher_global_config_and_dir());
+
+        let position = eval_option!(launcher_configurations.iter().position(|config| config.app_name == app_name), "Logic Error - Report as bug.");
+        let app_id = launcher_configurations[position].app_id;
+        let reference_count = launcher_configurations[position].reference_count;
+        if reference_count == 1 {
+            let _ = launcher_configurations.remove(position);
+            let mut root_dir_listing = eval_result!(dir_helper.get_user_root_directory_listing());
+            let app_dir_name = AppHandler::get_app_dir_name(&app_id, &app_name);
+            let _ = eval_result!(dir_helper.delete(&mut root_dir_listing, &app_dir_name));
+        } else {
+             let config = eval_option!(launcher_configurations.get_mut(position), "Logic Error - Report as bug.");
+             config.reference_count -= 1;
+        }
+        let file = eval_option!(dir_listing.find_file(&config_file_name).map(|file| file.clone()), "Logic Error - Report as bug.");
+        let mut writer = eval_result!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, dir_listing));
+        writer.write(&eval_result!(::safe_core::utility::serialise(&launcher_configurations)), 0);
+        let _ = eval_result!(writer.close());
+
+        // remove from local config
+        let _ = self.local_config_data.remove(&app_id);
     }
 }
 

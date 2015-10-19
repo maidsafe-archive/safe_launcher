@@ -18,6 +18,7 @@
 #[derive(Debug, Clone)]
 pub enum AppHandlerEvent {
     AddApp(Box<event_data::AppDetail>),
+    RemoveApp(Box<event_data::AppDetail>),
     ActivateApp(Box<::routing::NameType>),
     Terminate,
 }

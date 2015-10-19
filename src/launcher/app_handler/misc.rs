@@ -19,7 +19,7 @@
 pub struct LauncherConfiguration {
     pub app_id           : ::routing::NameType,
     pub app_name         : String,
-    pub refernece_count  : u32,
+    pub reference_count  : u32,
     pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
     pub safe_drive_access: bool,
 }
