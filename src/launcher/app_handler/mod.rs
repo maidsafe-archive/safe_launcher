@@ -87,7 +87,14 @@ impl AppHandler {
     }
 
     fn get_app_dir_name(id: &::routing::NameType, app_name: &String) -> String {
-        let app_id_string = eval_result!(String::from_utf8(id.0.iter().map(|x| *x).collect()));
+        let mut app_id_string: String = String::new();
+        let mut temp;
+        for i in &id.0[..] {
+            temp = i.to_string();
+            for c in temp.chars() {
+                app_id_string.push(c);
+            }
+        }
         format!("{}-{}", &app_name, app_id_string)
     }
 
