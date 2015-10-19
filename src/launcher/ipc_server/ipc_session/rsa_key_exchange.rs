@@ -19,8 +19,8 @@ use rustc_serialize::base64::ToBase64;
 
 #[derive(Debug, RustcEncodable)]
 struct KeyExchangeData {
-    pub public_key: String,
-    pub cipher       : String,
+    pub public_key  : String,
+    pub symmtric_key: String,
 }
 
 
@@ -36,12 +36,6 @@ pub fn perform_key_exchange(mut ipc_stream: ::launcher::ipc_server::ipc_session:
                             app_pub_key   : ::sodiumoxide::crypto::box_::PublicKey) -> Result<(::sodiumoxide::crypto::secretbox::Nonce,
                                                                                               ::sodiumoxide::crypto::secretbox::Key),
                                                                                              ::errors::LauncherError> {
-    let config = ::rustc_serialize::base64::Config {
-        char_set   : ::rustc_serialize::base64::CharacterSet::Standard,
-        newline    : ::rustc_serialize::base64::Newline::LF,
-        pad        : true,
-        line_length: None,
-    };
     // generate nonce and symmtric key
     let nonce = ::sodiumoxide::crypto::secretbox::gen_nonce();
     let key = ::sodiumoxide::crypto::secretbox::gen_key();
@@ -57,8 +51,8 @@ pub fn perform_key_exchange(mut ipc_stream: ::launcher::ipc_server::ipc_session:
     let encrypted_data = ::sodiumoxide::crypto::box_::seal(&data, &app_nonce, &app_pub_key, &launcher_secret_key);
     // Create the JSON as specified in the RFC
     let response = KeyExchangeData {
-      public_key: launcher_public_key.0.to_base64(config),
-      cipher: encrypted_data.to_base64(config),
+      public_key  : launcher_public_key.0.to_base64(::config::get_base64_config()),
+      symmtric_key: encrypted_data.to_base64(::config::get_base64_config()),
     };
     let payload = HandshakeResponse {
       id: vec![],

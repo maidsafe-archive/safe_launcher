@@ -334,8 +334,20 @@ mod test {
 
         let mut stream = eval_result!(::std::net::TcpStream::connect(&listener_ep[..]));
 
-        // create ExternalEvent::AppActivated
-        // send the AppActivation details -> event_sender.send(ExternalEvent::AppActivated)
+        let app_id = ::routing::NameType(eval_result!(::safe_core::utility::generate_random_array_u8_64()));
+        let dir_id = ::routing::NameType(eval_result!(::safe_core::utility::generate_random_array_u8_64()));
+        let directory_key = ::safe_nfs::metadata::directory_key::DirectoryKey::new(dir_id,
+                                                                                   10u64,
+                                                                                   false,
+                                                                                   ::safe_nfs::AccessLevel::Private);
+        let activation_details = ::launcher::ipc_server::events::event_data::ActivationDetail {
+            nonce            : "mock_nonce_string".to_string(),
+            app_id           : app_id,
+            app_root_dir_key : directory_key,
+            safe_drive_access: false,
+        };
+        let activate_event = ::launcher::ipc_server::events::ExternalEvent::AppActivated(Box::new(activation_details));
+        event_sender.send(activate_event);
 
         let _raii_joiner_1 = ::safe_core
                              ::utility
