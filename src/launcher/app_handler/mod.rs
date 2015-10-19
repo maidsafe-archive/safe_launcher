@@ -91,7 +91,7 @@ impl AppHandler {
             }
         }
     }
-
+    
     fn get_app_dir_name(id: &::routing::NameType, app_name: &String) -> String {
         let mut app_id_string: String = String::new();
         let mut temp;
@@ -144,7 +144,7 @@ impl AppHandler {
 
     fn get_launcher_global_config_and_dir(&self) -> Result<(Vec<misc::LauncherConfiguration>,
                                                             ::safe_nfs::directory_listing::DirectoryListing),
-                                                            ::errors::LauncherError> {
+                                                           ::errors::LauncherError> {
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
         let dir_listing = try!(dir_helper.get_configuration_directory_listing(::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string()));
 
