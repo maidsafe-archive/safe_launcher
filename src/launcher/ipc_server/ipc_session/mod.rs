@@ -173,8 +173,8 @@ mod tests {
     #[derive(Debug)]
     struct HandshakePayload {
         pub launcher_string: String,
-        pub nonce: [u8; 24],
-        pub public_encryption_key: [u8; 32],
+        pub nonce: [u8; ::sodiumoxide::crypto::box_::NONCEBYTES],
+        pub public_encryption_key: [u8; ::sodiumoxide::crypto::box_::PUBLICKEYBYTES],
     }
 
     impl ::rustc_serialize::json::ToJson for HandshakePayload {

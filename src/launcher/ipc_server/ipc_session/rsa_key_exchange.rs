@@ -75,18 +75,14 @@ pub fn perform_key_exchange(mut ipc_stream: ::launcher::ipc_server::ipc_session:
                             app_pub_key   : ::sodiumoxide::crypto::box_::PublicKey) -> Result<(::sodiumoxide::crypto::secretbox::Nonce,
                                                                                               ::sodiumoxide::crypto::secretbox::Key),
                                                                                              ::errors::LauncherError> {
-    // generate nonce and symmtric key
     let nonce = ::sodiumoxide::crypto::secretbox::gen_nonce();
     let key = ::sodiumoxide::crypto::secretbox::gen_key();
     let (launcher_public_key, launcher_secret_key) = ::sodiumoxide::crypto::box_::gen_keypair();
-    // Pack it into single [u8; NONCEBYTES+KEYBYTES] -> [nonce+key]
     let mut data = [0u8; KEY_SIZE];
     for (i, item) in nonce.0.iter().chain(key.0.iter()).enumerate() {
       data[i] = *item;
     }
-    // encrypt above by box_::seal to get Vec<u8>
     let encrypted_data = ::sodiumoxide::crypto::box_::seal(&data, &app_nonce, &app_pub_key, &launcher_secret_key);
-    // Create the JSON as specified in the RFC
     let response = KeyExchangeData {
       public_key   : launcher_public_key.0,
       symmetric_key: encrypted_data,
@@ -94,8 +90,7 @@ pub fn perform_key_exchange(mut ipc_stream: ::launcher::ipc_server::ipc_session:
     let payload = HandshakeResponse {
       id: [0u8; 0],
       data: response,
-    };
-    // write the data through the stream
+    };    
     let json_obj = payload.to_json();
     ipc_stream.write(json_obj.to_string().into_bytes());
     Ok((nonce, key))
