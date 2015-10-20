@@ -15,36 +15,19 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-#[derive(Debug)]
+#[derive(RustcDecodable, Debug)]
 pub struct CreateDir {
     dir_path      : String,
     is_private    : bool,
     is_versioned  : bool,
-    user_metadata : Option<Vec<u8>>, // This is for optimisation - allows moves
+    user_metadata : String,
     is_path_shared: bool,
-}
-
-impl CreateDir {
-    pub fn decode<D>(decoder: &mut D) -> Result<Self, ::errors::LauncherError>
-                                         where D: ::rustc_serialize::Decoder, D::Error: ::std::fmt::Debug {
-        use rustc_serialize::base64::FromBase64;
-
-        Ok(CreateDir {
-            dir_path: try!(parse_result!(decoder.read_struct_field("dir_path", 0, |d| ::rustc_serialize::Decodable::decode(d)), "")),
-            is_private: try!(parse_result!(decoder.read_struct_field("is_private", 0, |d| ::rustc_serialize::Decodable::decode(d)), "")),
-            is_versioned: try!(parse_result!(decoder.read_struct_field("is_versioned", 0, |d| ::rustc_serialize::Decodable::decode(d)), "")),
-            user_metadata: {
-                let base64_str: String = try!(parse_result!(decoder.read_struct_field("user_metadata", 0, |d| ::rustc_serialize::Decodable::decode(d)),
-                                                            ""));
-                Some(try!(parse_result!(base64_str.from_base64(), "Convert from Base64")))
-            },
-            is_path_shared: try!(parse_result!(decoder.read_struct_field("is_path_shared", 0, |d| ::rustc_serialize::Decodable::decode(d)), "")),
-        })
-    }
 }
 
 impl ::launcher::parser::traits::Action for CreateDir {
     fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType {
+        use rustc_serialize::base64::FromBase64;
+
         if self.is_path_shared && !*eval_result!(params.safe_drive_access.lock()) {
             return Err(::errors::LauncherError::PermissionDenied)
         }
@@ -76,9 +59,11 @@ impl ::launcher::parser::traits::Action for CreateDir {
             ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG
         };
 
+        let bin_metadata = try!(parse_result!(self.user_metadata.from_base64(), "Faild Converting from Base64."));
+
         let _ = try!(dir_helper.create(dir_to_create,
                                        tag,
-                                       eval_option!(self.user_metadata.take(), "Logic Error - Report a bug."),
+                                       bin_metadata,
                                        self.is_versioned,
                                        access_level,
                                        Some(&mut parent_sub_dir)));

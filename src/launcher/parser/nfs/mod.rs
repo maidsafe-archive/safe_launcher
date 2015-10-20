@@ -42,11 +42,13 @@ pub fn action_dispatcher<D>(params              : ::launcher::parser::ParameterP
 
 fn get_action<D>(action_str: &str, version: f32, decoder: &mut D) -> Result<Box<::launcher::parser::traits::Action>, ::errors::LauncherError>
                                                                      where D: ::rustc_serialize::Decoder, D::Error: ::std::fmt::Debug {
+    use rustc_serialize::Decodable;
+
     let version_err = Err(::errors::LauncherError::SpecificParseError(format!("Unsupported version {:?} for this endpoint.", version)));
 
     Ok(match action_str {
         "create-dir" => match version {
-            1.0 => Box::new(try!(create_dir_v1_0::CreateDir::decode(decoder))),
+            1.0 => Box::new(try!(parse_result!(create_dir_v1_0::CreateDir::decode(decoder), ""))),
             _   => return version_err,
         },
         "delete-dir" => match version {
