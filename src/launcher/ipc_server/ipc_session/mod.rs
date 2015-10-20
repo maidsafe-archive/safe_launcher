@@ -102,7 +102,7 @@ impl IpcSession {
                     if let Ok(authentication_event) = ipc_session.authentication_event_rx.try_recv() {
                         match authentication_event {
                             Ok(auth_data) => ipc_session.on_auth_data_received(auth_data),
-                            Err(err) => panic!("******* = {:?}", err),
+                            _ => unimplemented!(),
                         }
                     }
                 },
@@ -164,7 +164,6 @@ impl Drop for IpcSession {
 
 #[cfg(test)]
 mod tests {
-
     #[derive(Debug)]
     struct HandshakeRequest {
         pub endpoint: String,
