@@ -85,23 +85,25 @@ impl AppHandler {
         for event in event_rx.iter() {
             match event {
                 events::AppHandlerEvent::AddApp(app_detail)     => app_handler.on_add_app(app_detail),
-                events::AppHandlerEvent::RemoveApp(app_detail)  => app_handler.on_remove_app(app_detail),
+                events::AppHandlerEvent::RemoveApp(app_id)      => app_handler.on_remove_app(app_id),
                 events::AppHandlerEvent::ActivateApp(app_id)    => app_handler.on_activate_app(app_id),
                 events::AppHandlerEvent::Terminate => break,
             }
         }
     }
 
-    fn get_app_dir_name(id: &::routing::NameType, app_name: &String) -> String {
-        let mut app_id_string: String = String::new();
-        let mut temp;
-        for i in &id.0[..] {
-            temp = i.to_string();
-            for c in temp.chars() {
-                app_id_string.push(c);
+    fn get_app_dir_name(app_name: &String,
+                        directory_listing: &::safe_nfs::directory_listing::DirectoryListing) -> String {
+        let mut index = 0u8;
+        let mut dir_name = String::new();
+        loop {
+            dir_name = format!("{}-{}-Root-Dir", &app_name, index);
+            match directory_listing.find_sub_directory(&dir_name) {
+                Some(_) => index += 1,
+                None => break,
             }
-        }
-        format!("{}-{}", &app_name, app_id_string)
+        };
+        dir_name
     }
 
     fn tokenise_string(source: &str) -> Vec<String> {
@@ -144,7 +146,7 @@ impl AppHandler {
 
     fn get_launcher_global_config_and_dir(&self) -> Result<(Vec<misc::LauncherConfiguration>,
                                                             ::safe_nfs::directory_listing::DirectoryListing),
-                                                            ::errors::LauncherError> {
+                                                           ::errors::LauncherError> {
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
         let dir_listing = try!(dir_helper.get_configuration_directory_listing(::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string()));
 
@@ -190,7 +192,7 @@ impl AppHandler {
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
         let mut root_dir_listing = eval_result!(dir_helper.get_user_root_directory_listing());
 
-        let app_dir_name = AppHandler::get_app_dir_name(&app_id, &app_name);
+        let app_dir_name = AppHandler::get_app_dir_name(&app_name, &root_dir_listing);
         let app_root_dir_key = match root_dir_listing.find_sub_directory(&app_dir_name).map(|dir| dir.clone()) {
             Some(app_dir) => app_dir.get_key().clone(),
             None => {
@@ -241,26 +243,23 @@ impl AppHandler {
         }
     }
 
-    fn on_remove_app(&mut self, app_detail: Box<events::event_data::AppDetail>) {
-        // TODO(Krishna) Send terminate app event to IPC Server
-
+    // TODO(Krishna) Send terminate app event to IPC Server
+    fn on_remove_app(&mut self, app_id: Box<::routing::NameType>) {
         // remove/update from launcher_configurations
         let config_file_name = ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string();
-        let mut tokens = AppHandler::tokenise_string(&app_detail.absolute_path);
-        let mut app_name = eval_option!(tokens.pop(), ""); // TODO(Spandan) don't use eval_option here
 
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
         let (mut launcher_configurations, dir_listing) = eval_result!(self.get_launcher_global_config_and_dir());
 
-        let position = eval_option!(launcher_configurations.iter().position(|config| config.app_name == app_name), "Logic Error - Report as bug.");
-        let app_id = launcher_configurations[position].app_id;
+        let position = eval_option!(launcher_configurations.iter().position(|config| config.app_id == *app_id), "Logic Error - Report as bug.");
+        let app_root_dir_key = launcher_configurations[position].app_root_dir_key.clone();
         let reference_count = launcher_configurations[position].reference_count;
         if reference_count == 1 {
             let _ = launcher_configurations.remove(position);
             let mut root_dir_listing = eval_result!(dir_helper.get_user_root_directory_listing());
-            let app_dir_name = AppHandler::get_app_dir_name(&app_id, &app_name);
-            let _ = eval_result!(dir_helper.delete(&mut root_dir_listing, &app_dir_name));
+            let app_root_dir_listing = eval_result!(dir_helper.get(&app_root_dir_key));
+            let _ = eval_result!(dir_helper.delete(&mut root_dir_listing, app_root_dir_listing.get_metadata().get_name()));
         } else {
              let config = eval_option!(launcher_configurations.get_mut(position), "Logic Error - Report as bug.");
              config.reference_count -= 1;

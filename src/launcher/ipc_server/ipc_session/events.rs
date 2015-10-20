@@ -17,8 +17,7 @@
 
 #[derive(Clone, Debug)]
 pub enum IpcSessionEventCategory {
-    AppAuthenticationEvent,
-    RsaKeyExchangeEvent,
+    AppAuthenticationEvent,    
     SecureCommunicationEvent,
     ExternalEvent,
 }

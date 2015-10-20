@@ -207,7 +207,7 @@ impl IpcServer {
         loop {
             let local_ip = ::std::net::Ipv4Addr::new(127, 0, third_octate, fourth_octate);
             let local_endpoint = (local_ip, 0);
-            
+
             match ::std::net::TcpListener::bind(local_endpoint) {
                 Ok(listener) => {
                     ipc_listener = listener;
