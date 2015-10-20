@@ -21,48 +21,51 @@ mod dns;
 mod nfs;
 mod traits;
 
-pub fn begin_parse<D>(client : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+pub struct ParameterPacket {
+    pub client           : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+    pub safe_drive_access: ::std::sync::Arc<::std::sync::Mutex<bool>>,
+}
+
+pub fn begin_parse<D>(params : ParameterPacket,
                       decoder: &mut D) -> ResponseType
                                           where D: ::rustc_serialize::Decoder, D::Error: ::std::fmt::Debug {
-    let endpoint: String = try!(decoder.read_struct_field("endpoint",
-                                                          0,
-                                                          |d| ::rustc_serialize::Decodable::decode(d)).map_err(|e| ::errors
-                                                                                                                   ::LauncherError
-                                                                                                                   ::SpecificParseError(format!("{:?}", e))));
+    let endpoint: String = try!(parse_result!(decoder.read_struct_field("endpoint",
+                                                                        0,
+                                                                        |d| ::rustc_serialize::Decodable::decode(d)), ""));
     let mut tokens = endpoint.split(|element| element == '/')
                              .map(|token| token.to_string())
                              .collect::<Vec<String>>();
     tokens.reverse();
 
-    version_parser(client, tokens, decoder)
+    version_parser(params, tokens, decoder)
 }
 
-fn version_parser<D:>(client             : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+fn version_parser<D:>(params             : ParameterPacket,
                       mut endpoint_tokens: Vec<String>,
                       decoder            : &mut D) -> ResponseType
                                                       where D: ::rustc_serialize::Decoder, D::Error: ::std::fmt::Debug {
-    let api_dest = try!(endpoint_tokens.pop().ok_or(::errors::LauncherError::SpecificParseError(format!("Invalid endpoint."))));
+    let api_dest = try!(parse_option!(endpoint_tokens.pop(), "Invalid endpoint."));
     if api_dest != "safe-api" {
         return Err(::errors::LauncherError::SpecificParseError(format!("Unrecognised token \"{}\" in endpoint path.", api_dest)))
     }
 
-    let mut version_str = try!(endpoint_tokens.pop().ok_or(::errors::LauncherError::SpecificParseError(format!("Invalid endpoint - Version token not found."))));
+    let mut version_str = try!(parse_option!(endpoint_tokens.pop(), "Invalid endpoint - Version token not found."));
     if version_str.len() < 4 || version_str.remove(0) != 'v' {
-        return Err(::errors::LauncherError::SpecificParseError(format!("Unparsable version in endpoint path.")))
+        return Err(::errors::LauncherError::SpecificParseError("Unparsable version in endpoint path.".to_string()))
     }
-    let version = try!(version_str.parse::<f32>().map_err(|e| ::errors::LauncherError::SpecificParseError(format!("Unparsable version {:?}", e))));
+    let version = try!(parse_result!(version_str.parse::<f32>(), "Unparsable version"));
 
-    module_dispatcher(client, endpoint_tokens, version, decoder)
+    module_dispatcher(params, endpoint_tokens, version, decoder)
 }
 
-fn module_dispatcher<D>(client              : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+fn module_dispatcher<D>(params              : ParameterPacket,
                         mut remaining_tokens: Vec<String>,
                         version             : f32,
                         decoder             : &mut D) -> ResponseType
                                                          where D: ::rustc_serialize::Decoder, D::Error: ::std::fmt::Debug {
-    let module = try!(remaining_tokens.pop().ok_or(::errors::LauncherError::SpecificParseError(format!("Invalid endpoint - Module token not found."))));
+    let module = try!(parse_option!(remaining_tokens.pop(), "Invalid endpoint - Module token not found."));
     match &module[..] {
-        "nfs" => nfs::action_dispatcher(client, remaining_tokens, version, decoder),
+        "nfs" => nfs::action_dispatcher(params, remaining_tokens, version, decoder),
         "dns" => unimplemented!(),
         _     => Err(::errors::LauncherError::SpecificParseError(format!("Unrecognised module \"{}\" in endpoint path.", module))),
     }

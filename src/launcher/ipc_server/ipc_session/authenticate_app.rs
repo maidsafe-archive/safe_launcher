@@ -37,11 +37,11 @@ pub fn verify_launcher_nonce(mut ipc_stream  : ::launcher::ipc_server::ipc_sessi
                                                                                  ::SpecificParseError(err.description().to_string())),
                                         &mut senders);
         let json = eval_send!(::rustc_serialize::json::Json::from_str(&payload_as_str), &mut senders);
-        let json_obj = eval_send!(parse_result!(json.as_object(), "Could not parse as JSON object."),
+        let json_obj = eval_send!(parse_option!(json.as_object(), "Could not parse as JSON object."),
                                   &mut senders);
-        let json_endpoint = eval_send!(parse_result!(json_obj.get("endpoint"), "Expected \"endpoint\" token not present."),
+        let json_endpoint = eval_send!(parse_option!(json_obj.get("endpoint"), "Expected \"endpoint\" token not present."),
                                        &mut senders);
-        let endpoint = eval_send!(parse_result!(json_endpoint.as_string(), "Could not parse endpoint as String."),
+        let endpoint = eval_send!(parse_option!(json_endpoint.as_string(), "Could not parse endpoint as String."),
                                   &mut senders);
 
         if endpoint != APP_AUTHENTICATION_ENDPOINT {
@@ -49,25 +49,25 @@ pub fn verify_launcher_nonce(mut ipc_stream  : ::launcher::ipc_server::ipc_sessi
                        &mut senders);
         }
 
-        let json_data = eval_send!(parse_result!(json_obj.get("data"), "Expected \"data\" token not present."),
+        let json_data = eval_send!(parse_option!(json_obj.get("data"), "Expected \"data\" token not present."),
                                    &mut senders);
-        let json_data_obj = eval_send!(parse_result!(json_data.as_object(), "Could not parse \"data\" as JSON object."),
+        let json_data_obj = eval_send!(parse_option!(json_data.as_object(), "Could not parse \"data\" as JSON object."),
                                        &mut senders);
-        let json_str_nonce = eval_send!(parse_result!(json_data_obj.get("launcher_string"),
+        let json_str_nonce = eval_send!(parse_option!(json_data_obj.get("launcher_string"),
                                                       "Expected \"launcher_string\" token not present."),
                                         &mut senders);
-        let json_asymm_nonce = eval_send!(parse_result!(json_data_obj.get("nonce"),
+        let json_asymm_nonce = eval_send!(parse_option!(json_data_obj.get("nonce"),
                                                         "Expected \"nonce\" token not present."),
                                           &mut senders);
-        let json_asymm_pub_key = eval_send!(parse_result!(json_data_obj.get("public_encryption_key"),
+        let json_asymm_pub_key = eval_send!(parse_option!(json_data_obj.get("public_encryption_key"),
                                                           "Expected \"public_encryption_key\" token not present."),
                                             &mut senders);
 
-        let str_nonce = eval_send!(parse_result!(json_str_nonce.as_string(), "Could not parse launcher nonce as String."),
+        let str_nonce = eval_send!(parse_option!(json_str_nonce.as_string(), "Could not parse launcher nonce as String."),
                                    &mut senders);
-        let str_asymm_nonce = eval_send!(parse_result!(json_asymm_nonce.as_string(), "Could not parse asymm nonce as String."),
+        let str_asymm_nonce = eval_send!(parse_option!(json_asymm_nonce.as_string(), "Could not parse asymm nonce as String."),
                                          &mut senders);
-        let str_asymm_pub_key = eval_send!(parse_result!(json_str_nonce.as_string(), "Could not parse asymm public key as String."),
+        let str_asymm_pub_key = eval_send!(parse_option!(json_str_nonce.as_string(), "Could not parse asymm public key as String."),
                                            &mut senders);
 
         let vec_nonce = eval_send!(str_asymm_nonce.from_base64().map_err(|err| ::errors

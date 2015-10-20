@@ -24,7 +24,7 @@ mod create_file_v1_0;
 mod delete_file_v1_0;
 mod modify_file_v1_0;
 
-pub fn action_dispatcher<D>(client          : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+pub fn action_dispatcher<D>(params          : ::launcher::parser::ParameterPacket,
                             remaining_tokens: Vec<String>,
                             version         : f32,
                             decoder         : &mut D) -> ::launcher::parser::ResponseType

@@ -236,9 +236,16 @@ macro_rules! eval_send_event {
 }
 
 #[macro_export]
-macro_rules! parse_result {
+macro_rules! parse_option {
     ($output:expr, $err_statement:expr) => {
         $output.ok_or(::errors::LauncherError::SpecificParseError($err_statement.to_string()))
+    }
+}
+
+#[macro_export]
+macro_rules! parse_result {
+    ($output:expr, $err_statement:expr) => {
+        $output.map_err(|e| ::errors::LauncherError::SpecificParseError(format!("{} {:?}", $err_statement.to_string(), e)))
     }
 }
 
