@@ -64,6 +64,6 @@ fn module_dispatcher<D>(client              : ::std::sync::Arc<::std::sync::Mute
     match &module[..] {
         "nfs" => nfs::action_dispatcher(client, remaining_tokens, version, decoder),
         "dns" => unimplemented!(),
-        _ => Err(::errors::LauncherError::SpecificParseError(format!("Unrecognised module \"{}\" in endpoint path.", module))),
+        _     => Err(::errors::LauncherError::SpecificParseError(format!("Unrecognised module \"{}\" in endpoint path.", module))),
     }
 }
