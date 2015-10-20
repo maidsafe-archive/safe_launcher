@@ -18,7 +18,7 @@
 #[derive(Debug, Clone)]
 pub enum AppHandlerEvent {
     AddApp(Box<event_data::AppDetail>),
-    RemoveApp(Box<event_data::AppDetail>), // TODO (Krishna) pass app_id instead of AppDetail
+    RemoveApp(Box<::routing::NameType>),
     ActivateApp(Box<::routing::NameType>),
     Terminate,
 }

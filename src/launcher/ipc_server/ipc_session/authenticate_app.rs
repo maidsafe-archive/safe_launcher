@@ -67,7 +67,7 @@ pub fn verify_launcher_nonce(mut ipc_stream  : ::launcher::ipc_server::ipc_sessi
                                    &mut senders);
         let str_asymm_nonce = eval_send!(parse_option!(json_asymm_nonce.as_string(), "Could not parse asymm nonce as String."),
                                          &mut senders);
-        let str_asymm_pub_key = eval_send!(parse_result!(json_asymm_pub_key.as_string(), "Could not parse asymm public key as String."),
+        let str_asymm_pub_key = eval_send!(parse_option!(json_asymm_pub_key.as_string(), "Could not parse asymm public key as String."),
                                            &mut senders);
 
         let vec_nonce = eval_send!(str_asymm_nonce.from_base64().map_err(|err| ::errors
