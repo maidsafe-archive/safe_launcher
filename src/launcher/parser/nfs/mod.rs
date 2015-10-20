@@ -24,10 +24,59 @@ mod create_file_v1_0;
 mod delete_file_v1_0;
 mod modify_file_v1_0;
 
-pub fn action_dispatcher<D>(params          : ::launcher::parser::ParameterPacket,
-                            remaining_tokens: Vec<String>,
-                            version         : f32,
-                            decoder         : &mut D) -> ::launcher::parser::ResponseType
-                                                         where D: ::rustc_serialize::Decoder, D::Error: ::std::fmt::Debug {
-    unimplemented!()
+pub fn action_dispatcher<D>(params              : ::launcher::parser::ParameterPacket,
+                            mut remaining_tokens: Vec<String>,
+                            version             : f32,
+                            decoder             : &mut D) -> ::launcher::parser::ResponseType
+                                                             where D: ::rustc_serialize::Decoder, D::Error: ::std::fmt::Debug {
+    if remaining_tokens.len() > 1 {
+        return Err(::errors::LauncherError::SpecificParseError("Extra unrecognised tokens in endpoint.".to_string()))
+    }
+
+    let action_str = try!(parse_option!(remaining_tokens.pop(), "Invalid endpoint - Action not found."));
+
+    let mut action = try!(get_action(&action_str, version, decoder));
+
+    action.execute(params)
+}
+
+fn get_action<D>(action_str: &str, version: f32, decoder: &mut D) -> Result<Box<::launcher::parser::traits::Action>, ::errors::LauncherError>
+                                                                     where D: ::rustc_serialize::Decoder, D::Error: ::std::fmt::Debug {
+    let version_err = Err(::errors::LauncherError::SpecificParseError(format!("Unsupported version {:?} for this endpoint.", version)));
+
+    Ok(match action_str {
+        "create-dir" => match version {
+            1.0 => Box::new(try!(create_dir_v1_0::CreateDir::decode(decoder))),
+            _   => return version_err,
+        },
+        "delete-dir" => match version {
+            1.0 => unimplemented!(),
+            _   => return version_err,
+        },
+        "modify-dir" => match version {
+            1.0 => unimplemented!(),
+            _   => return version_err,
+        },
+        "get-dir" => match version {
+            1.0 => unimplemented!(),
+            _   => return version_err,
+        },
+        "create-file" => match version {
+            1.0 => unimplemented!(),
+            _   => return version_err,
+        },
+        "delete-file" => match version {
+            1.0 => unimplemented!(),
+            _   => return version_err,
+        },
+        "modify-file" => match version {
+            1.0 => unimplemented!(),
+            _   => return version_err,
+        },
+        "get-file" => match version {
+            1.0 => unimplemented!(),
+            _   => return version_err,
+        },
+        _ => return Err(::errors::LauncherError::SpecificParseError(format!("Unsupported action {:?} for this endpoint.", action_str))),
+    })
 }

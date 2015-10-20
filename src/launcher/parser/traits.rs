@@ -18,5 +18,5 @@
 /// ICommand trait
 pub trait Action {
     /// ICommand executer
-    fn execute(client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>) -> ::launcher::parser::ResponseType;
+    fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType;
 }
