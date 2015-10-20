@@ -101,8 +101,8 @@ impl IpcSession {
                 events::IpcSessionEventCategory::AppAuthenticationEvent => {
                     if let Ok(authentication_event) = ipc_session.authentication_event_rx.try_recv() {
                         match authentication_event {
-                            Ok(nonce) => ipc_session.on_auth_data_received(nonce),
-                            _ => unimplemented!(),
+                            Ok(auth_data) => ipc_session.on_auth_data_received(auth_data),
+                            Err(err) => panic!("******* = {:?}", err),
                         }
                     }
                 },
@@ -167,7 +167,7 @@ mod tests {
 
     #[derive(Debug)]
     struct HandshakeRequest {
-        pub end_point: String,
+        pub endpoint: String,
         pub data: HandshakePayload,
     }
 
@@ -203,7 +203,7 @@ mod tests {
             let mut tree = ::std::collections::BTreeMap::new();
             let config = ::config::get_base64_config();
 
-            assert!(tree.insert("end_point".to_string(), self.end_point.to_json()).is_none());
+            assert!(tree.insert("endpoint".to_string(), self.endpoint.to_json()).is_none());
             assert!(tree.insert("data".to_string(), self.data.to_json()).is_none());
 
             ::rustc_serialize::json::Json::Object(tree)
@@ -226,8 +226,6 @@ mod tests {
         eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::GetListenerEndpoint(tx)));
         let listener_ep = eval_result!(rx.recv());
 
-        let mut stream = eval_result!(::std::net::TcpStream::connect(&listener_ep[..]));
-
         let app_id = ::routing::NameType(eval_result!(::safe_core::utility::generate_random_array_u8_64()));
         let dir_id = ::routing::NameType(eval_result!(::safe_core::utility::generate_random_array_u8_64()));
         let directory_key = ::safe_nfs::metadata::directory_key::DirectoryKey::new(dir_id,
@@ -242,6 +240,8 @@ mod tests {
         };
         let activate_event = ::launcher::ipc_server::events::ExternalEvent::AppActivated(Box::new(activation_details));
         event_sender.send(activate_event);
+
+        let mut stream = eval_result!(::std::net::TcpStream::connect(&listener_ep[..]));
 
         let _raii_joiner_1 = ::safe_core
                              ::utility
@@ -265,15 +265,15 @@ mod tests {
                     public_encryption_key: app_public_key.0,
                 };
                 let request = HandshakeRequest {
-                    end_point: "safe-api/v1.0/handshake/authenticate-app".to_string(),
+                    endpoint: "safe-api/v1.0/handshake/authenticate-app".to_string(),
                     data     : payload,
                 };
 
                 let json_obj = request.to_json();
-
                 ipc_stream.write(json_obj.to_string().into_bytes());
 
-                assert!(ipc_stream.read_payload().is_ok());
+                let response = eval_result!(ipc_stream.read_payload());
+                assert!(ipc_stream.read_payload().is_err())
 
         })));
         ::std::thread::sleep_ms(3000);
