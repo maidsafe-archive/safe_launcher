@@ -44,6 +44,12 @@ pub enum LauncherError {
     JsonParseError(::rustc_serialize::json::ParserError),
     /// JSON non-conforming to the Launcher RFC
     SpecificParseError(String),
+    /// Unable to find/traverse directory or file path
+    PathNotFound,
+    /// Supplied path was invalid
+    InvalidPath,
+    /// Permission denied - e.g. permission to access SAFEDrive etc.
+    PermissionDenied,
     /// Unexpected - Probably a Logic error
     Unexpected(String),
 }
@@ -86,7 +92,10 @@ impl Into<i32> for LauncherError {
             LauncherError::FailedWritingStreamPayloadSize   => LAUNCHER_ERROR_START_RANGE - 8,
             LauncherError::JsonParseError(_)                => LAUNCHER_ERROR_START_RANGE - 9,
             LauncherError::SpecificParseError(_)            => LAUNCHER_ERROR_START_RANGE - 10,
-            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 11,
+            LauncherError::PathNotFound                     => LAUNCHER_ERROR_START_RANGE - 11,
+            LauncherError::InvalidPath                      => LAUNCHER_ERROR_START_RANGE - 12,
+            LauncherError::PermissionDenied                 => LAUNCHER_ERROR_START_RANGE - 13,
+            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 14,
         }
     }
 }
@@ -105,6 +114,9 @@ impl ::std::fmt::Debug for LauncherError {
             LauncherError::FailedWritingStreamPayloadSize   => write!(f, "LauncherError::FailedWritingStreamPayloadSize"),
             LauncherError::JsonParseError(ref error)        => write!(f, "LauncherError::JsonParseError -> {:?}", error),
             LauncherError::SpecificParseError(ref error)    => write!(f, "LauncherError::SpecificParseError -> {:?}", error),
+            LauncherError::PathNotFound                     => write!(f, "LauncherError::PathNotFound"),
+            LauncherError::InvalidPath                      => write!(f, "LauncherError::InvalidPath"),
+            LauncherError::PermissionDenied                 => write!(f, "LauncherError::PermissionDenied"),
             LauncherError::Unexpected(ref error)            => write!(f, "LauncherError::Unexpected{{{:?}}}", error),
         }
     }
