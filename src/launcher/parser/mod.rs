@@ -20,10 +20,13 @@ pub type ResponseType = Result<Option<::rustc_serialize::json::Json>, ::errors::
 mod dns;
 mod nfs;
 mod traits;
+mod helper;
 
 pub struct ParameterPacket {
-    pub client           : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-    pub safe_drive_access: ::std::sync::Arc<::std::sync::Mutex<bool>>,
+    pub client            : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+    pub app_root_dir_key  : ::safe_nfs::metadata::directory_key::DirectoryKey,
+    pub safe_drive_access : ::std::sync::Arc<::std::sync::Mutex<bool>>,
+    pub safe_drive_dir_key: ::safe_nfs::metadata::directory_key::DirectoryKey,
 }
 
 pub fn begin_parse<D>(params : ParameterPacket,
@@ -32,9 +35,7 @@ pub fn begin_parse<D>(params : ParameterPacket,
     let endpoint: String = try!(parse_result!(decoder.read_struct_field("endpoint",
                                                                         0,
                                                                         |d| ::rustc_serialize::Decodable::decode(d)), ""));
-    let mut tokens = endpoint.split(|element| element == '/')
-                             .map(|token| token.to_string())
-                             .collect::<Vec<String>>();
+    let mut tokens = helper::tokenise_path(&endpoint, true);
     tokens.reverse();
 
     version_parser(params, tokens, decoder)
