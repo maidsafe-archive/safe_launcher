@@ -39,10 +39,10 @@ impl ::rustc_serialize::json::ToJson for KeyExchangeData {
         let base64_public_key = (&self.public_key).to_base64(config);
         let base64_symmetric_key = (&self.symmetric_key).to_base64(config);
 
-        if tree.insert("public_key".to_string(), base64_public_key.to_json()).is_none() {
+        if tree.insert("public_key".to_string(), base64_public_key.to_json()).is_some() {
             error!("Json Conversion error -- KeyExchangeData -- public_key");
         }
-        if tree.insert("symmetric_key".to_string(), base64_symmetric_key.to_json()).is_none() {
+        if tree.insert("symmetric_key".to_string(), base64_symmetric_key.to_json()).is_some() {
             error!("Json Conversion error -- KeyExchangeData -- symmetric_key");
         }
 
@@ -58,10 +58,10 @@ impl ::rustc_serialize::json::ToJson for HandshakeResponse {
         let config = ::config::get_base64_config();
         let base64_id = (&self.id).to_base64(config);
 
-        if tree.insert("id".to_string(), base64_id.to_json()).is_none() {
+        if tree.insert("id".to_string(), base64_id.to_json()).is_some() {
             error!("Json Conversion error -- HandshakeResponse -- id");
         }
-        if tree.insert("data".to_string(), self.data.to_json()).is_none() {
+        if tree.insert("data".to_string(), self.data.to_json()).is_some() {
             error!("Json Conversion error -- HandshakeResponse -- data");
         }
         ::rustc_serialize::json::Json::Object(tree)

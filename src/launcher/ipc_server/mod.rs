@@ -340,13 +340,13 @@ mod test {
             let base64_nonce = (&self.nonce).to_base64(config);
             let base64_pub_encryption_key = (&self.public_encryption_key).to_base64(config);
 
-            if tree.insert("launcher_string".to_string(), self.launcher_string.to_json()).is_none() {
+            if tree.insert("launcher_string".to_string(), self.launcher_string.to_json()).is_some() {
                 error!("Json Conversion error -- HandshakePayload -- launcher_string");
             }
-            if tree.insert("nonce".to_string(), base64_nonce.to_json()).is_none() {
+            if tree.insert("nonce".to_string(), base64_nonce.to_json()).is_some() {
                 error!("Json Conversion error -- HandshakePayload -- nonce");
             }
-            if tree.insert("public_encryption_key".to_string(), base64_pub_encryption_key.to_json()).is_none() {
+            if tree.insert("public_encryption_key".to_string(), base64_pub_encryption_key.to_json()).is_some() {
                 error!("Json Conversion error -- HandshakePayload -- public_encryption_key");
             }
 
@@ -362,10 +362,10 @@ mod test {
             let mut tree = ::std::collections::BTreeMap::new();
             let config = ::config::get_base64_config();
 
-            if tree.insert("end_point".to_string(), self.end_point.to_json()).is_none() {
+            if tree.insert("end_point".to_string(), self.end_point.to_json()).is_some() {
                 error!("Json Conversion error -- HandshakeRequest -- endpoint");
             }
-            if tree.insert("data".to_string(), self.data.to_json()).is_none() {
+            if tree.insert("data".to_string(), self.data.to_json()).is_some() {
                 error!("Json Conversion error -- HandshakeRequest -- data");
             }
 
@@ -432,7 +432,7 @@ mod test {
                     data     : payload,
                 };
 
-                let json_obj = request.to_json();                
+                let json_obj = request.to_json();
                 let serialised_data = eval_result!(::safe_core::utility::serialise(&json_obj.to_string()));
 
                 ipc_stream.write(serialised_data);
