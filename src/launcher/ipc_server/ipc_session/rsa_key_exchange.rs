@@ -15,50 +15,87 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-use rustc_serialize::base64::ToBase64;
+use rustc_serialize::json::ToJson;
 
-#[derive(Debug, RustcEncodable)]
+#[derive(Debug)]
 struct KeyExchangeData {
-    pub public_key  : String,
-    pub symmtric_key: String,
+    pub public_key   : [u8; 32],
+    pub symmetric_key: Vec<u8>,
 }
 
 
-#[derive(Debug, RustcEncodable)]
+#[derive(Debug)]
 struct HandshakeResponse {
-    pub id  : Vec<u8>,
+    pub id  : [u8; 0],
     pub data: KeyExchangeData,
 }
 
+impl ::rustc_serialize::json::ToJson for KeyExchangeData {
+    fn to_json(&self) -> ::rustc_serialize::json::Json {
+        use ::rustc_serialize::base64::ToBase64;
+
+        let mut tree = ::std::collections::BTreeMap::new();
+        let config = ::config::get_base64_config();
+        let base64_public_key = (&self.public_key).to_base64(config);
+        let base64_symmetric_key = (&self.symmetric_key).to_base64(config);
+
+        if tree.insert("public_key".to_string(), base64_public_key.to_json()).is_none() {
+            error!("Json Conversion error -- KeyExchangeData -- public_key");
+        }
+        if tree.insert("symmetric_key".to_string(), base64_symmetric_key.to_json()).is_none() {
+            error!("Json Conversion error -- KeyExchangeData -- symmetric_key");
+        }
+
+        ::rustc_serialize::json::Json::Object(tree)
+    }
+}
+
+impl ::rustc_serialize::json::ToJson for HandshakeResponse {
+    fn to_json(&self) -> ::rustc_serialize::json::Json {
+        use ::rustc_serialize::base64::ToBase64;
+
+        let mut tree = ::std::collections::BTreeMap::new();
+        let config = ::config::get_base64_config();
+        let base64_id = (&self.id).to_base64(config);
+
+        if tree.insert("id".to_string(), base64_id.to_json()).is_none() {
+            error!("Json Conversion error -- HandshakeResponse -- id");
+        }
+        if tree.insert("data".to_string(), self.data.to_json()).is_none() {
+            error!("Json Conversion error -- HandshakeResponse -- data");
+        }
+        ::rustc_serialize::json::Json::Object(tree)
+    }
+}
 
 pub fn perform_key_exchange(mut ipc_stream: ::launcher::ipc_server::ipc_session::stream::IpcStream,
                             app_nonce     : ::sodiumoxide::crypto::box_::Nonce,
                             app_pub_key   : ::sodiumoxide::crypto::box_::PublicKey) -> Result<(::sodiumoxide::crypto::secretbox::Nonce,
                                                                                               ::sodiumoxide::crypto::secretbox::Key),
                                                                                              ::errors::LauncherError> {
+    println!("************* INSIDE ************");
     // generate nonce and symmtric key
     let nonce = ::sodiumoxide::crypto::secretbox::gen_nonce();
     let key = ::sodiumoxide::crypto::secretbox::gen_key();
     let (launcher_public_key, launcher_secret_key) = ::sodiumoxide::crypto::box_::gen_keypair();
     // Pack it into single [u8; NONCEBYTES+KEYBYTES] -> [nonce+key]
     let mut data = [0u8; 36];
-    let mut pos = 0;
-    for i in nonce.0.iter().chain(key.0.iter()) {
-      data[0] = *i;
-      pos += 1;
+    for (i, item) in nonce.0.iter().chain(key.0.iter()).enumerate() {
+      data[i] = *item;
     }
     // encrypt above by box_::seal to get Vec<u8>
     let encrypted_data = ::sodiumoxide::crypto::box_::seal(&data, &app_nonce, &app_pub_key, &launcher_secret_key);
     // Create the JSON as specified in the RFC
     let response = KeyExchangeData {
-      public_key  : launcher_public_key.0.to_base64(::config::get_base64_config()),
-      symmtric_key: encrypted_data.to_base64(::config::get_base64_config()),
+      public_key   : launcher_public_key.0,
+      symmetric_key: encrypted_data,
     };
     let payload = HandshakeResponse {
-      id: vec![],
+      id: [0u8; 0],
       data: response,
     };
     // write the data through the stream
-    ipc_stream.write(try!(::safe_core::utility::serialise(&eval_result!(::rustc_serialize::json::encode(&payload)))));
+    let json_obj = payload.to_json();
+    ipc_stream.write(try!(::safe_core::utility::serialise(&json_obj.to_string())));
     Ok((nonce, key))
 }

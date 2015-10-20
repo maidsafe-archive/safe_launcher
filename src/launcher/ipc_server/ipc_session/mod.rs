@@ -31,7 +31,9 @@ pub struct IpcSession {
     app_id                 : Option<::routing::NameType>,
     temp_id                : u32,
     stream                 : ::std::net::TcpStream,
+    symm_key               : Option<::sodiumoxide::crypto::secretbox::Key>,
     app_nonce              : Option<::sodiumoxide::crypto::box_::Nonce>,
+    symm_nonce             : Option<::sodiumoxide::crypto::secretbox::Nonce>,
     app_pub_key            : Option<::sodiumoxide::crypto::box_::PublicKey>,
     _raii_joiner           : ::safe_core::utility::RAIIThreadJoiner,
     safe_drive_access      : Option<::std::sync::Arc<::std::sync::Mutex<bool>>>, // TODO(Spandan) change to 3-level permission instead of 2
@@ -39,8 +41,6 @@ pub struct IpcSession {
     external_event_rx      : ::std::sync::mpsc::Receiver<events::ExternalEvent>,
     secure_comm_event_rx   : ::std::sync::mpsc::Receiver<events::SecureCommunicationEvent>,
     secure_comm_event_tx   : ::std::sync::mpsc::Sender<events::SecureCommunicationEvent>,
-    key_exchange_event_rx  : ::std::sync::mpsc::Receiver<events::RsaKeyExchangeEvent>,
-    key_exchange_event_tx  : ::std::sync::mpsc::Sender<events::RsaKeyExchangeEvent>,
     authentication_event_rx: ::std::sync::mpsc::Receiver<events::AppAuthenticationEvent>,
     ipc_server_event_sender: ::launcher::ipc_server::EventSenderToServer<::launcher::ipc_server::events::IpcSessionEvent>,
 }
@@ -54,7 +54,6 @@ impl IpcSession {
         let (event_catagory_tx, event_catagory_rx) = ::std::sync::mpsc::channel();
         let (external_event_tx, external_event_rx) = ::std::sync::mpsc::channel();
         let (secure_comm_event_tx, secure_comm_event_rx) = ::std::sync::mpsc::channel();
-        let (key_exchange_event_tx, key_exchange_event_rx) = ::std::sync::mpsc::channel();
         let (authentication_event_tx, authentication_event_rx) = ::std::sync::mpsc::channel();
 
         let authentication_event_sender = EventSenderToSession::<events::AppAuthenticationEvent>
@@ -72,7 +71,9 @@ impl IpcSession {
             app_id                 : None,
             temp_id                : temp_id,
             stream                 : stream,
+            symm_key               : None,
             app_nonce              : None,
+            symm_nonce             : None,
             app_pub_key            : None,
             _raii_joiner           : joiner,
             safe_drive_access      : None,
@@ -80,8 +81,6 @@ impl IpcSession {
             external_event_rx      : external_event_rx,
             secure_comm_event_rx   : secure_comm_event_rx,
             secure_comm_event_tx   : secure_comm_event_tx,
-            key_exchange_event_rx  : key_exchange_event_rx,
-            key_exchange_event_tx  : key_exchange_event_tx,
             authentication_event_rx: authentication_event_rx,
             ipc_server_event_sender: server_event_sender,
         };
@@ -107,13 +106,6 @@ impl IpcSession {
                     if let Ok(authentication_event) = ipc_session.authentication_event_rx.try_recv() {
                         match authentication_event {
                             Ok(nonce) => ipc_session.on_auth_data_received(nonce),
-                            _ => unimplemented!(),
-                        }
-                    }
-                },
-                events::IpcSessionEventCategory::RsaKeyExchangeEvent => {
-                    if let Ok(rsa_key_exchg_event) = ipc_session.key_exchange_event_rx.try_recv() {
-                        match rsa_key_exchg_event {
                             _ => unimplemented!(),
                         }
                     }
@@ -148,16 +140,18 @@ impl IpcSession {
                                           ::IpcSessionEvent::VerifySession(self.temp_id, auth_data.str_nonce));
     }
 
+    // TODO (Krishna) send => events::IpcSessionEventCategory::SecureCommunicationEvent
     fn on_app_detail_received(&mut self, app_detail: Box<events::event_data::AppDetail>) {
         let mut ipc_stream = eval_result!(stream::IpcStream::new(eval_result!(self.stream.try_clone()
                                                                                          .map_err(|err| ::errors
                                                                                                         ::LauncherError
                                                                                                         ::IpcStreamCloneError(err)))));
-        let (nonce, symmetric_key_key) = eval_result!(rsa_key_exchange::perform_key_exchange(ipc_stream,
-                                                                                             eval_option!(self.app_nonce, ""),
-                                                                                             eval_option!(self.app_pub_key, "")));
-        // Asign to self
-        // TODO (Krishna) send => events::IpcSessionEventCategory::SecureCommunicationEvent
+        let (nonce, symmetric_key) = eval_result!(rsa_key_exchange::perform_key_exchange(ipc_stream,
+                                                                                         eval_option!(self.app_nonce, "Nonce can not be None"),
+                                                                                         eval_option!(self.app_pub_key, "App Public Key can not be None")));
+        self.symm_nonce = Some(nonce);
+        self.symm_key = Some(symmetric_key);
+
     }
 
     fn on_change_safe_drive_access(&self, is_allowed: bool) {

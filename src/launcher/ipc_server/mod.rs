@@ -318,21 +318,64 @@ mod test {
         eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::Terminate));
     }
 
-    #[derive(RustcEncodable)]
+    #[derive(Debug)]
     struct HandshakeRequest {
         pub end_point: String,
         pub data: HandshakePayload,
     }
 
-    #[derive(RustcEncodable)]
+    #[derive(Debug)]
     struct HandshakePayload {
         pub launcher_string: String,
-        pub nonce: String,
-        pub public_encryption_key: String,
+        pub nonce: [u8; 24],
+        pub public_encryption_key: [u8; 32],
+    }
+
+    impl ::rustc_serialize::json::ToJson for HandshakePayload {
+        fn to_json(&self) -> ::rustc_serialize::json::Json {
+            use ::rustc_serialize::base64::ToBase64;
+
+            let mut tree = ::std::collections::BTreeMap::new();
+            let config = ::config::get_base64_config();
+            let base64_nonce = (&self.nonce).to_base64(config);
+            let base64_pub_encryption_key = (&self.public_encryption_key).to_base64(config);
+
+            if tree.insert("launcher_string".to_string(), self.launcher_string.to_json()).is_none() {
+                error!("Json Conversion error -- HandshakePayload -- launcher_string");
+            }
+            if tree.insert("nonce".to_string(), base64_nonce.to_json()).is_none() {
+                error!("Json Conversion error -- HandshakePayload -- nonce");
+            }
+            if tree.insert("public_encryption_key".to_string(), base64_pub_encryption_key.to_json()).is_none() {
+                error!("Json Conversion error -- HandshakePayload -- public_encryption_key");
+            }
+
+            ::rustc_serialize::json::Json::Object(tree)
+        }
+    }
+
+
+    impl ::rustc_serialize::json::ToJson for HandshakeRequest {
+        fn to_json(&self) -> ::rustc_serialize::json::Json {
+            use ::rustc_serialize::base64::ToBase64;
+
+            let mut tree = ::std::collections::BTreeMap::new();
+            let config = ::config::get_base64_config();
+
+            if tree.insert("end_point".to_string(), self.end_point.to_json()).is_none() {
+                error!("Json Conversion error -- HandshakeRequest -- endpoint");
+            }
+            if tree.insert("data".to_string(), self.data.to_json()).is_none() {
+                error!("Json Conversion error -- HandshakeRequest -- data");
+            }
+
+            ::rustc_serialize::json::Json::Object(tree)
+        }
     }
 
     #[test]
     fn application_handshake() {
+        use ::rustc_serialize::json::ToJson;
 
         let client = ::std
                      ::sync
@@ -381,16 +424,20 @@ mod test {
                 let (app_public_key, app_seccret_key) = ::sodiumoxide::crypto::box_::gen_keypair();
                 let payload = HandshakePayload {
                     launcher_string      : "mock_nonce_string".to_string(),
-                    nonce                : app_nonce.0.to_base64(::config::get_base64_config()),
-                    public_encryption_key: app_public_key.0.to_base64(::config::get_base64_config()),
+                    nonce                : app_nonce.0,
+                    public_encryption_key: app_public_key.0,
                 };
                 let request = HandshakeRequest {
                     end_point: "safe-api/v1.0/handshake/authenticate-app".to_string(),
                     data     : payload,
                 };
 
-                ipc_stream.write(eval_result!(::safe_core::utility::serialise(&eval_result!(::rustc_serialize::json::encode(&request)))));
-                
+                let json_obj = request.to_json();                
+                let serialised_data = eval_result!(::safe_core::utility::serialise(&json_obj.to_string()));
+
+                ipc_stream.write(serialised_data);
+
+                ::std::thread::sleep_ms(1000);
                 let mut buffer = [0; 1024];
                 assert_eq!(eval_result!(stream.read(&mut buffer)), 1024);
         })));
