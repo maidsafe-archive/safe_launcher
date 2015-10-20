@@ -17,9 +17,11 @@
 
 use rustc_serialize::json::ToJson;
 
+const KEY_SIZE: usize = ::sodiumoxide::crypto::secretbox::NONCEBYTES + ::sodiumoxide::crypto::secretbox::KEYBYTES;
+
 #[derive(Debug)]
 struct KeyExchangeData {
-    pub public_key   : [u8; 32],
+    pub public_key   : [u8; ::sodiumoxide::crypto::secretbox::KEYBYTES],
     pub symmetric_key: Vec<u8>,
 }
 
@@ -73,13 +75,12 @@ pub fn perform_key_exchange(mut ipc_stream: ::launcher::ipc_server::ipc_session:
                             app_pub_key   : ::sodiumoxide::crypto::box_::PublicKey) -> Result<(::sodiumoxide::crypto::secretbox::Nonce,
                                                                                               ::sodiumoxide::crypto::secretbox::Key),
                                                                                              ::errors::LauncherError> {
-    println!("************* INSIDE ************");
     // generate nonce and symmtric key
     let nonce = ::sodiumoxide::crypto::secretbox::gen_nonce();
     let key = ::sodiumoxide::crypto::secretbox::gen_key();
     let (launcher_public_key, launcher_secret_key) = ::sodiumoxide::crypto::box_::gen_keypair();
     // Pack it into single [u8; NONCEBYTES+KEYBYTES] -> [nonce+key]
-    let mut data = [0u8; 36];
+    let mut data = [0u8; KEY_SIZE];
     for (i, item) in nonce.0.iter().chain(key.0.iter()).enumerate() {
       data[i] = *item;
     }
@@ -96,6 +97,6 @@ pub fn perform_key_exchange(mut ipc_stream: ::launcher::ipc_server::ipc_session:
     };
     // write the data through the stream
     let json_obj = payload.to_json();
-    ipc_stream.write(try!(::safe_core::utility::serialise(&json_obj.to_string())));
+    ipc_stream.write(json_obj.to_string().into_bytes());
     Ok((nonce, key))
 }

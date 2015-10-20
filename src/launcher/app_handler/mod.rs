@@ -91,7 +91,7 @@ impl AppHandler {
             }
         }
     }
-    
+
     fn get_app_dir_name(id: &::routing::NameType, app_name: &String) -> String {
         let mut app_id_string: String = String::new();
         let mut temp;

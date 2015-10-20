@@ -16,10 +16,10 @@
 // relating to use of the SAFE Network Software.
 
 pub mod events;
-pub mod stream;
 
 pub type EventSenderToSession<EventSubset> = ::event_sender::EventSender<events::IpcSessionEventCategory, EventSubset>;
 
+mod stream;
 mod authenticate_app;
 mod rsa_key_exchange;
 mod secure_communication;
@@ -31,9 +31,7 @@ pub struct IpcSession {
     app_id                 : Option<::routing::NameType>,
     temp_id                : u32,
     stream                 : ::std::net::TcpStream,
-    symm_key               : Option<::sodiumoxide::crypto::secretbox::Key>,
     app_nonce              : Option<::sodiumoxide::crypto::box_::Nonce>,
-    symm_nonce             : Option<::sodiumoxide::crypto::secretbox::Nonce>,
     app_pub_key            : Option<::sodiumoxide::crypto::box_::PublicKey>,
     _raii_joiner           : ::safe_core::utility::RAIIThreadJoiner,
     safe_drive_access      : Option<::std::sync::Arc<::std::sync::Mutex<bool>>>, // TODO(Spandan) change to 3-level permission instead of 2
@@ -71,9 +69,7 @@ impl IpcSession {
             app_id                 : None,
             temp_id                : temp_id,
             stream                 : stream,
-            symm_key               : None,
             app_nonce              : None,
-            symm_nonce             : None,
             app_pub_key            : None,
             _raii_joiner           : joiner,
             safe_drive_access      : None,
@@ -149,8 +145,6 @@ impl IpcSession {
         let (nonce, symmetric_key) = eval_result!(rsa_key_exchange::perform_key_exchange(ipc_stream,
                                                                                          eval_option!(self.app_nonce, "Nonce can not be None"),
                                                                                          eval_option!(self.app_pub_key, "App Public Key can not be None")));
-        self.symm_nonce = Some(nonce);
-        self.symm_key = Some(symmetric_key);
 
     }
 
@@ -165,5 +159,124 @@ impl Drop for IpcSession {
             debug!("Failed to gracefully shutdown session for app-id {:?} with error {:?}",
                    self.app_id, err);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    #[derive(Debug)]
+    struct HandshakeRequest {
+        pub end_point: String,
+        pub data: HandshakePayload,
+    }
+
+    #[derive(Debug)]
+    struct HandshakePayload {
+        pub launcher_string: String,
+        pub nonce: [u8; 24],
+        pub public_encryption_key: [u8; 32],
+    }
+
+    impl ::rustc_serialize::json::ToJson for HandshakePayload {
+        fn to_json(&self) -> ::rustc_serialize::json::Json {
+            use ::rustc_serialize::base64::ToBase64;
+
+            let mut tree = ::std::collections::BTreeMap::new();
+            let config = ::config::get_base64_config();
+            let base64_nonce = (&self.nonce).to_base64(config);
+            let base64_pub_encryption_key = (&self.public_encryption_key).to_base64(config);
+
+            assert!(tree.insert("launcher_string".to_string(), self.launcher_string.to_json()).is_none());
+            assert!(tree.insert("nonce".to_string(), base64_nonce.to_json()).is_none());
+            assert!(tree.insert("public_encryption_key".to_string(), base64_pub_encryption_key.to_json()).is_none());
+
+            ::rustc_serialize::json::Json::Object(tree)
+        }
+    }
+
+
+    impl ::rustc_serialize::json::ToJson for HandshakeRequest {
+        fn to_json(&self) -> ::rustc_serialize::json::Json {
+            use ::rustc_serialize::base64::ToBase64;
+
+            let mut tree = ::std::collections::BTreeMap::new();
+            let config = ::config::get_base64_config();
+
+            assert!(tree.insert("end_point".to_string(), self.end_point.to_json()).is_none());
+            assert!(tree.insert("data".to_string(), self.data.to_json()).is_none());
+
+            ::rustc_serialize::json::Json::Object(tree)
+        }
+    }
+
+    #[test]
+    fn application_handshake() {
+        use ::rustc_serialize::json::ToJson;
+
+        let client = ::std
+                     ::sync
+                     ::Arc::new(::std
+                                ::sync
+                                ::Mutex::new(eval_result!(::safe_core::utility::test_utils::get_client())));
+
+        let (_raii_joiner_0, event_sender) = eval_result!(::launcher::ipc_server::IpcServer::new(client));
+
+        let (tx, rx) = ::std::sync::mpsc::channel();
+        eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::GetListenerEndpoint(tx)));
+        let listener_ep = eval_result!(rx.recv());
+
+        let mut stream = eval_result!(::std::net::TcpStream::connect(&listener_ep[..]));
+
+        let app_id = ::routing::NameType(eval_result!(::safe_core::utility::generate_random_array_u8_64()));
+        let dir_id = ::routing::NameType(eval_result!(::safe_core::utility::generate_random_array_u8_64()));
+        let directory_key = ::safe_nfs::metadata::directory_key::DirectoryKey::new(dir_id,
+                                                                                   10u64,
+                                                                                   false,
+                                                                                   ::safe_nfs::AccessLevel::Private);
+        let activation_details = ::launcher::ipc_server::events::event_data::ActivationDetail {
+            nonce            : "mock_nonce_string".to_string(),
+            app_id           : app_id,
+            app_root_dir_key : directory_key,
+            safe_drive_access: false,
+        };
+        let activate_event = ::launcher::ipc_server::events::ExternalEvent::AppActivated(Box::new(activation_details));
+        event_sender.send(activate_event);
+
+        let _raii_joiner_1 = ::safe_core
+                             ::utility
+                             ::RAIIThreadJoiner
+                             ::new(eval_result!(::std
+                                                ::thread
+                                                ::Builder::new().name("TCPClientThread".to_string())
+                                                                .spawn(move || {
+                use rustc_serialize::base64::ToBase64;
+
+                let mut ipc_stream = eval_result!(::launcher
+                                                  ::ipc_server
+                                                  ::ipc_session
+                                                  ::stream
+                                                  ::IpcStream::new(stream));
+                let app_nonce = ::sodiumoxide::crypto::box_::gen_nonce();
+                let (app_public_key, app_seccret_key) = ::sodiumoxide::crypto::box_::gen_keypair();
+                let payload = HandshakePayload {
+                    launcher_string      : "mock_nonce_string".to_string(),
+                    nonce                : app_nonce.0,
+                    public_encryption_key: app_public_key.0,
+                };
+                let request = HandshakeRequest {
+                    end_point: "safe-api/v1.0/handshake/authenticate-app".to_string(),
+                    data     : payload,
+                };
+
+                let json_obj = request.to_json();
+
+                ipc_stream.write(json_obj.to_string().into_bytes());
+
+                assert!(ipc_stream.read_payload().is_ok());
+
+        })));
+        ::std::thread::sleep_ms(3000);
+        eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::Terminate));
     }
 }
