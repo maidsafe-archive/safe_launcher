@@ -18,6 +18,7 @@
 pub fn tokenise_path(path: &str, keep_empty_splits: bool) -> Vec<String> {
     path.split(|element| element == '/')
         .filter(|token| keep_empty_splits || token.len() != 0)
+        .filter(|token| !token.contains('.'))
         .map(|token| token.to_string())
         .collect()
 }

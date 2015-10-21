@@ -19,11 +19,12 @@
 pub struct CreateFile {
     is_shared   : bool,
     file_path  : String,
-    user_metadata : Option<Vec<u8>>
+    user_metadata : String,
 }
 
 impl ::launcher::parser::traits::Action for CreateFile {
     fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType {
+        use rustc_serialize::base64::FromBase64;
         
         if self.is_shared && !*eval_result!(params.safe_drive_access.lock()) {
             return Err(::errors::LauncherError::PermissionDenied)
@@ -40,13 +41,13 @@ impl ::launcher::parser::traits::Action for CreateFile {
                                                                                         &tokens,
                                                                                         Some(start_dir_key)));
 
-        let p = self.file_path.split('/').last();
-        let file_name = eval_option!(p,"Error unable to get file name").to_string(); 
-
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(params.client);
 
+        let file_name = eval_option!(self.file_path.split('/').last(),"Failed to get file name.").to_string(); 
+        let bin_metadata = try!(parse_result!(self.user_metadata.from_base64(), "Failed Converting from Base64."));
+
         let _ = try!(file_helper.create(file_name,
-                                        eval_option!(self.user_metadata.take(), "Logic Error - Report a bug."),
+                                        bin_metadata,
                                         file_directory));
 
         Ok(None)
