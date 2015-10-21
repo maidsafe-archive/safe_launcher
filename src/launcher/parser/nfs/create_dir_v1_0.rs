@@ -21,21 +21,21 @@ pub struct CreateDir {
     is_private    : bool,
     is_versioned  : bool,
     user_metadata : String,
-    is_path_shared: bool,
+    is_shared: bool,
 }
 
 impl ::launcher::parser::traits::Action for CreateDir {
     fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType {
         use rustc_serialize::base64::FromBase64;
 
-        if self.is_path_shared && !*eval_result!(params.safe_drive_access.lock()) {
+        if self.is_shared && !*eval_result!(params.safe_drive_access.lock()) {
             return Err(::errors::LauncherError::PermissionDenied)
         }
 
         let mut tokens = ::launcher::parser::helper::tokenise_path(&self.dir_path, false);
         let dir_to_create = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
 
-        let start_dir_key = if self.is_path_shared {
+        let start_dir_key = if self.is_shared {
             &params.safe_drive_dir_key
         } else {
             &params.app_root_dir_key
