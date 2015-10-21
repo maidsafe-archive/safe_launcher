@@ -23,7 +23,6 @@ pub struct DeleteDir {
 
 impl ::launcher::parser::traits::Action for DeleteDir {
     fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType {
-        use rustc_serialize::base64::FromBase64;
 
         let mut tokens = ::launcher::parser::helper::tokenise_path(&self.dir_path, false);
         let dir_to_delete = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
