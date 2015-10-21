@@ -52,7 +52,7 @@ fn get_action<D>(action_str: &str, version: f32, decoder: &mut D) -> Result<Box<
             _   => return version_err,
         },
         "delete-dir" => match version {
-            1.0 => unimplemented!(),
+            1.0 => Box::new(try!(parse_result!(delete_dir_v1_0::DeleteDir::decode(decoder), ""))),
             _   => return version_err,
         },
         "modify-dir" => match version {
