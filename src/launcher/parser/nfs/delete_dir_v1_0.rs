@@ -17,7 +17,7 @@
 
 #[derive(RustcDecodable, Debug)]
 pub struct DeleteDir {
-    dir_path : String,
+    dir_path      : String,
     is_path_shared: bool,
 }
 
