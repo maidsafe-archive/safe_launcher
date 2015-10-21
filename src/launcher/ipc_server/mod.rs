@@ -106,8 +106,8 @@ impl IpcServer {
                 events::IpcServerEventCategory::IpcSessionEvent => {
                     if let Ok(session_event) = ipc_server.session_event_rx.try_recv() {
                         match session_event {
-                            events::IpcSessionEvent::VerifySession(temp_id, nonce) => ipc_server.on_verify_session(temp_id, nonce),
-                            events::IpcSessionEvent::IpcSessionWriteFailed(app_id) => ipc_server.on_ipc_session_write_failed(app_id),
+                            events::IpcSessionEvent::VerifySession(detail) => ipc_server.on_verify_session(detail),
+                            events::IpcSessionEvent::IpcSessionTerminated(detail) => ipc_server.on_ipc_session_terminated(detail),
                         }
                     }
                 },
@@ -149,7 +149,9 @@ impl IpcServer {
         ;
     }
 
-    fn on_verify_session(&mut self, temp_id: u32, nonce: String) {
+    fn on_verify_session(&mut self, detail: Box<(u32, String)>) {
+        let (temp_id, nonce) = *detail;
+
         match (self.unverified_sessions.remove(&temp_id), self.pending_verifications.remove(&nonce)) {
             (Some(session_info), Some(app_info)) => {
                 let app_detail = Box::new(ipc_session::events::event_data::AppDetail {
@@ -169,7 +171,7 @@ impl IpcServer {
         }
     }
 
-    fn on_ipc_session_write_failed(&self, app_id: Option<::routing::NameType>) {
+    fn on_ipc_session_terminated(&self, detail: Box<events::event_data::SessionTerminationDetail>) {
         ;
     }
 

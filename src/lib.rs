@@ -52,11 +52,11 @@ extern crate rustc_serialize;
 
 #[macro_use] mod macros;
 
+/// FFI interface
+pub mod ffi;
 /// Safe-Launcher Errors
 pub mod errors;
+
 mod config;
 mod launcher;
 mod event_sender;
-
-/// FFI interface
-pub mod ffi;
