@@ -18,7 +18,7 @@
 #[derive(RustcDecodable, Debug)]
 pub struct DeleteDir {
     dir_path : String,
-    is_shared: bool,
+    is_path_shared: bool,
 }
 
 impl ::launcher::parser::traits::Action for DeleteDir {
@@ -30,7 +30,7 @@ impl ::launcher::parser::traits::Action for DeleteDir {
 
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(params.client);
 
-        let mut parent_dir = if self.is_shared {
+        let mut parent_dir = if self.is_path_shared {
             try!(dir_helper.get(&params.safe_drive_dir_key))
         } else {
             try!(dir_helper.get_user_root_directory_listing())
