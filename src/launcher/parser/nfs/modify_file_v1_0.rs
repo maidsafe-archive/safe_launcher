@@ -114,9 +114,9 @@ impl ::rustc_serialize::Decodable for OptionalParams {
 
 #[derive(Debug)]
 struct FileContentParams {
-    pub offset : Option<u64>,
-    pub modify : Option<bool>,
-    pub bytes  : Option<String>,
+    pub offset: Option<u64>,
+    pub modify: Option<bool>,
+    pub bytes : Option<String>,
 }
 
 impl ::rustc_serialize::Decodable for FileContentParams {
@@ -125,7 +125,7 @@ impl ::rustc_serialize::Decodable for FileContentParams {
         Ok(FileContentParams {
             offset: decoder.read_struct_field("offset", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
             modify: decoder.read_struct_field("offset", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
-            bytes: decoder.read_struct_field("bytes", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
+            bytes : decoder.read_struct_field("bytes", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
         })
     }
 }
