@@ -16,9 +16,9 @@
 // relating to use of the SAFE Network Software.
 
 #[derive(RustcDecodable, Debug)]
-pub struct CreateFile {
-    is_shared   : bool,
-    file_path  : String,
+pub struct CreateFile {  
+    is_path_shared: bool, 
+    file_path     : String,
     user_metadata : String,
 }
 
@@ -26,29 +26,30 @@ impl ::launcher::parser::traits::Action for CreateFile {
     fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType {
         use rustc_serialize::base64::FromBase64;
         
-        if self.is_shared && !*eval_result!(params.safe_drive_access.lock()) {
+        if self.is_path_shared && !*eval_result!(params.safe_drive_access.lock()) {
             return Err(::errors::LauncherError::PermissionDenied)
         };
 
-        let start_dir_key = if self.is_shared {
+        let start_dir_key = if self.is_path_shared {
             &params.safe_drive_dir_key
         } else {
             &params.app_root_dir_key
         };
 
         let mut tokens = ::launcher::parser::helper::tokenise_path(&self.file_path, false);
+        let file_name = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
+
         let mut file_directory = try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
-                                                                                        &tokens,
-                                                                                        Some(start_dir_key)));
+                                                                                         &tokens,
+                                                                                         Some(start_dir_key)));
 
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(params.client);
-
-        let file_name = eval_option!(self.file_path.split('/').last(),"Failed to get file name.").to_string(); 
         let bin_metadata = try!(parse_result!(self.user_metadata.from_base64(), "Failed Converting from Base64."));
 
-        let _ = try!(file_helper.create(file_name,
-                                        bin_metadata,
-                                        file_directory));
+        let mut writer = try!(file_helper.create(file_name,
+                                                 bin_metadata,
+                                                 file_directory));
+        let _ = try!(writer.close());
 
         Ok(None)
     }
