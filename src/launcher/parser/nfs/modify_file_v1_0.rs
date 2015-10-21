@@ -95,9 +95,9 @@ impl ::launcher::parser::traits::Action for ModifyFile {
 
 #[derive(Debug)]
 struct OptionalParams {
-    pub name                  : Option<String>,
-    pub content               : Option<FileContentParams>,
-    pub user_metadata         : Option<String>,
+    pub name         : Option<String>,
+    pub content      : Option<FileContentParams>,
+    pub user_metadata: Option<String>,
 }
 
 impl ::rustc_serialize::Decodable for OptionalParams {
