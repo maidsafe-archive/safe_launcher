@@ -30,6 +30,12 @@ impl ::launcher::parser::traits::Action for ModifyFile {
             return Err(::errors::LauncherError::PermissionDenied)
         }
 
+        if self.new_values.name.is_none() &&
+           self.new_values.user_metadata.is_none() &&
+           self.new_values.content.is_none() {
+            return Err(::errors::LauncherError::from("Optional parameters could not be parsed"));
+        }
+
         let start_dir_key = if self.is_path_shared {
             &params.safe_drive_dir_key
         } else {
@@ -43,12 +49,6 @@ impl ::launcher::parser::traits::Action for ModifyFile {
                                                                                       Some(start_dir_key)));
 
         let mut file= try!(dir_of_file.find_file(&file_name).map(|file| file.clone()).ok_or(::errors::LauncherError::InvalidPath));
-
-        if self.new_values.name.is_none() &&
-           self.new_values.user_metadata.is_none() &&
-           self.new_values.content.is_none() {
-            return Err(::errors::LauncherError::SpecificParseError("new_values could not be parsed or new_values is empty".to_string()));
-        }
 
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(params.client);
 
@@ -86,7 +86,7 @@ impl ::launcher::parser::traits::Action for ModifyFile {
                 writer.write(&bytes[..], offset);
                 let _ = try!(writer.close());
             } else {
-                return Err(::errors::LauncherError::Unexpected("Empty bytes received for updating file".to_string()));
+                return Err(::errors::LauncherError::from("Empty bytes received for updating file"));
             }
         }
 

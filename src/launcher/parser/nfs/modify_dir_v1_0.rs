@@ -26,6 +26,10 @@ impl ::launcher::parser::traits::Action for ModifyDir {
     fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType {
         use rustc_serialize::base64::FromBase64;
 
+        if !(self.new_values.name.is_some() || self.new_values.user_metadata.is_some()) {
+            return Err(::errors::LauncherError::from("Optional parameters could not be parsed"));
+        }
+
         if self.is_path_shared && !*eval_result!(params.safe_drive_access.lock()) {
             return Err(::errors::LauncherError::PermissionDenied)
         }
@@ -40,10 +44,6 @@ impl ::launcher::parser::traits::Action for ModifyDir {
         let mut dir_to_modify = try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
                                                                                         &tokens,
                                                                                         Some(start_dir_key)));
-
-        if !(self.new_values.name.is_some() || self.new_values.user_metadata.is_some()) {
-            return Err(::errors::LauncherError::Unexpected("new_values could not be parsed or the field is empty".to_string()));
-        }
 
         let directory_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(params.client);
         if let Some(ref name) = self.new_values.name {
@@ -60,7 +60,10 @@ impl ::launcher::parser::traits::Action for ModifyDir {
         Ok(None)
     }
 }
-
+// TODO Below are the deviations from the RFC parameters
+// modified time stamp cann not be updated via NFS API
+// NFS Api does not permit changing the private to public accesslevel
+// versioning can not be changed too
 #[derive(Debug)]
 struct OptionalParams {
     pub name         : Option<String>,
