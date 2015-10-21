@@ -61,7 +61,7 @@ impl ::launcher::parser::traits::Action for ModifyDir {
     }
 }
 // TODO Below are the deviations from the RFC parameters
-// modified time stamp cann not be updated via NFS API
+// modified time stamp can not be updated via NFS API
 // NFS Api does not permit changing the private to public accesslevel
 // versioning can not be changed too
 #[derive(Debug)]

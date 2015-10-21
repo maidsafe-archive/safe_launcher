@@ -48,7 +48,7 @@ impl ::launcher::parser::traits::Action for ModifyFile {
                                                                                       &tokens,
                                                                                       Some(start_dir_key)));
 
-        let mut file= try!(dir_of_file.find_file(&file_name).map(|file| file.clone()).ok_or(::errors::LauncherError::InvalidPath));
+        let mut file = try!(dir_of_file.find_file(&file_name).map(|file| file.clone()).ok_or(::errors::LauncherError::InvalidPath));
 
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(params.client);
 
@@ -65,7 +65,6 @@ impl ::launcher::parser::traits::Action for ModifyFile {
         }
 
         if metadata_updated {
-
             let _ = try!(file_helper.update_metadata(file.clone(), &mut dir_of_file));
         }
 
