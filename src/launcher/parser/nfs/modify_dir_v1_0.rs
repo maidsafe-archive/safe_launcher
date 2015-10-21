@@ -36,7 +36,7 @@ impl ::launcher::parser::traits::Action for ModifyDir {
             &params.app_root_dir_key
         };
 
-        let mut tokens = ::launcher::parser::helper::tokenise_path(&self.dir_path, false);
+        let tokens = ::launcher::parser::helper::tokenise_path(&self.dir_path, false);
         let mut dir_to_modify = try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
                                                                                         &tokens,
                                                                                         Some(start_dir_key)));
@@ -66,7 +66,7 @@ impl ::rustc_serialize::Decodable for OptionalParams {
             is_versioned: decoder.read_struct_field("is_versioned", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
             user_metadata: decoder.read_struct_field("user_metadata", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
             modification_time_sec: decoder.read_struct_field("modification_time_sec", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
-            modification_time_nsec: decoder.read_struct_field("modification_time_sec", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
+            modification_time_nsec: decoder.read_struct_field("modification_time_nsec", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
         })
     }
 }
