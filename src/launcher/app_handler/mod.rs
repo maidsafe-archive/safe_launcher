@@ -203,15 +203,19 @@ impl AppHandler {
 
     fn get_app_dir_name(app_name: &String,
                         directory_listing: &::safe_nfs::directory_listing::DirectoryListing) -> String {
-        let mut index = 0u8;
-        let mut dir_name = String::new();
-        loop {
-            dir_name = format!("{}-{}-Root-Dir", &app_name, index);
-            match directory_listing.find_sub_directory(&dir_name) {
-                Some(_) => index += 1,
-                None => break,
+        let mut dir_name = format!("{}-Root-Dir", &app_name);
+        if directory_listing.find_sub_directory(&dir_name).is_some() {
+            let mut index = 1u8;
+            loop {
+                dir_name = format!("{}-{}-Root-Dir", &app_name, index);
+                if directory_listing.find_sub_directory(&dir_name).is_some() {
+                    index += 1;
+                } else {
+                    break;
+                }
             }
-        };
+        }
+
         dir_name
     }
 
