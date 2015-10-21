@@ -17,9 +17,9 @@
 
 #[derive(RustcDecodable, Debug)]
 pub struct ModifyFile {
-    path           : String,
-    new_values     : OptionalParams,
-    is_path_shared : bool,
+    path          : String,
+    new_values    : OptionalParams,
+    is_path_shared: bool,
 }
 
 impl ::launcher::parser::traits::Action for ModifyFile {
