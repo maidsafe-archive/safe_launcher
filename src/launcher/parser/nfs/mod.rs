@@ -64,7 +64,7 @@ fn get_action<D>(action_str: &str, version: f32, decoder: &mut D) -> Result<Box<
             _   => return version_err,
         },
         "create-file" => match version {
-            1.0 => Box::new(try!(parse_result!(create_file_v1_0::CreateFile::decode(decoder), ""))),
+            1.0 => Box::new(try!(parse_result!(decoder.read_struct_field("data", 0, |d| create_file_v1_0::CreateFile::decode(d)), ""))),
             _   => return version_err,
         },
         "delete-file" => match version {
