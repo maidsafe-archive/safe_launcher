@@ -104,7 +104,7 @@ impl ::rustc_serialize::Decodable for OptionalParams {
     fn decode<D>(decoder: &mut D) -> Result<Self, D::Error>
                                      where D: ::rustc_serialize::Decoder {
         Ok(OptionalParams {
-            name         : decoder.read_struct_field("dir_path", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
+            name         : decoder.read_struct_field("name", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
             content      : decoder.read_struct_field("content", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
             user_metadata: decoder.read_struct_field("user_metadata", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
         })
@@ -123,7 +123,7 @@ impl ::rustc_serialize::Decodable for FileContentParams {
                                      where D: ::rustc_serialize::Decoder {
         Ok(FileContentParams {
             offset: decoder.read_struct_field("offset", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
-            modify: decoder.read_struct_field("offset", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
+            modify: decoder.read_struct_field("modify", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
             bytes : decoder.read_struct_field("bytes", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
         })
     }
