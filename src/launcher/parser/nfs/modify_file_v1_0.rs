@@ -17,9 +17,9 @@
 
 #[derive(RustcDecodable, Debug)]
 pub struct ModifyFile {
-    is_path_shared : bool,
     path           : String,
     new_values     : OptionalParams,
+    is_path_shared : bool,
 }
 
 impl ::launcher::parser::traits::Action for ModifyFile {
@@ -29,6 +29,7 @@ impl ::launcher::parser::traits::Action for ModifyFile {
         if self.is_path_shared && !*eval_result!(params.safe_drive_access.lock()) {
             return Err(::errors::LauncherError::PermissionDenied)
         }
+
 
         if self.new_values.name.is_none() &&
            self.new_values.user_metadata.is_none() &&
@@ -57,7 +58,7 @@ impl ::launcher::parser::traits::Action for ModifyFile {
             file.get_mut_metadata().set_name(name.clone());
             metadata_updated = true;
         }
-
+        
         if let Some(ref metadata_base64) = self.new_values.user_metadata {
             let metadata = try!(parse_result!(metadata_base64.from_base64(), "Failed to convert from base64"));
             file.get_mut_metadata().set_user_metadata(metadata);
@@ -69,24 +70,19 @@ impl ::launcher::parser::traits::Action for ModifyFile {
         }
 
         if let Some(ref file_content_params) = self.new_values.content {
-            let mut mode = ::safe_nfs::helper::writer::Mode::Overwrite;
-            if let Some(modify) = file_content_params.modify {
-                if modify {
-                    mode = ::safe_nfs::helper::writer::Mode::Modify;
-                }
+            let mode = if file_content_params.overwrite {
+                ::safe_nfs::helper::writer::Mode::Overwrite
+            } else {
+                ::safe_nfs::helper::writer::Mode::Modify
             };
             let offset = match mode {
                 ::safe_nfs::helper::writer::Mode::Overwrite => 0,
-                ::safe_nfs::helper::writer::Mode::Modify    => file_content_params.offset.map_or(0, |v| v)
+                ::safe_nfs::helper::writer::Mode::Modify    => file_content_params.offset
             };
-            if let Some(ref data) = file_content_params.bytes {
-                let mut writer = try!(file_helper.update_content(file.clone(), mode, dir_of_file));
-                let bytes = try!(parse_result!(data.from_base64(), "Failed to convert from base64"));
-                writer.write(&bytes[..], offset);
-                let _ = try!(writer.close());
-            } else {
-                return Err(::errors::LauncherError::from("Empty bytes received for updating file"));
-            }
+            let mut writer = try!(file_helper.update_content(file.clone(), mode, dir_of_file));
+            let bytes = try!(parse_result!(file_content_params.bytes.from_base64(), "Failed to convert from base64"));
+            writer.write(&bytes[..], offset);
+            let _ = try!(writer.close());
         }
 
         Ok(None)
@@ -111,20 +107,9 @@ impl ::rustc_serialize::Decodable for OptionalParams {
     }
 }
 
-#[derive(Debug)]
+#[derive(RustcDecodable, Debug)]
 struct FileContentParams {
-    pub offset: Option<u64>,
-    pub modify: Option<bool>,
-    pub bytes : Option<String>,
-}
-
-impl ::rustc_serialize::Decodable for FileContentParams {
-    fn decode<D>(decoder: &mut D) -> Result<Self, D::Error>
-                                     where D: ::rustc_serialize::Decoder {
-        Ok(FileContentParams {
-            offset: decoder.read_struct_field("offset", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
-            modify: decoder.read_struct_field("modify", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
-            bytes : decoder.read_struct_field("bytes", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
-        })
-    }
+    pub bytes    : String,
+    pub offset   : u64,
+    pub overwrite: bool,
 }
