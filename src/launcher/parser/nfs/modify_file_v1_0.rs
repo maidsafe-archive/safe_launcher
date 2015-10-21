@@ -30,7 +30,6 @@ impl ::launcher::parser::traits::Action for ModifyFile {
             return Err(::errors::LauncherError::PermissionDenied)
         }
 
-
         if self.new_values.name.is_none() &&
            self.new_values.user_metadata.is_none() &&
            self.new_values.content.is_none() {
@@ -58,7 +57,7 @@ impl ::launcher::parser::traits::Action for ModifyFile {
             file.get_mut_metadata().set_name(name.clone());
             metadata_updated = true;
         }
-        
+
         if let Some(ref metadata_base64) = self.new_values.user_metadata {
             let metadata = try!(parse_result!(metadata_base64.from_base64(), "Failed to convert from base64"));
             file.get_mut_metadata().set_user_metadata(metadata);
