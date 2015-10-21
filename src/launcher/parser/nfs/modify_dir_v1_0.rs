@@ -36,7 +36,7 @@ impl ::launcher::parser::traits::Action for ModifyDir {
             &params.app_root_dir_key
         };
 
-        let mut tokens = ::launcher::parser::helper::tokenise_path(&self.dir_path, false);
+        let tokens = ::launcher::parser::helper::tokenise_path(&self.dir_path, false);
         let mut dir_to_modify = try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
                                                                                         &tokens,
                                                                                         Some(start_dir_key)));
