@@ -47,7 +47,7 @@ impl ::launcher::parser::traits::Action for ModifyFile {
         if self.new_values.name.is_none() &&
            self.new_values.user_metadata.is_none() &&
            self.new_values.content.is_none() {
-            return Err(::errors::LauncherError::SpecificParseError("new_values caould not be parsed or new_values is empty".to_string()));
+            return Err(::errors::LauncherError::SpecificParseError("new_values could not be parsed or new_values is empty".to_string()));
         }
 
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(params.client);
@@ -58,12 +58,14 @@ impl ::launcher::parser::traits::Action for ModifyFile {
             metadata_updated = true;
         }
 
-        if let Some(ref metadata) = self.new_values.user_metadata {
-            file.get_mut_metadata().set_user_metadata(metadata.clone());
+        if let Some(ref metadata_base64) = self.new_values.user_metadata {
+            let metadata = try!(parse_result!(metadata_base64.from_base64(), "Failed to convert from base64"));
+            file.get_mut_metadata().set_user_metadata(metadata);
             metadata_updated = true;
         }
 
         if metadata_updated {
+
             let _ = try!(file_helper.update_metadata(file.clone(), &mut dir_of_file));
         }
 
@@ -79,8 +81,10 @@ impl ::launcher::parser::traits::Action for ModifyFile {
                 ::safe_nfs::helper::writer::Mode::Modify    => file_content_params.offset.map_or(0, |v| v)
             };
             if let Some(ref data) = file_content_params.bytes {
-                let mut writter = try!(file_helper.update_content(file.clone(), mode, dir_of_file));
-                writter.write(&data[..], offset);
+                let mut writer = try!(file_helper.update_content(file.clone(), mode, dir_of_file));
+                let bytes = try!(parse_result!(data.from_base64(), "Failed to convert from base64"));
+                writer.write(&bytes[..], offset);
+                let _ = try!(writer.close());
             } else {
                 return Err(::errors::LauncherError::Unexpected("Empty bytes received for updating file".to_string()));
             }
@@ -94,7 +98,7 @@ impl ::launcher::parser::traits::Action for ModifyFile {
 struct OptionalParams {
     pub name                  : Option<String>,
     pub content               : Option<FileContentParams>,
-    pub user_metadata         : Option<Vec<u8>>,
+    pub user_metadata         : Option<String>,
 }
 
 impl ::rustc_serialize::Decodable for OptionalParams {
@@ -112,7 +116,7 @@ impl ::rustc_serialize::Decodable for OptionalParams {
 struct FileContentParams {
     pub offset : Option<u64>,
     pub modify : Option<bool>,
-    pub bytes  : Option<Vec<u8>>,
+    pub bytes  : Option<String>,
 }
 
 impl ::rustc_serialize::Decodable for FileContentParams {
