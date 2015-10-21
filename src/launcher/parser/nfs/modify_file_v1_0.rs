@@ -17,7 +17,7 @@
 
 #[derive(RustcDecodable, Debug)]
 pub struct ModifyFile {
-    path          : String,
+    file_path     : String,
     new_values    : OptionalParams,
     is_path_shared: bool,
 }
@@ -42,7 +42,7 @@ impl ::launcher::parser::traits::Action for ModifyFile {
             &params.app_root_dir_key
         };
 
-        let mut tokens = ::launcher::parser::helper::tokenise_path(&self.path, false);
+        let mut tokens = ::launcher::parser::helper::tokenise_path(&self.file_path, false);
         let file_name = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
         let mut dir_of_file = try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
                                                                                       &tokens,
