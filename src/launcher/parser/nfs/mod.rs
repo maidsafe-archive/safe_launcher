@@ -48,11 +48,11 @@ fn get_action<D>(action_str: &str, version: f32, decoder: &mut D) -> Result<Box<
 
     Ok(match action_str {
         "create-dir" => match version {
-            1.0 => Box::new(try!(parse_result!(create_dir_v1_0::CreateDir::decode(decoder), ""))),
+            1.0 => Box::new(try!(parse_result!(decoder.read_struct_field("data", 0, |d| create_dir_v1_0::CreateDir::decode(d)), ""))),
             _   => return version_err,
         },
         "delete-dir" => match version {
-            1.0 => Box::new(try!(parse_result!(delete_dir_v1_0::DeleteDir::decode(decoder), ""))),
+            1.0 => Box::new(try!(parse_result!(decoder.read_struct_field("data", 0, |d| delete_dir_v1_0::DeleteDir::decode(d)), ""))),
             _   => return version_err,
         },
         "modify-dir" => match version {
