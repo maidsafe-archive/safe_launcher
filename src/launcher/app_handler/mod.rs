@@ -63,17 +63,20 @@ impl AppHandler {
             }
 
             let (tx, rx) = ::std::sync::mpsc::channel();
-            eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::GetListenerEndpoint(tx)));
-            let launcher_endpoint = eval_result!(rx.recv());
+            if event_sender.send(::launcher::ipc_server::events::ExternalEvent::GetListenerEndpoint(tx)).is_ok() {
+                let launcher_endpoint = eval_result!(rx.recv());
 
-            let app_handler = AppHandler {
-                client                 : client,
-                launcher_endpoint      : launcher_endpoint,
-                local_config_data      : local_config_data,
-                ipc_server_event_sender: event_sender,
-            };
+                let mut app_handler = AppHandler {
+                    client                 : client,
+                    launcher_endpoint      : launcher_endpoint,
+                    local_config_data      : local_config_data,
+                    ipc_server_event_sender: event_sender,
+                };
 
-            AppHandler::run(app_handler, event_rx);
+                app_handler.run(event_rx);
+            } else {
+                debug!("AppHandler <-> IPC-Server Communication failed - Probably Launcher was closed too soon.");
+            }
 
             debug!("Exiting thread {:?}", APP_HANDLER_THREAD_NAME);
         }));
@@ -81,12 +84,12 @@ impl AppHandler {
         (::safe_core::utility::RAIIThreadJoiner::new(joiner), event_tx)
     }
 
-    fn run(mut app_handler: AppHandler, event_rx: ::std::sync::mpsc::Receiver<events::AppHandlerEvent>) {
+    fn run(&mut self, event_rx: ::std::sync::mpsc::Receiver<events::AppHandlerEvent>) {
         for event in event_rx.iter() {
             match event {
-                events::AppHandlerEvent::AddApp(app_detail)  => app_handler.on_add_app(app_detail),
-                events::AppHandlerEvent::RemoveApp(app_id)   => app_handler.on_remove_app(app_id),
-                events::AppHandlerEvent::ActivateApp(app_id) => app_handler.on_activate_app(app_id),
+                events::AppHandlerEvent::AddApp(app_detail)  => self.on_add_app(app_detail),
+                events::AppHandlerEvent::RemoveApp(app_id)   => self.on_remove_app(app_id),
+                events::AppHandlerEvent::ActivateApp(app_id) => self.on_activate_app(app_id),
                 events::AppHandlerEvent::Terminate           => break,
             }
         }

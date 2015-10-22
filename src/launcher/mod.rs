@@ -21,25 +21,29 @@ mod app_handler;
 mod observer_data;
 
 /// Launcher exposes API for managing applications
-#[derive(Clone)]
 pub struct Launcher {
-    client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+    _raii_joiners           : Vec<::safe_core::utility::RAIIThreadJoiner>,
+    ipc_event_sender        : ipc_server::EventSenderToServer<ipc_server::events::ExternalEvent>,
+    app_handler_event_sender: ::std::sync::mpsc::Sender<app_handler::events::AppHandlerEvent>,
 }
 
 impl Launcher {
-    /// Creates a new Launcher instance
+    /// Creates a new self-managed Launcher instance. This is basically a packet which will
+    /// intilise and store the library state. Dropping this packet would be enough to gracefully
+    /// exit the library by initiaing a domino effect via RAII.
     pub fn new(client: ::safe_core::client::Client) -> Result<Launcher, ::errors::LauncherError> {
-        let arc_client = ::std::sync::Arc::new(::std::sync::Mutex::new(client));
+        let client = ::std::sync::Arc::new(::std::sync::Mutex::new(client));
 
         let safe_drive_directory_name = ::config::SAFE_DRIVE_DIR_NAME.to_string();
         let launcher_config_directory_name = ::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string();
 
-        let directory_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(arc_client.clone());
-        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(arc_client.clone());
+        let directory_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(client.clone());
+        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(client.clone());
 
-        let mut user_root_directory = try!(directory_helper.get_user_root_directory_listing());
         // TODO(Krishna) also create empty launcher config file if it does not already exist
         let _ = try!(directory_helper.get_configuration_directory_listing(launcher_config_directory_name));
+
+        let mut user_root_directory = try!(directory_helper.get_user_root_directory_listing());
         if user_root_directory.find_sub_directory(&safe_drive_directory_name).is_none() {
            let _  = try!(directory_helper.create(safe_drive_directory_name,
                                                  ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
@@ -49,9 +53,36 @@ impl Launcher {
                                                  Some(&mut user_root_directory)));
         }
 
+        let (ipc_raii_joiner, ipc_event_sender) = try!(ipc_server::IpcServer::new(client.clone()));
+        let (app_raii_joiner, app_event_sender) = app_handler::AppHandler::new(client, ipc_event_sender.clone());
+
         Ok(Launcher {
-            client: arc_client,
+            _raii_joiners           : vec![app_raii_joiner, ipc_raii_joiner],
+            ipc_event_sender        : ipc_event_sender,
+            app_handler_event_sender: app_event_sender,
         })
+    }
+
+    /// Talk to IPC Server, for e.g. to regiter an observer etc.
+    pub fn get_ipc_event_sender(&self) -> &ipc_server::EventSenderToServer<ipc_server::events::ExternalEvent> {
+        &self.ipc_event_sender
+    }
+
+    /// Talk to App Handler, for e.g. to regiter an observer, add an app to Laucher, remove or
+    /// modify an already added app, etc.
+    pub fn get_app_handler_event_sender(&self) -> &::std::sync::mpsc::Sender<app_handler::events::AppHandlerEvent> {
+        &self.app_handler_event_sender
+    }
+}
+
+impl Drop for Launcher {
+    fn drop(&mut self) {
+        if let Err(err) = self.ipc_event_sender.send(ipc_server::events::ExternalEvent::Terminate) {
+            debug!("Error {:?} terminating IPC-Server - Probably already terminated.", err);
+        }
+        if let Err(err) = self.app_handler_event_sender.send(app_handler::events::AppHandlerEvent::Terminate) {
+            debug!("Error {:?} terminating App-Handler - Probably already terminated.", err);
+        }
     }
 }
 

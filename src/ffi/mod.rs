@@ -71,17 +71,18 @@ fn cast_to_launcher_ffi_handle(launcher: ::launcher::Launcher) -> *const ::libc:
     unsafe { ::std::mem::transmute(boxed_launcher) }
 }
 
-#[allow(unsafe_code)]
-fn cast_from_launcher_ffi_handle(launcher_handle: *const ::libc::c_void) -> ::launcher::Launcher {
-    let boxed_launcher: Box<::launcher::Launcher> = unsafe {
-        ::std::mem::transmute(launcher_handle)
-    };
-
-    let launcher = (*boxed_launcher).clone();
-    ::std::mem::forget(boxed_launcher);
-
-    launcher
-}
+// TODO(Spandan) ***W A R N I N G*** This will be UB - make sure to modify after uncommenting
+// #[allow(unsafe_code)]
+// fn cast_from_launcher_ffi_handle(launcher_handle: *const ::libc::c_void) -> ::launcher::Launcher {
+//     let boxed_launcher: Box<::launcher::Launcher> = unsafe {
+//         ::std::mem::transmute(launcher_handle)
+//     };
+// 
+//     let launcher = *boxed_launcher;
+//     ::std::mem::forget(boxed_launcher);
+// 
+//     launcher
+// }
 
 
 #[cfg(test)]

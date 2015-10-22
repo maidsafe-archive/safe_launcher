@@ -53,7 +53,6 @@ impl IpcServer {
         let (event_catagory_tx, event_catagory_rx) = ::std::sync::mpsc::channel();
 
         let stop_flag = ::std::sync::Arc::new(::std::sync::atomic::AtomicBool::new(false));
-
         let listener_event_sender = EventSenderToServer::<events::IpcListenerEvent>
                                                        ::new(listener_event_tx,
                                                              events::IpcServerEventCategory::IpcListenerEvent,
@@ -61,26 +60,29 @@ impl IpcServer {
 
         let (joiner, endpoint) = try!(IpcServer::spawn_acceptor(listener_event_sender,
                                                                 stop_flag.clone()));
-
-        let ipc_server = IpcServer {
-            client               : client,
-            temp_id              : 0,
-            _raii_joiner         : joiner,
-            session_event_tx     : session_event_tx,
-            session_event_rx     : session_event_rx,
-            listener_event_rx    : listener_event_rx,
-            external_event_rx    : external_event_rx,
-            event_catagory_tx    : event_catagory_tx.clone(),
-            listener_endpoint    : endpoint,
-            listener_stop_flag   : stop_flag,
-            verified_sessions    : ::std::collections::HashMap::new(),
-            unverified_sessions  : ::std::collections::HashMap::new(),
-            pending_verifications: ::std::collections::HashMap::new(),
-        };
+        let cloned_event_catagory_tx = event_catagory_tx.clone();
 
         let ipc_server_joiner = eval_result!(::std::thread::Builder::new().name(IPC_SERVER_THREAD_NAME.to_string())
                                                                           .spawn(move || {
-            IpcServer::activate_ipc_server(ipc_server, event_catagory_rx);
+
+            let mut ipc_server = IpcServer {
+                client               : client,
+                temp_id              : 0,
+                _raii_joiner         : joiner,
+                session_event_tx     : session_event_tx,
+                session_event_rx     : session_event_rx,
+                listener_event_rx    : listener_event_rx,
+                external_event_rx    : external_event_rx,
+                event_catagory_tx    : cloned_event_catagory_tx,
+                listener_endpoint    : endpoint,
+                listener_stop_flag   : stop_flag,
+                verified_sessions    : ::std::collections::HashMap::new(),
+                unverified_sessions  : ::std::collections::HashMap::new(),
+                pending_verifications: ::std::collections::HashMap::new(),
+            };
+
+            ipc_server.run(event_catagory_rx);
+
             debug!("Exiting Thread {:?}", IPC_SERVER_THREAD_NAME);
         }));
 
@@ -92,31 +94,31 @@ impl IpcServer {
         Ok((::safe_core::utility::RAIIThreadJoiner::new(ipc_server_joiner), external_event_sender))
     }
 
-    fn activate_ipc_server(mut ipc_server: IpcServer, event_catagory_rx: ::std::sync::mpsc::Receiver<events::IpcServerEventCategory>) {
+    fn run(&mut self, event_catagory_rx: ::std::sync::mpsc::Receiver<events::IpcServerEventCategory>) {
         for event_category in event_catagory_rx.iter() {
             match event_category {
                 events::IpcServerEventCategory::IpcListenerEvent => {
-                    if let Ok(listner_event) = ipc_server.listener_event_rx.try_recv() {
+                    if let Ok(listner_event) = self.listener_event_rx.try_recv() {
                         match listner_event {
-                           events::IpcListenerEvent::IpcListenerAborted(error)   => ipc_server.on_ipc_listener_aborted(error),
-                           events::IpcListenerEvent::SpawnIpcSession(tcp_stream) => ipc_server.on_spawn_ipc_session(tcp_stream),
+                           events::IpcListenerEvent::IpcListenerAborted(error)   => self.on_ipc_listener_aborted(error),
+                           events::IpcListenerEvent::SpawnIpcSession(tcp_stream) => self.on_spawn_ipc_session(tcp_stream),
                         }
                     }
                 },
                 events::IpcServerEventCategory::IpcSessionEvent => {
-                    if let Ok(session_event) = ipc_server.session_event_rx.try_recv() {
+                    if let Ok(session_event) = self.session_event_rx.try_recv() {
                         match session_event {
-                            events::IpcSessionEvent::VerifySession(detail) => ipc_server.on_verify_session(detail),
-                            events::IpcSessionEvent::IpcSessionTerminated(detail) => ipc_server.on_ipc_session_terminated(detail),
+                            events::IpcSessionEvent::VerifySession(detail)        => self.on_verify_session(detail),
+                            events::IpcSessionEvent::IpcSessionTerminated(detail) => self.on_ipc_session_terminated(detail),
                         }
                     }
                 },
                 events::IpcServerEventCategory::ExternalEvent => {
-                    if let Ok(external_event) = ipc_server.external_event_rx.try_recv() {
+                    if let Ok(external_event) = self.external_event_rx.try_recv() {
                         match external_event {
-                            events::ExternalEvent::AppActivated(activation_detail) => ipc_server.on_app_activated(activation_detail),
-                            events::ExternalEvent::ChangeSafeDriveAccess(app_id, is_allowed) => ipc_server.on_change_safe_drive_access(app_id, is_allowed),
-                            events::ExternalEvent::GetListenerEndpoint(sender) => ipc_server.on_get_listener_endpoint(sender),
+                            events::ExternalEvent::GetListenerEndpoint(sender)               => self.on_get_listener_endpoint(sender),
+                            events::ExternalEvent::AppActivated(activation_detail)           => self.on_app_activated(activation_detail),
+                            events::ExternalEvent::ChangeSafeDriveAccess(app_id, is_allowed) => self.on_change_safe_drive_access(app_id, is_allowed),
                             events::ExternalEvent::Terminate => break,
                         }
                     }
