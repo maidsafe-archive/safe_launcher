@@ -84,94 +84,12 @@ impl AppHandler {
     fn run(mut app_handler: AppHandler, event_rx: ::std::sync::mpsc::Receiver<events::AppHandlerEvent>) {
         for event in event_rx.iter() {
             match event {
-                events::AppHandlerEvent::AddApp(app_detail)     => app_handler.on_add_app(app_detail),
-                events::AppHandlerEvent::RemoveApp(app_id)      => app_handler.on_remove_app(app_id),
-                events::AppHandlerEvent::ActivateApp(app_id)    => app_handler.on_activate_app(app_id),
-                events::AppHandlerEvent::Terminate => break,
+                events::AppHandlerEvent::AddApp(app_detail)  => app_handler.on_add_app(app_detail),
+                events::AppHandlerEvent::RemoveApp(app_id)   => app_handler.on_remove_app(app_id),
+                events::AppHandlerEvent::ActivateApp(app_id) => app_handler.on_activate_app(app_id),
+                events::AppHandlerEvent::Terminate           => break,
             }
         }
-    }
-
-    fn get_app_dir_name(app_name: &String,
-                        directory_listing: &::safe_nfs::directory_listing::DirectoryListing) -> String {
-        let mut dir_name = format!("{}-Root-Dir", &app_name);
-        if directory_listing.find_sub_directory(&dir_name).is_some() {
-            let mut index = 1u8;
-            loop {
-                dir_name = format!("{}-{}-Root-Dir", &app_name, index);
-                if directory_listing.find_sub_directory(&dir_name).is_some() {
-                    index += 1;
-                } else {
-                    break;
-                }
-            }
-        };
-        dir_name
-    }
-
-    fn tokenise_string(source: &str) -> Vec<String> {
-        source .split(|element| element == '/')
-               .filter(|token| token.len() != 0)
-               .map(|token| token.to_string())
-               .collect()
-    }
-
-    fn get_launcher_global_config(&self) -> Result<Vec<misc::LauncherConfiguration>, ::errors::LauncherError> {
-        Ok(try!(self.get_launcher_global_config_and_dir()).0)
-    }
-
-    fn upsert_to_launcher_global_config(&self, config: misc::LauncherConfiguration) -> Result<(), ::errors::LauncherError> {
-        let (mut global_configs, dir_listing) = try!(self.get_launcher_global_config_and_dir());
-
-        // TODO(Spandan) Due to bug in the language, unable to use `if let Some() .. else` logic to
-        // upsert to a vector. Once the bug is resolved
-        // - https://github.com/rust-lang/rust/issues/28449
-        // then modify the following to use it.
-        if let Some(pos) = global_configs.iter().position(|existing_config| existing_config.app_id == config.app_id) {
-            let existing_config = eval_option!(global_configs.get_mut(pos), "Logic Error - Report bug.");
-            *existing_config = config;
-        } else {
-            global_configs.push(config);
-        }
-
-        let file = eval_option!(dir_listing.get_files()
-                                           .iter()
-                                           .find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME),
-                                "Logic Error - Launcher start-up should ensure the file must be present at this stage - Report bug.").clone();
-
-        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
-        let mut writer = try!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, dir_listing));
-        writer.write(&try!(::safe_core::utility::serialise(&global_configs)), 0);
-        let _ = try!(writer.close()); // TODO use result
-
-        Ok(())
-    }
-
-    fn get_launcher_global_config_and_dir(&self) -> Result<(Vec<misc::LauncherConfiguration>,
-                                                            ::safe_nfs::directory_listing::DirectoryListing),
-                                                           ::errors::LauncherError> {
-        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
-        let dir_listing = try!(dir_helper.get_configuration_directory_listing(::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string()));
-
-        let global_configs = {
-            let file = eval_option!(dir_listing.get_files()
-                                               .iter()
-                                               .find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME),
-                                    "Logic Error - Launcher start-up should ensure the file must be present at this stage - Report bug.");
-
-            let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
-            let mut reader = file_helper.read(file);
-
-            let size = reader.size();
-
-            if size != 0 {
-                try!(::safe_core::utility::deserialise(&try!(reader.read(0, size))))
-            } else {
-                Vec::new()
-            }
-        };
-
-        Ok((global_configs, dir_listing))
     }
 
     //TODO instead of eval_result! retun error to asker
@@ -188,7 +106,7 @@ impl AppHandler {
 
         let _ = self.local_config_data.insert(app_id, app_detail.absolute_path.clone());
 
-        let mut tokens = AppHandler::tokenise_string(&app_detail.absolute_path);
+        let mut tokens = AppHandler::tokenise_path(&app_detail.absolute_path);
 
         let mut app_name = eval_option!(tokens.pop(), ""); // TODO(Spandan) don't use eval_option here
 
@@ -274,6 +192,89 @@ impl AppHandler {
 
         // remove from local config
         let _ = self.local_config_data.remove(&app_id);
+    }
+
+    fn tokenise_path(path: &str) -> Vec<String> {
+        path.split(|element| element == '/')
+            .filter(|token| token.len() != 0)
+            .map(|token| token.to_string())
+            .collect()
+    }
+
+    fn get_app_dir_name(app_name: &String,
+                        directory_listing: &::safe_nfs::directory_listing::DirectoryListing) -> String {
+        let mut dir_name = format!("{}-Root-Dir", &app_name);
+        if directory_listing.find_sub_directory(&dir_name).is_some() {
+            let mut index = 1u8;
+            loop {
+                dir_name = format!("{}-{}-Root-Dir", &app_name, index);
+                if directory_listing.find_sub_directory(&dir_name).is_some() {
+                    index += 1;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        dir_name
+    }
+
+    fn get_launcher_global_config(&self) -> Result<Vec<misc::LauncherConfiguration>, ::errors::LauncherError> {
+        Ok(try!(self.get_launcher_global_config_and_dir()).0)
+    }
+
+    fn upsert_to_launcher_global_config(&self, config: misc::LauncherConfiguration) -> Result<(), ::errors::LauncherError> {
+        let (mut global_configs, dir_listing) = try!(self.get_launcher_global_config_and_dir());
+
+        // TODO(Spandan) Due to bug in the language, unable to use `if let Some() .. else` logic to
+        // upsert to a vector. Once the bug is resolved
+        // - https://github.com/rust-lang/rust/issues/28449
+        // then modify the following to use it.
+        if let Some(pos) = global_configs.iter().position(|existing_config| existing_config.app_id == config.app_id) {
+            let existing_config = eval_option!(global_configs.get_mut(pos), "Logic Error - Report bug.");
+            *existing_config = config;
+        } else {
+            global_configs.push(config);
+        }
+
+        let file = eval_option!(dir_listing.get_files()
+                                           .iter()
+                                           .find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME),
+                                "Logic Error - Launcher start-up should ensure the file must be present at this stage - Report bug.").clone();
+
+        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
+        let mut writer = try!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, dir_listing));
+        writer.write(&try!(::safe_core::utility::serialise(&global_configs)), 0);
+        let _ = try!(writer.close()); // TODO use result
+
+        Ok(())
+    }
+
+    fn get_launcher_global_config_and_dir(&self) -> Result<(Vec<misc::LauncherConfiguration>,
+                                                            ::safe_nfs::directory_listing::DirectoryListing),
+                                                           ::errors::LauncherError> {
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
+        let dir_listing = try!(dir_helper.get_configuration_directory_listing(::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string()));
+
+        let global_configs = {
+            let file = eval_option!(dir_listing.get_files()
+                                               .iter()
+                                               .find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME),
+                                    "Logic Error - Launcher start-up should ensure the file must be present at this stage - Report bug.");
+
+            let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
+            let mut reader = file_helper.read(file);
+
+            let size = reader.size();
+
+            if size != 0 {
+                try!(::safe_core::utility::deserialise(&try!(reader.read(0, size))))
+            } else {
+                Vec::new()
+            }
+        };
+
+        Ok((global_configs, dir_listing))
     }
 }
 

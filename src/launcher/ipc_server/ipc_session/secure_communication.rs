@@ -15,21 +15,51 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+const SECURE_COMM_THREAD_NAME: &'static str = "SecureCommunictionThread";
+
 pub struct SecureCommunication {
+    client           : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+    observer         : ::launcher::ipc_server::ipc_session::EventSenderToSession<::launcher
+                                                                                 ::ipc_server
+                                                                                 ::ipc_session
+                                                                                 ::events::SecureCommunicationEvent>,
+    symm_key         : ::sodiumoxide::crypto::secretbox::Key,
+    symm_nonce       : ::sodiumoxide::crypto::secretbox::Nonce,
     ipc_stream       : ::launcher::ipc_server::ipc_session::stream::IpcStream,
-    safe_drive_access: bool,
+    safe_drive_access: ::std::sync::Arc<::std::sync::Mutex<bool>>,
 }
 
 impl SecureCommunication {
-    pub fn new(ipc_stream       : ::launcher::ipc_server::ipc_session::stream::IpcStream,
-               safe_drive_access: bool) -> SecureCommunication {
-        SecureCommunication {
-            ipc_stream       : ipc_stream,
-            safe_drive_access: safe_drive_access,
-        }
+    pub fn new(client           : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+               observer         : ::launcher::ipc_server::ipc_session::EventSenderToSession<::launcher
+                                                                                            ::ipc_server
+                                                                                            ::ipc_session
+                                                                                            ::events::SecureCommunicationEvent>,
+               symm_key         : ::sodiumoxide::crypto::secretbox::Key,
+               symm_nonce       : ::sodiumoxide::crypto::secretbox::Nonce,
+               ipc_stream       : ::launcher::ipc_server::ipc_session::stream::IpcStream,
+               safe_drive_access: ::std::sync::Arc<::std::sync::Mutex<bool>>) -> ::safe_core::utility::RAIIThreadJoiner {
+        let joiner = eval_result!(::std::thread::Builder::new()
+                                                         .name(SECURE_COMM_THREAD_NAME.to_string())
+                                                         .spawn(move || {
+            let obj = SecureCommunication {
+                client           : client,
+                observer         : observer,
+                symm_key         : symm_key,
+                symm_nonce       : symm_nonce,
+                ipc_stream       : ipc_stream,
+                safe_drive_access: safe_drive_access,
+            };
+
+            SecureCommunication::start(obj);
+
+            debug!("Exiting Thread {:?}", SECURE_COMM_THREAD_NAME);
+        }));
+
+        ::safe_core::utility::RAIIThreadJoiner::new(joiner)
     }
 
-    pub fn start(&self) {
+    pub fn start(mut app_communicator: SecureCommunication) {
         ;
     }
 }

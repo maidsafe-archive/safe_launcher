@@ -28,14 +28,7 @@ pub type AppAuthenticationEvent = Result<event_data::AuthData, ::errors::Launche
 
 // --------------------------------------------------------------------------------------
 
-pub type RsaKeyExchangeEvent = Result<event_data::RsaData, ::errors::LauncherError>;
-
-// --------------------------------------------------------------------------------------
-
-#[derive(Debug)]
-pub enum SecureCommunicationEvent {
-    PlaceHolder, // TODO
-}
+pub type SecureCommunicationEvent = ::errors::LauncherError;
 
 // --------------------------------------------------------------------------------------
 
@@ -68,11 +61,5 @@ pub mod event_data {
         pub str_nonce    : String,
         pub asymm_nonce  : ::sodiumoxide::crypto::box_::Nonce,
         pub asymm_pub_key: ::sodiumoxide::crypto::box_::PublicKey,
-    }
-
-    #[derive(Debug)]
-    pub struct RsaData {
-        pub symm_key  : ::sodiumoxide::crypto::secretbox::Key,
-        pub symm_nonce: ::sodiumoxide::crypto::secretbox::Nonce,
     }
 }
