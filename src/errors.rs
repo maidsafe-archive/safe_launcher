@@ -54,6 +54,8 @@ pub enum LauncherError {
     PermissionDenied,
     /// Error encoding into Json String
     JsonEncodeError(::rustc_serialize::json::EncoderError),
+    /// Symmetric Deciphering failed for a cipher text
+    SymmetricDecipherFailure,
     /// Unexpected - Probably a Logic error
     Unexpected(String),
 }
@@ -88,6 +90,12 @@ impl From<::rustc_serialize::json::ParserError> for LauncherError {
     }
 }
 
+impl From<::rustc_serialize::json::EncoderError> for LauncherError {
+    fn from(error: ::rustc_serialize::json::EncoderError) -> LauncherError {
+        LauncherError::JsonEncodeError(error)
+    }
+}
+
 impl Into<i32> for LauncherError {
     fn into(self) -> i32 {
         match self {
@@ -107,7 +115,8 @@ impl Into<i32> for LauncherError {
             LauncherError::InvalidPath                      => LAUNCHER_ERROR_START_RANGE - 11,
             LauncherError::PermissionDenied                 => LAUNCHER_ERROR_START_RANGE - 12,
             LauncherError::JsonEncodeError(_)               => LAUNCHER_ERROR_START_RANGE - 13,
-            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 14,
+            LauncherError::SymmetricDecipherFailure         => LAUNCHER_ERROR_START_RANGE - 14,
+            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 15,
         }
     }
 }
@@ -131,6 +140,7 @@ impl ::std::fmt::Debug for LauncherError {
             LauncherError::InvalidPath                      => write!(f, "LauncherError::InvalidPath"),
             LauncherError::PermissionDenied                 => write!(f, "LauncherError::PermissionDenied"),
             LauncherError::JsonEncodeError(ref error)       => write!(f, "LauncherError::JsonEncodeError -> {:?}", error),
+            LauncherError::SymmetricDecipherFailure         => write!(f, "LauncherError::SymmetricDecipherFailure"),
             LauncherError::Unexpected(ref error)            => write!(f, "LauncherError::Unexpected{{{:?}}}", error),
         }
     }
