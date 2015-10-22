@@ -24,6 +24,8 @@ pub struct GetDir {
 
 impl ::launcher::parser::traits::Action for GetDir {
     fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType {
+        use rustc_serialize::json::ToJson;
+
         if self.is_path_shared && !*eval_result!(params.safe_drive_access.lock()) {
             return Err(::errors::LauncherError::PermissionDenied)
         }
@@ -35,13 +37,58 @@ impl ::launcher::parser::traits::Action for GetDir {
         };
 
         let tokens = ::launcher::parser::helper::tokenise_path(&self.dir_path, false);
-        let mut dir_to_get = try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
-                                                                                     &tokens,
-                                                                                     Some(start_dir_key)));
+        let dir_fetched = try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
+                                                                                      &tokens,
+                                                                                      Some(start_dir_key)));
+        let dir_info = get_directory_info(dir_fetched.get_metadata());
+        let mut sub_dirs: Vec<DirectoryInfo> = Vec::with_capacity(dir_fetched.get_sub_directories().len());
+        let mut files: Vec<FileInfo> = Vec::with_capacity(dir_fetched.get_files().len());
+        for metadata in dir_fetched.get_sub_directories() {
+            sub_dirs.push(get_directory_info(metadata));
+        }
+        for file in dir_fetched.get_files() {
+            files.push(get_file_info(file.get_metadata()));
+        }
+        let response = GetDirResponse {
+            info           : dir_info,
+            files          : files,
+            sub_directories: sub_dirs,
+        };
+        Ok(Some(try!(::rustc_serialize::json::encode(&response)).to_json()))
+    }
+}
 
-        unimplemented!();
+fn get_directory_info(dir_metadata: &::safe_nfs::metadata::directory_metadata::DirectoryMetadata) -> DirectoryInfo {
+    use rustc_serialize::base64::ToBase64;
 
-        Ok(None)
+    let dir_key = dir_metadata.get_key();
+    let created_time = dir_metadata.get_created_time().to_timespec();
+    let modified_time = dir_metadata.get_modified_time().to_timespec();
+    DirectoryInfo {
+        name                  : dir_metadata.get_name().clone(),
+        is_private            : *dir_key.get_access_level() == ::safe_nfs::AccessLevel::Private,
+        is_versioned          : dir_key.is_versioned(),
+        user_metadata         : (*dir_metadata.get_user_metadata()).to_base64(::config::get_base64_config()),
+        creation_time_sec     : created_time.sec,
+        creation_time_nsec    : created_time.nsec,
+        modification_time_sec : modified_time.sec,
+        modification_time_nsec: modified_time.nsec,
+    }
+}
+
+fn get_file_info(file_metadata: &::safe_nfs::metadata::file_metadata::FileMetadata) -> FileInfo {
+    use rustc_serialize::base64::ToBase64;
+
+    let created_time = file_metadata.get_created_time().to_timespec();
+    let modified_time = file_metadata.get_modified_time().to_timespec();
+    FileInfo {
+        name                  : file_metadata.get_name().clone(),
+        size                  : file_metadata.get_size(),
+        user_metadata         : (*file_metadata.get_user_metadata()).to_base64(::config::get_base64_config()),
+        creation_time_sec     : created_time.sec,
+        creation_time_nsec    : created_time.nsec,
+        modification_time_sec : modified_time.sec,
+        modification_time_nsec: modified_time.nsec,
     }
 }
 
@@ -60,18 +107,18 @@ struct DirectoryInfo {
     is_versioned          : bool,
     user_metadata         : String,
     creation_time_sec     : i64,
-    creation_time_nsec    : i64,
+    creation_time_nsec    : i32,
     modification_time_sec : i64,
-    modification_time_nsec: i64,
+    modification_time_nsec: i32,
 }
 
 #[derive(RustcEncodable, Debug)]
 struct FileInfo {
     name                  : String,
-    size                  : i64,
+    size                  : u64,
     user_metadata         : String,
     creation_time_sec     : i64,
-    creation_time_nsec    : i64,
+    creation_time_nsec    : i32,
     modification_time_sec : i64,
-    modification_time_nsec: i64,
+    modification_time_nsec: i32,
 }
