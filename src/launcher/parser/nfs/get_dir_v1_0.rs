@@ -70,9 +70,9 @@ fn get_directory_info(dir_metadata: &::safe_nfs::metadata::directory_metadata::D
         is_versioned          : dir_key.is_versioned(),
         user_metadata         : (*dir_metadata.get_user_metadata()).to_base64(::config::get_base64_config()),
         creation_time_sec     : created_time.sec,
-        creation_time_nsec    : created_time.nsec,
+        creation_time_nsec    : created_time.nsec as i64,
         modification_time_sec : modified_time.sec,
-        modification_time_nsec: modified_time.nsec,
+        modification_time_nsec: modified_time.nsec as i64,
     }
 }
 
@@ -83,12 +83,12 @@ fn get_file_info(file_metadata: &::safe_nfs::metadata::file_metadata::FileMetada
     let modified_time = file_metadata.get_modified_time().to_timespec();
     FileInfo {
         name                  : file_metadata.get_name().clone(),
-        size                  : file_metadata.get_size(),
+        size                  : file_metadata.get_size() as i64,
         user_metadata         : (*file_metadata.get_user_metadata()).to_base64(::config::get_base64_config()),
         creation_time_sec     : created_time.sec,
-        creation_time_nsec    : created_time.nsec,
+        creation_time_nsec    : created_time.nsec as i64,
         modification_time_sec : modified_time.sec,
-        modification_time_nsec: modified_time.nsec,
+        modification_time_nsec: modified_time.nsec as i64,
     }
 }
 
@@ -107,18 +107,18 @@ struct DirectoryInfo {
     is_versioned          : bool,
     user_metadata         : String,
     creation_time_sec     : i64,
-    creation_time_nsec    : i32,
+    creation_time_nsec    : i64,
     modification_time_sec : i64,
-    modification_time_nsec: i32,
+    modification_time_nsec: i64,
 }
 
 #[derive(RustcEncodable, Debug)]
 struct FileInfo {
     name                  : String,
-    size                  : u64,
+    size                  : i64,
     user_metadata         : String,
     creation_time_sec     : i64,
-    creation_time_nsec    : i32,
+    creation_time_nsec    : i64,
     modification_time_sec : i64,
-    modification_time_nsec: i32,
+    modification_time_nsec: i64,
 }
