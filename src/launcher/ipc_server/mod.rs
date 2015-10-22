@@ -145,8 +145,8 @@ impl IpcServer {
         self.temp_id = self.temp_id.wrapping_add(1);
     }
 
-    fn on_ipc_listener_aborted(&self, error_str: String) {
-        ;
+    fn on_ipc_listener_aborted(&self, error: Box<::errors::LauncherError>) {
+        let error = *error;
     }
 
     fn on_verify_session(&mut self, detail: Box<(u32, String)>) {
@@ -172,8 +172,15 @@ impl IpcServer {
         }
     }
 
-    fn on_ipc_session_terminated(&self, detail: Box<events::event_data::SessionTerminationDetail>) {
-        ;
+    fn on_ipc_session_terminated(&mut self, detail: Box<events::event_data::SessionTerminationDetail>) {
+        let detail = *detail;
+
+        let _ = match detail.id {
+            events::event_data::SessionId::AppId(app_id)   => self.verified_sessions.remove(&*app_id),
+            events::event_data::SessionId::TempId(temp_id) => self.unverified_sessions.remove(&temp_id),
+        };
+
+        debug!("IPC Server terminating session due to: {:?}", detail.reason);
     }
 
     fn on_app_activated(&mut self, activation_detail: Box<events::event_data::ActivationDetail>) {
@@ -188,8 +195,27 @@ impl IpcServer {
         }
     }
 
-    fn on_change_safe_drive_access(&self, app_id: ::routing::NameType, is_allowed: bool) {
-        ;
+    fn on_change_safe_drive_access(&mut self, app_id: ::routing::NameType, is_allowed: bool) {
+        let mut send_failed = false;
+
+        if let Some(session_info) = self.verified_sessions.get_mut(&app_id) {
+            send_failed = session_info.event_sender.send(::launcher
+                                                         ::ipc_server
+                                                         ::ipc_session
+                                                         ::events
+                                                         ::ExternalEvent::ChangeSafeDriveAccess(is_allowed)).is_err();
+        } else {
+            for (_, app_info) in self.pending_verifications.iter_mut() {
+                if app_info.app_id == app_id {
+                    app_info.safe_drive_access = is_allowed;
+                    break;
+                }
+            }
+        }
+
+        if send_failed {
+            let _ = self.verified_sessions.remove(&app_id);
+        }
     }
 
     fn on_get_listener_endpoint(&self, sender: ::std::sync::mpsc::Sender<String>) {
@@ -252,7 +278,7 @@ impl IpcServer {
                      event_sender: EventSenderToServer<events::IpcListenerEvent>,
                      stop_flag   : ::std::sync::Arc<::std::sync::atomic::AtomicBool>) {
         loop  {
-            match ipc_listener.accept() {
+            match ipc_listener.accept().map_err(|e| ::errors::LauncherError::IpcListenerAborted(e)) {
                 Ok((stream, _)) => {
                     if stop_flag.load(::std::sync::atomic::Ordering::SeqCst) {
                         break;
@@ -264,7 +290,7 @@ impl IpcServer {
                 },
                 Err(accept_error) => {
                     debug!("IPC Listener aborted !!");
-                    let _ = event_sender.send(events::IpcListenerEvent::IpcListenerAborted(format!("{:?}", accept_error)));
+                    let _ = event_sender.send(events::IpcListenerEvent::IpcListenerAborted(Box::new(accept_error)));
                     break;
                 },
             }
