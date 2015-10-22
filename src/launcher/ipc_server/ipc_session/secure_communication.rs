@@ -133,8 +133,7 @@ impl SecureCommunication {
             data: data,
         };
 
-        let json_str = try!(::rustc_serialize::json::encode(&normal_response)
-                                                    .map_err(|e| ::errors::LauncherError::JsonEncodeError(e)));
+        let json_str = try!(::rustc_serialize::json::encode(&normal_response));
 
         let cipher_text = ::sodiumoxide::crypto::secretbox::seal(&json_str.into_bytes(), &self.symm_nonce, &self.symm_key);
 
@@ -159,8 +158,7 @@ impl SecureCommunication {
             error: error_detail,
         };
 
-        let json_str = try!(::rustc_serialize::json::encode(&error_response)
-                                                    .map_err(|e| ::errors::LauncherError::JsonEncodeError(e)));
+        let json_str = try!(::rustc_serialize::json::encode(&error_response));
 
         let cipher_text = ::sodiumoxide::crypto::secretbox::seal(&json_str.into_bytes(), &self.symm_nonce, &self.symm_key);
 

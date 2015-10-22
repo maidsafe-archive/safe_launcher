@@ -90,6 +90,12 @@ impl From<::rustc_serialize::json::ParserError> for LauncherError {
     }
 }
 
+impl From<::rustc_serialize::json::EncoderError> for LauncherError {
+    fn from(error: ::rustc_serialize::json::EncoderError) -> LauncherError {
+        LauncherError::JsonEncodeError(error)
+    }
+}
+
 impl Into<i32> for LauncherError {
     fn into(self) -> i32 {
         match self {
