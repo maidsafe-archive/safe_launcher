@@ -15,3 +15,45 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+#[derive(RustcDecodable, Debug)]
+pub struct RegisterDns {
+    pub long_name            : String,
+    pub service_name         : String,
+    pub is_path_shared       : bool,
+    pub service_home_dir_path: String,
+}
+
+impl ::launcher::parser::traits::Action for RegisterDns {
+    fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType {
+        if self.is_path_shared && !*eval_result!(params.safe_drive_access.lock()) {
+            return Err(::errors::LauncherError::PermissionDenied)
+        }
+
+        let tokens = ::launcher::parser::helper::tokenise_path(&self.service_home_dir_path, false);
+
+        let start_dir_key = if self.is_path_shared {
+            &params.safe_drive_dir_key
+        } else {
+            &params.app_root_dir_key
+        };
+
+        let dir_to_map = try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
+                                                                                 &tokens,
+                                                                                 Some(start_dir_key)));
+
+       let (msg_public_key, msg_secret_key) = ::sodiumoxide::crypto::box_::gen_keypair();
+       let services = vec![(self.service_name.clone(), (dir_to_map.get_key().clone()))];
+       let public_signing_key = try!(eval_result!(params.client.lock()).get_public_signing_key()).clone();
+       let secret_signing_key = try!(eval_result!(params.client.lock()).get_secret_signing_key()).clone();
+       let dns_operation = try!(::safe_dns::dns_operations::DnsOperations::new(params.client.clone()));
+       let struct_data = try!(dns_operation.register_dns(self.long_name.clone(),
+                                                         &msg_public_key,
+                                                         &msg_secret_key,
+                                                         &services,
+                                                         vec![public_signing_key],
+                                                         &secret_signing_key,
+                                                         None));
+       eval_result!(params.client.lock()).post(::routing::data::Data::StructuredData(struct_data), None);
+       Ok(None)
+    }
+}

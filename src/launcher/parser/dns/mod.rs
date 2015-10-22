@@ -42,7 +42,7 @@ fn get_action<D>(action_str: &str, version: f32, decoder: &mut D) -> Result<Box<
 
     Ok(match action_str {
         "register-dns" => match version {
-            1.0 => unimplemented!(),
+            1.0 => Box::new(try!(parse_result!(decoder.read_struct_field("data", 0, |d| register_dns_v1_0::RegisterDns::decode(d)), ""))),
             _   => return version_err,
         },
         "add-service" => match version {
