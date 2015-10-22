@@ -45,7 +45,7 @@ impl ::launcher::parser::traits::Action for RegisterDns {
        let services = vec![(self.service_name.clone(), (dir_to_map.get_key().clone()))];
        let public_signing_key = try!(eval_result!(params.client.lock()).get_public_signing_key()).clone();
        let secret_signing_key = try!(eval_result!(params.client.lock()).get_secret_signing_key()).clone();
-       let dns_operation = try!(::safe_dns::dns_operations::DnsOperations::new(params.client));
+       let dns_operation = try!(::safe_dns::dns_operations::DnsOperations::new(params.client.clone()));
        let struct_data = try!(dns_operation.register_dns(self.long_name.clone(),
                                                          &msg_public_key,
                                                          &msg_secret_key,
