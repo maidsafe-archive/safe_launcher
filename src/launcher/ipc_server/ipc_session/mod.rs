@@ -102,14 +102,15 @@ impl IpcSession {
                     if let Ok(authentication_event) = ipc_session.authentication_event_rx.try_recv() {
                         match authentication_event {
                             Ok(auth_data) => ipc_session.on_auth_data_received(auth_data),
-                            _ => unimplemented!(),
+                            Err(err)      => ipc_session.terminate_session(err),
                         }
                     }
                 },
                 events::IpcSessionEventCategory::SecureCommunicationEvent => {
                     if let Ok(secure_comm_event) = ipc_session.secure_comm_event_rx.try_recv() {
                         match secure_comm_event {
-                            _ => unimplemented!(),
+                            Ok(())   => (),
+                            Err(err) => ipc_session.terminate_session(err),
                         }
                     }
                 },
@@ -203,11 +204,13 @@ impl IpcSession {
             reason: reason,
         });
 
-        let _ = self.ipc_server_event_sender.send(::launcher
-                                                  ::ipc_server
-                                                  ::events
-                                                  ::IpcSessionEvent
-                                                  ::IpcSessionTerminated(termination_detail));
+        if let Err(err) = self.ipc_server_event_sender.send(::launcher
+                                                            ::ipc_server
+                                                            ::events
+                                                            ::IpcSessionEvent
+                                                            ::IpcSessionTerminated(termination_detail)) {
+            debug!("Error {:?} - Sending termination notice to server.", err);
+        }
     }
 
     fn get_ipc_stream(&self) -> Result<stream::IpcStream, ::errors::LauncherError> {

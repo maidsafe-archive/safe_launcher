@@ -42,5 +42,5 @@ pub struct VerifiedSession {
 pub struct AppHandling {
     pub id        : ::routing::NameType,
     pub action    : Action,
-    pub local_path: Option<String>, // Will be None if present in global config but absent in local config
+    pub local_path: String,
 }

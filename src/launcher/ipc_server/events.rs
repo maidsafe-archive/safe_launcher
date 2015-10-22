@@ -26,17 +26,8 @@ pub enum IpcServerEventCategory {
 
 #[derive(Debug)]
 pub enum IpcListenerEvent {
-    IpcListenerAborted(String),
+    IpcListenerAborted(Box<::errors::LauncherError>),
     SpawnIpcSession(::std::net::TcpStream),
-}
-
-impl Clone for IpcListenerEvent {
-    fn clone(&self) -> IpcListenerEvent {
-        match *self {
-            IpcListenerEvent::IpcListenerAborted(ref err) => IpcListenerEvent::IpcListenerAborted(err.clone()),
-            IpcListenerEvent::SpawnIpcSession(ref stream) => IpcListenerEvent::SpawnIpcSession(eval_result!(stream.try_clone())),
-        }
-    }
 }
 
 // --------------------------------------------------------------------------------------
