@@ -67,7 +67,7 @@ fn module_dispatcher<D>(params              : ParameterPacket,
     let module = try!(parse_option!(remaining_tokens.pop(), "Invalid endpoint - Module token not found."));
     match &module[..] {
         "nfs" => nfs::action_dispatcher(params, remaining_tokens, version, decoder),
-        "dns" => unimplemented!(),
+        "dns" => dns::action_dispatcher(params, remaining_tokens, version, decoder),
         _     => Err(::errors::LauncherError::SpecificParseError(format!("Unrecognised module \"{}\" in endpoint path.", module))),
     }
 }
