@@ -25,6 +25,8 @@ pub enum LauncherError {
     /// not insanely bigger than others.
     CoreError(Box<::safe_core::errors::CoreError>),
     /// Errors from safe_nfs
+    DnsError(Box<::safe_dns::errors::DnsError>),
+    /// Errors from safe_nfs
     NfsError(Box<::safe_nfs::errors::NfsError>),
     /// Ipc Listener could not be bound to an endpoint
     IpcListenerCouldNotBeBound,
@@ -72,6 +74,12 @@ impl From<::safe_nfs::errors::NfsError> for LauncherError {
     }
 }
 
+impl From<::safe_dns::errors::DnsError> for LauncherError {
+    fn from(error: ::safe_dns::errors::DnsError) -> LauncherError {
+        LauncherError::DnsError(Box::new(error))
+    }
+}
+
 impl From<::rustc_serialize::json::ParserError> for LauncherError {
     fn from(error: ::rustc_serialize::json::ParserError) -> LauncherError {
         LauncherError::JsonParseError(error)
@@ -82,20 +90,21 @@ impl Into<i32> for LauncherError {
     fn into(self) -> i32 {
         match self {
             LauncherError::CoreError(error)                 => (*error).into(),
-            LauncherError::NfsError(_)                      => LAUNCHER_ERROR_START_RANGE - 1,
-            LauncherError::IpcListenerCouldNotBeBound       => LAUNCHER_ERROR_START_RANGE - 2,
-            LauncherError::IpcListenerAborted(_)            => LAUNCHER_ERROR_START_RANGE - 3,
-            LauncherError::IpcStreamCloneError(_)           => LAUNCHER_ERROR_START_RANGE - 4,
-            LauncherError::ReceiverChannelDisconnected      => LAUNCHER_ERROR_START_RANGE - 5,
-            LauncherError::IpcSessionTerminated(_)          => LAUNCHER_ERROR_START_RANGE - 6,
-            LauncherError::FailedReadingStreamPayloadSize   => LAUNCHER_ERROR_START_RANGE - 7,
-            LauncherError::FailedWritingStreamPayloadSize   => LAUNCHER_ERROR_START_RANGE - 8,
-            LauncherError::JsonParseError(_)                => LAUNCHER_ERROR_START_RANGE - 9,
-            LauncherError::SpecificParseError(_)            => LAUNCHER_ERROR_START_RANGE - 10,
-            LauncherError::PathNotFound                     => LAUNCHER_ERROR_START_RANGE - 11,
-            LauncherError::InvalidPath                      => LAUNCHER_ERROR_START_RANGE - 12,
-            LauncherError::PermissionDenied                 => LAUNCHER_ERROR_START_RANGE - 13,
-            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 14,
+            LauncherError::NfsError(error)                  => (*error).into(),
+            LauncherError::DnsError(error)                  => (*error).into(),
+            LauncherError::IpcListenerCouldNotBeBound       => LAUNCHER_ERROR_START_RANGE - 1,
+            LauncherError::IpcListenerAborted(_)            => LAUNCHER_ERROR_START_RANGE - 2,
+            LauncherError::IpcStreamCloneError(_)           => LAUNCHER_ERROR_START_RANGE - 3,
+            LauncherError::ReceiverChannelDisconnected      => LAUNCHER_ERROR_START_RANGE - 4,
+            LauncherError::IpcSessionTerminated(_)          => LAUNCHER_ERROR_START_RANGE - 5,
+            LauncherError::FailedReadingStreamPayloadSize   => LAUNCHER_ERROR_START_RANGE - 6,
+            LauncherError::FailedWritingStreamPayloadSize   => LAUNCHER_ERROR_START_RANGE - 7,
+            LauncherError::JsonParseError(_)                => LAUNCHER_ERROR_START_RANGE - 8,
+            LauncherError::SpecificParseError(_)            => LAUNCHER_ERROR_START_RANGE - 9,
+            LauncherError::PathNotFound                     => LAUNCHER_ERROR_START_RANGE - 10,
+            LauncherError::InvalidPath                      => LAUNCHER_ERROR_START_RANGE - 11,
+            LauncherError::PermissionDenied                 => LAUNCHER_ERROR_START_RANGE - 12,
+            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 13,
         }
     }
 }
@@ -104,6 +113,7 @@ impl ::std::fmt::Debug for LauncherError {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         match *self {
             LauncherError::CoreError(ref error)             => write!(f, "LauncherError::CoreError -> {:?}", error),
+            LauncherError::DnsError(ref error)              => write!(f, "LauncherError::DnsError -> {:?}", error),
             LauncherError::NfsError(ref error)              => write!(f, "LauncherError::NfsError -> {:?}", error),
             LauncherError::IpcListenerCouldNotBeBound       => write!(f, "LauncherError::IpcListenerCouldNotBeBound"),
             LauncherError::IpcListenerAborted(ref error)    => write!(f, "LauncherError::IpcListenerAborted -> {:?}", error),

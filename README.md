@@ -52,8 +52,8 @@ cargo test
   - [X] [MAID-1414](https://maidsafe.atlassian.net/browse/MAID-1414) Delete Directory
   - [X] [MAID-1415](https://maidsafe.atlassian.net/browse/MAID-1415) Modify Directory
   - [ ] [MAID-1416](https://maidsafe.atlassian.net/browse/MAID-1416) Get Directory
-  - [ ] [MAID-1417](https://maidsafe.atlassian.net/browse/MAID-1417) Create File
-  - [ ] [MAID-1418](https://maidsafe.atlassian.net/browse/MAID-1418) Delete File
+  - [X] [MAID-1417](https://maidsafe.atlassian.net/browse/MAID-1417) Create File
+  - [X] [MAID-1418](https://maidsafe.atlassian.net/browse/MAID-1418) Delete File
   - [X] [MAID-1419](https://maidsafe.atlassian.net/browse/MAID-1419) Modify File
   - [ ] [MAID-1420](https://maidsafe.atlassian.net/browse/MAID-1420) Get File
   - [ ] [MAID-1421](https://maidsafe.atlassian.net/browse/MAID-1421) Register DNS
