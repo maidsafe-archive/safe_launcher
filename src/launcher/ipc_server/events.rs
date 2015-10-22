@@ -41,10 +41,10 @@ impl Clone for IpcListenerEvent {
 
 // --------------------------------------------------------------------------------------
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub enum IpcSessionEvent {
-    VerifySession(u32, String),
-    IpcSessionWriteFailed(Option<::routing::NameType>),
+    VerifySession(Box<(u32, String)>),
+    IpcSessionTerminated(Box<event_data::SessionTerminationDetail>),
 }
 
 // --------------------------------------------------------------------------------------
@@ -76,5 +76,17 @@ pub mod event_data {
         pub app_id           : ::routing::NameType,
         pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
         pub safe_drive_access: bool,
+    }
+
+    #[derive(Debug)]
+    pub struct SessionTerminationDetail {
+        pub id    : SessionId,
+        pub reason: ::errors::LauncherError,
+    }
+
+    #[derive(Debug, Clone)]
+    pub enum SessionId {
+        AppId(Box<::routing::NameType>),
+        TempId(u32),
     }
 }

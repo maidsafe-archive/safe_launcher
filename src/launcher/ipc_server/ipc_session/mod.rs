@@ -33,7 +33,7 @@ pub struct IpcSession {
     stream                 : ::std::net::TcpStream,
     app_nonce              : Option<::sodiumoxide::crypto::box_::Nonce>,
     app_pub_key            : Option<::sodiumoxide::crypto::box_::PublicKey>,
-    _raii_joiner           : ::safe_core::utility::RAIIThreadJoiner,
+    raii_joiner            : ::safe_core::utility::RAIIThreadJoiner,
     safe_drive_access      : Option<::std::sync::Arc<::std::sync::Mutex<bool>>>, // TODO(Spandan) change to 3-level permission instead of 2
     event_catagory_tx      : ::std::sync::mpsc::Sender<events::IpcSessionEventCategory>,
     external_event_rx      : ::std::sync::mpsc::Receiver<events::ExternalEvent>,
@@ -71,7 +71,7 @@ impl IpcSession {
             stream                 : stream,
             app_nonce              : None,
             app_pub_key            : None,
-            _raii_joiner           : joiner,
+            raii_joiner            : joiner,
             safe_drive_access      : None,
             event_catagory_tx      : event_catagory_tx.clone(),
             external_event_rx      : external_event_rx,
@@ -133,23 +133,87 @@ impl IpcSession {
         self.ipc_server_event_sender.send(::launcher
                                           ::ipc_server
                                           ::events
-                                          ::IpcSessionEvent::VerifySession(self.temp_id, auth_data.str_nonce));
+                                          ::IpcSessionEvent
+                                          ::VerifySession(Box::new((self.temp_id, auth_data.str_nonce))));
     }
 
-    // TODO (Krishna) send => events::IpcSessionEventCategory::SecureCommunicationEvent
     fn on_app_detail_received(&mut self, app_detail: Box<events::event_data::AppDetail>) {
-        let mut ipc_stream = eval_result!(stream::IpcStream::new(eval_result!(self.stream.try_clone()
-                                                                                         .map_err(|err| ::errors
-                                                                                                        ::LauncherError
-                                                                                                        ::IpcStreamCloneError(err)))));
-        let (nonce, symmetric_key) = eval_result!(rsa_key_exchange::perform_key_exchange(ipc_stream,
-                                                                                         eval_option!(self.app_nonce, "Nonce can not be None"),
-                                                                                         eval_option!(self.app_pub_key, "App Public Key can not be None")));
+        let app_detail = *app_detail;
 
+        self.app_id = Some(app_detail.app_id);
+        self.safe_drive_access = Some(::std::sync::Arc::new(::std::sync::Mutex::new(app_detail.safe_drive_access))); 
+
+        if let Some(mut ipc_stream) = self.get_ipc_stream_or_terminate() {
+            match rsa_key_exchange::perform_key_exchange(&mut ipc_stream,
+                                                         eval_option!(self.app_nonce, "Logic Error - Report a bug."),
+                                                         eval_option!(self.app_pub_key, "Logice Error - Report a bug.")) {
+                Ok((symm_nonce, symm_key)) => {
+                    let safe_drive_access = if let Some(ref access) = self.safe_drive_access {
+                        access.clone()
+                    } else {
+                        panic!("Logic Error - Report a bug.")
+                    };
+
+                    let event_sender = EventSenderToSession::<events::SecureCommunicationEvent>
+                                                           ::new(self.secure_comm_event_tx.clone(),
+                                                                 events::IpcSessionEventCategory::SecureCommunicationEvent,
+                                                                 self.event_catagory_tx.clone());
+
+                    self.raii_joiner = secure_communication::SecureCommunication::new(app_detail.client,
+                                                                                      event_sender,
+                                                                                      symm_key,
+                                                                                      symm_nonce,
+                                                                                      ipc_stream,
+                                                                                      safe_drive_access);
+                },
+                Err(err) => {
+                    debug!("RSA Key Exchange unsuccessful {:?}", err);
+                    self.terminate_session(err);
+                },
+            }
+        }
     }
 
     fn on_change_safe_drive_access(&self, is_allowed: bool) {
-        ;
+        if let Some(ref safe_drive_access) = self.safe_drive_access {
+            *(eval_result!(safe_drive_access.lock())) = is_allowed;
+        }
+    }
+
+    fn get_ipc_stream_or_terminate(&self) -> Option<stream::IpcStream> {
+        match self.get_ipc_stream() {
+            Ok(stream) => Some(stream),
+            Err(err) => {
+                self.terminate_session(err);
+                None
+            },
+        }
+    }
+
+    fn terminate_session(&self, reason: ::errors::LauncherError) {
+        let id = if let Some(ref app_id) = self.app_id {
+            ::launcher::ipc_server::events::event_data::SessionId::AppId(Box::new(app_id.clone()))
+        } else {
+            ::launcher::ipc_server::events::event_data::SessionId::TempId(self.temp_id)
+        };
+
+        let termination_detail = Box::new(::launcher::ipc_server::events::event_data::SessionTerminationDetail {
+            id    : id,
+            reason: reason,
+        });
+
+        let _ = self.ipc_server_event_sender.send(::launcher
+                                                  ::ipc_server
+                                                  ::events
+                                                  ::IpcSessionEvent
+                                                  ::IpcSessionTerminated(termination_detail));
+    }
+
+    fn get_ipc_stream(&self) -> Result<stream::IpcStream, ::errors::LauncherError> {
+        let stream = try!(self.stream.try_clone().map_err(|err| ::errors
+                                                                ::LauncherError
+                                                                ::IpcStreamCloneError(err)));
+        stream::IpcStream::new(stream)
     }
 }
 

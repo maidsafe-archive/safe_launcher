@@ -52,6 +52,8 @@ pub enum LauncherError {
     InvalidPath,
     /// Permission denied - e.g. permission to access SAFEDrive etc.
     PermissionDenied,
+    /// Error encoding into Json String
+    JsonEncodeError(::rustc_serialize::json::EncoderError),
     /// Unexpected - Probably a Logic error
     Unexpected(String),
 }
@@ -104,7 +106,8 @@ impl Into<i32> for LauncherError {
             LauncherError::PathNotFound                     => LAUNCHER_ERROR_START_RANGE - 10,
             LauncherError::InvalidPath                      => LAUNCHER_ERROR_START_RANGE - 11,
             LauncherError::PermissionDenied                 => LAUNCHER_ERROR_START_RANGE - 12,
-            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 13,
+            LauncherError::JsonEncodeError(_)               => LAUNCHER_ERROR_START_RANGE - 13,
+            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 14,
         }
     }
 }
@@ -127,6 +130,7 @@ impl ::std::fmt::Debug for LauncherError {
             LauncherError::PathNotFound                     => write!(f, "LauncherError::PathNotFound"),
             LauncherError::InvalidPath                      => write!(f, "LauncherError::InvalidPath"),
             LauncherError::PermissionDenied                 => write!(f, "LauncherError::PermissionDenied"),
+            LauncherError::JsonEncodeError(ref error)       => write!(f, "LauncherError::JsonEncodeError -> {:?}", error),
             LauncherError::Unexpected(ref error)            => write!(f, "LauncherError::Unexpected{{{:?}}}", error),
         }
     }
