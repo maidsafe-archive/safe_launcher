@@ -38,6 +38,7 @@ impl Launcher {
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(arc_client.clone());
 
         let mut user_root_directory = try!(directory_helper.get_user_root_directory_listing());
+        // TODO(Krishna) also create empty launcher config file if it does not already exist
         let _ = try!(directory_helper.get_configuration_directory_listing(launcher_config_directory_name));
         if user_root_directory.find_sub_directory(&safe_drive_directory_name).is_none() {
            let _  = try!(directory_helper.create(safe_drive_directory_name,
