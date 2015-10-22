@@ -42,11 +42,12 @@ impl ::launcher::parser::traits::Action for AddService {
                                                                                  Some(start_dir_key)));
 
        let signing_key = try!(eval_result!(params.client.lock()).get_secret_signing_key()).clone();
-       let dns_operation = try!(::safe_dns::dns_operations::DnsOperations::new(params.client));
-       let _ = try!(dns_operation.add_service(&self.long_name,
-                                              (self.service_name.clone(), dir_to_map.get_key().clone()),
-                                              &signing_key,
-                                              None));
+       let dns_operation = try!(::safe_dns::dns_operations::DnsOperations::new(params.client.clone()));
+       let struct_data = try!(dns_operation.add_service(&self.long_name,
+                                                        (self.service_name.clone(), dir_to_map.get_key().clone()),
+                                                        &signing_key,
+                                                        None));
+       eval_result!(params.client.lock()).post(::routing::data::Data::StructuredData(struct_data), None);
        Ok(None)
     }
 }
