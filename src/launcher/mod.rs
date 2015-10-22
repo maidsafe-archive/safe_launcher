@@ -18,6 +18,7 @@
 mod parser;
 mod ipc_server;
 mod app_handler;
+mod observer_config;
 
 /// Launcher exposes API for managing applications
 #[derive(Clone)]

@@ -155,8 +155,9 @@ impl IpcServer {
         match (self.unverified_sessions.remove(&temp_id), self.pending_verifications.remove(&nonce)) {
             (Some(session_info), Some(app_info)) => {
                 let app_detail = Box::new(ipc_session::events::event_data::AppDetail {
-                    client: self.client.clone(),
-                    app_id: app_info.app_id.clone(),
+                    client           : self.client.clone(),
+                    app_id           : app_info.app_id.clone(),
+                    app_root_dir_key : app_info.app_root_dir_key,
                     safe_drive_access: app_info.safe_drive_access,
                 });
 

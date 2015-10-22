@@ -28,7 +28,7 @@ pub type AppAuthenticationEvent = Result<event_data::AuthData, ::errors::Launche
 
 // --------------------------------------------------------------------------------------
 
-pub type SecureCommunicationEvent = ::errors::LauncherError;
+pub type SecureCommunicationEvent = Result<(), ::errors::LauncherError>;
 
 // --------------------------------------------------------------------------------------
 
@@ -46,6 +46,7 @@ pub mod event_data {
     pub struct AppDetail {
         pub client           : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
         pub app_id           : ::routing::NameType,
+        pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
         pub safe_drive_access: bool,
     }
 

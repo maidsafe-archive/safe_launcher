@@ -164,6 +164,7 @@ impl IpcSession {
                                                                                       symm_key,
                                                                                       symm_nonce,
                                                                                       ipc_stream,
+                                                                                      app_detail.app_root_dir_key,
                                                                                       safe_drive_access);
                 },
                 Err(err) => {
