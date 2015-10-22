@@ -46,13 +46,14 @@ impl ::launcher::parser::traits::Action for RegisterDns {
        let public_signing_key = try!(eval_result!(params.client.lock()).get_public_signing_key()).clone();
        let secret_signing_key = try!(eval_result!(params.client.lock()).get_secret_signing_key()).clone();
        let dns_operation = try!(::safe_dns::dns_operations::DnsOperations::new(params.client));
-       let _ = try!(dns_operation.register_dns(self.long_name.clone(),
-                                               &msg_public_key,
-                                               &msg_secret_key,
-                                               &services,
-                                               vec![public_signing_key],
-                                               &secret_signing_key,
-                                               None));
+       let struct_data = try!(dns_operation.register_dns(self.long_name.clone(),
+                                                         &msg_public_key,
+                                                         &msg_secret_key,
+                                                         &services,
+                                                         vec![public_signing_key],
+                                                         &secret_signing_key,
+                                                         None));
+       eval_result!(params.client.lock()).post(::routing::data::Data::StructuredData(struct_data), None);
        Ok(None)
     }
 }
