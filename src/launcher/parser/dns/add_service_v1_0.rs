@@ -29,7 +29,7 @@ impl ::launcher::parser::traits::Action for AddService {
             return Err(::errors::LauncherError::PermissionDenied)
         }
 
-        let mut tokens = ::launcher::parser::helper::tokenise_path(&self.service_home_dir_path, false);
+        let tokens = ::launcher::parser::helper::tokenise_path(&self.service_home_dir_path, false);
 
         let start_dir_key = if self.is_path_shared {
             &params.safe_drive_dir_key

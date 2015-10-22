@@ -25,9 +25,9 @@ pub enum LauncherError {
     /// not insanely bigger than others.
     CoreError(Box<::safe_core::errors::CoreError>),
     /// Errors from safe_nfs
-    DnsError(Box<::safe_dns::errors::DnsError>),
-    /// Errors from safe_nfs
     NfsError(Box<::safe_nfs::errors::NfsError>),
+    /// Errors from safe_nfs
+    DnsError(Box<::safe_dns::errors::DnsError>),
     /// Ipc Listener could not be bound to an endpoint
     IpcListenerCouldNotBeBound,
     /// The Ipc Listener has errored out. New apps will no longer be able to connect to Launcher
@@ -116,8 +116,8 @@ impl ::std::fmt::Debug for LauncherError {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         match *self {
             LauncherError::CoreError(ref error)             => write!(f, "LauncherError::CoreError -> {:?}", error),
-            LauncherError::DnsError(ref error)              => write!(f, "LauncherError::DnsError -> {:?}", error),
             LauncherError::NfsError(ref error)              => write!(f, "LauncherError::NfsError -> {:?}", error),
+            LauncherError::DnsError(ref error)              => write!(f, "LauncherError::DnsError -> {:?}", error),
             LauncherError::IpcListenerCouldNotBeBound       => write!(f, "LauncherError::IpcListenerCouldNotBeBound"),
             LauncherError::IpcListenerAborted(ref error)    => write!(f, "LauncherError::IpcListenerAborted -> {:?}", error),
             LauncherError::IpcStreamCloneError(ref error)   => write!(f, "LauncherError::IpcStreamCloneError -> {:?}", error),
