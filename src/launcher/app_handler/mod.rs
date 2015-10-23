@@ -24,24 +24,26 @@ mod misc;
 const APP_HANDLER_THREAD_NAME: &'static str = "AppHandlerThread";
 
 pub struct AppHandler {
-    client                  : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-    launcher_endpoint       : String,
-    local_config_data       : ::std::collections::HashMap<::routing::NameType, String>,
-    ipc_server_event_sender : ::launcher
-                              ::ipc_server
-                              ::EventSenderToServer<::launcher
-                                                    ::ipc_server
-                                                    ::events::ExternalEvent>,
-    app_add_remove_observers: Vec<::observer::AppHandlerObserver>,
+    client                 : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+    launcher_endpoint      : String,
+    local_config_data      : ::std::collections::HashMap<::routing::NameType, String>,
+    app_add_observers      : Vec<::observer::AppHandlerObserver>,
+    app_remove_observers   : Vec<::observer::AppHandlerObserver>,
+    ipc_server_event_sender: ::launcher
+                             ::ipc_server
+                             ::EventSenderToServer<::launcher
+                                                   ::ipc_server
+                                                   ::events::ExternalEvent>,
 }
 
 impl AppHandler {
     pub fn new(client      : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-               event_sender: ::launcher::ipc_server
-                                       ::EventSenderToServer<::launcher
-                                                             ::ipc_server
-                                                             ::events::ExternalEvent>) -> (::safe_core::utility::RAIIThreadJoiner,
-                                                                                           ::std::sync::mpsc::Sender<events::AppHandlerEvent>) {
+               event_sender: ::launcher
+                             ::ipc_server
+                             ::EventSenderToServer<::launcher
+                                                   ::ipc_server
+                                                   ::events::ExternalEvent>) -> (::safe_core::utility::RAIIThreadJoiner,
+                                                                                 ::std::sync::mpsc::Sender<events::AppHandlerEvent>) {
         let (event_tx, event_rx) = ::std::sync::mpsc::channel();
 
         let joiner = eval_result!(::std::thread::Builder::new().name(APP_HANDLER_THREAD_NAME.to_string())
@@ -67,11 +69,12 @@ impl AppHandler {
             if event_sender.send(::launcher::ipc_server::events::ExternalEvent::GetListenerEndpoint(tx)).is_ok() {
                 if let Ok(launcher_endpoint) = rx.recv() {
                     let mut app_handler = AppHandler {
-                        client                  : client,
-                        launcher_endpoint       : launcher_endpoint,
-                        local_config_data       : local_config_data,
-                        ipc_server_event_sender : event_sender,
-                        app_add_remove_observers: Vec::with_capacity(2),
+                        client                 : client,
+                        launcher_endpoint      : launcher_endpoint,
+                        local_config_data      : local_config_data,
+                        app_add_observers      : Vec::with_capacity(2),
+                        app_remove_observers   : Vec::with_capacity(2),
+                        ipc_server_event_sender: event_sender,
                     };
 
                     app_handler.run(event_rx);
@@ -91,46 +94,61 @@ impl AppHandler {
     fn run(&mut self, event_rx: ::std::sync::mpsc::Receiver<events::AppHandlerEvent>) {
         for event in event_rx.iter() {
             match event {
-                events::AppHandlerEvent::AddApp(app_detail)                => self.on_add_app(app_detail),
-                events::AppHandlerEvent::RemoveApp(app_id)                 => self.on_remove_app(app_id),
-                events::AppHandlerEvent::ActivateApp(app_id)               => self.on_activate_app(app_id),
-                events::AppHandlerEvent::RegisterAppAddRemoveObserver(obs) => self.on_register_app_add_remove_observer(obs),
+                events::AppHandlerEvent::AddApp(app_detail)             => self.on_add_app(app_detail),
+                events::AppHandlerEvent::RemoveApp(app_id)              => self.on_remove_app(app_id),
+                events::AppHandlerEvent::ActivateApp(app_id)            => self.on_activate_app(app_id),
+                events::AppHandlerEvent::GetAllManagedApps(obs)         => self.on_get_all_managed_apps(obs),
+                events::AppHandlerEvent::RegisterAppAddObserver(obs)    => self.on_register_app_add_observer(obs),
+                events::AppHandlerEvent::RegisterAppRemoveObserver(obs) => self.on_register_app_remove_observer(obs),
                 events::AppHandlerEvent::Terminate => break,
             }
         }
     }
 
-    //TODO instead of eval_result! retun error to asker
     fn on_add_app(&mut self, app_detail: events::event_data::AppDetail) {
+        let abs_path = app_detail.absolute_path.clone();
+
+        match self.on_add_app_impl(app_detail) {
+            Ok(data) => group_send!(data, &mut self.app_add_observers),
+            Err(err) => {
+                let data = ::observer::event_data::AppAdded {
+                    result    : Err(err),
+                    local_path: abs_path,
+                };
+
+                group_send!(data, &mut self.app_add_observers);
+            },
+        }
+    }
+
+    fn on_add_app_impl(&mut self, app_detail: events::event_data::AppDetail) -> Result<::observer::event_data::AppAdded,
+                                                                                       ::errors::LauncherError> {
         {
             let mut paths = self.local_config_data.values();
             if let Some(_) = paths.find(|stored_path| **stored_path == app_detail.absolute_path) {
-                debug!("App already added");
-                return
+                return Err(::errors::LauncherError::AppAlreadyAdded)
             }
         }
 
-        let app_id = ::routing::NameType::new(eval_result!(::safe_core::utility::generate_random_array_u8_64()));
-
-        let _ = self.local_config_data.insert(app_id, app_detail.absolute_path.clone());
+        let app_id = ::routing::NameType::new(try!(::safe_core::utility::generate_random_array_u8_64()));
 
         let mut tokens = AppHandler::tokenise_path(&app_detail.absolute_path);
 
-        let mut app_name = eval_option!(tokens.pop(), ""); // TODO(Spandan) don't use eval_option here
+        let mut app_name = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
 
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
-        let mut root_dir_listing = eval_result!(dir_helper.get_user_root_directory_listing());
+        let mut root_dir_listing = try!(dir_helper.get_user_root_directory_listing());
 
         let app_dir_name = AppHandler::get_app_dir_name(&app_name, &root_dir_listing);
         let app_root_dir_key = match root_dir_listing.find_sub_directory(&app_dir_name).map(|dir| dir.clone()) {
             Some(app_dir) => app_dir.get_key().clone(),
             None => {
-                eval_result!(dir_helper.create(app_dir_name,
-                                               ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
-                                               Vec::new(),
-                                               false,
-                                               ::safe_nfs::AccessLevel::Private,
-                                               Some(&mut root_dir_listing))).0.get_key().clone()
+                try!(dir_helper.create(app_dir_name,
+                                       ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
+                                       Vec::new(),
+                                       false,
+                                       ::safe_nfs::AccessLevel::Private,
+                                       Some(&mut root_dir_listing))).0.get_key().clone()
             },
         };
 
@@ -141,14 +159,14 @@ impl AppHandler {
             app_root_dir_key : app_root_dir_key,
             safe_drive_access: app_detail.safe_drive_access,
         };
-        eval_result!(self.upsert_to_launcher_global_config(new_launcher_config));
+        try!(self.upsert_to_launcher_global_config(new_launcher_config));
 
-        let data = ::observer::event_data::AppAddRemove {
-            id        : app_id,
-            action    : ::observer::event_data::Action::Added,
+        let _ = self.local_config_data.insert(app_id, app_detail.absolute_path.clone());
+
+        Ok(::observer::event_data::AppAdded {
+            result    : Ok(app_id),
             local_path: app_detail.absolute_path,
-        };
-        group_send!(data, &mut self.app_add_remove_observers);
+        })
     }
 
     fn on_activate_app(&mut self, app_id: ::routing::NameType) {
@@ -178,48 +196,87 @@ impl AppHandler {
         }
     }
 
-    // TODO(Krishna) Send terminate app event to IPC Server
     fn on_remove_app(&mut self, app_id: ::routing::NameType) {
+        match self.on_remove_app_impl(app_id) {
+            Ok(data) => group_send!(data, &mut self.app_remove_observers),
+            Err(err) => {
+                let data = ::observer::event_data::AppRemoved {
+                    id    : app_id,
+                    result: Some(err),
+                };
+
+                group_send!(data, &mut self.app_remove_observers);
+            }
+        }
+    }
+
+    // TODO(Krishna) Send terminate app event to IPC Server
+    // TODO(Krishna) Validate if eval_option! is really required
+    fn on_remove_app_impl(&mut self, app_id: ::routing::NameType) -> Result<::observer::event_data::AppRemoved,
+                                                                            ::errors::LauncherError> {
         let config_file_name = ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string();
 
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
-        let (mut launcher_configurations, dir_listing) = eval_result!(self.get_launcher_global_config_and_dir());
+        let (mut launcher_configurations, dir_listing) = try!(self.get_launcher_global_config_and_dir());
 
         let position = eval_option!(launcher_configurations.iter().position(|config| config.app_id == app_id), "Logic Error - Report as bug.");
         let app_root_dir_key = launcher_configurations[position].app_root_dir_key.clone();
         let reference_count = launcher_configurations[position].reference_count;
+
         if reference_count == 1 {
             let _ = launcher_configurations.remove(position);
-            let mut root_dir_listing = eval_result!(dir_helper.get_user_root_directory_listing());
-            let app_root_dir_listing = eval_result!(dir_helper.get(&app_root_dir_key));
-            let _ = eval_result!(dir_helper.delete(&mut root_dir_listing, app_root_dir_listing.get_metadata().get_name()));
         } else {
              let config = eval_option!(launcher_configurations.get_mut(position), "Logic Error - Report as bug.");
              config.reference_count -= 1;
         }
+
         let file = eval_option!(dir_listing.find_file(&config_file_name).map(|file| file.clone()), "Logic Error - Report as bug.");
-        let mut writer = eval_result!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, dir_listing));
-        writer.write(&eval_result!(::safe_core::utility::serialise(&launcher_configurations)), 0);
-        let _ = eval_result!(writer.close());
+        let mut writer = try!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, dir_listing));
+        writer.write(&try!(::safe_core::utility::serialise(&launcher_configurations)), 0);
+        let _ = try!(writer.close());
 
-        // remove from local config
-        let local_path = if let Some(path) = self.local_config_data.remove(&app_id) {
-            path
-        } else {
-            String::new()
-        };
+        if self.local_config_data.remove(&app_id).is_none() {
+            debug!("Could not remove app from local config - app did not exist.");
+        }
 
-        let data = ::observer::event_data::AppAddRemove {
-            id        : app_id,
-            action    : ::observer::event_data::Action::Removed(None),
-            local_path: local_path,
-        };
-        group_send!(data, &mut self.app_add_remove_observers);
+        Ok(::observer::event_data::AppRemoved {
+            id    : app_id,
+            result: None,
+        })
     }
 
-    fn on_register_app_add_remove_observer(&mut self, observer: ::observer::AppHandlerObserver) {
-        self.app_add_remove_observers.push(observer);
+    fn on_register_app_add_observer(&mut self, observer: ::observer::AppHandlerObserver) {
+        self.app_add_observers.push(observer);
+    }
+
+    fn on_register_app_remove_observer(&mut self, observer: ::observer::AppHandlerObserver) {
+        self.app_remove_observers.push(observer);
+    }
+
+    fn on_get_all_managed_apps(&self, observer: ::std::sync::mpsc::Sender<Vec<events::event_data::ManagedApp>>) {
+        let global_configs = eval_result!(self.get_launcher_global_config());
+        let mut managed_apps = Vec::with_capacity(global_configs.len());
+        for it in global_configs.iter() {
+            let local_path = if let Some(path) = self.local_config_data.get(&it.app_id) {
+                Some(path.clone())
+            } else {
+                None
+            };
+
+            let managed_app = events::event_data::ManagedApp {
+                id               :      it.app_id,
+                local_path       : local_path,
+                reference_count  : it.reference_count,
+                safe_drive_access: it.safe_drive_access,
+            };
+
+            managed_apps.push(managed_app);
+        }
+
+        if let Err(err) = observer.send(managed_apps) {
+            debug!("Error communicating all managed apps to observer.");
+        }
     }
 
     fn tokenise_path(path: &str) -> Vec<String> {

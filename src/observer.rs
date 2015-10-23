@@ -52,12 +52,19 @@ impl From<event_data::PendingVerification> for IpcEvent {
 
 #[derive(Debug)]
 pub enum AppHandlingEvent {
-    AppAddRemove(event_data::AppAddRemove),
+    AppAdded(event_data::AppAdded),
+    AppRemoved(event_data::AppRemoved),
 }
 
-impl From<event_data::AppAddRemove> for AppHandlingEvent {
-    fn from(data: event_data::AppAddRemove) -> AppHandlingEvent {
-        AppHandlingEvent::AppAddRemove(data)
+impl From<event_data::AppAdded> for AppHandlingEvent {
+    fn from(data: event_data::AppAdded) -> AppHandlingEvent {
+        AppHandlingEvent::AppAdded(data)
+    }
+}
+
+impl From<event_data::AppRemoved> for AppHandlingEvent {
+    fn from(data: event_data::AppRemoved) -> AppHandlingEvent {
+        AppHandlingEvent::AppRemoved(data)
     }
 }
 
@@ -65,6 +72,7 @@ pub mod event_data {
     #[derive(Debug)]
     pub enum Action {
         Added,
+        /// If removal was due to some internal error, the optional field will be duely filled
         Removed(Option<::errors::LauncherError>),
     }
 
@@ -87,9 +95,14 @@ pub mod event_data {
     }
 
     #[derive(Debug)]
-    pub struct AppAddRemove {
-        pub id        : ::routing::NameType,
-        pub action    : Action,
+    pub struct AppAdded {
+        pub result    : Result<::routing::NameType, ::errors::LauncherError>,
         pub local_path: String,
+    }
+
+    #[derive(Debug)]
+    pub struct AppRemoved {
+        pub id    : ::routing::NameType,
+        pub result: Option<::errors::LauncherError>,
     }
 }

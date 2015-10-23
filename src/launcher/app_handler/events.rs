@@ -19,13 +19,12 @@ pub enum AppHandlerEvent {
     AddApp(event_data::AppDetail),
     RemoveApp(::routing::NameType),
     ActivateApp(::routing::NameType),
-    RegisterAppAddRemoveObserver(::observer::AppHandlerObserver),
+    RegisterAppAddObserver(::observer::AppHandlerObserver),
+    RegisterAppRemoveObserver(::observer::AppHandlerObserver),
+    GetAllManagedApps(::std::sync::mpsc::Sender<Vec<event_data::ManagedApp>>),
     Terminate,
 }
 
-// (Spandan)
-// Manually implemented this because default version given by attribute (#[derive(Debug)]) fails to
-// compile.
 impl ::std::fmt::Debug for AppHandlerEvent {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         write!(f, "{:?}", *self)
@@ -36,6 +35,14 @@ pub mod event_data {
     #[derive(Debug, Clone)]
     pub struct AppDetail {
         pub absolute_path    : String,
+        pub safe_drive_access: bool,
+    }
+
+    #[derive(Debug, Clone)]
+    pub struct ManagedApp {
+        pub id               : ::routing::NameType,
+        pub local_path       : Option<String>,
+        pub reference_count  : u32,
         pub safe_drive_access: bool,
     }
 }

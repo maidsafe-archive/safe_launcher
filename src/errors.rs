@@ -60,6 +60,8 @@ pub enum LauncherError {
     JsonEncodeError(::rustc_serialize::json::EncoderError),
     /// Symmetric Deciphering failed for a cipher text
     SymmetricDecipherFailure,
+    /// This path to binary has already been added on this machine
+    AppAlreadyAdded,
     /// Unexpected - Probably a Logic error
     Unexpected(String),
 }
@@ -127,7 +129,8 @@ impl Into<i32> for LauncherError {
             LauncherError::SpecificParseError(_)            => LAUNCHER_ERROR_START_RANGE - 13,
             LauncherError::JsonEncodeError(_)               => LAUNCHER_ERROR_START_RANGE - 14,
             LauncherError::SymmetricDecipherFailure         => LAUNCHER_ERROR_START_RANGE - 15,
-            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 16,
+            LauncherError::AppAlreadyAdded                  => LAUNCHER_ERROR_START_RANGE - 16,
+            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 17,
         }
     }
 }
@@ -153,6 +156,7 @@ impl ::std::fmt::Debug for LauncherError {
             LauncherError::SpecificParseError(ref error)    => write!(f, "LauncherError::SpecificParseError -> {:?}", error),
             LauncherError::JsonEncodeError(ref error)       => write!(f, "LauncherError::JsonEncodeError -> {:?}", error),
             LauncherError::SymmetricDecipherFailure         => write!(f, "LauncherError::SymmetricDecipherFailure"),
+            LauncherError::AppAlreadyAdded                  => write!(f, "LauncherError::AppAlreadyAdded"),
             LauncherError::Unexpected(ref error)            => write!(f, "LauncherError::Unexpected{{{:?}}}", error),
         }
     }
