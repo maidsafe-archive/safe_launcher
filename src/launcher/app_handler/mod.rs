@@ -21,7 +21,7 @@ use std::io::{Read, Write};
 
 mod misc;
 
-const APP_HANDLER_THREAD_NAME: &'static str = "launcher.config";
+const APP_HANDLER_THREAD_NAME: &'static str = "AppHandlerThread";
 
 pub struct AppHandler {
     client                 : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
@@ -64,16 +64,18 @@ impl AppHandler {
 
             let (tx, rx) = ::std::sync::mpsc::channel();
             if event_sender.send(::launcher::ipc_server::events::ExternalEvent::GetListenerEndpoint(tx)).is_ok() {
-                let launcher_endpoint = eval_result!(rx.recv());
+                if let Ok(launcher_endpoint) = rx.recv() {
+                    let mut app_handler = AppHandler {
+                        client                 : client,
+                        launcher_endpoint      : launcher_endpoint,
+                        local_config_data      : local_config_data,
+                        ipc_server_event_sender: event_sender,
+                    };
 
-                let mut app_handler = AppHandler {
-                    client                 : client,
-                    launcher_endpoint      : launcher_endpoint,
-                    local_config_data      : local_config_data,
-                    ipc_server_event_sender: event_sender,
-                };
-
-                app_handler.run(event_rx);
+                    app_handler.run(event_rx);
+                } else {
+                    debug!("AppHandler <-> IPC-Server Communication failed - Probably Launcher was closed too soon.");
+                }
             } else {
                 debug!("AppHandler <-> IPC-Server Communication failed - Probably Launcher was closed too soon.");
             }

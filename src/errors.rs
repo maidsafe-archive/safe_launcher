@@ -42,16 +42,20 @@ pub enum LauncherError {
     FailedReadingStreamPayloadSize,
     /// Could not write the payload size to stream
     FailedWritingStreamPayloadSize,
-    /// Could not parse payload as a valid JSON
-    JsonParseError(::rustc_serialize::json::ParserError),
-    /// JSON non-conforming to the Launcher RFC
-    SpecificParseError(String),
     /// Unable to find/traverse directory or file path
     PathNotFound,
     /// Supplied path was invalid
     InvalidPath,
     /// Permission denied - e.g. permission to access SAFEDrive etc.
     PermissionDenied,
+    /// Could not parse payload as a valid JSON
+    JsonParseError(::rustc_serialize::json::ParserError),
+    /// Could not decode valid JSON into expected Structures probably because a mandatory field was
+    /// missing or a field was wrongly named etc.
+    JsonDecodeError(::rustc_serialize::json::DecoderError),
+    /// JSON non-conforming to the Launcher RFC and not covered by JsonDecodeError, e.g. things
+    /// like invalid base64 formatting, unreasonable/unexpected indexing, ranges etc.
+    SpecificParseError(String),
     /// Error encoding into Json String
     JsonEncodeError(::rustc_serialize::json::EncoderError),
     /// Symmetric Deciphering failed for a cipher text
@@ -96,6 +100,12 @@ impl From<::rustc_serialize::json::EncoderError> for LauncherError {
     }
 }
 
+impl From<::rustc_serialize::json::DecoderError> for LauncherError {
+    fn from(error: ::rustc_serialize::json::DecoderError) -> LauncherError {
+        LauncherError::JsonDecodeError(error)
+    }
+}
+
 impl Into<i32> for LauncherError {
     fn into(self) -> i32 {
         match self {
@@ -109,14 +119,15 @@ impl Into<i32> for LauncherError {
             LauncherError::IpcSessionTerminated(_)          => LAUNCHER_ERROR_START_RANGE - 5,
             LauncherError::FailedReadingStreamPayloadSize   => LAUNCHER_ERROR_START_RANGE - 6,
             LauncherError::FailedWritingStreamPayloadSize   => LAUNCHER_ERROR_START_RANGE - 7,
-            LauncherError::JsonParseError(_)                => LAUNCHER_ERROR_START_RANGE - 8,
-            LauncherError::SpecificParseError(_)            => LAUNCHER_ERROR_START_RANGE - 9,
-            LauncherError::PathNotFound                     => LAUNCHER_ERROR_START_RANGE - 10,
-            LauncherError::InvalidPath                      => LAUNCHER_ERROR_START_RANGE - 11,
-            LauncherError::PermissionDenied                 => LAUNCHER_ERROR_START_RANGE - 12,
-            LauncherError::JsonEncodeError(_)               => LAUNCHER_ERROR_START_RANGE - 13,
-            LauncherError::SymmetricDecipherFailure         => LAUNCHER_ERROR_START_RANGE - 14,
-            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 15,
+            LauncherError::PathNotFound                     => LAUNCHER_ERROR_START_RANGE - 8,
+            LauncherError::InvalidPath                      => LAUNCHER_ERROR_START_RANGE - 9,
+            LauncherError::PermissionDenied                 => LAUNCHER_ERROR_START_RANGE - 10,
+            LauncherError::JsonParseError(_)                => LAUNCHER_ERROR_START_RANGE - 11,
+            LauncherError::JsonDecodeError(_)               => LAUNCHER_ERROR_START_RANGE - 12,
+            LauncherError::SpecificParseError(_)            => LAUNCHER_ERROR_START_RANGE - 13,
+            LauncherError::JsonEncodeError(_)               => LAUNCHER_ERROR_START_RANGE - 14,
+            LauncherError::SymmetricDecipherFailure         => LAUNCHER_ERROR_START_RANGE - 15,
+            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 16,
         }
     }
 }
@@ -134,11 +145,12 @@ impl ::std::fmt::Debug for LauncherError {
             LauncherError::IpcSessionTerminated(ref error)  => write!(f, "LauncherError::IpcSessionTerminated -> {:?}", error),
             LauncherError::FailedReadingStreamPayloadSize   => write!(f, "LauncherError::FailedReadingStreamPayloadSize"),
             LauncherError::FailedWritingStreamPayloadSize   => write!(f, "LauncherError::FailedWritingStreamPayloadSize"),
-            LauncherError::JsonParseError(ref error)        => write!(f, "LauncherError::JsonParseError -> {:?}", error),
-            LauncherError::SpecificParseError(ref error)    => write!(f, "LauncherError::SpecificParseError -> {:?}", error),
             LauncherError::PathNotFound                     => write!(f, "LauncherError::PathNotFound"),
             LauncherError::InvalidPath                      => write!(f, "LauncherError::InvalidPath"),
             LauncherError::PermissionDenied                 => write!(f, "LauncherError::PermissionDenied"),
+            LauncherError::JsonParseError(ref error)        => write!(f, "LauncherError::JsonParseError -> {:?}", error),
+            LauncherError::JsonDecodeError(ref error)       => write!(f, "LauncherError::JsonDecodeError -> {:?}", error),
+            LauncherError::SpecificParseError(ref error)    => write!(f, "LauncherError::SpecificParseError -> {:?}", error),
             LauncherError::JsonEncodeError(ref error)       => write!(f, "LauncherError::JsonEncodeError -> {:?}", error),
             LauncherError::SymmetricDecipherFailure         => write!(f, "LauncherError::SymmetricDecipherFailure"),
             LauncherError::Unexpected(ref error)            => write!(f, "LauncherError::Unexpected{{{:?}}}", error),

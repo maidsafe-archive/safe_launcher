@@ -259,8 +259,8 @@ mod tests {
             let base64_pub_encryption_key = (&self.public_encryption_key).to_base64(config);
 
             assert!(tree.insert("launcher_string".to_string(), self.launcher_string.to_json()).is_none());
-            assert!(tree.insert("nonce".to_string(), base64_nonce.to_json()).is_none());
-            assert!(tree.insert("public_encryption_key".to_string(), base64_pub_encryption_key.to_json()).is_none());
+            assert!(tree.insert("asymm_nonce".to_string(), base64_nonce.to_json()).is_none());
+            assert!(tree.insert("asymm_pub_key".to_string(), base64_pub_encryption_key.to_json()).is_none());
 
             ::rustc_serialize::json::Json::Object(tree)
         }
@@ -319,7 +319,7 @@ mod tests {
                              ::RAIIThreadJoiner
                              ::new(eval_result!(::std
                                                 ::thread
-                                                ::Builder::new().name("TCPClientThread".to_string())
+                                                ::Builder::new().name("AppHandshakeThread".to_string())
                                                                 .spawn(move || {
                 use rustc_serialize::base64::ToBase64;
 
@@ -347,6 +347,7 @@ mod tests {
                 assert!(ipc_stream.read_payload().is_err())
 
         })));
+
         ::std::thread::sleep_ms(3000);
         eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::Terminate));
     }
