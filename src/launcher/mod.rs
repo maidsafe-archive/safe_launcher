@@ -102,15 +102,21 @@ mod tests {
         let safe_drive_directory_name = ::config::SAFE_DRIVE_DIR_NAME.to_string();
         let arc_client = ::std::sync::Arc::new(::std::sync::Mutex::new(client));
         let directory_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(arc_client.clone());
-        { // client should not have SAFEDrive in user root directory
+
+        // client should not have SAFEDrive in user root directory
+        {
             let user_root_directory = eval_result!(directory_helper.get_user_root_directory_listing());
             assert!(user_root_directory.find_sub_directory(&safe_drive_directory_name).is_none());
         }
-        { // Create Launcher instance
+
+        // Create Launcher instance
+        {
             let client = eval_result!(::safe_core::client::Client::log_in(keyword, pin, password));
             let _ = Launcher::new(client);
         }
-        { // client should have SAFEDrive in user root directory
+
+        // client should have SAFEDrive in user root directory
+        {
             let user_root_directory = eval_result!(directory_helper.get_user_root_directory_listing());
             assert!(user_root_directory.find_sub_directory(&safe_drive_directory_name).is_some());
         }

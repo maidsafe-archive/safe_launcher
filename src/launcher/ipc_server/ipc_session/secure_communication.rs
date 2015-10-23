@@ -44,9 +44,13 @@ impl SecureCommunication {
                                                          .spawn(move || {
             let mut observers = vec![observer];
 
-            let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(client.clone());
-            // TODO(Spandan) this is wrong - Fix it in nfs to get safe_drive listing directly.
-            let safe_drive_dir_key = eval_send!(dir_helper.get_user_root_directory_listing(), &mut observers).get_key().clone();
+            let safe_drive_dir_key = {
+                let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(client.clone());
+                let user_root_dir_listing = eval_send!(dir_helper.get_user_root_directory_listing(), &mut observers);
+                eval_send!(user_root_dir_listing.find_sub_directory(&::config::SAFE_DRIVE_DIR_NAME.to_string())
+                                                .ok_or(::errors::LauncherError::from("Could not find SAFEDrive")),
+                           &mut observers).get_key().clone()
+            };
 
             let parameter_packet = ::launcher::parser::ParameterPacket {
                 client            : client,
