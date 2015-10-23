@@ -15,13 +15,14 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-pub type ResponseType = Result<Option<::rustc_serialize::json::Json>, ::errors::LauncherError>;
+pub type ResponseType = Result<Option<String>, ::errors::LauncherError>;
 
 mod dns;
 mod nfs;
 mod traits;
 mod helper;
 
+#[derive(Clone)]
 pub struct ParameterPacket {
     pub client            : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
     pub app_root_dir_key  : ::safe_nfs::metadata::directory_key::DirectoryKey,

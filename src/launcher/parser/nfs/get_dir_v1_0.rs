@@ -42,10 +42,10 @@ impl ::launcher::parser::traits::Action for GetDir {
                                                                                       Some(start_dir_key)));
         let dir_info = get_directory_info(dir_fetched.get_metadata());
         let mut sub_dirs: Vec<DirectoryInfo> = Vec::with_capacity(dir_fetched.get_sub_directories().len());
-        let mut files: Vec<FileInfo> = Vec::with_capacity(dir_fetched.get_files().len());
         for metadata in dir_fetched.get_sub_directories() {
             sub_dirs.push(get_directory_info(metadata));
         }
+        let mut files: Vec<FileInfo> = Vec::with_capacity(dir_fetched.get_files().len());
         for file in dir_fetched.get_files() {
             files.push(get_file_info(file.get_metadata()));
         }
@@ -54,7 +54,7 @@ impl ::launcher::parser::traits::Action for GetDir {
             files          : files,
             sub_directories: sub_dirs,
         };
-        Ok(Some(try!(::rustc_serialize::json::encode(&response)).to_json()))
+        Ok(Some(try!(::rustc_serialize::json::encode(&response))))
     }
 }
 
