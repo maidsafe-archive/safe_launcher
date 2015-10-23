@@ -38,13 +38,27 @@ pub enum IpcSessionEvent {
     IpcSessionTerminated(Box<event_data::SessionTerminationDetail>),
 }
 
+impl From<(u32, String)> for IpcSessionEvent {
+    fn from(data: (u32, String)) -> IpcSessionEvent {
+        IpcSessionEvent::VerifySession(Box::new(data))
+    }
+}
+
+impl From<event_data::SessionTerminationDetail> for IpcSessionEvent {
+    fn from(data: event_data::SessionTerminationDetail) -> IpcSessionEvent {
+        IpcSessionEvent::IpcSessionTerminated(Box::new(data))
+    }
+}
+
 // --------------------------------------------------------------------------------------
 
-#[derive(Clone)]
 pub enum ExternalEvent {
     AppActivated(Box<event_data::ActivationDetail>),
     ChangeSafeDriveAccess(::routing::NameType, bool),
     GetListenerEndpoint(::std::sync::mpsc::Sender<String>),
+    RegisterVerifiedSessionObserver(::observer::IpcObserver),
+    RegisterUnverifiedSessionObserver(::observer::IpcObserver),
+    RegisterPendingVerificationObserver(::observer::IpcObserver),
     Terminate,
 }
 
@@ -55,6 +69,12 @@ impl ::std::fmt::Debug for ExternalEvent {
         } else {
             write!(f, "{:?}", *self)
         }
+    }
+}
+
+impl From<event_data::ActivationDetail> for ExternalEvent {
+    fn from(data: event_data::ActivationDetail) -> ExternalEvent {
+        ExternalEvent::AppActivated(Box::new(data))
     }
 }
 

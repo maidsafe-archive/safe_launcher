@@ -40,6 +40,12 @@ pub enum ExternalEvent {
     Terminate,
 }
 
+impl From<event_data::AppDetail> for ExternalEvent {
+    fn from(data: event_data::AppDetail) -> Self {
+        ExternalEvent::AppDetailReceived(Box::new(data))
+    }
+}
+
 // --------------------------------------------------------------------------------------
 
 pub mod event_data {

@@ -15,12 +15,21 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-#[derive(Debug, Clone)]
 pub enum AppHandlerEvent {
-    AddApp(Box<event_data::AppDetail>),
-    RemoveApp(Box<::routing::NameType>),
-    ActivateApp(Box<::routing::NameType>),
+    AddApp(event_data::AppDetail),
+    RemoveApp(::routing::NameType),
+    ActivateApp(::routing::NameType),
+    RegisterAppAddRemoveObserver(::observer::AppHandlerObserver),
     Terminate,
+}
+
+// (Spandan)
+// Manually implemented this because default version given by attribute (#[derive(Debug)]) fails to
+// compile.
+impl ::std::fmt::Debug for AppHandlerEvent {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        write!(f, "{:?}", *self)
+    }
 }
 
 pub mod event_data {

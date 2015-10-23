@@ -54,7 +54,9 @@ macro_rules! eval_break {
 }
 
 /// This macro is intended to be used in all cases when we want to send a value to a group
-/// (Vector) of `std::sync::mpsc::Sender<T>`, for e.g. an observer pattern with senders,
+/// (Vector) of `std::sync::mpsc::Sender<T>`, for e.g. an observer pattern with senders. It
+/// performs necessary trait conversion for sending the given data if such a conversion was
+/// defined.
 /// Additionally it will purge all the dead observers (i.e. those no longer existing or
 /// interested in observing).
 ///
@@ -105,16 +107,67 @@ macro_rules! group_send {
         // - cannot move out of captured outer variable in an `FnMut` closure
         // while doing a move in the closure provided to `retain()` below
         let mut option_dance = Some($data);
-        $senders.retain(|tx| tx.send(eval_option!(option_dance.take(), "Logic Error - Report a bug."))
+        $senders.retain(|tx| tx.send(::std::convert::From::from(eval_option!(option_dance.take(), "Logic Error - Report a bug.")))
                                .is_ok());
     }}
 }
 
+/// This macro is intended to be used in all cases when we want to send a value to a single
+/// `std::sync::mpsc::Sender<T>`, for e.g. an observer. It performs necessary trait conversion for
+/// sending the given data if such a conversion was defined.
+///
+/// #Examples
+///
+/// ```
+/// # #[macro_use] extern crate safe_core;
+/// # #[macro_use] extern crate safe_launcher;
+/// struct DataType {
+///     field: String,
+/// }
+///
+/// struct Notifier {
+///     observer: std::sync::mpsc::Sender<DataType>,
+/// }
+///
+/// impl Notifier {
+///     pub fn notify_one(&mut self) {
+///         let data = DataType {
+///             field: "Some String".to_string(),
+///         };
+///
+///         send_one!(data, &self.observer);
+///     }
+/// }
+///
+/// fn main() {
+///     let (tx, rx) = std::sync::mpsc::channel();
+///     let joiner = eval_result!(std::thread::Builder::new()
+///                                           .name("Doc-group_send-thread".to_string())
+///                                           .spawn(move || {
+///         let data: DataType = eval_result!(rx.recv());
+///     }));
+///
+///     let mut notifier = Notifier {
+///         observer: tx,
+///     };
+///
+///     notifier.notify_one();
+///
+///     eval_result!(joiner.join());
+/// }
+/// ```
+#[macro_export]
+macro_rules! send_one {
+    ($data:expr, $sender:expr) => {
+        $sender.send(::std::convert::From::from($data))
+    }
+}
+
 /// This macro is intended to be used in all cases where we get an Err out of Result<T, U> and
-/// want to send it to a group (Vector) of `std::sync::mpsc::Sender<Result<T, U>>`, for e.g.
-/// an observer pattern with senders, and subsequently return from the function. Additionally
-/// it will purge all the dead observers (i.e. those no longer existing or interested in
-/// observing).
+/// want to send it to a single `std::sync::mpsc::Sender<Result<T, U>>`, for e.g.  an observer,
+/// and subsequently return from the function.
+/// Additionally it will purge all the dead observers (i.e. those no longer existing or interested
+/// in observing).
 ///
 /// #Examples
 ///
@@ -129,123 +182,111 @@ macro_rules! group_send {
 ///     Err(safe_launcher::errors::LauncherError::from("An Example Error"))
 /// }
 ///
-/// fn f(mut senders: Vec<std::sync::mpsc::Sender<Result<DataType, safe_launcher::errors::LauncherError>>>) {
-///     let some_val = eval_send!(g(), &mut senders);
+/// fn f(sender: std::sync::mpsc::Sender<Result<DataType, safe_launcher::errors::LauncherError>>) {
+///     let some_val = eval_send_one!(g(), &sender);
 ///
 ///     let data = DataType {
 ///         field: some_val,
 ///     };
 ///
-///     group_send!(Ok(data), &mut senders);
+///     send_one!(Ok(data), &sender);
 /// }
 ///
 /// fn main() {
 ///     let (tx, rx) = std::sync::mpsc::channel();
 ///     let joiner = eval_result!(std::thread::Builder::new()
-///                                           .name("Doc-eval_send-thread".to_string())
+///                                           .name("Doc-eval_send_one-thread".to_string())
 ///                                           .spawn(move || {
 ///         let result: Result<DataType,
 ///                            safe_launcher::errors::LauncherError> = eval_result!(rx.recv());
 ///         assert!(result.is_err());
 ///     }));
 ///
-///     let observers = vec![tx];
-///     f(observers);
+///     f(tx);
 ///
 ///     eval_result!(joiner.join());
 /// }
 /// ```
 #[macro_export]
-macro_rules! eval_send {
-    ($result:expr, $senders:expr) => {
+macro_rules! eval_send_one {
+    ($result:expr, $sender:expr) => {
         match $result {
             Ok(value)  => value,
             Err(error) => {
                 let converted_err = Err(::std::convert::From::from(error));
-                group_send!(converted_err, $senders);
+                let _ = send_one!(converted_err, $sender);
                 return
             },
         }
     }
 }
 
-/// This macro is intended to be used in all cases where we get an Err out of Result<T, U> and
-/// want to send it to a group (Vector) of `std::sync::mpsc::Sender<Event(Result<T, U>)>`, for
-/// e.g.  an observer pattern with senders, and subsequently return from the function.
-/// Additionally it will purge all the dead observers (i.e. those no longer existing or
-/// interested in observing).
+/// This macro is intended to be used in all cases where we get a None out of Option<T> and want to
+/// package it into `safe_launcher::errors::LauncherError::SpecificParseError(String)`. This is
+/// useful because there may be miscellaneous erros while parsing through a valid JSON due to JSON
+/// not conforming to certain mandatory requirements. This can then be communicated back to the
+/// JSON sending client.
 ///
 /// #Examples
 ///
 /// ```
-/// # #[macro_use] extern crate safe_core;
 /// # #[macro_use] extern crate safe_launcher;
-/// struct DataType {
-///     field: String,
-/// }
+/// fn g() -> Result<(), safe_launcher::errors::LauncherError> {
+///     let mut remaining_tokens = vec![];
+///     let _module = try!(parse_option!(remaining_tokens.pop(), "Invalid endpoint - Module token not found."));
 ///
-/// enum EventSet {
-///     SomeEvent(Result<DataType, safe_launcher::errors::LauncherError>),
-///     SomeOtherEvent,
-/// }
-///
-/// fn g() -> Result<String, safe_launcher::errors::LauncherError> {
-///     Err(safe_launcher::errors::LauncherError::from("An Example Error"))
-/// }
-///
-/// fn f(mut senders: Vec<std::sync::mpsc::Sender<EventSet>>) {
-///     let some_val = eval_send_event!(g(), &mut senders, EventSet::SomeEvent);
-///
-///     let data = DataType {
-///         field: some_val,
-///     };
-///
-///     group_send!(EventSet::SomeEvent(Ok(data)), &mut senders);
+///     Ok(())
 /// }
 ///
 /// fn main() {
-///     let (tx, rx) = std::sync::mpsc::channel();
-///     let joiner = eval_result!(std::thread::Builder::new()
-///                                           .name("Doc-eval_send-thread".to_string())
-///                                           .spawn(move || {
-///         match eval_result!(rx.recv()) {
-///             EventSet::SomeEvent(result) => assert!(result.is_err()),
-///             EventSet::SomeOtherEvent => panic!("This is not what it should be !!"),
-///         }
-///     }));
-///
-///     let observers = vec![tx];
-///     f(observers);
-///
-///     eval_result!(joiner.join());
+///     if let Err(err) = g() {
+///         println!("{:?}", err);
+///     }
 /// }
 /// ```
 #[macro_export]
-macro_rules! eval_send_event {
-    ($result:expr, $senders:expr, $event:expr) => {
-        match $result {
-            Ok(value)  => value,
-            Err(error) => {
-                let converted_err = Err(::std::convert::From::from(error));
-                let event = $event(converted_err);
-                group_send!(event, $senders);
-                return
-            },
-        }
-    }
-}
-
-#[macro_export]
 macro_rules! parse_option {
     ($output:expr, $err_statement:expr) => {
-        $output.ok_or(::errors::LauncherError::SpecificParseError($err_statement.to_string()))
+        $output.ok_or($crate::errors::LauncherError::SpecificParseError($err_statement.to_string()))
     }
 }
 
+/// This macro is intended to be used in all cases where we get an Err out of Result<T, U> and want
+/// to package it into `safe_launcher::errors::LauncherError::SpecificParseError(String)`. This is
+/// useful because there may be miscellaneous erros while parsing through a valid JSON due to JSON
+/// not conforming to certain mandatory requirements. This can then be communicated back to the
+/// JSON sending client.
+///
+/// #Examples
+///
+/// ```
+/// # #[macro_use] extern crate safe_launcher;
+/// #[derive(Debug)]
+/// enum SomeSpecialError {
+///     Zero,
+///     One,
+/// }
+///
+/// fn f() -> Result<String, SomeSpecialError> {
+///     Err(SomeSpecialError::One)
+/// }
+///
+/// fn g() -> Result<(), safe_launcher::errors::LauncherError> {
+///     let _module = try!(parse_result!(f(), ""));
+///
+///     Ok(())
+/// }
+///
+/// fn main() {
+///     if let Err(err) = g() {
+///         println!("{:?}", err);
+///     }
+/// }
+/// ```
 #[macro_export]
 macro_rules! parse_result {
     ($output:expr, $err_statement:expr) => {
-        $output.map_err(|e| ::errors::LauncherError::SpecificParseError(format!("{} {:?}", $err_statement.to_string(), e)))
+        $output.map_err(|e| $crate::errors::LauncherError::SpecificParseError(format!("{} {:?}", $err_statement.to_string(), e)))
     }
 }
 

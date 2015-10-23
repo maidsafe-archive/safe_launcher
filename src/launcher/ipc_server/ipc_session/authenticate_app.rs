@@ -28,29 +28,27 @@ pub fn verify_launcher_nonce(mut ipc_stream  : ::launcher::ipc_server::ipc_sessi
                                                            .spawn(move || {
         use rustc_serialize::base64::FromBase64;
 
-        let mut senders = vec![event_sender];
-
-        let payload = eval_send!(ipc_stream.read_payload(), &mut senders);
-        let payload_as_str = eval_send!(parse_result!(String::from_utf8(payload), "Invalid UTF-8"), &mut senders);
-        let handshake_request: HandshakeRequest = eval_send!(::rustc_serialize::json::decode(&payload_as_str), &mut senders);
+        let payload = eval_send_one!(ipc_stream.read_payload(), &event_sender);
+        let payload_as_str = eval_send_one!(parse_result!(String::from_utf8(payload), "Invalid UTF-8"), &event_sender);
+        let handshake_request: HandshakeRequest = eval_send_one!(::rustc_serialize::json::decode(&payload_as_str), &event_sender);
 
         if handshake_request.endpoint != APP_AUTHENTICATION_ENDPOINT {
-            eval_send!(Err(::errors::LauncherError::SpecificParseError("Invalid endpoint for app-auhtentication".to_string())),
-                       &mut senders);
+            eval_send_one!(Err(::errors::LauncherError::SpecificParseError("Invalid endpoint for app-auhtentication".to_string())),
+                           &event_sender);
         }
 
-        let vec_nonce = eval_send!(parse_result!(handshake_request.data.asymm_nonce.from_base64(), "Nonce -> Base64"),
-                                   &mut senders);
+        let vec_nonce = eval_send_one!(parse_result!(handshake_request.data.asymm_nonce.from_base64(), "Nonce -> Base64"),
+                                       &event_sender);
         if vec_nonce.len() != ::sodiumoxide::crypto::box_::NONCEBYTES {
-            eval_send!(Err(::errors::LauncherError::SpecificParseError("Invalid asymmetric nonce length.".to_string())),
-                       &mut senders);
+            eval_send_one!(Err(::errors::LauncherError::SpecificParseError("Invalid asymmetric nonce length.".to_string())),
+                           &event_sender);
         }
 
-        let vec_pub_key = eval_send!(parse_result!(handshake_request.data.asymm_pub_key.from_base64(), "PublicKey -> Base64"),
-                                     &mut senders);
+        let vec_pub_key = eval_send_one!(parse_result!(handshake_request.data.asymm_pub_key.from_base64(), "PublicKey -> Base64"),
+                                     &event_sender);
         if vec_pub_key.len() != ::sodiumoxide::crypto::box_::PUBLICKEYBYTES {
-            eval_send!(Err(::errors::LauncherError::SpecificParseError("Invalid asymmetric public key length.".to_string())),
-                       &mut senders);
+            eval_send_one!(Err(::errors::LauncherError::SpecificParseError("Invalid asymmetric public key length.".to_string())),
+                           &event_sender);
         }
 
         let mut asymm_nonce = ::sodiumoxide::crypto::box_::Nonce([0; ::sodiumoxide::crypto::box_::NONCEBYTES]);
@@ -63,11 +61,11 @@ pub fn verify_launcher_nonce(mut ipc_stream  : ::launcher::ipc_server::ipc_sessi
             asymm_pub_key.0[it.0] = it.1;
         }
 
-        group_send!(Ok(::launcher::ipc_server::ipc_session::events::event_data::AuthData {
+        send_one!(Ok(::launcher::ipc_server::ipc_session::events::event_data::AuthData {
             str_nonce    : handshake_request.data.launcher_string,
             asymm_nonce  : asymm_nonce,
             asymm_pub_key: asymm_pub_key,
-        }), &mut senders);
+        }), &event_sender);
 
         debug!("Exiting thread {:?}", NONCE_VERIFIER_THREAD_NAME);
     }));

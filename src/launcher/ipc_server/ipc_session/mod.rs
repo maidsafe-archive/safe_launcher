@@ -135,11 +135,7 @@ impl IpcSession {
         self.app_nonce = Some(auth_data.asymm_nonce);
         self.app_pub_key = Some(auth_data.asymm_pub_key);
 
-        self.ipc_server_event_sender.send(::launcher
-                                          ::ipc_server
-                                          ::events
-                                          ::IpcSessionEvent
-                                          ::VerifySession(Box::new((self.temp_id, auth_data.str_nonce))));
+        let _ = send_one!((self.temp_id, auth_data.str_nonce), &self.ipc_server_event_sender);
     }
 
     fn on_app_detail_received(&mut self, app_detail: Box<events::event_data::AppDetail>) {
@@ -203,16 +199,12 @@ impl IpcSession {
             ::launcher::ipc_server::events::event_data::SessionId::TempId(self.temp_id)
         };
 
-        let termination_detail = Box::new(::launcher::ipc_server::events::event_data::SessionTerminationDetail {
+        let termination_detail = ::launcher::ipc_server::events::event_data::SessionTerminationDetail {
             id    : id,
             reason: reason,
-        });
+        };
 
-        if let Err(err) = self.ipc_server_event_sender.send(::launcher
-                                                            ::ipc_server
-                                                            ::events
-                                                            ::IpcSessionEvent
-                                                            ::IpcSessionTerminated(termination_detail)) {
+        if let Err(err) = send_one!(termination_detail, &self.ipc_server_event_sender) {
             debug!("Error {:?} - Sending termination notice to server.", err);
         }
     }

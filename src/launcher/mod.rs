@@ -18,9 +18,14 @@
 mod parser;
 mod ipc_server;
 mod app_handler;
-mod observer_data;
 
-/// Launcher exposes API for managing applications
+/// A self-managed Launcher. This is a packet which will intilise and store the library state.
+/// Dropping this packet would be enough to gracefully exit the library by initiaing a domino
+/// effect via RAII.
+/// It is intended that the main thread be the owner of this. In order for multiple threads to tap
+/// into observer registration facility all that is need to be done is use one of the getters to
+/// event senders, clone it and distribute it to other threads. These event senders will help
+/// communicate with the core library in a completely asynchronous and thread safe manner.
 pub struct Launcher {
     _raii_joiners           : Vec<::safe_core::utility::RAIIThreadJoiner>,
     ipc_event_sender        : ipc_server::EventSenderToServer<ipc_server::events::ExternalEvent>,
@@ -28,9 +33,9 @@ pub struct Launcher {
 }
 
 impl Launcher {
-    /// Creates a new self-managed Launcher instance. This is basically a packet which will
-    /// intilise and store the library state. Dropping this packet would be enough to gracefully
-    /// exit the library by initiaing a domino effect via RAII.
+    /// Creates a new self-managed Launcher instance, which is a packet that will intilise and
+    /// store the library state. Dropping this packet would be enough to gracefully exit the
+    /// library by initiaing a domino effect via RAII.
     pub fn new(client: ::safe_core::client::Client) -> Result<Launcher, ::errors::LauncherError> {
         let client = ::std::sync::Arc::new(::std::sync::Mutex::new(client));
 
@@ -63,13 +68,13 @@ impl Launcher {
         })
     }
 
-    /// Talk to IPC Server, for e.g. to regiter an observer etc.
+    /// Event Sender to communicate with the IPC Server, for e.g. to regiter observers etc.
     pub fn get_ipc_event_sender(&self) -> &ipc_server::EventSenderToServer<ipc_server::events::ExternalEvent> {
         &self.ipc_event_sender
     }
 
-    /// Talk to App Handler, for e.g. to regiter an observer, add an app to Laucher, remove or
-    /// modify an already added app, etc.
+    /// Event Sender to communicate with the App Handler, for e.g. to regiter observers, add an app to
+    /// Laucher, remove or modify an already added app, etc.
     pub fn get_app_handler_event_sender(&self) -> &::std::sync::mpsc::Sender<app_handler::events::AppHandlerEvent> {
         &self.app_handler_event_sender
     }
@@ -92,9 +97,10 @@ mod tests {
 
     #[test]
     pub fn initialise_safe_drive_dir() {
-        let keyword = eval_result!(::safe_core::utility::generate_random_string(10));
         let pin = eval_result!(::safe_core::utility::generate_random_string(10));
+        let keyword = eval_result!(::safe_core::utility::generate_random_string(10));
         let password = eval_result!(::safe_core::utility::generate_random_string(10));
+
         let client = eval_result!(::safe_core::client::Client::create_account(keyword.clone(),
                                                                               pin.clone(),
                                                                               password.clone()));

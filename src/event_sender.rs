@@ -15,7 +15,6 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-#[derive(Clone)]
 pub struct EventSender<Category, EventSubset> {
     event_tx         : ::std::sync::mpsc::Sender<EventSubset>,
     event_category   : Category,
@@ -45,5 +44,21 @@ impl<Category   : ::std::fmt::Debug + Clone,
         }
 
         Ok(())
+    }
+}
+
+// (Spandan)
+// Needed to manually implement this since the attribute version (#[derive(Clone)]) seems to
+// require not only the field types but also the sub-types in the field types to be clonable
+// which is stupid because field like Sender<T> are clonable without requirement of T to be
+// clonable.
+impl<Category   : ::std::fmt::Debug + Clone,
+     EventSubset: ::std::fmt::Debug> Clone for EventSender<Category, EventSubset> {
+    fn clone(&self) -> Self {
+        EventSender {
+            event_tx         : self.event_tx.clone(),
+            event_category   : self.event_category.clone(),
+            event_category_tx: self.event_category_tx.clone(),
+        }
     }
 }
