@@ -134,7 +134,7 @@ impl ::std::fmt::Debug for LauncherError {
             LauncherError::IpcSessionTerminated(ref error)  => write!(f, "LauncherError::IpcSessionTerminated -> {:?}", error),
             LauncherError::FailedReadingStreamPayloadSize   => write!(f, "LauncherError::FailedReadingStreamPayloadSize"),
             LauncherError::FailedWritingStreamPayloadSize   => write!(f, "LauncherError::FailedWritingStreamPayloadSize"),
-            LauncherError::JsonParseError(ref error)        => write!(f, "LauncherError::JsonParseError -> {:?}", error),            
+            LauncherError::JsonParseError(ref error)        => write!(f, "LauncherError::JsonParseError -> {:?}", error),
             LauncherError::SpecificParseError(ref error)    => write!(f, "LauncherError::SpecificParseError -> {:?}", error),
             LauncherError::PathNotFound                     => write!(f, "LauncherError::PathNotFound"),
             LauncherError::InvalidPath                      => write!(f, "LauncherError::InvalidPath"),
