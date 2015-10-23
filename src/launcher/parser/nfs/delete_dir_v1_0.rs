@@ -32,12 +32,47 @@ impl ::launcher::parser::traits::Action for DeleteDir {
         let mut parent_dir = if self.is_path_shared {
             try!(dir_helper.get(&params.safe_drive_dir_key))
         } else {
-            try!(dir_helper.get_user_root_directory_listing())
+            try!(dir_helper.get(&params.app_root_dir_key))
         };
 
         let _ = try!(dir_helper.delete(&mut parent_dir,
                                        &dir_to_delete));
 
         Ok(None)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use ::launcher::parser::traits::Action;
+
+    #[test]
+    pub fn delete_dir() {
+        let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
+        let mut app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        let _ = eval_result!(dir_helper.create("test_dir".to_string(),
+                                               ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
+                                               Vec::new(),
+                                               false,
+                                               ::safe_nfs::AccessLevel::Private,
+                                               Some(&mut app_root_dir)));
+
+
+        let mut request = DeleteDir {
+            dir_path      : "/test_dir2".to_string(),
+            is_path_shared: false,
+        };
+        assert!(request.execute(parameter_packet.clone()).is_err());
+        app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        assert_eq!(app_root_dir.get_sub_directories().len(), 1);
+        assert!(app_root_dir.find_sub_directory(&"test_dir".to_string()).is_some());
+        request.dir_path = "/test_dir".to_string();
+        assert!(request.execute(parameter_packet.clone()).is_ok());
+        app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        assert_eq!(app_root_dir.get_sub_directories().len(), 0);
+        assert!(request.execute(parameter_packet.clone()).is_err());
     }
 }

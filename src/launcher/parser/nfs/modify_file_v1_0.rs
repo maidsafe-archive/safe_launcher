@@ -112,3 +112,125 @@ struct FileContentParams {
     pub offset   : u64,
     pub overwrite: bool,
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use ::launcher::parser::traits::Action;
+    use rustc_serialize::base64::ToBase64;
+
+    const TEST_FILE_NAME: &'static str = "test_file.txt";
+    const METADATA_BASE64: &'static str = "c2FtcGxlIHRleHQ=";
+
+    fn create_test_file(parameter_packet: &::launcher::parser::ParameterPacket) {
+        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(parameter_packet.client.clone());
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
+        let app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        let mut writer = eval_result!(file_helper.create(TEST_FILE_NAME.to_string(),
+                                                         Vec::new(),
+                                                         app_root_dir));
+        let _ = eval_result!(writer.close());
+    }
+
+    #[test]
+    pub fn file_rename() {
+        let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+
+        create_test_file(&parameter_packet);
+
+        let values = super::OptionalParams {
+            name         : Some("new_test_file.txt".to_string()),
+            content      : None,
+            user_metadata: None
+        };
+
+        let mut request = ModifyFile {
+            file_path     : format!("/{}", TEST_FILE_NAME),
+            new_values    : values,
+            is_path_shared: false,
+        };
+
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
+        let mut app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        assert_eq!(app_root_dir.get_files().len(), 1);
+        assert!(app_root_dir.find_file(&TEST_FILE_NAME.to_string()).is_some());
+        let app_root_dir_key = parameter_packet.app_root_dir_key.clone();
+        assert!(request.execute(parameter_packet).is_ok());
+        app_root_dir = eval_result!(dir_helper.get(&app_root_dir_key));
+        assert_eq!(app_root_dir.get_files().len(), 1);
+        assert!(app_root_dir.find_file(&TEST_FILE_NAME.to_string()).is_none());
+        assert!(app_root_dir.find_file(&"new_test_file.txt".to_string()).is_some());
+    }
+
+    #[test]
+    pub fn file_update_user_metadata() {
+        let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+
+        create_test_file(&parameter_packet);
+
+        let values = super::OptionalParams {
+            name         : None,
+            content      : None,
+            user_metadata: Some(METADATA_BASE64.to_string()),
+        };
+
+        let mut request = ModifyFile {
+            file_path     : format!("/{}", TEST_FILE_NAME),
+            new_values    : values,
+            is_path_shared: false,
+        };
+
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
+        let app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        let file = eval_option!(app_root_dir.find_file(&TEST_FILE_NAME.to_string()), "File not found");
+        assert_eq!(file.get_metadata().get_user_metadata().len(), 0);
+        let app_root_dir_key = parameter_packet.app_root_dir_key.clone();
+        assert!(request.execute(parameter_packet).is_ok());
+        let app_root_dir = eval_result!(dir_helper.get(&app_root_dir_key));
+        let file = eval_option!(app_root_dir.find_file(&TEST_FILE_NAME.to_string()), "File not found");
+        assert!(file.get_metadata().get_user_metadata().len() > 0);
+        assert_eq!(file.get_metadata().get_user_metadata().to_base64(::config::get_base64_config()), METADATA_BASE64.to_string());
+    }
+
+    #[test]
+    pub fn file_update_content() {
+        let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+
+        create_test_file(&parameter_packet);
+
+        let content = super::FileContentParams {
+            bytes    : METADATA_BASE64.to_string(),
+            offset   : 0,
+            overwrite: true,
+        };
+
+        let values = super::OptionalParams {
+            name         : None,
+            content      : Some(content),
+            user_metadata: None,
+        };
+
+        let mut request = ModifyFile {
+            file_path     : format!("/{}", TEST_FILE_NAME),
+            new_values    : values,
+            is_path_shared: false,
+        };
+
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
+        let app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        let file = eval_option!(app_root_dir.find_file(&TEST_FILE_NAME.to_string()), "File not found");
+        assert_eq!(file.get_metadata().get_size(), 0);
+        let app_root_dir_key = parameter_packet.app_root_dir_key.clone();
+        assert!(request.execute(parameter_packet.clone()).is_ok());
+        let app_root_dir = eval_result!(dir_helper.get(&app_root_dir_key));
+        let file = eval_option!(app_root_dir.find_file(&TEST_FILE_NAME.to_string()), "File not found");
+        let file_size = file.get_metadata().get_size();
+        assert!(file_size > 0);
+        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(parameter_packet.client.clone());
+        let mut reader = file_helper.read(file);
+        let size = reader.size();
+        assert_eq!(size, file_size);
+        let data = eval_result!(reader.read(0, size));
+        assert_eq!(data.to_base64(::config::get_base64_config()), METADATA_BASE64.to_string());
+    }
+}

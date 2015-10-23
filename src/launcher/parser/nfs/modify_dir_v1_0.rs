@@ -79,3 +79,81 @@ impl ::rustc_serialize::Decodable for OptionalParams {
         })
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use ::launcher::parser::traits::Action;
+    use rustc_serialize::base64::ToBase64;
+
+    const TEST_DIR_NAME: &'static str = "test_dir";
+    const METADATA_BASE64: &'static str = "c2FtcGxlIHRleHQ=";
+
+    fn create_test_dir(parameter_packet: &::launcher::parser::ParameterPacket) {
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
+        let mut app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        let _ = eval_result!(dir_helper.create(TEST_DIR_NAME.to_string(),
+                                               ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
+                                               Vec::new(),
+                                               false,
+                                               ::safe_nfs::AccessLevel::Private,
+                                               Some(&mut app_root_dir)));
+    }
+
+    #[test]
+    pub fn rename_dir() {
+        let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+
+        create_test_dir(&parameter_packet);
+
+        let values = super::OptionalParams {
+            name         : Some("new_test_dir".to_string()),
+            user_metadata: None
+        };
+
+        let mut request = ModifyDir {
+            dir_path      : format!("/{}", TEST_DIR_NAME),
+            new_values    : values,
+            is_path_shared: false,
+        };
+
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
+        let mut app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        assert_eq!(app_root_dir.get_sub_directories().len(), 1);
+        assert!(app_root_dir.find_sub_directory(&TEST_DIR_NAME.to_string()).is_some());
+        let app_root_dir_key = parameter_packet.app_root_dir_key.clone();
+        assert!(request.execute(parameter_packet).is_ok());
+        app_root_dir = eval_result!(dir_helper.get(&app_root_dir_key));
+        assert_eq!(app_root_dir.get_sub_directories().len(), 1);
+        assert!(app_root_dir.find_sub_directory(&TEST_DIR_NAME.to_string()).is_none());
+        assert!(app_root_dir.find_sub_directory(&"new_test_dir".to_string()).is_some());
+    }
+
+    #[test]
+    pub fn dir_update_user_metadata() {
+        let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+
+        create_test_dir(&parameter_packet);
+
+        let values = super::OptionalParams {
+            name         : None,
+            user_metadata: Some(METADATA_BASE64.to_string()),
+        };
+
+        let mut request = ModifyDir {
+            dir_path      : format!("/{}", TEST_DIR_NAME),
+            new_values    : values,
+            is_path_shared: false,
+        };
+
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
+        let app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        let directory_key = eval_option!(app_root_dir.find_sub_directory(&TEST_DIR_NAME.to_string()), "Directory not found").get_key();
+        let mut directory_to_modify = eval_result!(dir_helper.get(directory_key));
+        assert_eq!(directory_to_modify.get_metadata().get_user_metadata().len(), 0);
+        assert!(request.execute(parameter_packet).is_ok());
+        directory_to_modify = eval_result!(dir_helper.get(directory_key));
+        assert!(directory_to_modify.get_metadata().get_user_metadata().len() > 0);
+        assert_eq!(directory_to_modify.get_metadata().get_user_metadata().to_base64(::config::get_base64_config()), METADATA_BASE64.to_string());
+    }
+}

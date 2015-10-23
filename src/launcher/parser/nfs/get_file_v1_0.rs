@@ -57,9 +57,12 @@ impl ::launcher::parser::traits::Action for GetFile {
 
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(params.client);
         let mut reader = file_helper.read(&file);
-        let size = reader.size();
+        let mut size = self.length as u64;
+        if size == 0 {
+            size = reader.size();
+        };
         let response = GetFileResponse {
-            content : try!(reader.read(size, 0)).to_base64(::config::get_base64_config()),
+            content : try!(reader.read(self.offset as u64, size)).to_base64(::config::get_base64_config()),
             metadata: file_metadata,
         };
 
@@ -111,4 +114,45 @@ struct Metadata {
     creation_time_nsec    : i64,
     modification_time_sec : i64,
     modification_time_nsec: i64,
+}
+
+#[cfg(test)]
+mod test {
+    use ::launcher::parser::traits::Action;
+
+    const TEST_FILE_NAME: &'static str = "test_file.txt";
+
+    fn create_test_file(parameter_packet: &::launcher::parser::ParameterPacket) {
+        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(parameter_packet.client.clone());
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
+        let app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        let mut writer = eval_result!(file_helper.create(TEST_FILE_NAME.to_string(),
+                                                         Vec::new(),
+                                                         app_root_dir));
+        let data = vec![10u8; 20];
+        writer.write(&data[..], 0);
+        let _ = eval_result!(writer.close());
+    }
+
+
+    #[test]
+    pub fn get_file() {
+        let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+
+        create_test_file(&parameter_packet);
+
+        let mut request = super::GetFile {
+            offset          : 0,
+            length          : 0,
+            file_path       : format!("/{}", TEST_FILE_NAME),
+            is_path_shared  : false,
+            include_metadata: true,
+        };
+
+        assert!(eval_result!(request.execute(parameter_packet.clone())).is_some());
+
+        request.file_path = "/does_not_exixts".to_string();
+        assert!(request.execute(parameter_packet).is_err());
+    }
+
 }

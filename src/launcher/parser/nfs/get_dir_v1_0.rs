@@ -122,3 +122,41 @@ struct FileInfo {
     modification_time_sec : i64,
     modification_time_nsec: i64,
 }
+
+
+#[cfg(test)]
+mod test {
+    use ::launcher::parser::traits::Action;    
+
+    const TEST_DIR_NAME: &'static str = "test_dir";
+
+    fn create_test_dir(parameter_packet: &::launcher::parser::ParameterPacket) {
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
+        let mut app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        let _ = eval_result!(dir_helper.create(TEST_DIR_NAME.to_string(),
+                                               ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
+                                               Vec::new(),
+                                               false,
+                                               ::safe_nfs::AccessLevel::Private,
+                                               Some(&mut app_root_dir)));
+    }
+
+    #[test]
+    pub fn get_dir() {
+        let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+
+        create_test_dir(&parameter_packet);
+
+        let mut request = super::GetDir {
+            dir_path      : format!("/{}", TEST_DIR_NAME),
+            timeout_ms    : 1000,
+            is_path_shared: false,
+        };
+
+        assert!(eval_result!(request.execute(parameter_packet.clone())).is_some());
+
+        request.dir_path = "/does_not_exixts".to_string();
+        assert!(request.execute(parameter_packet).is_err());
+    }
+
+}
