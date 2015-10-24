@@ -39,16 +39,16 @@ impl ::launcher::parser::traits::Action for CreateFile {
         let mut tokens = ::launcher::parser::helper::tokenise_path(&self.file_path, false);
         let file_name = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
 
-        let mut file_directory = try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
-                                                                                         &tokens,
-                                                                                         Some(start_dir_key)));
+        let file_directory = try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
+                                                                                     &tokens,
+                                                                                     Some(start_dir_key)));
 
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(params.client);
         let bin_metadata = try!(parse_result!(self.user_metadata.from_base64(), "Failed Converting from Base64."));
 
-        let mut writer = try!(file_helper.create(file_name,
-                                                 bin_metadata,
-                                                 file_directory));
+        let writer = try!(file_helper.create(file_name,
+                                             bin_metadata,
+                                             file_directory));
         let _ = try!(writer.close());
 
         Ok(None)

@@ -24,8 +24,6 @@ pub struct GetDir {
 
 impl ::launcher::parser::traits::Action for GetDir {
     fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType {
-        use rustc_serialize::json::ToJson;
-
         if self.is_path_shared && !*eval_result!(params.safe_drive_access.lock()) {
             return Err(::errors::LauncherError::PermissionDenied)
         }
@@ -38,22 +36,25 @@ impl ::launcher::parser::traits::Action for GetDir {
 
         let tokens = ::launcher::parser::helper::tokenise_path(&self.dir_path, false);
         let dir_fetched = try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
-                                                                                      &tokens,
-                                                                                      Some(start_dir_key)));
+                                                                                  &tokens,
+                                                                                  Some(start_dir_key)));
         let dir_info = get_directory_info(dir_fetched.get_metadata());
         let mut sub_dirs: Vec<DirectoryInfo> = Vec::with_capacity(dir_fetched.get_sub_directories().len());
         for metadata in dir_fetched.get_sub_directories() {
             sub_dirs.push(get_directory_info(metadata));
         }
+
         let mut files: Vec<FileInfo> = Vec::with_capacity(dir_fetched.get_files().len());
         for file in dir_fetched.get_files() {
             files.push(get_file_info(file.get_metadata()));
         }
+
         let response = GetDirResponse {
             info           : dir_info,
             files          : files,
             sub_directories: sub_dirs,
         };
+
         Ok(Some(try!(::rustc_serialize::json::encode(&response))))
     }
 }

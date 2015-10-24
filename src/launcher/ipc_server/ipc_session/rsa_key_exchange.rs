@@ -15,8 +15,6 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-use rustc_serialize::json::ToJson;
-
 pub fn perform_key_exchange(ipc_stream : &mut ::launcher::ipc_server::ipc_session::stream::IpcStream,
                             app_nonce  : ::sodiumoxide::crypto::box_::Nonce,
                             app_pub_key: ::sodiumoxide::crypto::box_::PublicKey) -> Result<(::sodiumoxide::crypto::secretbox::Nonce,

@@ -15,6 +15,11 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+/// Events that can be communicated to the app-handling module.
+pub use self::app_handler::events::{AppHandlerEvent, event_data};
+/// Events that can be communicated to the IPC-handling module.
+pub use self::ipc_server::events::ExternalEvent as IpcExternalEvent;
+
 mod parser;
 mod ipc_server;
 mod app_handler;
@@ -22,14 +27,15 @@ mod app_handler;
 /// A self-managed Launcher. This is a packet which will intilise and store the library state.
 /// Dropping this packet would be enough to gracefully exit the library by initiaing a domino
 /// effect via RAII.
+///
 /// It is intended that the main thread be the owner of this. In order for multiple threads to tap
 /// into observer registration facility all that is need to be done is use one of the getters to
 /// event senders, clone it and distribute it to other threads. These event senders will help
 /// communicate with the core library in a completely asynchronous and thread safe manner.
 pub struct Launcher {
     _raii_joiners           : Vec<::safe_core::utility::RAIIThreadJoiner>,
-    ipc_event_sender        : ipc_server::EventSenderToServer<ipc_server::events::ExternalEvent>,
-    app_handler_event_sender: ::std::sync::mpsc::Sender<app_handler::events::AppHandlerEvent>,
+    ipc_event_sender        : ipc_server::EventSenderToServer<IpcExternalEvent>,
+    app_handler_event_sender: ::std::sync::mpsc::Sender<AppHandlerEvent>,
 }
 
 impl Launcher {
@@ -43,7 +49,6 @@ impl Launcher {
         let launcher_config_directory_name = ::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string();
 
         let directory_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(client.clone());
-        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(client.clone());
 
         // TODO(Krishna) also create empty launcher config file if it does not already exist
         let _ = try!(directory_helper.get_configuration_directory_listing(launcher_config_directory_name));
@@ -68,24 +73,24 @@ impl Launcher {
         })
     }
 
-    /// Event Sender to communicate with the IPC Server, for e.g. to regiter observers etc.
-    pub fn get_ipc_event_sender(&self) -> &ipc_server::EventSenderToServer<ipc_server::events::ExternalEvent> {
+    /// Event Sender to communicate with the IPC Server, for e.g. to register observers etc.
+    pub fn get_ipc_event_sender(&self) -> &ipc_server::EventSenderToServer<IpcExternalEvent> {
         &self.ipc_event_sender
     }
 
-    /// Event Sender to communicate with the App Handler, for e.g. to regiter observers, add an app to
-    /// Laucher, remove or modify an already added app, etc.
-    pub fn get_app_handler_event_sender(&self) -> &::std::sync::mpsc::Sender<app_handler::events::AppHandlerEvent> {
+    /// Event Sender to communicate with the App Handler, for e.g. to register observers, add an app
+    /// to Laucher, remove or modify an already added app, etc.
+    pub fn get_app_handler_event_sender(&self) -> &::std::sync::mpsc::Sender<AppHandlerEvent> {
         &self.app_handler_event_sender
     }
 }
 
 impl Drop for Launcher {
     fn drop(&mut self) {
-        if let Err(err) = self.ipc_event_sender.send(ipc_server::events::ExternalEvent::Terminate) {
+        if let Err(err) = self.ipc_event_sender.send(IpcExternalEvent::Terminate) {
             debug!("Error {:?} terminating IPC-Server - Probably already terminated.", err);
         }
-        if let Err(err) = self.app_handler_event_sender.send(app_handler::events::AppHandlerEvent::Terminate) {
+        if let Err(err) = self.app_handler_event_sender.send(AppHandlerEvent::Terminate) {
             debug!("Error {:?} terminating App-Handler - Probably already terminated.", err);
         }
     }

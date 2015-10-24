@@ -57,9 +57,9 @@ mod test {
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(parameter_packet.client.clone());
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
         let mut app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
-        let mut writer = eval_result!(file_helper.create("test_file.txt".to_string(),
-                                                         Vec::new(),
-                                                         app_root_dir));
+        let writer = eval_result!(file_helper.create("test_file.txt".to_string(),
+                                                     Vec::new(),
+                                                     app_root_dir));
         let _ = eval_result!(writer.close());
 
         let mut request = DeleteFile {

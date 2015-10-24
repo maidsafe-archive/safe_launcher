@@ -24,7 +24,6 @@ mod authenticate_app;
 mod rsa_key_exchange;
 mod secure_communication;
 
-const IPC_STREAM_THREAD_NAME: &'static str = "IpcStreamThread";
 const IPC_SESSION_THREAD_NAME: &'static str = "IpcSessionThread";
 
 pub struct IpcSession {
@@ -261,10 +260,7 @@ mod tests {
 
     impl ::rustc_serialize::json::ToJson for HandshakeRequest {
         fn to_json(&self) -> ::rustc_serialize::json::Json {
-            use ::rustc_serialize::base64::ToBase64;
-
             let mut tree = ::std::collections::BTreeMap::new();
-            let config = ::config::get_base64_config();
 
             assert!(tree.insert("endpoint".to_string(), self.endpoint.to_json()).is_none());
             assert!(tree.insert("data".to_string(), self.data.to_json()).is_none());
@@ -302,9 +298,9 @@ mod tests {
             safe_drive_access: false,
         };
         let activate_event = ::launcher::ipc_server::events::ExternalEvent::AppActivated(Box::new(activation_details));
-        event_sender.send(activate_event);
+        eval_result!(event_sender.send(activate_event));
 
-        let mut stream = eval_result!(::std::net::TcpStream::connect(&listener_ep[..]));
+        let stream = eval_result!(::std::net::TcpStream::connect(&listener_ep[..]));
 
         let _raii_joiner_1 = ::safe_core
                              ::utility
@@ -313,15 +309,13 @@ mod tests {
                                                 ::thread
                                                 ::Builder::new().name("AppHandshakeThread".to_string())
                                                                 .spawn(move || {
-                use rustc_serialize::base64::ToBase64;
-
                 let mut ipc_stream = eval_result!(::launcher
                                                   ::ipc_server
                                                   ::ipc_session
                                                   ::stream
                                                   ::IpcStream::new(stream));
                 let app_nonce = ::sodiumoxide::crypto::box_::gen_nonce();
-                let (app_public_key, app_seccret_key) = ::sodiumoxide::crypto::box_::gen_keypair();
+                let (app_public_key, _) = ::sodiumoxide::crypto::box_::gen_keypair();
                 let payload = HandshakePayload {
                     launcher_string      : "mock_nonce_string".to_string(),
                     nonce                : app_nonce.0,
@@ -333,9 +327,10 @@ mod tests {
                 };
 
                 let json_obj = request.to_json();
-                ipc_stream.write(json_obj.to_string().into_bytes());
+                eval_result!(ipc_stream.write(json_obj.to_string().into_bytes()));
 
-                let response = eval_result!(ipc_stream.read_payload());
+                // TODO(Krishna) -> use response
+                let _response = eval_result!(ipc_stream.read_payload());
                 assert!(ipc_stream.read_payload().is_err())
 
         })));
