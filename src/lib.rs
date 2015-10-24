@@ -59,4 +59,5 @@ pub mod errors;
 
 mod config;
 mod launcher;
+mod observer;
 mod event_sender;

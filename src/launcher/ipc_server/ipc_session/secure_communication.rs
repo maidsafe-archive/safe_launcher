@@ -18,10 +18,10 @@
 const SECURE_COMM_THREAD_NAME: &'static str = "SecureCommunicationThread";
 
 pub struct SecureCommunication {
-    observers        : Vec<::launcher::ipc_server::ipc_session::EventSenderToSession<::launcher
-                                                                                     ::ipc_server
-                                                                                     ::ipc_session
-                                                                                     ::events::SecureCommunicationEvent>>,
+    observer         : ::launcher::ipc_server::ipc_session::EventSenderToSession<::launcher
+                                                                                 ::ipc_server
+                                                                                 ::ipc_session
+                                                                                 ::events::SecureCommunicationEvent>,
     symm_key         : ::sodiumoxide::crypto::secretbox::Key,
     symm_nonce       : ::sodiumoxide::crypto::secretbox::Nonce,
     ipc_stream       : ::launcher::ipc_server::ipc_session::stream::IpcStream,
@@ -42,11 +42,13 @@ impl SecureCommunication {
         let joiner = eval_result!(::std::thread::Builder::new()
                                                          .name(SECURE_COMM_THREAD_NAME.to_string())
                                                          .spawn(move || {
-            let mut observers = vec![observer];
-
-            let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(client.clone());
-            // TODO(Spandan) this is wrong - Fix it in nfs to get safe_drive listing directly.
-            let safe_drive_dir_key = eval_send!(dir_helper.get_user_root_directory_listing(), &mut observers).get_key().clone();
+            let safe_drive_dir_key = {
+                let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(client.clone());
+                let user_root_dir_listing = eval_send_one!(dir_helper.get_user_root_directory_listing(), &observer);
+                eval_send_one!(user_root_dir_listing.find_sub_directory(&::config::SAFE_DRIVE_DIR_NAME.to_string())
+                                                    .ok_or(::errors::LauncherError::from("Could not find SAFEDrive")),
+                               &observer).get_key().clone()
+            };
 
             let parameter_packet = ::launcher::parser::ParameterPacket {
                 client            : client,
@@ -56,7 +58,7 @@ impl SecureCommunication {
             };
 
             let mut secure_comm_obj = SecureCommunication {
-                observers        : observers,
+                observer         : observer,
                 symm_key         : symm_key,
                 symm_nonce       : symm_nonce,
                 ipc_stream       : ipc_stream,
@@ -73,7 +75,7 @@ impl SecureCommunication {
 
     fn start(&mut self) {
         loop {
-            let cipher_text = eval_send!(self.ipc_stream.read_payload(), &mut self.observers);
+            let cipher_text = eval_send_one!(self.ipc_stream.read_payload(), &self.observer);
 
             match ::sodiumoxide::crypto::secretbox::open(&cipher_text, &self.symm_nonce, &self.symm_key) {
                 Ok(plain_text) => {
@@ -86,14 +88,14 @@ impl SecureCommunication {
                                         Ok(parser_response) => {
                                             if let Some(response_json_str) = parser_response {
                                                match self.get_encrypted_normal_response(&cipher_text, response_json_str) {
-                                                    Ok(response_cipher) => eval_send!(self.ipc_stream.write(response_cipher), &mut self.observers),
+                                                    Ok(response_cipher) => eval_send_one!(self.ipc_stream.write(response_cipher), &self.observer),
                                                     Err(err) => debug!("{:?} - Failed to construct a normal response for peer.", err),
                                                 }
                                             }
                                         },
                                         Err(err) => {
                                            match self.get_encrypted_error_response(&cipher_text, err) {
-                                                Ok(response_cipher) => eval_send!(self.ipc_stream.write(response_cipher), &mut self.observers),
+                                                Ok(response_cipher) => eval_send_one!(self.ipc_stream.write(response_cipher), &self.observer),
                                                 Err(err) => debug!("{:?} - Failed to construct a response error for peer.", err),
                                             }
                                         },
@@ -101,7 +103,7 @@ impl SecureCommunication {
                                 },
                                 Err(err) => {
                                    match self.get_encrypted_error_response(&cipher_text, ::errors::LauncherError::from(err)) {
-                                        Ok(response_cipher) => eval_send!(self.ipc_stream.write(response_cipher), &mut self.observers),
+                                        Ok(response_cipher) => eval_send_one!(self.ipc_stream.write(response_cipher), &self.observer),
                                         Err(err) => debug!("{:?} - Failed to construct a response error for peer.", err),
                                     }
                                 },
@@ -109,7 +111,7 @@ impl SecureCommunication {
                         },
                         Err(err) => {
                             match self.get_encrypted_error_response(&cipher_text, err) {
-                                Ok(response_cipher) => eval_send!(self.ipc_stream.write(response_cipher), &mut self.observers),
+                                Ok(response_cipher) => eval_send_one!(self.ipc_stream.write(response_cipher), &self.observer),
                                 Err(err) => debug!("{:?} - Failed to construct a response error for peer.", err),
                             }
                         },
@@ -117,7 +119,7 @@ impl SecureCommunication {
                 },
                 Err(()) => {
                     match self.get_encrypted_error_response(&cipher_text, ::errors::LauncherError::SymmetricDecipherFailure) {
-                        Ok(response_cipher) => eval_send!(self.ipc_stream.write(response_cipher), &mut self.observers),
+                        Ok(response_cipher) => eval_send_one!(self.ipc_stream.write(response_cipher), &self.observer),
                         Err(err) => debug!("{:?} - Failed to construct a response error for peer.", err),
                     }
                 },

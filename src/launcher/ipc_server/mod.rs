@@ -28,19 +28,22 @@ const LISTENER_THIRD_OCTATE_START: u8 = 0;
 const LISTENER_FOURTH_OCTATE_START: u8 = 1;
 
 pub struct IpcServer {
-    client               : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-    temp_id              : u32,
-    _raii_joiner         : ::safe_core::utility::RAIIThreadJoiner,
-    session_event_tx     : ::std::sync::mpsc::Sender<events::IpcSessionEvent>,
-    session_event_rx     : ::std::sync::mpsc::Receiver<events::IpcSessionEvent>,
-    listener_event_rx    : ::std::sync::mpsc::Receiver<events::IpcListenerEvent>,
-    external_event_rx    : ::std::sync::mpsc::Receiver<events::ExternalEvent>,
-    event_catagory_tx    : ::std::sync::mpsc::Sender<events::IpcServerEventCategory>,
-    listener_endpoint    : String,
-    listener_stop_flag   : ::std::sync::Arc<::std::sync::atomic::AtomicBool>,
-    verified_sessions    : ::std::collections::HashMap<::routing::NameType, misc::SessionInfo>,
-    unverified_sessions  : ::std::collections::HashMap<u32, misc::SessionInfo>,
-    pending_verifications: ::std::collections::HashMap<String, misc::AppInfo>,
+    client                        : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+    temp_id                       : u32,
+    _raii_joiner                  : ::safe_core::utility::RAIIThreadJoiner,
+    session_event_tx              : ::std::sync::mpsc::Sender<events::IpcSessionEvent>,
+    session_event_rx              : ::std::sync::mpsc::Receiver<events::IpcSessionEvent>,
+    listener_event_rx             : ::std::sync::mpsc::Receiver<events::IpcListenerEvent>,
+    external_event_rx             : ::std::sync::mpsc::Receiver<events::ExternalEvent>,
+    event_catagory_tx             : ::std::sync::mpsc::Sender<events::IpcServerEventCategory>,
+    listener_endpoint             : String,
+    listener_stop_flag            : ::std::sync::Arc<::std::sync::atomic::AtomicBool>,
+    verified_sessions             : ::std::collections::HashMap<::routing::NameType, misc::SessionInfo>,
+    unverified_sessions           : ::std::collections::HashMap<u32, misc::SessionInfo>,
+    pending_verifications         : ::std::collections::HashMap<String, misc::AppInfo>,
+    verified_session_observers    : Vec<::observer::IpcObserver>,
+    unverified_session_observers  : Vec<::observer::IpcObserver>,
+    pending_verification_observers: Vec<::observer::IpcObserver>,
 }
 
 impl IpcServer {
@@ -53,7 +56,6 @@ impl IpcServer {
         let (event_catagory_tx, event_catagory_rx) = ::std::sync::mpsc::channel();
 
         let stop_flag = ::std::sync::Arc::new(::std::sync::atomic::AtomicBool::new(false));
-
         let listener_event_sender = EventSenderToServer::<events::IpcListenerEvent>
                                                        ::new(listener_event_tx,
                                                              events::IpcServerEventCategory::IpcListenerEvent,
@@ -61,26 +63,32 @@ impl IpcServer {
 
         let (joiner, endpoint) = try!(IpcServer::spawn_acceptor(listener_event_sender,
                                                                 stop_flag.clone()));
-
-        let ipc_server = IpcServer {
-            client               : client,
-            temp_id              : 0,
-            _raii_joiner         : joiner,
-            session_event_tx     : session_event_tx,
-            session_event_rx     : session_event_rx,
-            listener_event_rx    : listener_event_rx,
-            external_event_rx    : external_event_rx,
-            event_catagory_tx    : event_catagory_tx.clone(),
-            listener_endpoint    : endpoint,
-            listener_stop_flag   : stop_flag,
-            verified_sessions    : ::std::collections::HashMap::new(),
-            unverified_sessions  : ::std::collections::HashMap::new(),
-            pending_verifications: ::std::collections::HashMap::new(),
-        };
+        let cloned_event_catagory_tx = event_catagory_tx.clone();
 
         let ipc_server_joiner = eval_result!(::std::thread::Builder::new().name(IPC_SERVER_THREAD_NAME.to_string())
                                                                           .spawn(move || {
-            IpcServer::activate_ipc_server(ipc_server, event_catagory_rx);
+
+            let mut ipc_server = IpcServer {
+                client                        : client,
+                temp_id                       : 0,
+                _raii_joiner                  : joiner,
+                session_event_tx              : session_event_tx,
+                session_event_rx              : session_event_rx,
+                listener_event_rx             : listener_event_rx,
+                external_event_rx             : external_event_rx,
+                event_catagory_tx             : cloned_event_catagory_tx,
+                listener_endpoint             : endpoint,
+                listener_stop_flag            : stop_flag,
+                verified_sessions             : ::std::collections::HashMap::new(),
+                unverified_sessions           : ::std::collections::HashMap::new(),
+                pending_verifications         : ::std::collections::HashMap::new(),
+                verified_session_observers    : Vec::with_capacity(2),
+                unverified_session_observers  : Vec::with_capacity(2),
+                pending_verification_observers: Vec::with_capacity(2),
+            };
+
+            ipc_server.run(event_catagory_rx);
+
             debug!("Exiting Thread {:?}", IPC_SERVER_THREAD_NAME);
         }));
 
@@ -92,31 +100,34 @@ impl IpcServer {
         Ok((::safe_core::utility::RAIIThreadJoiner::new(ipc_server_joiner), external_event_sender))
     }
 
-    fn activate_ipc_server(mut ipc_server: IpcServer, event_catagory_rx: ::std::sync::mpsc::Receiver<events::IpcServerEventCategory>) {
+    fn run(&mut self, event_catagory_rx: ::std::sync::mpsc::Receiver<events::IpcServerEventCategory>) {
         for event_category in event_catagory_rx.iter() {
             match event_category {
                 events::IpcServerEventCategory::IpcListenerEvent => {
-                    if let Ok(listner_event) = ipc_server.listener_event_rx.try_recv() {
+                    if let Ok(listner_event) = self.listener_event_rx.try_recv() {
                         match listner_event {
-                           events::IpcListenerEvent::IpcListenerAborted(error)   => ipc_server.on_ipc_listener_aborted(error),
-                           events::IpcListenerEvent::SpawnIpcSession(tcp_stream) => ipc_server.on_spawn_ipc_session(tcp_stream),
+                           events::IpcListenerEvent::IpcListenerAborted(error)   => self.on_ipc_listener_aborted(error),
+                           events::IpcListenerEvent::SpawnIpcSession(tcp_stream) => self.on_spawn_ipc_session(tcp_stream),
                         }
                     }
                 },
                 events::IpcServerEventCategory::IpcSessionEvent => {
-                    if let Ok(session_event) = ipc_server.session_event_rx.try_recv() {
+                    if let Ok(session_event) = self.session_event_rx.try_recv() {
                         match session_event {
-                            events::IpcSessionEvent::VerifySession(detail) => ipc_server.on_verify_session(detail),
-                            events::IpcSessionEvent::IpcSessionTerminated(detail) => ipc_server.on_ipc_session_terminated(detail),
+                            events::IpcSessionEvent::VerifySession(detail)        => self.on_verify_session(detail),
+                            events::IpcSessionEvent::IpcSessionTerminated(detail) => self.on_ipc_session_terminated(detail),
                         }
                     }
                 },
                 events::IpcServerEventCategory::ExternalEvent => {
-                    if let Ok(external_event) = ipc_server.external_event_rx.try_recv() {
+                    if let Ok(external_event) = self.external_event_rx.try_recv() {
                         match external_event {
-                            events::ExternalEvent::AppActivated(activation_detail) => ipc_server.on_app_activated(activation_detail),
-                            events::ExternalEvent::ChangeSafeDriveAccess(app_id, is_allowed) => ipc_server.on_change_safe_drive_access(app_id, is_allowed),
-                            events::ExternalEvent::GetListenerEndpoint(sender) => ipc_server.on_get_listener_endpoint(sender),
+                            events::ExternalEvent::GetListenerEndpoint(sender)               => self.on_get_listener_endpoint(sender),
+                            events::ExternalEvent::AppActivated(activation_detail)           => self.on_app_activated(activation_detail),
+                            events::ExternalEvent::ChangeSafeDriveAccess(app_id, is_allowed) => self.on_change_safe_drive_access(app_id, is_allowed),
+                            events::ExternalEvent::RegisterVerifiedSessionObserver(obs)      => self.on_register_verified_session_observer(obs),
+                            events::ExternalEvent::RegisterUnverifiedSessionObserver(obs)    => self.on_register_unverified_session_observer(obs),
+                            events::ExternalEvent::RegisterPendingVerificationObserver(obs)  => self.on_register_pending_verification_observer(obs),
                             events::ExternalEvent::Terminate => break,
                         }
                     }
@@ -137,7 +148,13 @@ impl IpcServer {
                 if let Some(_) = self.unverified_sessions.insert(self.temp_id,
                                                                  misc::SessionInfo::new(raii_joiner,
                                                                                         event_sender)) {
-                    debug!("Unverified session existed even after all temporary ids are exhausted. Terminating session ...");
+                    debug!("Unverified session existed even after all temporary ids are exhausted. Terminating that session ...");
+                } else {
+                    let data = ::observer::event_data::UnverifiedSession {
+                        id    : self.temp_id,
+                        action: ::observer::event_data::Action::Added,
+                    };
+                    group_send!(data, &mut self.unverified_session_observers);
                 }
             },
             Err(err) => debug!("IPC Session spawning failed for peer {:?}", err),
@@ -154,44 +171,83 @@ impl IpcServer {
 
         match (self.unverified_sessions.remove(&temp_id), self.pending_verifications.remove(&nonce)) {
             (Some(session_info), Some(app_info)) => {
-                let app_detail = Box::new(ipc_session::events::event_data::AppDetail {
+                let app_detail = ipc_session::events::event_data::AppDetail {
                     client           : self.client.clone(),
                     app_id           : app_info.app_id.clone(),
                     app_root_dir_key : app_info.app_root_dir_key,
                     safe_drive_access: app_info.safe_drive_access,
-                });
+                };
 
-                if session_info.event_sender.send(ipc_session::events::ExternalEvent::AppDetailReceived(app_detail)).is_err() {
+                if send_one!(app_detail, &session_info.event_sender).is_err() {
                     debug!("Unable to communicate with the session via channel. Session will be terminated.");
-                } else if let Some(_) = self.verified_sessions.insert(app_info.app_id, session_info) {
+                } else if let Some(_) = self.verified_sessions.insert(app_info.app_id.clone(), session_info) {
                     debug!("Detected an attempt by an app to connect twice. Previous instance will be terminated.");
+                } else {
+                    let data = ::observer::event_data::VerifiedSession {
+                        id    : app_info.app_id,
+                        action: ::observer::event_data::Action::Added,
+                    };
+                    group_send!(data, &mut self.verified_session_observers);
                 }
             },
             _ => debug!("Temp Id {:?} and/or Nonce {:?} invalid. Possible security breach - situation salvaged.",
                         temp_id, nonce),
         }
+
+        let data = ::observer::event_data::UnverifiedSession {
+            id    : temp_id,
+            action: ::observer::event_data::Action::Removed(None),
+        };
+        group_send!(data, &mut self.unverified_session_observers);
+
+        let data = ::observer::event_data::PendingVerification {
+            nonce : nonce,
+            action: ::observer::event_data::Action::Removed(None),
+        };
+        group_send!(data, &mut self.pending_verification_observers);
     }
 
     fn on_ipc_session_terminated(&mut self, detail: Box<events::event_data::SessionTerminationDetail>) {
         let detail = *detail;
 
-        let _ = match detail.id {
-            events::event_data::SessionId::AppId(app_id)   => self.verified_sessions.remove(&*app_id),
-            events::event_data::SessionId::TempId(temp_id) => self.unverified_sessions.remove(&temp_id),
-        };
+        match detail.id {
+            events::event_data::SessionId::AppId(app_id) => {
+                let _ = self.verified_sessions.remove(&*app_id);
 
-        debug!("IPC Server terminating session due to: {:?}", detail.reason);
+                let data = ::observer::event_data::VerifiedSession {
+                    id    : *app_id,
+                    action: ::observer::event_data::Action::Removed(Some(detail.reason)),
+                };
+                group_send!(data, &mut self.verified_session_observers);
+            },
+            events::event_data::SessionId::TempId(temp_id) => {
+                let _ = self.unverified_sessions.remove(&temp_id);
+
+                let data = ::observer::event_data::UnverifiedSession {
+                    id    : temp_id,
+                    action: ::observer::event_data::Action::Removed(Some(detail.reason)),
+                };
+                group_send!(data, &mut self.unverified_session_observers);
+            },
+        };
     }
 
     fn on_app_activated(&mut self, activation_detail: Box<events::event_data::ActivationDetail>) {
         let detail = *activation_detail;
-        if let Some(info) = self.pending_verifications.insert(detail.nonce,
+        if let Some(info) = self.pending_verifications.insert(detail.nonce.clone(),
                                                               misc::AppInfo::new(detail.app_id,
                                                                                  detail.app_root_dir_key,
                                                                                  detail.safe_drive_access)) {
             // TODO(Spandan) handle this security hole.
             debug!("Same nonce was already given to an app pending verification. This is a security hole not fixed in this iteration.");
+            debug!("Issues like mixed-up safe drive access could arise.");
             debug!("Dropping the previous app information and re-assigning nonce to a new app");
+        } else {
+            let data = ::observer::event_data::PendingVerification {
+                nonce : detail.nonce,
+                action: ::observer::event_data::Action::Added,
+            };
+            group_send!(data, &mut self.pending_verification_observers);
         }
     }
 
@@ -215,6 +271,12 @@ impl IpcServer {
 
         if send_failed {
             let _ = self.verified_sessions.remove(&app_id);
+
+            let data = ::observer::event_data::VerifiedSession {
+                id    : app_id,
+                action: ::observer::event_data::Action::Removed(Some(::errors::LauncherError::ReceiverChannelDisconnected)),
+            };
+            group_send!(data, &mut self.verified_session_observers);
         }
     }
 
@@ -222,6 +284,18 @@ impl IpcServer {
         if let Err(err) = sender.send(self.listener_endpoint.clone()) {
             debug!("Error Sending Endpoint: {:?}", err);
         }
+    }
+
+    fn on_register_verified_session_observer(&mut self, observer: ::observer::IpcObserver) {
+        self.verified_session_observers.push(observer);
+    }
+
+    fn on_register_unverified_session_observer(&mut self, observer: ::observer::IpcObserver) {
+        self.unverified_session_observers.push(observer);
+    }
+
+    fn on_register_pending_verification_observer(&mut self, observer: ::observer::IpcObserver) {
+        self.pending_verification_observers.push(observer);
     }
 
     fn spawn_acceptor(event_sender: EventSenderToServer<events::IpcListenerEvent>,

@@ -50,7 +50,7 @@ pub fn perform_key_exchange(ipc_stream : &mut ::launcher::ipc_server::ipc_sessio
       data: response,
     };
 
-    let payload = try!(::rustc_serialize::json::encode(&json_packet).map_err(|e| ::errors::LauncherError::JsonEncodeError(e)));
+    let payload = try!(::rustc_serialize::json::encode(&json_packet));
 
     try!(ipc_stream.write(payload.into_bytes()));
 
