@@ -49,41 +49,45 @@ impl IpcSession {
                stream             : ::std::net::TcpStream) -> Result<(::safe_core::utility::RAIIThreadJoiner,
                                                                       EventSenderToSession<events::ExternalEvent>),
                                                                      ::errors::LauncherError> {
+        let ipc_stream = try!(stream::IpcStream::new(try!(stream.try_clone()
+                                                                .map_err(|err| ::errors
+                                                                               ::LauncherError
+                                                                               ::IpcStreamCloneError(err)))));
+
         let (event_catagory_tx, event_catagory_rx) = ::std::sync::mpsc::channel();
         let (external_event_tx, external_event_rx) = ::std::sync::mpsc::channel();
         let (secure_comm_event_tx, secure_comm_event_rx) = ::std::sync::mpsc::channel();
         let (authentication_event_tx, authentication_event_rx) = ::std::sync::mpsc::channel();
 
-        let authentication_event_sender = EventSenderToSession::<events::AppAuthenticationEvent>
-                                                              ::new(authentication_event_tx,
-                                                                    events::IpcSessionEventCategory::AppAuthenticationEvent,
-                                                                    event_catagory_tx.clone());
-
-        let ipc_stream = try!(stream::IpcStream::new(try!(stream.try_clone()
-                                                                .map_err(|err| ::errors
-                                                                               ::LauncherError
-                                                                               ::IpcStreamCloneError(err)))));
-        let joiner = authenticate_app::verify_launcher_nonce(ipc_stream, authentication_event_sender);
-
-        let ipc_session = IpcSession {
-            app_id                 : None,
-            temp_id                : temp_id,
-            stream                 : stream,
-            app_nonce              : None,
-            app_pub_key            : None,
-            raii_joiner            : joiner,
-            safe_drive_access      : None,
-            event_catagory_tx      : event_catagory_tx.clone(),
-            external_event_rx      : external_event_rx,
-            secure_comm_event_rx   : secure_comm_event_rx,
-            secure_comm_event_tx   : secure_comm_event_tx,
-            authentication_event_rx: authentication_event_rx,
-            ipc_server_event_sender: server_event_sender,
-        };
+        let cloned_event_catagory_tx = event_catagory_tx.clone();
 
         let ipc_session_joiner = eval_result!(::std::thread::Builder::new().name(IPC_SESSION_THREAD_NAME.to_string())
                                                                            .spawn(move || {
-            IpcSession::activate_ipc_session(ipc_session, event_catagory_rx);
+            let authentication_event_sender = EventSenderToSession::<events::AppAuthenticationEvent>
+                                                                  ::new(authentication_event_tx,
+                                                                        events::IpcSessionEventCategory::AppAuthenticationEvent,
+                                                                        cloned_event_catagory_tx.clone());
+
+            let joiner = authenticate_app::verify_launcher_nonce(ipc_stream, authentication_event_sender);
+
+            let mut ipc_session = IpcSession {
+                app_id                 : None,
+                temp_id                : temp_id,
+                stream                 : stream,
+                app_nonce              : None,
+                app_pub_key            : None,
+                raii_joiner            : joiner,
+                safe_drive_access      : None,
+                event_catagory_tx      : cloned_event_catagory_tx,
+                external_event_rx      : external_event_rx,
+                secure_comm_event_rx   : secure_comm_event_rx,
+                secure_comm_event_tx   : secure_comm_event_tx,
+                authentication_event_rx: authentication_event_rx,
+                ipc_server_event_sender: server_event_sender,
+            };
+
+            ipc_session.run(event_catagory_rx);
+
             debug!("Exiting Thread {:?}", IPC_SESSION_THREAD_NAME);
         }));
 
@@ -95,30 +99,30 @@ impl IpcSession {
         Ok((::safe_core::utility::RAIIThreadJoiner::new(ipc_session_joiner), external_event_sender))
     }
 
-    fn activate_ipc_session(mut ipc_session: IpcSession, event_catagory_rx: ::std::sync::mpsc::Receiver<events::IpcSessionEventCategory>) {
+    fn run(&mut self, event_catagory_rx: ::std::sync::mpsc::Receiver<events::IpcSessionEventCategory>) {
         for event_category in event_catagory_rx.iter() {
             match event_category {
                 events::IpcSessionEventCategory::AppAuthenticationEvent => {
-                    if let Ok(authentication_event) = ipc_session.authentication_event_rx.try_recv() {
+                    if let Ok(authentication_event) = self.authentication_event_rx.try_recv() {
                         match authentication_event {
-                            Ok(auth_data) => ipc_session.on_auth_data_received(auth_data),
-                            Err(err)      => ipc_session.terminate_session(err),
+                            Ok(auth_data) => self.on_auth_data_received(auth_data),
+                            Err(err)      => self.terminate_session(err),
                         }
                     }
                 },
                 events::IpcSessionEventCategory::SecureCommunicationEvent => {
-                    if let Ok(secure_comm_event) = ipc_session.secure_comm_event_rx.try_recv() {
+                    if let Ok(secure_comm_event) = self.secure_comm_event_rx.try_recv() {
                         match secure_comm_event {
                             Ok(())   => (),
-                            Err(err) => ipc_session.terminate_session(err),
+                            Err(err) => self.terminate_session(err),
                         }
                     }
                 },
                 events::IpcSessionEventCategory::ExternalEvent => {
-                    if let Ok(external_event) = ipc_session.external_event_rx.try_recv() {
+                    if let Ok(external_event) = self.external_event_rx.try_recv() {
                         match external_event {
-                            events::ExternalEvent::AppDetailReceived(app_detail) => ipc_session.on_app_detail_received(app_detail),
-                            events::ExternalEvent::ChangeSafeDriveAccess(is_allowed) => ipc_session.on_change_safe_drive_access(is_allowed),
+                            events::ExternalEvent::AppDetailReceived(app_detail)     => self.on_app_detail_received(app_detail),
+                            events::ExternalEvent::ChangeSafeDriveAccess(is_allowed) => self.on_change_safe_drive_access(is_allowed),
                             events::ExternalEvent::Terminate => break,
                         }
                     }
@@ -131,11 +135,7 @@ impl IpcSession {
         self.app_nonce = Some(auth_data.asymm_nonce);
         self.app_pub_key = Some(auth_data.asymm_pub_key);
 
-        self.ipc_server_event_sender.send(::launcher
-                                          ::ipc_server
-                                          ::events
-                                          ::IpcSessionEvent
-                                          ::VerifySession(Box::new((self.temp_id, auth_data.str_nonce))));
+        let _ = send_one!((self.temp_id, auth_data.str_nonce), &self.ipc_server_event_sender);
     }
 
     fn on_app_detail_received(&mut self, app_detail: Box<events::event_data::AppDetail>) {
@@ -199,16 +199,12 @@ impl IpcSession {
             ::launcher::ipc_server::events::event_data::SessionId::TempId(self.temp_id)
         };
 
-        let termination_detail = Box::new(::launcher::ipc_server::events::event_data::SessionTerminationDetail {
+        let termination_detail = ::launcher::ipc_server::events::event_data::SessionTerminationDetail {
             id    : id,
             reason: reason,
-        });
+        };
 
-        if let Err(err) = self.ipc_server_event_sender.send(::launcher
-                                                            ::ipc_server
-                                                            ::events
-                                                            ::IpcSessionEvent
-                                                            ::IpcSessionTerminated(termination_detail)) {
+        if let Err(err) = send_one!(termination_detail, &self.ipc_server_event_sender) {
             debug!("Error {:?} - Sending termination notice to server.", err);
         }
     }
@@ -255,8 +251,8 @@ mod tests {
             let base64_pub_encryption_key = (&self.public_encryption_key).to_base64(config);
 
             assert!(tree.insert("launcher_string".to_string(), self.launcher_string.to_json()).is_none());
-            assert!(tree.insert("nonce".to_string(), base64_nonce.to_json()).is_none());
-            assert!(tree.insert("public_encryption_key".to_string(), base64_pub_encryption_key.to_json()).is_none());
+            assert!(tree.insert("asymm_nonce".to_string(), base64_nonce.to_json()).is_none());
+            assert!(tree.insert("asymm_pub_key".to_string(), base64_pub_encryption_key.to_json()).is_none());
 
             ::rustc_serialize::json::Json::Object(tree)
         }
@@ -315,7 +311,7 @@ mod tests {
                              ::RAIIThreadJoiner
                              ::new(eval_result!(::std
                                                 ::thread
-                                                ::Builder::new().name("TCPClientThread".to_string())
+                                                ::Builder::new().name("AppHandshakeThread".to_string())
                                                                 .spawn(move || {
                 use rustc_serialize::base64::ToBase64;
 
@@ -343,6 +339,7 @@ mod tests {
                 assert!(ipc_stream.read_payload().is_err())
 
         })));
+
         ::std::thread::sleep_ms(3000);
         eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::Terminate));
     }

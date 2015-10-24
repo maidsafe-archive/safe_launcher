@@ -15,18 +15,34 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-#[derive(Debug, Clone)]
 pub enum AppHandlerEvent {
-    AddApp(Box<event_data::AppDetail>),
-    RemoveApp(Box<::routing::NameType>),
-    ActivateApp(Box<::routing::NameType>),
+    AddApp(event_data::AppDetail),
+    RemoveApp(::routing::NameType),
+    ActivateApp(::routing::NameType),
+    RegisterAppAddObserver(::observer::AppHandlerObserver),
+    RegisterAppRemoveObserver(::observer::AppHandlerObserver),
+    GetAllManagedApps(::std::sync::mpsc::Sender<Vec<event_data::ManagedApp>>),
     Terminate,
+}
+
+impl ::std::fmt::Debug for AppHandlerEvent {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        write!(f, "{:?}", *self)
+    }
 }
 
 pub mod event_data {
     #[derive(Debug, Clone)]
     pub struct AppDetail {
         pub absolute_path    : String,
+        pub safe_drive_access: bool,
+    }
+
+    #[derive(Debug, Clone)]
+    pub struct ManagedApp {
+        pub id               : ::routing::NameType,
+        pub local_path       : Option<String>,
+        pub reference_count  : u32,
         pub safe_drive_access: bool,
     }
 }
