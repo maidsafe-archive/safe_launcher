@@ -51,3 +51,45 @@ impl ::launcher::parser::traits::Action for AddService {
        Ok(None)
     }
 }
+
+/* TODO test is failing because Addservice is nevere returning any response. Hangs at line 46.
+#[cfg(test)]
+mod test {
+    use super::*;
+    use ::launcher::parser::traits::Action;
+
+    const TEST_DIR_NAME: &'static str = "test_dir";
+
+    #[test]
+    pub fn add_dns_service() {
+        let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
+        let mut app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        let _ = eval_result!(dir_helper.create(TEST_DIR_NAME.to_string(),
+                                               ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
+                                               Vec::new(),
+                                               false,
+                                               ::safe_nfs::AccessLevel::Public,
+                                               Some(&mut app_root_dir)));
+
+
+        let mut register_request = ::launcher::parser::dns::register_dns_v1_0::RegisterDns {
+            long_name            : "test2.com".to_string(),
+            service_name         : "www".to_string(),
+            is_path_shared       : false,
+            service_home_dir_path: format!("/{}", TEST_DIR_NAME).to_string(),
+        };
+        assert!(register_request.execute(parameter_packet.clone()).is_ok());
+
+        let mut request = AddService {
+            long_name            : "test2.com".to_string(),
+            service_name         : "blog".to_string(),
+            is_path_shared       : false,
+            service_home_dir_path: format!("/{}", TEST_DIR_NAME).to_string(),
+        };
+
+        assert!(request.execute(parameter_packet).is_ok());
+    }
+}
+*/

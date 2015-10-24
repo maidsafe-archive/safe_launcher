@@ -57,3 +57,37 @@ impl ::launcher::parser::traits::Action for RegisterDns {
        Ok(None)
     }
 }
+
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use ::launcher::parser::traits::Action;
+
+    const TEST_DIR_NAME: &'static str = "test_dir";
+
+    #[test]
+    pub fn register_dns() {
+        let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
+        let mut app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        let _ = eval_result!(dir_helper.create(TEST_DIR_NAME.to_string(),
+                                               ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
+                                               Vec::new(),
+                                               false,
+                                               ::safe_nfs::AccessLevel::Public,
+                                               Some(&mut app_root_dir)));
+
+
+        let mut request = RegisterDns {
+            long_name            : "test.com".to_string(),
+            service_name         : "www".to_string(),
+            is_path_shared       : false,
+            service_home_dir_path: "/test_dir2".to_string(),
+        };
+        assert!(request.execute(parameter_packet.clone()).is_err());
+        request.service_home_dir_path = format!("/{}", TEST_DIR_NAME);
+        assert!(request.execute(parameter_packet).is_ok());
+    }
+}

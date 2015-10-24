@@ -28,12 +28,15 @@ pub struct GetFile {
 
 impl ::launcher::parser::traits::Action for GetFile {
     fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType {
+        use rustc_serialize::json::ToJson;
+        use rustc_serialize::base64::ToBase64;
+
         if self.is_path_shared && !*eval_result!(params.safe_drive_access.lock()) {
             return Err(::errors::LauncherError::PermissionDenied)
         }
 
         let mut tokens = ::launcher::parser::helper::tokenise_path(&self.file_path, false);
-        let file_to_get = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
+        let file_name = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
 
         let start_dir_key = if self.is_path_shared {
             &params.safe_drive_dir_key
@@ -41,13 +44,45 @@ impl ::launcher::parser::traits::Action for GetFile {
             &params.app_root_dir_key
         };
 
-        let parent_sub_dir = try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
-                                                                                     &tokens,
-                                                                                     Some(start_dir_key)));
+        let file_dir = try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
+                                                                               &tokens,
+                                                                               Some(start_dir_key)));
+        let file = try!(file_dir.find_file(&file_name).ok_or(::errors::LauncherError::InvalidPath));
 
-        unimplemented!();
+        let file_metadata = if self.include_metadata {
+            Some(get_file_metadata(file.get_metadata()))
+        } else {
+            None
+        };
 
-        Ok(None)
+        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(params.client);
+        let mut reader = file_helper.read(&file);
+        let mut size = self.length as u64;
+        if size == 0 {
+            size = reader.size();
+        };
+        let response = GetFileResponse {
+            content : try!(reader.read(self.offset as u64, size)).to_base64(::config::get_base64_config()),
+            metadata: file_metadata,
+        };
+
+        Ok(Some(try!(::rustc_serialize::json::encode(&response.to_json()))))
+    }
+}
+
+fn get_file_metadata(file_metadata: &::safe_nfs::metadata::file_metadata::FileMetadata) -> Metadata {
+    use rustc_serialize::base64::ToBase64;
+
+    let created_time = file_metadata.get_created_time().to_timespec();
+    let modified_time = file_metadata.get_modified_time().to_timespec();
+    Metadata {
+        name                  : file_metadata.get_name().clone(),
+        size                  : file_metadata.get_size() as i64,
+        user_metadata         : (*file_metadata.get_user_metadata()).to_base64(::config::get_base64_config()),
+        creation_time_sec     : created_time.sec,
+        creation_time_nsec    : created_time.nsec as i64,
+        modification_time_sec : modified_time.sec,
+        modification_time_nsec: modified_time.nsec as i64,
     }
 }
 
@@ -81,3 +116,43 @@ struct Metadata {
     modification_time_nsec: i64,
 }
 
+#[cfg(test)]
+mod test {
+    use ::launcher::parser::traits::Action;
+
+    const TEST_FILE_NAME: &'static str = "test_file.txt";
+
+    fn create_test_file(parameter_packet: &::launcher::parser::ParameterPacket) {
+        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(parameter_packet.client.clone());
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
+        let app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        let mut writer = eval_result!(file_helper.create(TEST_FILE_NAME.to_string(),
+                                                         Vec::new(),
+                                                         app_root_dir));
+        let data = vec![10u8; 20];
+        writer.write(&data[..], 0);
+        let _ = eval_result!(writer.close());
+    }
+
+
+    #[test]
+    pub fn get_file() {
+        let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+
+        create_test_file(&parameter_packet);
+
+        let mut request = super::GetFile {
+            offset          : 0,
+            length          : 0,
+            file_path       : format!("/{}", TEST_FILE_NAME),
+            is_path_shared  : false,
+            include_metadata: true,
+        };
+
+        assert!(eval_result!(request.execute(parameter_packet.clone())).is_some());
+
+        request.file_path = "/does_not_exixts".to_string();
+        assert!(request.execute(parameter_packet).is_err());
+    }
+
+}
