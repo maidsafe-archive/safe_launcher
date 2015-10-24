@@ -29,7 +29,7 @@ pub enum AppHandlerEvent {
     /// Register an observer to receive notifications about status of removal of an app.
     RegisterAppRemoveObserver(::observer::AppHandlerObserver),
     /// Obtain all apps currently being managed by Launcher.
-    GetAllManagedApps(::std::sync::mpsc::Sender<Vec<event_data::ManagedApp>>),
+    GetAllManagedApps(::std::sync::mpsc::Sender<Result<Vec<event_data::ManagedApp>, ::errors::LauncherError>>),
     /// Gracefully exit the app handling module. After a call to this Launcher will no longer cater
     /// to any requests handled by this module. This is essentially Launcher-close scenario and
     /// Launcher must be restarted to be functional again.

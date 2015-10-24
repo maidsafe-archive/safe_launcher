@@ -122,6 +122,7 @@ impl IpcServer {
                 events::IpcServerEventCategory::ExternalEvent => {
                     if let Ok(external_event) = self.external_event_rx.try_recv() {
                         match external_event {
+                            events::ExternalEvent::EndSession(app_id)                        => self.on_end_session(app_id),
                             events::ExternalEvent::GetListenerEndpoint(sender)               => self.on_get_listener_endpoint(sender),
                             events::ExternalEvent::AppActivated(activation_detail)           => self.on_app_activated(activation_detail),
                             events::ExternalEvent::ChangeSafeDriveAccess(app_id, is_allowed) => self.on_change_safe_drive_access(app_id, is_allowed),
@@ -297,6 +298,24 @@ impl IpcServer {
 
     fn on_register_pending_verification_observer(&mut self, observer: ::observer::IpcObserver) {
         self.pending_verification_observers.push(observer);
+    }
+
+    fn on_end_session(&mut self, app_id: ::routing::NameType) {
+        if self.verified_sessions.remove(&app_id).is_none() {
+            let mut found = None;
+            for (launcher_nonce, app_info) in &self.pending_verifications {
+                if app_info.app_id == app_id {
+                    found = Some(launcher_nonce.clone());
+                    break;
+                }
+            }
+
+            if let Some(launcher_nonce) = found {
+                let _ = eval_option!(self.pending_verifications.remove(&launcher_nonce), "Logic Error - Report a bug.");
+            } else {
+                debug!("IPC Server has no knowledge of the given App-Id {:?} for removal", app_id);
+            }
+        }
     }
 
     fn spawn_acceptor(event_sender: EventSenderToServer<events::IpcListenerEvent>,
