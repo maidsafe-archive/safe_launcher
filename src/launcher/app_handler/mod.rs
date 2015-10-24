@@ -17,8 +17,6 @@
 
 pub mod events;
 
-use std::io::{Read, Write};
-
 mod misc;
 
 const APP_HANDLER_THREAD_NAME: &'static str = "AppHandlerThread";
@@ -44,6 +42,8 @@ impl AppHandler {
                                                    ::ipc_server
                                                    ::events::ExternalEvent>) -> (::safe_core::utility::RAIIThreadJoiner,
                                                                                  ::std::sync::mpsc::Sender<events::AppHandlerEvent>) {
+        use std::io::Read;
+
         let (event_tx, event_rx) = ::std::sync::mpsc::channel();
 
         let joiner = eval_result!(::std::thread::Builder::new().name(APP_HANDLER_THREAD_NAME.to_string())
@@ -133,8 +133,7 @@ impl AppHandler {
         let app_id = ::routing::NameType::new(try!(::safe_core::utility::generate_random_array_u8_64()));
 
         let mut tokens = AppHandler::tokenise_path(&app_detail.absolute_path);
-
-        let mut app_name = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
+        let app_name = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
 
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
         let mut root_dir_listing = try!(dir_helper.get_user_root_directory_listing());
@@ -216,12 +215,10 @@ impl AppHandler {
                                                                             ::errors::LauncherError> {
         let config_file_name = ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string();
 
-        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
         let (mut launcher_configurations, dir_listing) = try!(self.get_launcher_global_config_and_dir());
 
         let position = eval_option!(launcher_configurations.iter().position(|config| config.app_id == app_id), "Logic Error - Report as bug.");
-        let app_root_dir_key = launcher_configurations[position].app_root_dir_key.clone();
         let reference_count = launcher_configurations[position].reference_count;
 
         if reference_count == 1 {
@@ -275,7 +272,7 @@ impl AppHandler {
         }
 
         if let Err(err) = observer.send(managed_apps) {
-            debug!("Error communicating all managed apps to observer.");
+            debug!("{:?} Error communicating all managed apps to observer.", err);
         }
     }
 
@@ -365,6 +362,8 @@ impl AppHandler {
 
 impl Drop for AppHandler {
     fn drop(&mut self) {
+        use std::io::Write;
+
         let mut temp_dir_pathbuf = ::std::env::temp_dir();
         temp_dir_pathbuf.push(::config::LAUNCHER_LOCAL_CONFIG_FILE_NAME);
 

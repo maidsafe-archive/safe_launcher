@@ -54,8 +54,7 @@ impl IpcStream {
     // benefits if data exchanged are of considerable magnitude and frequency.
     #[allow(unsafe_code)]
     pub fn read_payload(&mut self) -> Result<Vec<u8>, ::errors::LauncherError> {
-        use ::std::io::Read;
-        use ::byteorder::ReadBytesExt;
+        use byteorder::ReadBytesExt;
 
         let mut size_buffer = [0; 8];
         try!(self.fill_buffer(&mut size_buffer[..]));
@@ -85,8 +84,8 @@ impl IpcStream {
     // continue. The next write event will however immediately notify the caller about the
     // writer channel being hung-up so that IPC Session can be terminated gracefully.
     fn handle_write(rx: ::std::sync::mpsc::Receiver<WriterEvent>, mut stream: ::std::net::TcpStream) {
-        use ::std::io::Write;
-        use ::byteorder::WriteBytesExt;
+        use std::io::Write;
+        use byteorder::WriteBytesExt;
 
         for it in rx.iter() {
             match it {

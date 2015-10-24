@@ -61,11 +61,13 @@ pub fn verify_launcher_nonce(mut ipc_stream  : ::launcher::ipc_server::ipc_sessi
             asymm_pub_key.0[it.0] = it.1;
         }
 
-        send_one!(Ok(::launcher::ipc_server::ipc_session::events::event_data::AuthData {
+        if let Err(err) = send_one!(Ok(::launcher::ipc_server::ipc_session::events::event_data::AuthData {
             str_nonce    : handshake_request.data.launcher_string,
             asymm_nonce  : asymm_nonce,
             asymm_pub_key: asymm_pub_key,
-        }), &event_sender);
+        }), &event_sender) {
+            debug!("{:?} Error sending authentication data to IPCSession.", err);
+        }
 
         debug!("Exiting thread {:?}", NONCE_VERIFIER_THREAD_NAME);
     }));

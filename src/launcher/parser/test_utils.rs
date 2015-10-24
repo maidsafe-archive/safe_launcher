@@ -15,7 +15,6 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-/// Creates a ParameterPacket for testing purpose
 pub fn get_parameter_packet(has_safe_drive_access: bool) -> Result<::launcher::parser::ParameterPacket, ::errors::LauncherError> {
     let client = ::std::sync::Arc::new(::std::sync::Mutex::new(try!(::safe_core::utility::test_utils::get_client())));
     let directory_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(client.clone());

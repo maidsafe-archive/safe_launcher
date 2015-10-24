@@ -21,7 +21,7 @@ mod dns;
 mod nfs;
 mod traits;
 mod helper;
-mod test_utils;
+#[cfg(test)] mod test_utils;
 
 #[derive(Clone)]
 pub struct ParameterPacket {

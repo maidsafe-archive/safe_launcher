@@ -37,8 +37,6 @@
 #![allow(box_pointers, fat_ptr_transmutes, missing_copy_implementations,
          missing_debug_implementations)]
 
-#![allow(dead_code, unused)] // TODO(Spandan) Remove this once code base in sufficient
-
 extern crate libc;
 extern crate routing;
 extern crate safe_dns;
@@ -52,12 +50,18 @@ extern crate rustc_serialize;
 
 #[macro_use] mod macros;
 
-/// FFI interface
+/// FFI interface.
 pub mod ffi;
-/// Safe-Launcher Errors
+/// Safe-Launcher Errors.
 pub mod errors;
+/// The gateway to the Launcher core modules. It consumes `safe_core::client::Client` and is a
+/// packet that must be held for the duration the core library is activated.
+pub mod launcher;
+/// Since the entire core library is purely event driven, this module provides types and primitives
+/// that an interfacing crate (executable or another library) should make use of to easily tap into
+/// the information and events of interest happening in the core.
+pub mod observer;
+/// Mechanisms to help with event-subsetting.
+pub mod event_sender;
 
 mod config;
-mod launcher;
-mod observer;
-mod event_sender;

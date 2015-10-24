@@ -162,6 +162,7 @@ impl IpcServer {
         self.temp_id = self.temp_id.wrapping_add(1);
     }
 
+    #[allow(unused)]
     fn on_ipc_listener_aborted(&self, error: Box<::errors::LauncherError>) {
         let error = *error;
     }
@@ -234,10 +235,10 @@ impl IpcServer {
 
     fn on_app_activated(&mut self, activation_detail: Box<events::event_data::ActivationDetail>) {
         let detail = *activation_detail;
-        if let Some(info) = self.pending_verifications.insert(detail.nonce.clone(),
-                                                              misc::AppInfo::new(detail.app_id,
-                                                                                 detail.app_root_dir_key,
-                                                                                 detail.safe_drive_access)) {
+        if let Some(_) = self.pending_verifications.insert(detail.nonce.clone(),
+                                                           misc::AppInfo::new(detail.app_id,
+                                                                              detail.app_root_dir_key,
+                                                                              detail.safe_drive_access)) {
             // TODO(Spandan) handle this security hole.
             debug!("Same nonce was already given to an app pending verification. This is a security hole not fixed in this iteration.");
             debug!("Issues like mixed-up safe drive access could arise.");

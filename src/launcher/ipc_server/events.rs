@@ -50,15 +50,23 @@ impl From<event_data::SessionTerminationDetail> for IpcSessionEvent {
     }
 }
 
-// --------------------------------------------------------------------------------------
-
+/// This is an event subset to be used by external codes to communicate with the IPC handling
+/// module. Observer registration facilities may be availed for notifications.
 pub enum ExternalEvent {
+    #[doc(hidden)]
     AppActivated(Box<event_data::ActivationDetail>),
+    #[doc(hidden)]
     ChangeSafeDriveAccess(::routing::NameType, bool),
+    /// Obtain the endpoint on which the Launcher IPC is listening to for incoming connections.
     GetListenerEndpoint(::std::sync::mpsc::Sender<String>),
+    /// Register an observer to receive notifications about changes in verified sessions.
     RegisterVerifiedSessionObserver(::observer::IpcObserver),
+    /// Register an observer to receive notifications about changes in unverified sessions.
     RegisterUnverifiedSessionObserver(::observer::IpcObserver),
+    /// Register an observer to receive notifications about changes in pending verifications.
     RegisterPendingVerificationObserver(::observer::IpcObserver),
+    /// Terminate Launcher IPC - this will essentially exit all sessions and close IPC down
+    /// gracefully.
     Terminate,
 }
 
