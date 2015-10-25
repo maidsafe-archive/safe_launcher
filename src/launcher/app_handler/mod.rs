@@ -197,7 +197,15 @@ impl AppHandler {
 
     fn on_remove_app(&mut self, app_id: ::routing::NameType) {
         match self.on_remove_app_impl(app_id) {
-            Ok(data) => group_send!(data, &mut self.app_remove_observers),
+            Ok(data) => {
+                if let Err(err) = self.ipc_server_event_sender.send(::launcher
+                                                                    ::ipc_server
+                                                                    ::events
+                                                                    ::ExternalEvent::EndSession(app_id)) {
+                    debug!("{:?} Error sending end-session signal to IPC Server.", err);
+                }
+                group_send!(data, &mut self.app_remove_observers);
+            },
             Err(err) => {
                 let data = ::observer::event_data::AppRemoved {
                     id    : app_id,
@@ -209,7 +217,6 @@ impl AppHandler {
         }
     }
 
-    // TODO(Krishna) Send terminate app event to IPC Server
     // TODO(Krishna) Validate if eval_option! is really required
     fn on_remove_app_impl(&mut self, app_id: ::routing::NameType) -> Result<::observer::event_data::AppRemoved,
                                                                             ::errors::LauncherError> {
@@ -251,8 +258,9 @@ impl AppHandler {
         self.app_remove_observers.push(observer);
     }
 
-    fn on_get_all_managed_apps(&self, observer: ::std::sync::mpsc::Sender<Vec<events::event_data::ManagedApp>>) {
-        let global_configs = eval_result!(self.get_launcher_global_config());
+    fn on_get_all_managed_apps(&self, observer: ::std::sync::mpsc::Sender<Result<Vec<events::event_data::ManagedApp>,
+                                                                                 ::errors::LauncherError>>) {
+        let global_configs = eval_send_one!(self.get_launcher_global_config(), &observer);
         let mut managed_apps = Vec::with_capacity(global_configs.len());
         for it in global_configs.iter() {
             let local_path = if let Some(path) = self.local_config_data.get(&it.app_id) {
@@ -271,7 +279,7 @@ impl AppHandler {
             managed_apps.push(managed_app);
         }
 
-        if let Err(err) = observer.send(managed_apps) {
+        if let Err(err) = observer.send(Ok(managed_apps)) {
             debug!("{:?} Error communicating all managed apps to observer.", err);
         }
     }
@@ -308,8 +316,9 @@ impl AppHandler {
     fn upsert_to_launcher_global_config(&self, config: misc::LauncherConfiguration) -> Result<(), ::errors::LauncherError> {
         let (mut global_configs, dir_listing) = try!(self.get_launcher_global_config_and_dir());
 
-        // TODO(Spandan) Due to bug in the language, unable to use `if let Some() .. else` logic to
-        // upsert to a vector. Once the bug is resolved
+        // (Spandan)
+        // Due to bug in the language, unable to use `if let Some() .. else` logic to upsert to a vector.
+        // Once the bug is resolved
         // - https://github.com/rust-lang/rust/issues/28449
         // then modify the following to use it.
         if let Some(pos) = global_configs.iter().position(|existing_config| existing_config.app_id == config.app_id) {

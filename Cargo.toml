@@ -31,6 +31,11 @@ rustc-serialize = "*"
 [dev-dependencies]
 env_logger = "*"
 
+[[example]]
+name  = "launcher_cli"
+test  = true
+bench = false
+
 [features]
 use-mock-routing = ["safe_dns/use-mock-routing",
                     "safe_nfs/use-mock-routing",

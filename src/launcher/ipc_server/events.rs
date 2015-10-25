@@ -59,6 +59,8 @@ pub enum ExternalEvent {
     ChangeSafeDriveAccess(::routing::NameType, bool),
     /// Obtain the endpoint on which the Launcher IPC is listening to for incoming connections.
     GetListenerEndpoint(::std::sync::mpsc::Sender<String>),
+    /// Request IPC Server to forget a session with given app-id. The session will be terminated.
+    EndSession(::routing::NameType),
     /// Register an observer to receive notifications about changes in verified sessions.
     RegisterVerifiedSessionObserver(::observer::IpcObserver),
     /// Register an observer to receive notifications about changes in unverified sessions.

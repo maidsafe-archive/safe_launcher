@@ -34,6 +34,11 @@ pub enum LauncherEventCategoy {
     IpcEvent,
     /// Category representing some Application-Handling event.
     AppHandlingEvent,
+    /// This category is not used by Launcher. It is provided for the owner/observer code to make
+    /// use of and put in any miscellaneous events, internal or otherwise, that it may be
+    /// interested in. For e.g. it can map some sort of a termination event to exit the receiver
+    /// loop gracefully.
+    OwnerCategory,
 }
 
 /// An event subset for IPC Event category. These are the individual events that occur within the
