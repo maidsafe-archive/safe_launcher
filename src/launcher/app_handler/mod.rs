@@ -316,8 +316,9 @@ impl AppHandler {
     fn upsert_to_launcher_global_config(&self, config: misc::LauncherConfiguration) -> Result<(), ::errors::LauncherError> {
         let (mut global_configs, dir_listing) = try!(self.get_launcher_global_config_and_dir());
 
-        // TODO(Spandan) Due to bug in the language, unable to use `if let Some() .. else` logic to
-        // upsert to a vector. Once the bug is resolved
+        // (Spandan)
+        // Due to bug in the language, unable to use `if let Some() .. else` logic to upsert to a vector.
+        // Once the bug is resolved
         // - https://github.com/rust-lang/rust/issues/28449
         // then modify the following to use it.
         if let Some(pos) = global_configs.iter().position(|existing_config| existing_config.app_id == config.app_id) {
