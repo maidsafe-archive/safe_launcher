@@ -45,17 +45,26 @@ impl Launcher {
     pub fn new(client: ::safe_core::client::Client) -> Result<Launcher, ::errors::LauncherError> {
         let client = ::std::sync::Arc::new(::std::sync::Mutex::new(client));
 
-        let safe_drive_directory_name = ::config::SAFE_DRIVE_DIR_NAME.to_string();
-        let launcher_config_directory_name = ::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string();
-
         let directory_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(client.clone());
 
-        // TODO(Krishna) also create empty launcher config file if it does not already exist
-        let _ = try!(directory_helper.get_configuration_directory_listing(launcher_config_directory_name));
+        let launcher_config_dir_name = ::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string();
+        let launcher_config_dir = try!(directory_helper.get_configuration_directory_listing(launcher_config_dir_name));
+
+        if launcher_config_dir.get_files()
+                              .iter()
+                              .find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME)
+                              .is_none() {
+            let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(client.clone());
+            let writer = try!(file_helper.create(::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string(),
+                                                 Vec::new(),
+                                                 launcher_config_dir));
+            let _ = try!(writer.close());
+        }
 
         let mut user_root_directory = try!(directory_helper.get_user_root_directory_listing());
-        if user_root_directory.find_sub_directory(&safe_drive_directory_name).is_none() {
-           let _  = try!(directory_helper.create(safe_drive_directory_name,
+        let safe_drive_dir_name = ::config::SAFE_DRIVE_DIR_NAME.to_string();
+        if user_root_directory.find_sub_directory(&safe_drive_dir_name).is_none() {
+           let _  = try!(directory_helper.create(safe_drive_dir_name,
                                                  ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
                                                  Vec::new(),
                                                  false,

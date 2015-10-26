@@ -291,7 +291,7 @@ impl AppHandler {
             .collect()
     }
 
-    fn get_app_dir_name(app_name: &String,
+    fn get_app_dir_name(app_name         : &String,
                         directory_listing: &::safe_nfs::directory_listing::DirectoryListing) -> String {
         let mut dir_name = format!("{}-Root-Dir", &app_name);
         if directory_listing.find_sub_directory(&dir_name).is_some() {
