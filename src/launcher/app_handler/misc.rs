@@ -23,3 +23,17 @@ pub struct LauncherConfiguration {
     pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
     pub safe_drive_access: bool,
 }
+
+// (Spandan)
+// This is a hack because presently cbor isn't able to decode/encode HashMap<NameType, String>
+// properly
+pub fn convert_hashmap_to_vec(hashmap: &::std::collections::HashMap<::routing::NameType, String>) -> Vec<(::routing::NameType, String)> {
+    hashmap.iter().map(|a| (a.0.clone(), a.1.clone())).collect()
+}
+
+// (Spandan)
+// This is a hack because presently cbor isn't able to decode/encode HashMap<NameType, String>
+// properly
+pub fn convert_vec_to_hashmap(vec: Vec<(::routing::NameType, String)>) -> ::std::collections::HashMap<::routing::NameType, String> {
+    vec.into_iter().collect()
+}
