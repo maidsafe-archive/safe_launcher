@@ -19,7 +19,7 @@ pub fn handle_self_authentication() -> Result<::safe_core::client::Client,
                                               ::safe_launcher::errors::LauncherError> {
     use std::io::Write;
 
-    print!("Do you have an existing account [Y to login to an existing account] ?: ");
+    print!("Do you have an existing account [Y to login to an existing account]?: ");
     eval_result!(::std::io::stdout().flush());
     let mut choice = String::new();
     let _ = eval_result!(::std::io::stdin().read_line(&mut choice));

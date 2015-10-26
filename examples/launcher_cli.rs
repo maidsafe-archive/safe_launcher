@@ -54,7 +54,7 @@ fn on_add_app(lists   : &Lists,
 
     println!("\n=============== Add an application to be managed ===============\n");
 
-    print!("Enter absolute path to the binary [use only fron-slash]: "); eval_result!(std::io::stdout().flush());
+    print!("Enter absolute path to the binary [use only front-slashes]: "); eval_result!(std::io::stdout().flush());
     let mut local_path = String::with_capacity(20);
     let _ = eval_result!(std::io::stdin().read_line(&mut local_path));
     local_path = local_path.trim().to_string();
@@ -111,8 +111,8 @@ fn on_list_all_managed_apps(lists: &Lists) {
         let is_activated = eval_result!(lists.running_apps.lock()).iter().find(|id| **id == it.1.id).is_some();
 
         println!("\n------------------- Application - Serial number {} -------------------", it.0 + 1);
-        println!("Unique App-ID: {:?}\nLocation on this machine: {}\nNumber of machines installed in: {}\nIs allowed \"SAFEDrive\" access: {}\n\nCurrently activated: {}",
-                 it.1.id, location, it.1.reference_count, it.1.safe_drive_access, is_activated);
+        println!("Unique App-ID: {:?}\nName: {}\nLocation on this machine: {}\nNumber of machines installed in: {}\nIs allowed \"SAFEDrive\" access: {}\n\nCurrently activated: {}",
+                 it.1.id, it.1.name, location, it.1.reference_count, it.1.safe_drive_access, is_activated);
     }
     println!("\n====================================================\n");
 }
@@ -135,6 +135,80 @@ fn on_activate_app(lists   : &Lists,
                                  .send(safe_launcher::launcher
                                                     ::AppHandlerEvent
                                                     ::ActivateApp(managed_apps[serial_number - 1].id)));
+        } else {
+            println!("Error: Invalid Serial Number.");
+        }
+    } else {
+        println!("Error: Invalid Serial Number.");
+    }
+}
+
+fn on_modify_app(lists   : &Lists,
+                 launcher: &safe_launcher::launcher::Launcher) {
+    use std::io::Write;
+
+    println!("\n=============== Modify a managed application  ===============\n");
+
+    print!("Enter application serial number: "); eval_result!(std::io::stdout().flush());
+    let mut serial_no = String::with_capacity(3);
+    let _ = eval_result!(std::io::stdin().read_line(&mut serial_no));
+
+    if let Ok(serial_number) = serial_no.trim().parse::<usize>() {
+        let ref managed_apps = *eval_result!(lists.managed_apps.lock());
+
+        if serial_number > 0 && serial_number <= managed_apps.len() {
+            let mut user_option = String::new();
+            let mut name = String::with_capacity(10);
+            let mut path = String::with_capacity(20);
+            let mut safe_drive_access = String::with_capacity(3);
+
+            loop {
+                println!("\n\n     -------------------\n    | MODIFICATION MENU |\n     -------------------");
+                println!("\n<1> Change name");
+                println!("\n<2> Change path to binary");
+                println!("\n<3> Change \"SAFEDrive\" access permission");
+                println!("\n<4> Apply and Exit");
+                print!("\nEnter Option [1-4]: ");
+                eval_result!(std::io::stdout().flush());
+                let _ = std::io::stdin().read_line(&mut user_option);
+
+                if let Ok(option) = user_option.trim().parse::<u8>() {
+                    match option {
+                        1 => {
+                            name.clear();
+                            print!("\nEnter new name: "); eval_result!(std::io::stdout().flush());
+                            let _ = eval_result!(std::io::stdin().read_line(&mut name));
+                            name = name.trim().to_string();
+                        },
+                        2 => {
+                            path.clear();
+                            print!("\nEnter new absolute path to binary [use only front-slashes]: "); eval_result!(std::io::stdout().flush());
+                            let _ = eval_result!(std::io::stdin().read_line(&mut path));
+                            path = path.trim().to_string();
+                        },
+                        3 => {
+                            safe_drive_access.clear();
+                            print!("Permission to access \"SAFEDrive\" [Y if allowed] : "); eval_result!(std::io::stdout().flush());
+                            let _ = eval_result!(std::io::stdin().read_line(&mut safe_drive_access));
+                            safe_drive_access = safe_drive_access.trim().to_string();
+                        },
+                        4 => break,
+                        _ => println!("\nUnrecognised option !!"),
+                    }
+                } else {
+                    println!("\nUnrecognised option !!");
+                }
+                user_option.clear();
+            }
+
+            let modify_app_settings = safe_launcher::launcher::event_data::ModifyAppSettings {
+                id               : managed_apps[serial_number - 1].id,
+                name             : if name != "" { Some(name) } else { None },
+                local_path       : if path != "" { Some(path) } else { None },
+                safe_drive_access: if safe_drive_access != "" { Some(safe_drive_access == "Y" || safe_drive_access == "y") } else { None },
+            };
+
+            eval_result!(send_one!(modify_app_settings, &launcher.get_app_handler_event_sender()));
         } else {
             println!("Error: Invalid Serial Number.");
         }
@@ -181,7 +255,7 @@ fn main() {
                 2 => on_remove_app(&app_lists, &launcher),
                 3 => on_list_all_managed_apps(&app_lists),
                 4 => on_activate_app(&app_lists, &launcher),
-                5 => unimplemented!(),
+                5 => on_modify_app(&app_lists, &launcher),
                 6 => break,
                 _ => println!("\nUnrecognised option !!"),
             }
@@ -189,8 +263,6 @@ fn main() {
             println!("\nUnrecognised option !!");
         }
 
-        println!("Hit Enter to continue...");
-        let _ = std::io::stdin().read_line(&mut user_option);
         user_option.clear();
     }
 

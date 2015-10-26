@@ -81,23 +81,37 @@ impl From<event_data::PendingVerification> for IpcEvent {
 /// within the App Handling Category umberlla.
 #[derive(Debug)]
 pub enum AppHandlingEvent {
-    /// This event is triggered when an Application has been successfully added into Launcher and
-    /// can now be managed from inside Launcher.
-    AppAdded(event_data::AppAdded),
-    /// This event is triggered when an Application has been successfully removed from Launcher and
-    /// can now be no longer managed from inside Launcher for this machine.
-    AppRemoved(event_data::AppRemoved),
+    /// This event is triggered when an Application has been attempted to be added into Launcher
+    /// and if successful, app can now be managed from inside Launcher.
+    AppAddition(event_data::AppAddition),
+    /// This event is triggered when an Application has been attempted to be removed from Launcher
+    /// and if successful, app can no longer be managed from inside Launcher for this machine.
+    AppRemoval(event_data::AppRemoval),
+    /// This is a notification about an attempt to activate a managed application. Note however
+    /// that a successful activation does not necessarily translate into successfully managed
+    /// session. It just means that app has been started. It can still crash after start, fail
+    /// authentication etc. Register obeservers in IPC module to get a more fine grained
+    /// information.
+    AppActivation(Result<::routing::NameType, ::errors::LauncherError>),
+    /// This event is triggered when an Application has been attempted to be modified.
+    AppModification(event_data::AppModification),
 }
 
-impl From<event_data::AppAdded> for AppHandlingEvent {
-    fn from(data: event_data::AppAdded) -> AppHandlingEvent {
-        AppHandlingEvent::AppAdded(data)
+impl From<event_data::AppAddition> for AppHandlingEvent {
+    fn from(data: event_data::AppAddition) -> AppHandlingEvent {
+        AppHandlingEvent::AppAddition(data)
     }
 }
 
-impl From<event_data::AppRemoved> for AppHandlingEvent {
-    fn from(data: event_data::AppRemoved) -> AppHandlingEvent {
-        AppHandlingEvent::AppRemoved(data)
+impl From<event_data::AppRemoval> for AppHandlingEvent {
+    fn from(data: event_data::AppRemoval) -> AppHandlingEvent {
+        AppHandlingEvent::AppRemoval(data)
+    }
+}
+
+impl From<event_data::AppModification> for AppHandlingEvent {
+    fn from(data: event_data::AppModification) -> AppHandlingEvent {
+        AppHandlingEvent::AppModification(data)
     }
 }
 
@@ -140,21 +154,51 @@ pub mod event_data {
         pub action: Action,
     }
 
-    /// Data for an app that was successfully added to Launcher.
+    /// Data for an app that was attempted to be added to Launcher.
     #[derive(Debug)]
-    pub struct AppAdded {
+    pub struct AppAddition {
         /// Result of operation.
-        pub result    : Result<::routing::NameType, ::errors::LauncherError>,
+        pub result    : Result<AppAdditionData, ::errors::LauncherError>,
         /// Local path of application binary on this machine.
         pub local_path: String,
     }
 
-    /// Data for an app that was successfully removed from Launcher.
+    /// Data corresponding to app addition
     #[derive(Debug)]
-    pub struct AppRemoved {
+    pub struct AppAdditionData {
+        /// Unique id of the Application managed by Launcher.
+        pub id  : ::routing::NameType,
+        /// Name given to the App by Launcher,
+        pub name: String
+    }
+
+    /// Data for an app that was attempted to be removed from Launcher.
+    #[derive(Debug)]
+    pub struct AppRemoval {
         /// Unique id of the Application managed by Launcher.
         pub id    : ::routing::NameType,
         /// Result of operation.
         pub result: Option<::errors::LauncherError>,
+    }
+
+    /// Data for an app that was attempted to be modified.
+    #[derive(Debug)]
+    pub struct AppModification {
+        /// Unique id of the Application managed by Launcher.
+        pub id    : ::routing::NameType,
+        /// Result of operation.
+        pub result: Result<ModificationDetail, ::errors::LauncherError>,
+    }
+
+    /// Optional parameters that were changed. Those marked `None` have not been changed and were
+    /// what they were previously.
+    #[derive(Debug)]
+    pub struct ModificationDetail {
+        /// Name of the app.
+        pub name             : Option<String>,
+        /// Absolute local path to binary.
+        pub local_path       : Option<String>,
+        /// If this app is allowed to have access to `SAFEDrive`.
+        pub safe_drive_access: Option<bool>,
     }
 }

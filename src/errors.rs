@@ -62,6 +62,10 @@ pub enum LauncherError {
     SymmetricDecipherFailure,
     /// This path to binary has already been added on this machine
     AppAlreadyAdded,
+    /// The given app is not managed by Launcher
+    AppNotRegistered,
+    /// Starting of App as an external process has failed
+    AppActivationFailed(::std::io::Error),
     /// Unexpected - Probably a Logic error
     Unexpected(String),
 }
@@ -130,7 +134,9 @@ impl Into<i32> for LauncherError {
             LauncherError::JsonEncodeError(_)               => LAUNCHER_ERROR_START_RANGE - 14,
             LauncherError::SymmetricDecipherFailure         => LAUNCHER_ERROR_START_RANGE - 15,
             LauncherError::AppAlreadyAdded                  => LAUNCHER_ERROR_START_RANGE - 16,
-            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 17,
+            LauncherError::AppNotRegistered                 => LAUNCHER_ERROR_START_RANGE - 17,
+            LauncherError::AppActivationFailed(_)           => LAUNCHER_ERROR_START_RANGE - 18,
+            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 19,
         }
     }
 }
@@ -157,6 +163,8 @@ impl ::std::fmt::Debug for LauncherError {
             LauncherError::JsonEncodeError(ref error)       => write!(f, "LauncherError::JsonEncodeError -> {:?}", error),
             LauncherError::SymmetricDecipherFailure         => write!(f, "LauncherError::SymmetricDecipherFailure"),
             LauncherError::AppAlreadyAdded                  => write!(f, "LauncherError::AppAlreadyAdded"),
+            LauncherError::AppNotRegistered                 => write!(f, "LauncherError::AppNotRegistered"),
+            LauncherError::AppActivationFailed(ref error)   => write!(f, "LauncherError::AppActivationFailed -> {:?}", error),
             LauncherError::Unexpected(ref error)            => write!(f, "LauncherError::Unexpected{{{:?}}}", error),
         }
     }
