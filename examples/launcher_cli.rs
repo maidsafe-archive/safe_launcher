@@ -33,33 +33,166 @@
          missing_debug_implementations)]
 
 extern crate routing;
+#[macro_use] extern crate log;
 #[macro_use] extern crate safe_core;
 #[macro_use] extern crate safe_launcher;
 #[allow(unused_extern_crates)] extern crate env_logger;
 
+mod self_auth;
 mod event_loop;
 
 /// Contains lists of various categories of apps
 pub struct Lists {
-    managed_apps: std::sync::Arc<std::sync::Mutex<Vec<safe_launcher::launcher::event_data::ManagedApp>>>,
-    running_apps: std::sync::Arc<std::sync::Mutex<Vec<routing::NameType>>>,
+    managed_apps       : std::sync::Arc<std::sync::Mutex<Vec<safe_launcher::launcher::event_data::ManagedApp>>>,
+    running_apps       : std::sync::Arc<std::sync::Mutex<Vec<routing::NameType>>>,
+    pending_add_request: std::sync::Arc<std::sync::Mutex<std::collections::HashMap<String, bool>>>,
+}
+
+fn on_add_app(lists   : &Lists,
+              launcher: &safe_launcher::launcher::Launcher) {
+    use std::io::Write;
+
+    println!("\n=============== Add an application to be managed ===============\n");
+
+    print!("Enter absolute path to the binary [use only fron-slash]: "); eval_result!(std::io::stdout().flush());
+    let mut local_path = String::with_capacity(20);
+    let _ = eval_result!(std::io::stdin().read_line(&mut local_path));
+    local_path = local_path.trim().to_string();
+
+    print!("Permission to access \"SAFEDrive\" [Y if allowed] : "); eval_result!(std::io::stdout().flush());
+    let mut permission = String::new();
+    let _ = eval_result!(std::io::stdin().read_line(&mut permission));
+    permission = permission.trim().to_string();
+    let safe_drive_access = permission == "Y" || permission == "y";
+
+    let _ = eval_result!(lists.pending_add_request.lock()).insert(local_path.clone(), safe_drive_access);
+    let data = safe_launcher::launcher::event_data::AppDetail {
+        absolute_path    : local_path,
+        safe_drive_access: safe_drive_access,
+    };
+    eval_result!(send_one!(data, launcher.get_app_handler_event_sender()));
+}
+
+fn on_remove_app(lists   : &Lists,
+                 launcher: &safe_launcher::launcher::Launcher) {
+    use std::io::Write;
+
+    println!("\n=============== Remove a managed application  ===============\n");
+
+    print!("Enter application serial number: "); eval_result!(std::io::stdout().flush());
+    let mut serial_no = String::with_capacity(3);
+    let _ = eval_result!(std::io::stdin().read_line(&mut serial_no));
+
+    if let Ok(serial_number) = serial_no.trim().parse::<usize>() {
+        let ref managed_apps = *eval_result!(lists.managed_apps.lock());
+
+        if serial_number > 0 && serial_number <= managed_apps.len() {
+            eval_result!(launcher.get_app_handler_event_sender()
+                                 .send(safe_launcher::launcher
+                                                    ::AppHandlerEvent
+                                                    ::RemoveApp(managed_apps[serial_number - 1].id)));
+        } else {
+            println!("Error: Invalid Serial Number.");
+        }
+    } else {
+        println!("Error: Invalid Serial Number.");
+    }
+}
+
+fn on_list_all_managed_apps(lists: &Lists) {
+    println!("\n=============== Managed Applications ===============");
+    for it in eval_result!(lists.managed_apps.lock()).iter().enumerate() {
+        let location = if let Some(ref loc) = it.1.local_path {
+            loc.clone()
+        } else {
+            " -- N/A --".to_string()
+        };
+
+        let is_activated = eval_result!(lists.running_apps.lock()).iter().find(|id| **id == it.1.id).is_some();
+
+        println!("\n------------------- Application - Serial number {} -------------------", it.0 + 1);
+        println!("Unique App-ID: {:?}\nLocation on this machine: {}\nNumber of machines installed in: {}\nIs allowed \"SAFEDrive\" access: {}\n\nCurrently activated: {}",
+                 it.1.id, location, it.1.reference_count, it.1.safe_drive_access, is_activated);
+    }
+    println!("\n====================================================\n");
+}
+
+fn on_activate_app(lists   : &Lists,
+                   launcher: &safe_launcher::launcher::Launcher) {
+    use std::io::Write;
+
+    println!("\n=============== Activate a managed application  ===============\n");
+
+    print!("Enter application serial number: "); eval_result!(std::io::stdout().flush());
+    let mut serial_no = String::with_capacity(3);
+    let _ = eval_result!(std::io::stdin().read_line(&mut serial_no));
+
+    if let Ok(serial_number) = serial_no.trim().parse::<usize>() {
+        let ref managed_apps = *eval_result!(lists.managed_apps.lock());
+
+        if serial_number > 0 && serial_number <= managed_apps.len() {
+            eval_result!(launcher.get_app_handler_event_sender()
+                                 .send(safe_launcher::launcher
+                                                    ::AppHandlerEvent
+                                                    ::ActivateApp(managed_apps[serial_number - 1].id)));
+        } else {
+            println!("Error: Invalid Serial Number.");
+        }
+    } else {
+        println!("Error: Invalid Serial Number.");
+    }
 }
 
 fn main() {
+    use std::io::Write;
+
     let app_lists = Lists {
-        managed_apps: ::std::sync::Arc::new(std::sync::Mutex::new(Vec::with_capacity(5))),
-        running_apps: ::std::sync::Arc::new(std::sync::Mutex::new(Vec::with_capacity(5))),
+        managed_apps       : ::std::sync::Arc::new(std::sync::Mutex::new(Vec::with_capacity(5))),
+        running_apps       : ::std::sync::Arc::new(std::sync::Mutex::new(Vec::with_capacity(5))),
+        pending_add_request: ::std::sync::Arc::new(std::sync::Mutex::new(::std::collections::HashMap::new())),
     };
 
-    let client = eval_result!(safe_core::utility::test_utils::get_client());
+    let client = eval_result!(self_auth::handle_self_authentication());
+    println!("\nSelf-authentication Successful !!");
+
+    println!("Initialising Launcher ...");
     let launcher = eval_result!(safe_launcher::launcher::Launcher::new(client));
 
-    let (_raii_joiner, internal_sender) = event_loop::run_event_loop(&launcher, &app_lists);
+    let (_raii_joiner, internal_sender) = event_loop::EventLoop::new(&launcher, &app_lists);
 
-    // ---------------------------------------------
-    //      ------ Put Main Menu Here ------
-    // ---------------------------------------------
+    let mut user_option = String::new();
 
-    // After Main Menu Exit Condition
+    loop {
+        println!("\n\n     ------\n    | MENU |\n     ------");
+        println!("\n<1> Add application");
+        println!("\n<2> Remove application");
+        println!("\n<3> List all managed applications");
+        println!("\n<4> Activate application");
+        println!("\n<5> Modify settings for application");
+        println!("\n<6> Exit");
+
+        print!("\nEnter Option [1-6]: ");
+        eval_result!(std::io::stdout().flush());
+        let _ = std::io::stdin().read_line(&mut user_option);
+
+        if let Ok(option) = user_option.trim().parse::<u8>() {
+            match option {
+                1 => on_add_app(&app_lists, &launcher),
+                2 => on_remove_app(&app_lists, &launcher),
+                3 => on_list_all_managed_apps(&app_lists),
+                4 => on_activate_app(&app_lists, &launcher),
+                5 => unimplemented!(),
+                6 => break,
+                _ => println!("\nUnrecognised option !!"),
+            }
+        } else {
+            println!("\nUnrecognised option !!");
+        }
+
+        println!("Hit Enter to continue...");
+        let _ = std::io::stdin().read_line(&mut user_option);
+        user_option.clear();
+    }
+
     eval_result!(internal_sender.send(event_loop::Terminate));
 }

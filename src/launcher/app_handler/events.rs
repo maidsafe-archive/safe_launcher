@@ -42,6 +42,12 @@ impl ::std::fmt::Debug for AppHandlerEvent {
     }
 }
 
+impl From<event_data::AppDetail> for AppHandlerEvent {
+    fn from(data: event_data::AppDetail) -> Self {
+        AppHandlerEvent::AddApp(data)
+    }
+}
+
 /// Data that will be transferred during specific events to get a fine-grained detail about various
 /// parameters.
 pub mod event_data {
