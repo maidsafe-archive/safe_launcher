@@ -46,23 +46,24 @@ cargo test
   - [x] [MAID-1408](https://maidsafe.atlassian.net/browse/MAID-1408) Handle Adding of App
   - [X] [MAID-1409](https://maidsafe.atlassian.net/browse/MAID-1409) App authentication
   - [X] [MAID-1410](https://maidsafe.atlassian.net/browse/MAID-1410) App Removal
-- [ ] [MAID-1411](https://maidsafe.atlassian.net/browse/MAID-1411) Launcher provided services to apps
+- [X] [MAID-1411](https://maidsafe.atlassian.net/browse/MAID-1411) Launcher provided services to apps
   - [X] [MAID-1412](https://maidsafe.atlassian.net/browse/MAID-1412) Design JSON dispatcher
   - [X] [MAID-1413](https://maidsafe.atlassian.net/browse/MAID-1413) Create Directory
   - [X] [MAID-1414](https://maidsafe.atlassian.net/browse/MAID-1414) Delete Directory
   - [X] [MAID-1415](https://maidsafe.atlassian.net/browse/MAID-1415) Modify Directory
-  - [ ] [MAID-1416](https://maidsafe.atlassian.net/browse/MAID-1416) Get Directory
+  - [X] [MAID-1416](https://maidsafe.atlassian.net/browse/MAID-1416) Get Directory
   - [X] [MAID-1417](https://maidsafe.atlassian.net/browse/MAID-1417) Create File
   - [X] [MAID-1418](https://maidsafe.atlassian.net/browse/MAID-1418) Delete File
   - [X] [MAID-1419](https://maidsafe.atlassian.net/browse/MAID-1419) Modify File
-  - [ ] [MAID-1420](https://maidsafe.atlassian.net/browse/MAID-1420) Get File
-  - [ ] [MAID-1421](https://maidsafe.atlassian.net/browse/MAID-1421) Register DNS
-  - [ ] [MAID-1422](https://maidsafe.atlassian.net/browse/MAID-1422) Add Service to registered DNS
-- [ ] [MAID-1440](https://maidsafe.atlassian.net/browse/MAID-1440) Launcher CLI Example
-  - [ ] [MAID-1441](https://maidsafe.atlassian.net/browse/MAID-1441)
-  - [ ] [MAID-1442](https://maidsafe.atlassian.net/browse/MAID-1442)
-  - [ ] [MAID-1443](https://maidsafe.atlassian.net/browse/MAID-1443)
-  - [ ] [MAID-1444](https://maidsafe.atlassian.net/browse/MAID-1444)
-  - [ ] [MAID-1445](https://maidsafe.atlassian.net/browse/MAID-1445)
-  - [ ] [MAID-1446](https://maidsafe.atlassian.net/browse/MAID-1446)
-  - [ ] [MAID-1447](https://maidsafe.atlassian.net/browse/MAID-1447)
+  - [X] [MAID-1420](https://maidsafe.atlassian.net/browse/MAID-1420) Get File
+  - [X] [MAID-1421](https://maidsafe.atlassian.net/browse/MAID-1421) Register DNS
+  - [X] [MAID-1422](https://maidsafe.atlassian.net/browse/MAID-1422) Add Service to registered DNS
+- [X] [MAID-1440](https://maidsafe.atlassian.net/browse/MAID-1440) Launcher CLI Example
+  - [X] [MAID-1441](https://maidsafe.atlassian.net/browse/MAID-1441)
+  - [X] [MAID-1442](https://maidsafe.atlassian.net/browse/MAID-1442)
+  - [X] [MAID-1443](https://maidsafe.atlassian.net/browse/MAID-1443)
+  - [X] [MAID-1444](https://maidsafe.atlassian.net/browse/MAID-1444)
+  - [X] [MAID-1445](https://maidsafe.atlassian.net/browse/MAID-1445)
+  - [X] [MAID-1446](https://maidsafe.atlassian.net/browse/MAID-1446)
+  - [X] [MAID-1447](https://maidsafe.atlassian.net/browse/MAID-1447)
+- [X] [MAID-1472](https://maidsafe.atlassian.net/browse/MAID-1472) Observer Registration to events in modules
