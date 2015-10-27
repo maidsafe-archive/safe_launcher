@@ -57,6 +57,7 @@ impl ::launcher::parser::traits::Action for GetFile {
 
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(params.client);
         let mut reader = file_helper.read(&file);
+        // TODO(Krishna) This is WRONG - see rfc.
         let mut size = self.length as u64;
         if size == 0 {
             size = reader.size();
