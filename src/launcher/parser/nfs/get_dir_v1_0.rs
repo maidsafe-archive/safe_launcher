@@ -93,7 +93,6 @@ fn get_file_info(file_metadata: &::safe_nfs::metadata::file_metadata::FileMetada
     }
 }
 
-// TODO(Spandan) requires RFC update for info field
 #[derive(RustcEncodable, Debug)]
 struct GetDirResponse {
     info           : DirectoryInfo,

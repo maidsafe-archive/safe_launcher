@@ -110,6 +110,8 @@ impl ::rustc_serialize::Decodable for OptionalParams {
 struct FileContentParams {
     pub bytes    : String,
     pub offset   : u64,
+    // TODO(Krishna) This should not be required - Specifying both offset and overwrite does not
+    // make sense
     pub overwrite: bool,
 }
 
