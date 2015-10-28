@@ -43,7 +43,7 @@ mod event_loop;
 
 /// Contains lists of various categories of apps
 pub struct Lists {
-    managed_apps       : std::sync::Arc<std::sync::Mutex<Vec<safe_launcher::launcher::event_data::ManagedApp>>>,
+    managed_apps       : std::sync::Arc<std::sync::Mutex<Vec<safe_launcher::launcher::app_handler_event_data::ManagedApp>>>,
     running_apps       : std::sync::Arc<std::sync::Mutex<Vec<routing::NameType>>>,
     pending_add_request: std::sync::Arc<std::sync::Mutex<std::collections::HashMap<String, bool>>>,
 }
@@ -66,7 +66,7 @@ fn on_add_app(lists   : &Lists,
     let safe_drive_access = permission == "Y" || permission == "y";
 
     let _ = eval_result!(lists.pending_add_request.lock()).insert(local_path.clone(), safe_drive_access);
-    let data = safe_launcher::launcher::event_data::AppDetail {
+    let data = safe_launcher::launcher::app_handler_event_data::AppDetail {
         absolute_path    : local_path,
         safe_drive_access: safe_drive_access,
     };
@@ -201,7 +201,7 @@ fn on_modify_app(lists   : &Lists,
                 user_option.clear();
             }
 
-            let modify_app_settings = safe_launcher::launcher::event_data::ModifyAppSettings {
+            let modify_app_settings = safe_launcher::launcher::app_handler_event_data::ModifyAppSettings {
                 id               : managed_apps[serial_number - 1].id,
                 name             : if name != "" { Some(name) } else { None },
                 local_path       : if path != "" { Some(path) } else { None },

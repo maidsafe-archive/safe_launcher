@@ -23,7 +23,7 @@ pub struct Terminate;
 pub struct EventLoop {
     ipc_rx             : ::std::sync::mpsc::Receiver<::safe_launcher::observer::IpcEvent>,
     owner_rx           : ::std::sync::mpsc::Receiver<Terminate>,
-    managed_apps       : ::std::sync::Arc<::std::sync::Mutex<Vec<::safe_launcher::launcher::event_data::ManagedApp>>>,
+    managed_apps       : ::std::sync::Arc<::std::sync::Mutex<Vec<::safe_launcher::launcher::app_handler_event_data::ManagedApp>>>,
     running_apps       : ::std::sync::Arc<::std::sync::Mutex<Vec<::routing::NameType>>>,
     app_handling_rx    : ::std::sync::mpsc::Receiver<::safe_launcher::observer::AppHandlingEvent>,
     pending_add_request: ::std::sync::Arc<::std::sync::Mutex<::std::collections::HashMap<String, bool>>>,
@@ -44,7 +44,8 @@ impl EventLoop {
 
         // Sync the list the first time
         let (managed_apps_tx, managed_apps_rx) = ::std::sync::mpsc::channel();
-        eval_result!(launcher.get_app_handler_event_sender().send(::safe_launcher::launcher::AppHandlerEvent::GetAllManagedApps(managed_apps_tx)));
+        eval_result!(launcher.get_app_handler_event_sender()
+                             .send(::safe_launcher::launcher::AppHandlerEvent::GetAllManagedApps(managed_apps_tx)));
         *eval_result!(cloned_managed_apps.lock()) = eval_result!(eval_result!(managed_apps_rx.recv()));
 
         // Register observer to IPC events
@@ -164,7 +165,7 @@ impl EventLoop {
                                                           "Logic Error - Main thread should have put this data in here by now - Report a bug.");
         match data.result {
             Ok(detail) => {
-                let managed_app = ::safe_launcher::launcher::event_data::ManagedApp {
+                let managed_app = ::safe_launcher::launcher::app_handler_event_data::ManagedApp {
                     id               : detail.id,
                     name             : detail.name,
                     local_path       : Some(data.local_path),

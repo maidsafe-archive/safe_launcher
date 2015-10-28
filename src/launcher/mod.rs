@@ -15,10 +15,10 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-/// Events that can be communicated to the app-handling module.
-pub use self::app_handler::events::{AppHandlerEvent, event_data};
 /// Events that can be communicated to the IPC-handling module.
 pub use self::ipc_server::events::ExternalEvent as IpcExternalEvent;
+/// Events that can be communicated to the app-handling module.
+pub use self::app_handler::events::{AppHandlerEvent, event_data as app_handler_event_data};
 
 mod parser;
 mod ipc_server;

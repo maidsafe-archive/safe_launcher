@@ -65,7 +65,7 @@ impl SecureCommunication {
                 parser_parameters: parameter_packet,
             };
 
-            secure_comm_obj.start();
+            secure_comm_obj.run();
 
             debug!("Exiting Thread {:?}", SECURE_COMM_THREAD_NAME);
         }));
@@ -73,58 +73,36 @@ impl SecureCommunication {
         ::safe_core::utility::RAIIThreadJoiner::new(joiner)
     }
 
-    fn start(&mut self) {
+    fn run(&mut self) {
         loop {
             let cipher_text = eval_send_one!(self.ipc_stream.read_payload(), &self.observer);
 
-            match ::sodiumoxide::crypto::secretbox::open(&cipher_text, &self.symm_nonce, &self.symm_key) {
-                Ok(plain_text) => {
-                    match parse_result!(String::from_utf8(plain_text), "Invalid UTF-8") {
-                        Ok(json_str) => {
-                            match ::rustc_serialize::json::Json::from_str(&json_str) {
-                                Ok(json_request) => {
-                                    match ::launcher::parser::begin_parse(self.parser_parameters.clone(),
-                                                                          &mut ::rustc_serialize::json::Decoder::new(json_request)) {
-                                        Ok(parser_response) => {
-                                            if let Some(response_json_str) = parser_response {
-                                               match self.get_encrypted_normal_response(&cipher_text, response_json_str) {
-                                                    Ok(response_cipher) => eval_send_one!(self.ipc_stream.write(response_cipher), &self.observer),
-                                                    Err(err) => debug!("{:?} - Failed to construct a normal response for peer.", err),
-                                                }
-                                            }
-                                        },
-                                        Err(err) => {
-                                           match self.get_encrypted_error_response(&cipher_text, err) {
-                                                Ok(response_cipher) => eval_send_one!(self.ipc_stream.write(response_cipher), &self.observer),
-                                                Err(err) => debug!("{:?} - Failed to construct a response error for peer.", err),
-                                            }
-                                        },
-                                    }
-                                },
-                                Err(err) => {
-                                   match self.get_encrypted_error_response(&cipher_text, ::errors::LauncherError::from(err)) {
-                                        Ok(response_cipher) => eval_send_one!(self.ipc_stream.write(response_cipher), &self.observer),
-                                        Err(err) => debug!("{:?} - Failed to construct a response error for peer.", err),
-                                    }
-                                },
-                            }
-                        },
-                        Err(err) => {
-                            match self.get_encrypted_error_response(&cipher_text, err) {
-                                Ok(response_cipher) => eval_send_one!(self.ipc_stream.write(response_cipher), &self.observer),
-                                Err(err) => debug!("{:?} - Failed to construct a response error for peer.", err),
-                            }
-                        },
+            match self.on_receive_payload(&cipher_text) {
+                Ok(parser_response) => {
+                    if let Some(response_json_str) = parser_response {
+                        match self.get_encrypted_normal_response(&cipher_text, response_json_str) {
+                             Ok(response_cipher) => eval_send_one!(self.ipc_stream.write(response_cipher), &self.observer),
+                             Err(err) => debug!("{:?} - Failed to construct a normal response for peer.", err),
+                         }
                     }
                 },
-                Err(()) => {
-                    match self.get_encrypted_error_response(&cipher_text, ::errors::LauncherError::SymmetricDecipherFailure) {
-                        Ok(response_cipher) => eval_send_one!(self.ipc_stream.write(response_cipher), &self.observer),
-                        Err(err) => debug!("{:?} - Failed to construct a response error for peer.", err),
+                Err(err) => {
+                    match self.get_encrypted_error_response(&cipher_text, err) {
+                         Ok(response_cipher) => eval_send_one!(self.ipc_stream.write(response_cipher), &self.observer),
+                         Err(err) => debug!("{:?} - Failed to construct a response error for peer.", err),
                     }
                 },
             }
         }
+    }
+
+    fn on_receive_payload(&self, cipher_text: &[u8]) -> ::launcher::parser::ResponseType {
+        let plain_text = try!(::sodiumoxide::crypto::secretbox::open(&cipher_text, &self.symm_nonce, &self.symm_key)
+                                                               .map_err(|()| ::errors::LauncherError::SymmetricDecipherFailure));
+        let json_str = try!(parse_result!(String::from_utf8(plain_text), "Invalid UTF-8"));
+        let json_request = try!(::rustc_serialize::json::Json::from_str(&json_str));
+
+        ::launcher::parser::begin_parse(self.parser_parameters.clone(), &mut ::rustc_serialize::json::Decoder::new(json_request))
     }
 
     fn get_encrypted_normal_response(&self,

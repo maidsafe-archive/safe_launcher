@@ -44,28 +44,18 @@ impl AppHandler {
                                                    ::ipc_server
                                                    ::events::ExternalEvent>) -> (::safe_core::utility::RAIIThreadJoiner,
                                                                                  ::std::sync::mpsc::Sender<events::AppHandlerEvent>) {
-        use std::io::Read;
-
         let (event_tx, event_rx) = ::std::sync::mpsc::channel();
 
         let joiner = eval_result!(::std::thread::Builder::new().name(APP_HANDLER_THREAD_NAME.to_string())
                                                                .spawn(move || {
-            let mut temp_dir_pathbuf = ::std::env::temp_dir();
-            temp_dir_pathbuf.push(::config::LAUNCHER_LOCAL_CONFIG_FILE_NAME);
-
-            let mut local_config_data = ::std::collections::HashMap::with_capacity(10);
-
-            if let Ok(mut file) = ::std::fs::File::open(temp_dir_pathbuf) {
-                let mut raw_disk_data = Vec::with_capacity(eval_result!(file.metadata()).len() as usize);
-                if let Ok(_) = file.read_to_end(&mut raw_disk_data) {
-                    if raw_disk_data.len() != 0 {
-                        match eval_result!(client.lock()).hybrid_decrypt(&raw_disk_data, None) {
-                            Ok(plain_text) => local_config_data = misc::convert_vec_to_hashmap(eval_result!(::safe_core
-                                                                                                            ::utility
-                                                                                                            ::deserialise(&plain_text))),
-                            Err(err) => debug!("{:?} -> Local config file could not be read - either tampered or corrupted. Starting afresh...", err),
-                        }
-                    }
+            let raw_disk_data = eval_result!(misc::read_local_config_file());
+            let mut local_config_data = ::std::collections::HashMap::with_capacity(raw_disk_data.len() + 1);
+            if raw_disk_data.len() != 0 {
+                match eval_result!(client.lock()).hybrid_decrypt(&raw_disk_data, None) {
+                    Ok(plain_text) => local_config_data = misc::convert_vec_to_hashmap(eval_result!(::safe_core
+                                                                                                    ::utility
+                                                                                                    ::deserialise(&plain_text))),
+                    Err(err) => debug!("{:?} -> Local config file could not be read - either tampered or corrupted. Starting afresh...", err),
                 }
             }
 
@@ -199,7 +189,9 @@ impl AppHandler {
                 *it += 48;
             }
         }
-        let str_nonce = try!(String::from_utf8(rand_vec).map_err(|e| ::errors::LauncherError::Unexpected(format!("{:?} -> Logic Error - Report a bug.", e))));
+        let str_nonce = try!(String::from_utf8(rand_vec).map_err(|e| ::errors
+                                                                     ::LauncherError
+                                                                     ::Unexpected(format!("{:?} -> Logic Error - Report a bug.", e))));
 
         let activation_detail = ::launcher::ipc_server::events::event_data::ActivationDetail {
             nonce            : str_nonce.clone(),
@@ -211,7 +203,8 @@ impl AppHandler {
         try!(send_one!(activation_detail,
                        &self.ipc_server_event_sender).map_err(|e| ::errors
                                                                   ::LauncherError
-                                                                  ::Unexpected(format!("{:?} Could not communicate activation detail to IPC Server", e))));
+                                                                  ::Unexpected(format!("{:?} Could not communicate activation detail \
+                                                                                       to IPC Server", e))));
         let command_line_arg = format!("tcp:{}:{}", self.launcher_endpoint, str_nonce);
 
         if let Err(err) = ::std::process::Command::new(app_binary_path)
@@ -493,17 +486,10 @@ impl AppHandler {
 
 impl Drop for AppHandler {
     fn drop(&mut self) {
-        use std::io::Write;
-
-        let mut temp_dir_pathbuf = ::std::env::temp_dir();
-        temp_dir_pathbuf.push(::config::LAUNCHER_LOCAL_CONFIG_FILE_NAME);
-
-        let mut file = eval_result!(::std::fs::File::create(temp_dir_pathbuf));
         let plain_text = eval_result!(::safe_core
                                       ::utility
                                       ::serialise(&misc::convert_hashmap_to_vec(&self.local_config_data)));
         let cipher_text = eval_result!(eval_result!(self.client.lock()).hybrid_encrypt(&plain_text, None));
-        let _ = file.write_all(&cipher_text);
-        eval_result!(file.sync_all());
+        eval_result!(misc::flush_to_local_config(&cipher_text));
     }
 }

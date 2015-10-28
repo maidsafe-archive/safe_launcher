@@ -68,6 +68,8 @@ pub enum LauncherError {
     AppActivationFailed(::std::io::Error),
     /// Payload to read is prohibitive in size
     ReadPayloadSizeProhibitive,
+    /// Unable to Read from or Write to a Local Config file.
+    LocalConfigAccessFailed(String),
     /// Unexpected - Probably a Logic error
     Unexpected(String),
 }
@@ -139,7 +141,8 @@ impl Into<i32> for LauncherError {
             LauncherError::AppNotRegistered                 => LAUNCHER_ERROR_START_RANGE - 17,
             LauncherError::AppActivationFailed(_)           => LAUNCHER_ERROR_START_RANGE - 18,
             LauncherError::ReadPayloadSizeProhibitive       => LAUNCHER_ERROR_START_RANGE - 19,
-            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 20,
+            LauncherError::LocalConfigAccessFailed(_)       => LAUNCHER_ERROR_START_RANGE - 20,
+            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 21,
         }
     }
 }
@@ -147,29 +150,30 @@ impl Into<i32> for LauncherError {
 impl ::std::fmt::Debug for LauncherError {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         match *self {
-            LauncherError::CoreError(ref error)             => write!(f, "LauncherError::CoreError -> {:?}", error),
-            LauncherError::NfsError(ref error)              => write!(f, "LauncherError::NfsError -> {:?}", error),
-            LauncherError::DnsError(ref error)              => write!(f, "LauncherError::DnsError -> {:?}", error),
-            LauncherError::IpcListenerCouldNotBeBound       => write!(f, "LauncherError::IpcListenerCouldNotBeBound"),
-            LauncherError::IpcListenerAborted(ref error)    => write!(f, "LauncherError::IpcListenerAborted -> {:?}", error),
-            LauncherError::IpcStreamCloneError(ref error)   => write!(f, "LauncherError::IpcStreamCloneError -> {:?}", error),
-            LauncherError::ReceiverChannelDisconnected      => write!(f, "LauncherError::ReceiverChannelDisconnected"),
-            LauncherError::IpcSessionTerminated(ref error)  => write!(f, "LauncherError::IpcSessionTerminated -> {:?}", error),
-            LauncherError::FailedReadingStreamPayloadSize   => write!(f, "LauncherError::FailedReadingStreamPayloadSize"),
-            LauncherError::FailedWritingStreamPayloadSize   => write!(f, "LauncherError::FailedWritingStreamPayloadSize"),
-            LauncherError::PathNotFound                     => write!(f, "LauncherError::PathNotFound"),
-            LauncherError::InvalidPath                      => write!(f, "LauncherError::InvalidPath"),
-            LauncherError::PermissionDenied                 => write!(f, "LauncherError::PermissionDenied"),
-            LauncherError::JsonParseError(ref error)        => write!(f, "LauncherError::JsonParseError -> {:?}", error),
-            LauncherError::JsonDecodeError(ref error)       => write!(f, "LauncherError::JsonDecodeError -> {:?}", error),
-            LauncherError::SpecificParseError(ref error)    => write!(f, "LauncherError::SpecificParseError -> {:?}", error),
-            LauncherError::JsonEncodeError(ref error)       => write!(f, "LauncherError::JsonEncodeError -> {:?}", error),
-            LauncherError::SymmetricDecipherFailure         => write!(f, "LauncherError::SymmetricDecipherFailure"),
-            LauncherError::AppAlreadyAdded                  => write!(f, "LauncherError::AppAlreadyAdded"),
-            LauncherError::AppNotRegistered                 => write!(f, "LauncherError::AppNotRegistered"),
-            LauncherError::AppActivationFailed(ref error)   => write!(f, "LauncherError::AppActivationFailed -> {:?}", error),
-            LauncherError::ReadPayloadSizeProhibitive       => write!(f, "LauncherError::ReadPayloadSizeProhibitive"),
-            LauncherError::Unexpected(ref error)            => write!(f, "LauncherError::Unexpected{{{:?}}}", error),
+            LauncherError::CoreError(ref error)               => write!(f, "LauncherError::CoreError -> {:?}", error),
+            LauncherError::NfsError(ref error)                => write!(f, "LauncherError::NfsError -> {:?}", error),
+            LauncherError::DnsError(ref error)                => write!(f, "LauncherError::DnsError -> {:?}", error),
+            LauncherError::IpcListenerCouldNotBeBound         => write!(f, "LauncherError::IpcListenerCouldNotBeBound"),
+            LauncherError::IpcListenerAborted(ref error)      => write!(f, "LauncherError::IpcListenerAborted -> {:?}", error),
+            LauncherError::IpcStreamCloneError(ref error)     => write!(f, "LauncherError::IpcStreamCloneError -> {:?}", error),
+            LauncherError::ReceiverChannelDisconnected        => write!(f, "LauncherError::ReceiverChannelDisconnected"),
+            LauncherError::IpcSessionTerminated(ref error)    => write!(f, "LauncherError::IpcSessionTerminated -> {:?}", error),
+            LauncherError::FailedReadingStreamPayloadSize     => write!(f, "LauncherError::FailedReadingStreamPayloadSize"),
+            LauncherError::FailedWritingStreamPayloadSize     => write!(f, "LauncherError::FailedWritingStreamPayloadSize"),
+            LauncherError::PathNotFound                       => write!(f, "LauncherError::PathNotFound"),
+            LauncherError::InvalidPath                        => write!(f, "LauncherError::InvalidPath"),
+            LauncherError::PermissionDenied                   => write!(f, "LauncherError::PermissionDenied"),
+            LauncherError::JsonParseError(ref error)          => write!(f, "LauncherError::JsonParseError -> {:?}", error),
+            LauncherError::JsonDecodeError(ref error)         => write!(f, "LauncherError::JsonDecodeError -> {:?}", error),
+            LauncherError::SpecificParseError(ref error)      => write!(f, "LauncherError::SpecificParseError -> {:?}", error),
+            LauncherError::JsonEncodeError(ref error)         => write!(f, "LauncherError::JsonEncodeError -> {:?}", error),
+            LauncherError::SymmetricDecipherFailure           => write!(f, "LauncherError::SymmetricDecipherFailure"),
+            LauncherError::AppAlreadyAdded                    => write!(f, "LauncherError::AppAlreadyAdded"),
+            LauncherError::AppNotRegistered                   => write!(f, "LauncherError::AppNotRegistered"),
+            LauncherError::AppActivationFailed(ref error)     => write!(f, "LauncherError::AppActivationFailed -> {:?}", error),
+            LauncherError::ReadPayloadSizeProhibitive         => write!(f, "LauncherError::ReadPayloadSizeProhibitive"),
+            LauncherError::LocalConfigAccessFailed(ref error) => write!(f, "LauncherError::LocalConfigAccessFailed -> {:?}", error),
+            LauncherError::Unexpected(ref error)              => write!(f, "LauncherError::Unexpected{{{:?}}}", error),
         }
     }
 }
