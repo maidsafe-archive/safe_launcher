@@ -190,7 +190,16 @@ impl AppHandler {
 
         let app_info = try!(global_configs.iter().find(|config| config.app_id == app_id).ok_or(::errors::LauncherError::AppNotRegistered));
         let app_binary_path = try!(self.local_config_data.get(&app_info.app_id).ok_or(::errors::LauncherError::PathNotFound));
-        let str_nonce = try!(::safe_core::utility::generate_random_string(::config::LAUNCHER_NONCE_LENGTH));
+
+        let mut rand_vec = try!(::safe_core::utility::generate_random_vector::<u8>(::config::LAUNCHER_NONCE_LENGTH));
+        // Ensure valid ASCII and hence valid UTF-8. Keep it in ASCII range [48, 127].
+        for it in rand_vec.iter_mut() {
+            *it %= 128;
+            if *it < 48 {
+                *it += 48;
+            }
+        }
+        let str_nonce = try!(String::from_utf8(rand_vec).map_err(|e| ::errors::LauncherError::Unexpected(format!("{:?} -> Logic Error - Report a bug.", e))));
 
         let activation_detail = ::launcher::ipc_server::events::event_data::ActivationDetail {
             nonce            : str_nonce.clone(),
