@@ -20,6 +20,7 @@ pub const LAUNCHER_NONCE_LENGTH: usize = 13;
 pub const LAUNCHER_GLOBAL_DIRECTORY_NAME: &'static str = "LauncherReservedDirectory";
 pub const LAUNCHER_LOCAL_CONFIG_FILE_NAME: &'static str = "launcher.config";
 pub const LAUNCHER_GLOBAL_CONFIG_FILE_NAME: &'static str = "LauncherSpecificConfigurationFile";
+pub const MAX_ALLOWED_READ_PAYLOAD_SIZE_BYTES: u64 = 300 * 1024 * 1024;
 
 pub fn get_base64_config() -> ::rustc_serialize::base64::Config {
     ::rustc_serialize::base64::Config {

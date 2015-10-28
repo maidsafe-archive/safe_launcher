@@ -21,7 +21,7 @@ pub type EventSenderToSession<EventSubset> = ::event_sender::EventSender<events:
 
 mod stream;
 mod authenticate_app;
-mod rsa_key_exchange;
+mod ecdh_key_exchange;
 mod secure_communication;
 
 const IPC_SESSION_THREAD_NAME: &'static str = "IpcSessionThread";
@@ -144,9 +144,9 @@ impl IpcSession {
         self.safe_drive_access = Some(::std::sync::Arc::new(::std::sync::Mutex::new(app_detail.safe_drive_access))); 
 
         if let Some(mut ipc_stream) = self.get_ipc_stream_or_terminate() {
-            match rsa_key_exchange::perform_key_exchange(&mut ipc_stream,
-                                                         eval_option!(self.app_nonce, "Logic Error - Report a bug."),
-                                                         eval_option!(self.app_pub_key, "Logice Error - Report a bug.")) {
+            match ecdh_key_exchange::perform_ecdh_exchange(&mut ipc_stream,
+                                                           eval_option!(self.app_nonce, "Logic Error - Report a bug."),
+                                                           eval_option!(self.app_pub_key, "Logice Error - Report a bug.")) {
                 Ok((symm_nonce, symm_key)) => {
                     let safe_drive_access = if let Some(ref access) = self.safe_drive_access {
                         access.clone()
@@ -168,7 +168,7 @@ impl IpcSession {
                                                                                       safe_drive_access);
                 },
                 Err(err) => {
-                    debug!("RSA Key Exchange unsuccessful {:?}", err);
+                    debug!("ECDH Key Exchange unsuccessful {:?}", err);
                     self.terminate_session(err);
                 },
             }

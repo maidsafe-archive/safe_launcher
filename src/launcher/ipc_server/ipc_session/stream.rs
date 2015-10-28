@@ -63,9 +63,14 @@ impl IpcStream {
                                                                 .map_err(|err| {
                                                                     debug!("{:?}", err);
                                                                     ::errors::LauncherError::FailedReadingStreamPayloadSize
-                                                                })) as usize;
-        let mut payload = Vec::with_capacity(size);
-        unsafe { payload.set_len(size); }
+                                                                }));
+
+        if size > ::config::MAX_ALLOWED_READ_PAYLOAD_SIZE_BYTES {
+            return Err(::errors::LauncherError::ReadPayloadSizeProhibitive)
+        }
+
+        let mut payload = Vec::with_capacity(size as usize);
+        unsafe { payload.set_len(size as usize); }
 
         try!(self.fill_buffer(&mut payload));
 

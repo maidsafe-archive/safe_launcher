@@ -15,11 +15,11 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-pub fn perform_key_exchange(ipc_stream : &mut ::launcher::ipc_server::ipc_session::stream::IpcStream,
-                            app_nonce  : ::sodiumoxide::crypto::box_::Nonce,
-                            app_pub_key: ::sodiumoxide::crypto::box_::PublicKey) -> Result<(::sodiumoxide::crypto::secretbox::Nonce,
-                                                                                            ::sodiumoxide::crypto::secretbox::Key),
-                                                                                           ::errors::LauncherError> {
+pub fn perform_ecdh_exchange(ipc_stream : &mut ::launcher::ipc_server::ipc_session::stream::IpcStream,
+                             app_nonce  : ::sodiumoxide::crypto::box_::Nonce,
+                             app_pub_key: ::sodiumoxide::crypto::box_::PublicKey) -> Result<(::sodiumoxide::crypto::secretbox::Nonce,
+                                                                                             ::sodiumoxide::crypto::secretbox::Key),
+                                                                                            ::errors::LauncherError> {
     use ::rustc_serialize::base64::ToBase64;
 
     let key = ::sodiumoxide::crypto::secretbox::gen_key();
@@ -38,7 +38,7 @@ pub fn perform_key_exchange(ipc_stream : &mut ::launcher::ipc_server::ipc_sessio
     let launcher_pub_key_base64 = launcher_public_key.0.to_base64(b64_config);
     let cipher_text_base64 = cipher_text.to_base64(b64_config);
 
-    let response = RsaKeyExchgResponse {
+    let response = EcdhKeyExchgResponse {
       encrypted_symm_key : cipher_text_base64,
       launcher_public_key: launcher_pub_key_base64,
     };
@@ -58,11 +58,11 @@ pub fn perform_key_exchange(ipc_stream : &mut ::launcher::ipc_server::ipc_sessio
 #[derive(RustcEncodable, Debug)]
 struct JsonPacket {
     pub id  : String,
-    pub data: RsaKeyExchgResponse,
+    pub data: EcdhKeyExchgResponse,
 }
 
 #[derive(RustcEncodable, Debug)]
-struct RsaKeyExchgResponse {
+struct EcdhKeyExchgResponse {
     pub encrypted_symm_key : String,
     pub launcher_public_key: String,
 }

@@ -66,6 +66,8 @@ pub enum LauncherError {
     AppNotRegistered,
     /// Starting of App as an external process has failed
     AppActivationFailed(::std::io::Error),
+    /// Payload to read is prohibitive in size
+    ReadPayloadSizeProhibitive,
     /// Unexpected - Probably a Logic error
     Unexpected(String),
 }
@@ -136,7 +138,8 @@ impl Into<i32> for LauncherError {
             LauncherError::AppAlreadyAdded                  => LAUNCHER_ERROR_START_RANGE - 16,
             LauncherError::AppNotRegistered                 => LAUNCHER_ERROR_START_RANGE - 17,
             LauncherError::AppActivationFailed(_)           => LAUNCHER_ERROR_START_RANGE - 18,
-            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 19,
+            LauncherError::ReadPayloadSizeProhibitive       => LAUNCHER_ERROR_START_RANGE - 19,
+            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 20,
         }
     }
 }
@@ -165,6 +168,7 @@ impl ::std::fmt::Debug for LauncherError {
             LauncherError::AppAlreadyAdded                  => write!(f, "LauncherError::AppAlreadyAdded"),
             LauncherError::AppNotRegistered                 => write!(f, "LauncherError::AppNotRegistered"),
             LauncherError::AppActivationFailed(ref error)   => write!(f, "LauncherError::AppActivationFailed -> {:?}", error),
+            LauncherError::ReadPayloadSizeProhibitive       => write!(f, "LauncherError::ReadPayloadSizeProhibitive"),
             LauncherError::Unexpected(ref error)            => write!(f, "LauncherError::Unexpected{{{:?}}}", error),
         }
     }
