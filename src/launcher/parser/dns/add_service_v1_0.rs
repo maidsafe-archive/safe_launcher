@@ -81,7 +81,7 @@ mod test {
         assert!(register_request.execute(parameter_packet.clone()).is_ok());
 
         let mut request = AddService {
-            long_name            : public_name.clone(),
+            long_name            : public_name,
             service_name         : "blog".to_string(),
             is_path_shared       : false,
             service_home_dir_path: format!("/{}", TEST_DIR_NAME).to_string(),
