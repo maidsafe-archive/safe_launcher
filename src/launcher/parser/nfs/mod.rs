@@ -56,11 +56,11 @@ fn get_action<D>(action_str: &str, version: f32, decoder: &mut D) -> Result<Box<
             _   => return version_err,
         },
         "modify-dir" => match version {
-            1.0 => unimplemented!(),
+            1.0 => Box::new(try!(parse_result!(decoder.read_struct_field("data", 0, |d| modify_dir_v1_0::ModifyDir::decode(d)), ""))),
             _   => return version_err,
         },
         "get-dir" => match version {
-            1.0 => unimplemented!(),
+            1.0 => Box::new(try!(parse_result!(decoder.read_struct_field("data", 0, |d| get_dir_v1_0::GetDir::decode(d)), ""))),
             _   => return version_err,
         },
         "create-file" => match version {
@@ -68,7 +68,7 @@ fn get_action<D>(action_str: &str, version: f32, decoder: &mut D) -> Result<Box<
             _   => return version_err,
         },
         "delete-file" => match version {
-            1.0 => unimplemented!(),
+            1.0 => Box::new(try!(parse_result!(decoder.read_struct_field("data", 0, |d| delete_file_v1_0::DeleteFile::decode(d)), ""))),
             _   => return version_err,
         },
         "modify-file" => match version {
@@ -76,7 +76,7 @@ fn get_action<D>(action_str: &str, version: f32, decoder: &mut D) -> Result<Box<
             _   => return version_err,
         },
         "get-file" => match version {
-            1.0 => unimplemented!(),
+            1.0 => Box::new(try!(parse_result!(decoder.read_struct_field("data", 0, |d| get_file_v1_0::GetFile::decode(d)), ""))),
             _   => return version_err,
         },
         _ => return Err(::errors::LauncherError::SpecificParseError(format!("Unsupported action {:?} for this endpoint.", action_str))),
