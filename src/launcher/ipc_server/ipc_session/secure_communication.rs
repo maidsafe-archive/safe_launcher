@@ -84,10 +84,15 @@ impl SecureCommunication {
                              Ok(response_cipher) => eval_send_one!(self.ipc_stream.write(response_cipher), &self.observer),
                              Err(err) => debug!("{:?} - Failed to construct a normal response for peer.", err),
                          }
+                    } else {
+                        match self.get_encrypted_error_response(&cipher_text, None) {
+                             Ok(response_cipher) => eval_send_one!(self.ipc_stream.write(response_cipher), &self.observer),
+                             Err(err) => debug!("{:?} - Failed to construct a response error for peer.", err),
+                        }
                     }
                 },
                 Err(err) => {
-                    match self.get_encrypted_error_response(&cipher_text, err) {
+                    match self.get_encrypted_error_response(&cipher_text, Some(err)) {
                          Ok(response_cipher) => eval_send_one!(self.ipc_stream.write(response_cipher), &self.observer),
                          Err(err) => debug!("{:?} - Failed to construct a response error for peer.", err),
                     }
@@ -122,11 +127,14 @@ impl SecureCommunication {
 
     fn get_encrypted_error_response(&self,
                                     orig_payload: &[u8],
-                                    error       : ::errors::LauncherError) -> Result<Vec<u8>, ::errors::LauncherError> {
+                                    error       : Option<::errors::LauncherError>) -> Result<Vec<u8>, ::errors::LauncherError> {
         let response_id = SecureCommunication::get_response_id(orig_payload);
-        let debug_description = format!("{:?}", error);
 
-        let error_code: i32 = error.into();
+        let (debug_description, error_code) = if let Some(err) = error {
+            (format!("{:?}", err), err.into())
+        } else {
+            (String::new(), 0i32)
+        };
 
         let error_detail = ErrorDetail {
             code       : error_code as i64,
