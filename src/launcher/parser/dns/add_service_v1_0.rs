@@ -52,7 +52,6 @@ impl ::launcher::parser::traits::Action for AddService {
     }
 }
 
-/* TODO test is failing because Addservice is nevere returning any response. Hangs at line 46.
 #[cfg(test)]
 mod test {
     use super::*;
@@ -72,10 +71,9 @@ mod test {
                                                false,
                                                ::safe_nfs::AccessLevel::Public,
                                                Some(&mut app_root_dir)));
-
-
+        let public_name = eval_result!(::safe_core::utility::generate_random_string(10));        
         let mut register_request = ::launcher::parser::dns::register_dns_v1_0::RegisterDns {
-            long_name            : "test2.com".to_string(),
+            long_name            : public_name.clone(),
             service_name         : "www".to_string(),
             is_path_shared       : false,
             service_home_dir_path: format!("/{}", TEST_DIR_NAME).to_string(),
@@ -83,7 +81,7 @@ mod test {
         assert!(register_request.execute(parameter_packet.clone()).is_ok());
 
         let mut request = AddService {
-            long_name            : "test2.com".to_string(),
+            long_name            : public_name.clone(),
             service_name         : "blog".to_string(),
             is_path_shared       : false,
             service_home_dir_path: format!("/{}", TEST_DIR_NAME).to_string(),
@@ -92,4 +90,3 @@ mod test {
         assert!(request.execute(parameter_packet).is_ok());
     }
 }
-*/
