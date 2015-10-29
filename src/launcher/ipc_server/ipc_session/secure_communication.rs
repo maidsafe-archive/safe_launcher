@@ -29,16 +29,16 @@ pub struct SecureCommunication {
 }
 
 impl SecureCommunication {
-    pub fn new(client            : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-               observer          : ::launcher::ipc_server::ipc_session::EventSenderToSession<::launcher
-                                                                                             ::ipc_server
-                                                                                             ::ipc_session
-                                                                                             ::events::SecureCommunicationEvent>,
-               symm_key          : ::sodiumoxide::crypto::secretbox::Key,
-               symm_nonce        : ::sodiumoxide::crypto::secretbox::Nonce,
-               ipc_stream        : ::launcher::ipc_server::ipc_session::stream::IpcStream,
-               app_root_dir_key  : ::safe_nfs::metadata::directory_key::DirectoryKey,
-               safe_drive_access : ::std::sync::Arc<::std::sync::Mutex<bool>>) -> ::safe_core::utility::RAIIThreadJoiner {
+    pub fn new(client           : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+               observer         : ::launcher::ipc_server::ipc_session::EventSenderToSession<::launcher
+                                                                                            ::ipc_server
+                                                                                            ::ipc_session
+                                                                                            ::events::SecureCommunicationEvent>,
+               symm_key         : ::sodiumoxide::crypto::secretbox::Key,
+               symm_nonce       : ::sodiumoxide::crypto::secretbox::Nonce,
+               ipc_stream       : ::launcher::ipc_server::ipc_session::stream::IpcStream,
+               app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
+               safe_drive_access: ::std::sync::Arc<::std::sync::Mutex<bool>>) -> ::safe_core::utility::RAIIThreadJoiner {
         let joiner = eval_result!(::std::thread::Builder::new()
                                                          .name(SECURE_COMM_THREAD_NAME.to_string())
                                                          .spawn(move || {

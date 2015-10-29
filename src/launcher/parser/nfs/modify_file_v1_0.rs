@@ -88,22 +88,11 @@ impl ::launcher::parser::traits::Action for ModifyFile {
     }
 }
 
-#[derive(Debug)]
+#[derive(RustcDecodable, Debug)]
 struct OptionalParams {
     pub name         : Option<String>,
     pub content      : Option<FileContentParams>,
     pub user_metadata: Option<String>,
-}
-
-impl ::rustc_serialize::Decodable for OptionalParams {
-    fn decode<D>(decoder: &mut D) -> Result<Self, D::Error>
-                                     where D: ::rustc_serialize::Decoder {
-        Ok(OptionalParams {
-            name         : decoder.read_struct_field("name", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
-            content      : decoder.read_struct_field("content", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
-            user_metadata: decoder.read_struct_field("user_metadata", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
-        })
-    }
 }
 
 #[derive(RustcDecodable, Debug)]

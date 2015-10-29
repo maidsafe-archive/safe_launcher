@@ -60,24 +60,11 @@ impl ::launcher::parser::traits::Action for ModifyDir {
         Ok(None)
     }
 }
-// TODO Below are the deviations from the RFC parameters
-// modified time stamp can not be updated via NFS API
-// NFS Api does not permit changing the private to public accesslevel
-// versioning can not be changed too
-#[derive(Debug)]
+
+#[derive(Debug, RustcDecodable)]
 struct OptionalParams {
     pub name         : Option<String>,
     pub user_metadata: Option<String>,
-}
-
-impl ::rustc_serialize::Decodable for OptionalParams {
-    fn decode<D>(decoder: &mut D) -> Result<Self, D::Error>
-                                     where D: ::rustc_serialize::Decoder {
-        Ok(OptionalParams {
-            name         : decoder.read_struct_field("name", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
-            user_metadata: decoder.read_struct_field("user_metadata", 0, |d| ::rustc_serialize::Decodable::decode(d)).ok(),
-        })
-    }
 }
 
 #[cfg(test)]
