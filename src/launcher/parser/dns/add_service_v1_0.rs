@@ -71,7 +71,7 @@ mod test {
                                                false,
                                                ::safe_nfs::AccessLevel::Public,
                                                Some(&mut app_root_dir)));
-        let public_name = eval_result!(::safe_core::utility::generate_random_string(10));        
+        let public_name = eval_result!(::safe_core::utility::generate_random_string(10));
         let mut register_request = ::launcher::parser::dns::register_dns_v1_0::RegisterDns {
             long_name            : public_name.clone(),
             service_name         : "www".to_string(),
