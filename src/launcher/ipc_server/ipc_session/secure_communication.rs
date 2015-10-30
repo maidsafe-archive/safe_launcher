@@ -115,7 +115,10 @@ impl SecureCommunication {
                                      data        : String) -> Result<Vec<u8>, ::errors::LauncherError> {
         let normal_response = LauncherNormalResponse {
             id  : SecureCommunication::get_response_id(orig_payload),
-            data: data,
+            // TODO(Spandan)
+            // This is inefficient - encoding into a json_str and then again decoding that into a
+            // JSON. Instead get directly into a JSON in ::launcher::parser::ResponseType
+            data: eval_result!(::rustc_serialize::json::Json::from_str(&data[..])),
         };
 
         let json_str = try!(::rustc_serialize::json::encode(&normal_response));
@@ -164,7 +167,7 @@ impl SecureCommunication {
 #[derive(RustcEncodable, Debug)]
 struct LauncherNormalResponse {
     id  : String,
-    data: String,
+    data: ::rustc_serialize::json::Json,
 }
 
 #[derive(RustcEncodable, Debug)]
