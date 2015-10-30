@@ -41,23 +41,22 @@ impl ::launcher::parser::traits::Action for RegisterDns {
                                                                                  &tokens,
                                                                                  Some(start_dir_key)));
 
-       let (msg_public_key, msg_secret_key) = ::sodiumoxide::crypto::box_::gen_keypair();
-       let services = vec![(self.service_name.clone(), (dir_to_map.get_key().clone()))];
-       let public_signing_key = try!(eval_result!(params.client.lock()).get_public_signing_key()).clone();
-       let secret_signing_key = try!(eval_result!(params.client.lock()).get_secret_signing_key()).clone();
-       let dns_operation = try!(::safe_dns::dns_operations::DnsOperations::new(params.client.clone()));
-       let struct_data = try!(dns_operation.register_dns(self.long_name.clone(),
-                                                         &msg_public_key,
-                                                         &msg_secret_key,
-                                                         &services,
-                                                         vec![public_signing_key],
-                                                         &secret_signing_key,
-                                                         None));
-       eval_result!(params.client.lock()).post(::routing::data::Data::StructuredData(struct_data), None);
-       Ok(None)
+        let (msg_public_key, msg_secret_key) = ::sodiumoxide::crypto::box_::gen_keypair();
+        let services = vec![(self.service_name.clone(), (dir_to_map.get_key().clone()))];
+        let public_signing_key = try!(eval_result!(params.client.lock()).get_public_signing_key()).clone();
+        let secret_signing_key = try!(eval_result!(params.client.lock()).get_secret_signing_key()).clone();
+        let dns_operation = try!(::safe_dns::dns_operations::DnsOperations::new(params.client.clone()));
+        let struct_data = try!(dns_operation.register_dns(self.long_name.clone(),
+                                                          &msg_public_key,
+                                                          &msg_secret_key,
+                                                          &services,
+                                                          vec![public_signing_key],
+                                                          &secret_signing_key,
+                                                          None));
+        try!(eval_result!(params.client.lock()).put(::routing::data::Data::StructuredData(struct_data), None));
+        Ok(None)
     }
 }
-
 
 #[cfg(test)]
 mod test {
@@ -78,10 +77,9 @@ mod test {
                                                false,
                                                ::safe_nfs::AccessLevel::Public,
                                                Some(&mut app_root_dir)));
-
-
+        let public_name = eval_result!(::safe_core::utility::generate_random_string(10));
         let mut request = RegisterDns {
-            long_name            : "test.com".to_string(),
+            long_name            : public_name,
             service_name         : "www".to_string(),
             is_path_shared       : false,
             service_home_dir_path: "/test_dir2".to_string(),
