@@ -182,9 +182,9 @@ impl AppHandler {
         let app_binary_path = try!(self.local_config_data.get(&app_info.app_id).ok_or(::errors::LauncherError::PathNotFound));
 
         let mut rand_vec = try!(::safe_core::utility::generate_random_vector::<u8>(::config::LAUNCHER_NONCE_LENGTH));
-        // Ensure valid ASCII and hence valid UTF-8. Keep it in ASCII range [48, 127].
+        // Ensure valid ASCII and hence valid UTF-8. Keep it in ASCII range [48, 122].
         for it in rand_vec.iter_mut() {
-            *it %= 128;
+            *it %= 123;
             if *it < 48 {
                 *it += 48;
             }
