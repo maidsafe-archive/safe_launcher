@@ -61,7 +61,7 @@ mod test {
     use ::launcher::parser::traits::Action;
 
     #[test]
-    pub fn create_file() {
+    fn create_file() {
         let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         let mut request = CreateFile {

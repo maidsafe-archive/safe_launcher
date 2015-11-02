@@ -78,7 +78,7 @@ mod test {
     use ::launcher::parser::traits::Action;
 
     #[test]
-    pub fn create_dir() {
+    fn create_dir() {
         let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         let mut request = CreateDir {

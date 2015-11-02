@@ -126,7 +126,7 @@ struct FileInfo {
 
 #[cfg(test)]
 mod test {
-    use ::launcher::parser::traits::Action;    
+    use ::launcher::parser::traits::Action;
 
     const TEST_DIR_NAME: &'static str = "test_dir";
 
@@ -142,7 +142,7 @@ mod test {
     }
 
     #[test]
-    pub fn get_dir() {
+    fn get_dir() {
         let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         create_test_dir(&parameter_packet);

@@ -77,7 +77,7 @@ fn module_dispatcher<D>(params              : ParameterPacket,
 #[cfg(test)]
 mod test {
     #[test]
-    pub fn parse_request() {
+    fn parse_request() {
         let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         let mut json_str = "{}";
