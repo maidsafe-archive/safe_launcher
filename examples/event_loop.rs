@@ -119,7 +119,7 @@ impl EventLoop {
                     if let Ok(ipc_event) = self.ipc_rx.try_recv() {
                         match ipc_event {
                             ::safe_launcher::observer::IpcEvent::VerifiedSessionUpdate(data) => self.on_verified_session_update(data),
-                            _ => println!("Ignoring incoming event {:?} for this example.", ipc_event),
+                            _ => println!("Launcher: Ignoring incoming event {:?} for this example.", ipc_event),
                         }
                     }
                 },
@@ -129,7 +129,7 @@ impl EventLoop {
                             ::safe_launcher::observer::AppHandlingEvent::AppAddition(data) => self.on_app_addition(data),
                             ::safe_launcher::observer::AppHandlingEvent::AppRemoval(data) => self.on_app_removal(data),
                             ::safe_launcher::observer::AppHandlingEvent::AppModification(data) => self.on_app_modification(data),
-                            _ => println!("Ignoring incoming event {:?} for this example.", app_handling_event),
+                            _ => println!("Launcher: Ignoring incoming event {:?} for this example.", app_handling_event),
                         }
                     }
                 },
@@ -146,10 +146,15 @@ impl EventLoop {
         match data.action {
             ::safe_launcher::observer::event_data::Action::Added => eval_result!(self.running_apps.lock()).push(data.id),
             ::safe_launcher::observer::event_data::Action::Removed(err_opt) => {
+                let ref managed_apps = *eval_result!(self.managed_apps.lock());
                 let ref mut running_apps = *eval_result!(self.running_apps.lock());
 
+                let id = data.id;
                 if let Some(err) = err_opt {
-                    println!("Session {:?} removed due to {:?}", data.id, err);
+                    if let Some(pos) = managed_apps.iter().position(|app| app.id == id) {
+                        let ref managed_app = managed_apps[pos];
+                        println!("Launcher: App {:?} - serial number {}, removed due to {:?}", managed_app.name, pos + 1, err);
+                    }
                 }
 
                 let remove_id = data.id;
@@ -174,13 +179,13 @@ impl EventLoop {
                 };
                 eval_result!(self.managed_apps.lock()).push(managed_app);
             },
-            Err(err) => println!("Error {:?} adding app {:?} to Launcher", err, data.local_path),
+            Err(err) => println!("Launcher: Error {:?} adding app {:?} to Launcher", err, data.local_path),
         }
     }
 
     fn on_app_removal(&self, data: ::safe_launcher::observer::event_data::AppRemoval) {
         match data.result {
-            Some(err) => println!("Error {:?} removing app from Launcher", err),
+            Some(err) => println!("Launcher: Error {:?} removing app from Launcher", err),
             None => {
                 let ref mut managed_apps = *eval_result!(self.managed_apps.lock());
 
@@ -209,7 +214,7 @@ impl EventLoop {
                     }
                 }
             },
-            Err(err) => println!("Error {:?} modifying app in Launcher", err),
+            Err(err) => println!("Launcher: Error {:?} modifying app in Launcher", err),
         }
     }
 }

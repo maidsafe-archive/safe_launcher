@@ -110,11 +110,12 @@ fn on_list_all_managed_apps(lists: &Lists) {
 
         let is_activated = eval_result!(lists.running_apps.lock()).iter().find(|id| **id == it.1.id).is_some();
 
-        println!("\n------------------- Application - Serial number {} -------------------", it.0 + 1);
-        println!("Unique App-ID: {:?}\nName: {}\nLocation on this machine: {}\nNumber of machines installed in: {}\nIs allowed \"SAFEDrive\" access: {}\n\nCurrently activated: {}",
-                 it.1.id, it.1.name, location, it.1.reference_count, it.1.safe_drive_access, is_activated);
+        println!("\n------------------- Application - Serial number {} -------------------\n", it.0 + 1);
+        println!("Serial number: {}\nName: {}\nLocation on this machine: {}\nIs allowed \"SAFEDrive\" access: {}\
+                  \n\nCurrently activated: {}\n\nNumber of machines installed in: {}\nUnique App-ID: {:?}\n",
+                 it.0 + 1, it.1.name, location, it.1.safe_drive_access, is_activated, it.1.reference_count, it.1.id);
     }
-    println!("\n====================================================\n");
+    println!("====================================================\n");
 }
 
 fn on_activate_app(lists   : &Lists,
