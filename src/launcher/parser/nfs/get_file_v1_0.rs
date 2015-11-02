@@ -137,7 +137,7 @@ mod test {
 
 
     #[test]
-    pub fn get_file() {
+    fn get_file() {
         let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         create_test_file(&parameter_packet);

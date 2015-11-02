@@ -48,7 +48,7 @@ mod test {
     use ::launcher::parser::traits::Action;
 
     #[test]
-    pub fn delete_dir() {
+    fn delete_dir() {
         let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());

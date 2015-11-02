@@ -66,7 +66,7 @@ mod test {
     const TEST_DIR_NAME: &'static str = "test_dir";
 
     #[test]
-    pub fn register_dns() {
+    fn register_dns() {
         let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());

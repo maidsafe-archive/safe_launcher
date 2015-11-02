@@ -244,7 +244,7 @@ impl AppHandler {
 
         group_send!(reply, &mut self.app_remove_observers);
     }
-    
+
     fn on_remove_app_impl(&mut self, app_id: ::routing::NameType) -> Result<::observer::event_data::AppRemoval,
                                                                             ::errors::LauncherError> {
         let config_file_name = ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string();
@@ -253,21 +253,19 @@ impl AppHandler {
         let (mut launcher_configurations, dir_listing) = try!(self.get_launcher_global_config_and_dir());
 
         let position = try!(launcher_configurations.iter()
-                                                    .position(|config| config.app_id == app_id)
-                                                    .ok_or(::errors::LauncherError::from("app_id not found in configuration")));
+                                                   .position(|config| config.app_id == app_id)
+                                                   .ok_or(::errors::LauncherError::AppNotRegistered));
         let reference_count = launcher_configurations[position].reference_count;
 
         if reference_count == 1 {
             let _ = launcher_configurations.remove(position);
         } else {
              let config = try!(launcher_configurations.get_mut(position)
-                                                      .ok_or(::errors::LauncherError::from("Configuration unavailable")));
+                                                      .ok_or(::errors::LauncherError::AppNotRegistered));
              config.reference_count -= 1;
         }
 
-        let file = try!(dir_listing.find_file(&config_file_name)
-                                   .map(|file| file.clone())
-                                   .ok_or(::errors::LauncherError::from("Configuration file not found")));
+        let file = eval_option!(dir_listing.find_file(&config_file_name).map(|file| file.clone()), "Configuration file not found");
         let mut writer = try!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, dir_listing));
         writer.write(&try!(::safe_core::utility::serialise(&launcher_configurations)), 0);
         let _ = try!(writer.close());

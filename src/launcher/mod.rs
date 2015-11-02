@@ -110,7 +110,7 @@ mod tests {
     use super::*;
 
     #[test]
-    pub fn initialise_safe_drive_dir() {
+    fn initialise_safe_drive_dir() {
         let pin = eval_result!(::safe_core::utility::generate_random_string(10));
         let keyword = eval_result!(::safe_core::utility::generate_random_string(10));
         let password = eval_result!(::safe_core::utility::generate_random_string(10));

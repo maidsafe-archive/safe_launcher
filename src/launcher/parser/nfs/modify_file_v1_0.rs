@@ -98,7 +98,7 @@ struct FileContentParams {
 
 #[cfg(test)]
 mod test {
-    use super::*;
+    use super::{ModifyFile, FileContentParams, OptionalParams};
     use ::launcher::parser::traits::Action;
     use rustc_serialize::base64::ToBase64;
 
@@ -116,12 +116,12 @@ mod test {
     }
 
     #[test]
-    pub fn file_rename() {
+    fn file_rename() {
         let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         create_test_file(&parameter_packet);
 
-        let values = super::OptionalParams {
+        let values = OptionalParams {
             name         : Some("new_test_file.txt".to_string()),
             content      : None,
             user_metadata: None
@@ -146,12 +146,12 @@ mod test {
     }
 
     #[test]
-    pub fn file_update_user_metadata() {
+    fn file_update_user_metadata() {
         let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         create_test_file(&parameter_packet);
 
-        let values = super::OptionalParams {
+        let values = OptionalParams {
             name         : None,
             content      : None,
             user_metadata: Some(METADATA_BASE64.to_string()),
@@ -176,17 +176,17 @@ mod test {
     }
 
     #[test]
-    pub fn file_update_content() {
+    fn file_update_content() {
         let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         create_test_file(&parameter_packet);
 
-        let content = super::FileContentParams {
+        let content = FileContentParams {
             bytes : METADATA_BASE64.to_string(),
-            offset: None,                  
+            offset: None,
         };
 
-        let values = super::OptionalParams {
+        let values = OptionalParams {
             name         : None,
             content      : Some(content),
             user_metadata: None,

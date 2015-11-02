@@ -51,7 +51,7 @@ mod test {
     use ::launcher::parser::traits::Action;
 
     #[test]
-    pub fn delete_file() {
+    fn delete_file() {
         let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(parameter_packet.client.clone());

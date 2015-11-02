@@ -88,7 +88,7 @@ mod test {
     }
 
     #[test]
-    pub fn rename_dir() {
+    fn rename_dir() {
         let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         create_test_dir(&parameter_packet);
@@ -117,7 +117,7 @@ mod test {
     }
 
     #[test]
-    pub fn dir_update_user_metadata() {
+    fn dir_update_user_metadata() {
         let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         create_test_dir(&parameter_packet);
