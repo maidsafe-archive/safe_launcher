@@ -69,14 +69,9 @@ impl ::launcher::parser::traits::Action for ModifyFile {
         }
 
         if let Some(ref file_content_params) = self.new_values.content {
-            let mode = if file_content_params.overwrite {
-                ::safe_nfs::helper::writer::Mode::Overwrite
-            } else {
-                ::safe_nfs::helper::writer::Mode::Modify
-            };
-            let offset = match mode {
-                ::safe_nfs::helper::writer::Mode::Overwrite => 0,
-                ::safe_nfs::helper::writer::Mode::Modify    => file_content_params.offset
+            let (mode, offset) = match file_content_params.offset {
+                Some(offset) => (::safe_nfs::helper::writer::Mode::Modify, offset),
+                None         => (::safe_nfs::helper::writer::Mode::Overwrite, 0),
             };
             let mut writer = try!(file_helper.update_content(file.clone(), mode, dir_of_file));
             let bytes = try!(parse_result!(file_content_params.bytes.from_base64(), "Failed to convert from base64"));
@@ -97,11 +92,8 @@ struct OptionalParams {
 
 #[derive(RustcDecodable, Debug)]
 struct FileContentParams {
-    pub bytes    : String,
-    pub offset   : u64,
-    // TODO(Krishna) This should not be required - Specifying both offset and overwrite does not
-    // make sense
-    pub overwrite: bool,
+    pub bytes : String,
+    pub offset: Option<u64>
 }
 
 #[cfg(test)]
@@ -190,9 +182,8 @@ mod test {
         create_test_file(&parameter_packet);
 
         let content = super::FileContentParams {
-            bytes    : METADATA_BASE64.to_string(),
-            offset   : 0,
-            overwrite: true,
+            bytes : METADATA_BASE64.to_string(),
+            offset: None,                  
         };
 
         let values = super::OptionalParams {
