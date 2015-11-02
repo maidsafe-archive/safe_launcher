@@ -1,6 +1,6 @@
 [package]
 name          = "safe_launcher"
-version       = "0.0.1"
+version       = "0.1.0"
 authors       = ["MaidSafe Developers <dev@maidsafe.net>"]
 description   = "SAFE Launcher library"
 documentation = "http://maidsafe.github.io/safe_launcher/latest/"
