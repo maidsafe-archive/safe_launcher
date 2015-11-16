@@ -141,7 +141,7 @@ impl IpcSession {
         let app_detail = *app_detail;
 
         self.app_id = Some(app_detail.app_id);
-        self.safe_drive_access = Some(::std::sync::Arc::new(::std::sync::Mutex::new(app_detail.safe_drive_access))); 
+        self.safe_drive_access = Some(::std::sync::Arc::new(::std::sync::Mutex::new(app_detail.safe_drive_access)));
 
         if let Some(mut ipc_stream) = self.get_ipc_stream_or_terminate() {
             match ecdh_key_exchange::perform_ecdh_exchange(&mut ipc_stream,
@@ -335,7 +335,8 @@ mod tests {
 
         })));
 
-        ::std::thread::sleep_ms(3000);
+        let duration = ::std::time::Duration::from_millis(3000);
+        ::std::thread::sleep(duration);
         eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::Terminate));
     }
 }
