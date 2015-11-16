@@ -434,7 +434,8 @@ mod test {
             assert_eq!(eval_result!(stream.read(&mut buffer)), 0);
         })));
 
-        ::std::thread::sleep_ms(3000);
+        let duration = ::std::time::Duration::from_millis(3000);
+        ::std::thread::sleep(duration);
         // Terminate to exit this test - otherwise the raii_joiners will hang this test - this is
         // by design. So there is no way out but graceful termination which is what this entire
         // design strives for.

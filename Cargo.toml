@@ -1,6 +1,6 @@
 [package]
 name          = "safe_launcher"
-version       = "0.1.0"
+version       = "0.1.1"
 authors       = ["MaidSafe Developers <dev@maidsafe.net>"]
 description   = "SAFE Launcher library"
 documentation = "http://maidsafe.github.io/safe_launcher/latest/"
@@ -15,21 +15,21 @@ crate_type = ["staticlib", "dylib", "rlib"]
 
 [dependencies]
 # ---- Maidsafe ----
-routing     = "0.4.*"
-safe_nfs    = "0.3.*"
-safe_dns    = "0.3.*"
-safe_core   = "0.3.*"
+routing     = "~0.4.2"
+safe_nfs    = "~0.3.1"
+safe_dns    = "~0.3.1"
+safe_core   = "~0.3.1"
 
 # ---- Others ----
-log             = "*"
-libc            = "*"
-byteorder       = "*"
-bufstream       = "*"
-sodiumoxide     = "*"
-rustc-serialize = "*"
+log             = "~0.3.3"
+libc            = "~0.2.2"
+byteorder       = "~0.4.2"
+bufstream       = "~0.1.1"
+sodiumoxide     = "~0.0.9"
+rustc-serialize = "~0.3.16"
 
 [dev-dependencies]
-env_logger = "*"
+env_logger = "~0.3.2"
 
 [[example]]
 name  = "launcher_cli"

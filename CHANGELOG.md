@@ -1,5 +1,8 @@
 # Safe Launcher - Change Log
 
+## [0.1.1]
+- Remove wildcard dependencies
+
 ## [0.1.0]
 - [MAID-1401](https://maidsafe.atlassian.net/browse/MAID-1401) Launcher Start-up
   - [MAID-1402](https://maidsafe.atlassian.net/browse/MAID-1402) Self-Authenticate
