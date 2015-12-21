@@ -1,5 +1,8 @@
 # Safe Launcher - Change Log
 
+## [0.2.0]
+- Refactored to comply with latest routing, and client modules' api's
+
 ## [0.1.1]
 - Remove wildcard dependencies
 
