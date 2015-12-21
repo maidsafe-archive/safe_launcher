@@ -20,9 +20,9 @@ pub fn handle_self_authentication() -> Result<::safe_core::client::Client,
     use std::io::Write;
 
     print!("Do you have an existing account [Y to login to an existing account]?: ");
-    eval_result!(::std::io::stdout().flush());
+    unwrap_result!(::std::io::stdout().flush());
     let mut choice = String::new();
-    let _ = eval_result!(::std::io::stdin().read_line(&mut choice));
+    let _ = unwrap_result!(::std::io::stdin().read_line(&mut choice));
     choice = choice.trim().to_string();
 
     let action = if choice == "Y" || choice == "y" {
@@ -39,13 +39,13 @@ pub fn handle_self_authentication() -> Result<::safe_core::client::Client,
     println!("\t================");
 
     println!("\n------------ Enter Keyword ---------------");
-    let _ = eval_result!(::std::io::stdin().read_line(&mut keyword));
+    let _ = unwrap_result!(::std::io::stdin().read_line(&mut keyword));
 
     println!("\n\n------------ Enter Password --------------");
-    let _ = eval_result!(::std::io::stdin().read_line(&mut password));
+    let _ = unwrap_result!(::std::io::stdin().read_line(&mut password));
     loop {
         println!("\n\n--------- Enter PIN (4 Digits) -----------");
-        let _ = eval_result!(::std::io::stdin().read_line(&mut pin));
+        let _ = unwrap_result!(::std::io::stdin().read_line(&mut pin));
         pin = pin.trim().to_string();
         if pin.parse::<u16>().is_ok() && pin.len() == 4 {
             break;

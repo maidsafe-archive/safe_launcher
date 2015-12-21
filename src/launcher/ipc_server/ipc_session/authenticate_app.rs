@@ -15,17 +15,16 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use maidsafe_utilities::thread::RaiiThreadJoiner;
+
 const NONCE_VERIFIER_THREAD_NAME: &'static str = "LauncherNonceVerifierThread";
 const APP_AUTHENTICATION_ENDPOINT: &'static str = "safe-api/v1.0/handshake/authenticate-app";
 
 pub fn verify_launcher_nonce(mut ipc_stream  : ::launcher::ipc_server::ipc_session::stream::IpcStream,
                              event_sender    : ::launcher::ipc_server::ipc_session
                                                ::EventSenderToSession<::launcher::ipc_server::ipc_session
-                                                                      ::events::AppAuthenticationEvent>) -> ::safe_core
-                                                                                                            ::utility
-                                                                                                            ::RAIIThreadJoiner {
-    let joiner = eval_result!(::std::thread::Builder::new().name(NONCE_VERIFIER_THREAD_NAME.to_string())
-                                                           .spawn(move || {
+                                                                      ::events::AppAuthenticationEvent>) -> RaiiThreadJoiner {
+    let joiner = thread!(NONCE_VERIFIER_THREAD_NAME, move || {
         use rustc_serialize::base64::FromBase64;
 
         let payload = eval_send_one!(ipc_stream.read_payload(), &event_sender);
@@ -70,9 +69,9 @@ pub fn verify_launcher_nonce(mut ipc_stream  : ::launcher::ipc_server::ipc_sessi
         }
 
         debug!("Exiting thread {:?}", NONCE_VERIFIER_THREAD_NAME);
-    }));
+    });
 
-    ::safe_core::utility::RAIIThreadJoiner::new(joiner)
+    RaiiThreadJoiner::new(joiner)
 }
 
 #[derive(RustcDecodable, Debug)]

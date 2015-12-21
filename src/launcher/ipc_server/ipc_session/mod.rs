@@ -15,9 +15,13 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use xor_name::XorName;
+use maidsafe_utilities::thread::RaiiThreadJoiner;
+use maidsafe_utilities::event_sender::EventSender;
+
 pub mod events;
 
-pub type EventSenderToSession<EventSubset> = ::event_sender::EventSender<events::IpcSessionEventCategory, EventSubset>;
+pub type EventSenderToSession<EventSubset> = EventSender<events::IpcSessionEventCategory, EventSubset>;
 
 mod stream;
 mod authenticate_app;
@@ -27,12 +31,12 @@ mod secure_communication;
 const IPC_SESSION_THREAD_NAME: &'static str = "IpcSessionThread";
 
 pub struct IpcSession {
-    app_id                 : Option<::routing::NameType>,
+    app_id                 : Option<XorName>,
     temp_id                : u32,
     stream                 : ::std::net::TcpStream,
     app_nonce              : Option<::sodiumoxide::crypto::box_::Nonce>,
     app_pub_key            : Option<::sodiumoxide::crypto::box_::PublicKey>,
-    raii_joiner            : ::safe_core::utility::RAIIThreadJoiner,
+    raii_joiner            : RaiiThreadJoiner,
     safe_drive_access      : Option<::std::sync::Arc<::std::sync::Mutex<bool>>>, // TODO(Spandan) change to 3-level permission instead of 2
     event_catagory_tx      : ::std::sync::mpsc::Sender<events::IpcSessionEventCategory>,
     external_event_rx      : ::std::sync::mpsc::Receiver<events::ExternalEvent>,
@@ -45,7 +49,7 @@ pub struct IpcSession {
 impl IpcSession {
     pub fn new(server_event_sender: ::launcher::ipc_server::EventSenderToServer<::launcher::ipc_server::events::IpcSessionEvent>,
                temp_id            : u32,
-               stream             : ::std::net::TcpStream) -> Result<(::safe_core::utility::RAIIThreadJoiner,
+               stream             : ::std::net::TcpStream) -> Result<(RaiiThreadJoiner,
                                                                       EventSenderToSession<events::ExternalEvent>),
                                                                      ::errors::LauncherError> {
         let ipc_stream = try!(stream::IpcStream::new(try!(stream.try_clone()
@@ -60,8 +64,7 @@ impl IpcSession {
 
         let cloned_event_catagory_tx = event_catagory_tx.clone();
 
-        let ipc_session_joiner = eval_result!(::std::thread::Builder::new().name(IPC_SESSION_THREAD_NAME.to_string())
-                                                                           .spawn(move || {
+        let ipc_session_joiner = thread!(IPC_SESSION_THREAD_NAME, move || {
             let authentication_event_sender = EventSenderToSession::<events::AppAuthenticationEvent>
                                                                   ::new(authentication_event_tx,
                                                                         events::IpcSessionEventCategory::AppAuthenticationEvent,
@@ -88,14 +91,14 @@ impl IpcSession {
             ipc_session.run(event_catagory_rx);
 
             debug!("Exiting Thread {:?}", IPC_SESSION_THREAD_NAME);
-        }));
+        });
 
         let external_event_sender = EventSenderToSession::<events::ExternalEvent>
                                                         ::new(external_event_tx,
                                                               events::IpcSessionEventCategory::ExternalEvent,
                                                               event_catagory_tx);
 
-        Ok((::safe_core::utility::RAIIThreadJoiner::new(ipc_session_joiner), external_event_sender))
+        Ok((RaiiThreadJoiner::new(ipc_session_joiner), external_event_sender))
     }
 
     fn run(&mut self, event_catagory_rx: ::std::sync::mpsc::Receiver<events::IpcSessionEventCategory>) {
@@ -145,8 +148,8 @@ impl IpcSession {
 
         if let Some(mut ipc_stream) = self.get_ipc_stream_or_terminate() {
             match ecdh_key_exchange::perform_ecdh_exchange(&mut ipc_stream,
-                                                           eval_option!(self.app_nonce, "Logic Error - Report a bug."),
-                                                           eval_option!(self.app_pub_key, "Logice Error - Report a bug.")) {
+                                                           unwrap_option!(self.app_nonce, "Logic Error - Report a bug."),
+                                                           unwrap_option!(self.app_pub_key, "Logice Error - Report a bug.")) {
                 Ok((symm_nonce, symm_key)) => {
                     let safe_drive_access = if let Some(ref access) = self.safe_drive_access {
                         access.clone()
@@ -177,7 +180,7 @@ impl IpcSession {
 
     fn on_change_safe_drive_access(&self, is_allowed: bool) {
         if let Some(ref safe_drive_access) = self.safe_drive_access {
-            *(eval_result!(safe_drive_access.lock())) = is_allowed;
+            *(unwrap_result!(safe_drive_access.lock())) = is_allowed;
         }
     }
 
@@ -227,6 +230,9 @@ impl Drop for IpcSession {
 
 #[cfg(test)]
 mod tests {
+    use xor_name::XorName;
+    use maidsafe_utilities::thread::RaiiThreadJoiner;
+
     #[derive(Debug)]
     struct HandshakeRequest {
         pub endpoint: String,
@@ -277,16 +283,16 @@ mod tests {
                      ::sync
                      ::Arc::new(::std
                                 ::sync
-                                ::Mutex::new(eval_result!(::safe_core::utility::test_utils::get_client())));
+                                ::Mutex::new(unwrap_result!(::safe_core::utility::test_utils::get_client())));
 
-        let (_raii_joiner_0, event_sender) = eval_result!(::launcher::ipc_server::IpcServer::new(client));
+        let (_raii_joiner_0, event_sender) = unwrap_result!(::launcher::ipc_server::IpcServer::new(client));
 
         let (tx, rx) = ::std::sync::mpsc::channel();
-        eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::GetListenerEndpoint(tx)));
-        let listener_ep = eval_result!(rx.recv());
+        unwrap_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::GetListenerEndpoint(tx)));
+        let listener_ep = unwrap_result!(rx.recv());
 
-        let app_id = ::routing::NameType(eval_result!(::safe_core::utility::generate_random_array_u8_64()));
-        let dir_id = ::routing::NameType(eval_result!(::safe_core::utility::generate_random_array_u8_64()));
+        let app_id = XorName(unwrap_result!(::safe_core::utility::generate_random_array_u8_64()));
+        let dir_id = XorName(unwrap_result!(::safe_core::utility::generate_random_array_u8_64()));
         let directory_key = ::safe_nfs::metadata::directory_key::DirectoryKey::new(dir_id,
                                                                                    10u64,
                                                                                    false,
@@ -298,18 +304,12 @@ mod tests {
             safe_drive_access: false,
         };
         let activate_event = ::launcher::ipc_server::events::ExternalEvent::AppActivated(Box::new(activation_details));
-        eval_result!(event_sender.send(activate_event));
+        unwrap_result!(event_sender.send(activate_event));
 
-        let stream = eval_result!(::std::net::TcpStream::connect(&listener_ep[..]));
+        let stream = unwrap_result!(::std::net::TcpStream::connect(&listener_ep[..]));
 
-        let _raii_joiner_1 = ::safe_core
-                             ::utility
-                             ::RAIIThreadJoiner
-                             ::new(eval_result!(::std
-                                                ::thread
-                                                ::Builder::new().name("AppHandshakeThread".to_string())
-                                                                .spawn(move || {
-                let mut ipc_stream = eval_result!(::launcher
+        let _raii_joiner_1 = RaiiThreadJoiner::new(thread!("AppHandshakeThread", move || {
+                let mut ipc_stream = unwrap_result!(::launcher
                                                   ::ipc_server
                                                   ::ipc_session
                                                   ::stream
@@ -327,16 +327,16 @@ mod tests {
                 };
 
                 let json_obj = request.to_json();
-                eval_result!(ipc_stream.write(json_obj.to_string().into_bytes()));
+                unwrap_result!(ipc_stream.write(json_obj.to_string().into_bytes()));
 
                 // TODO(Krishna) -> use response
-                let _response = eval_result!(ipc_stream.read_payload());
+                let _response = unwrap_result!(ipc_stream.read_payload());
                 assert!(ipc_stream.read_payload().is_err())
 
-        })));
+        }));
 
         let duration = ::std::time::Duration::from_millis(3000);
         ::std::thread::sleep(duration);
-        eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::Terminate));
+        unwrap_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::Terminate));
     }
 }

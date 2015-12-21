@@ -15,10 +15,12 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use maidsafe_utilities::thread::RaiiThreadJoiner;
+
 const STREAM_WRITER_THREAD_NAME: &'static str = "IpcStreamWriterThread";
 
 pub struct IpcStream {
-    _raii_joiner : ::safe_core::utility::RAIIThreadJoiner,
+    _raii_joiner : RaiiThreadJoiner,
     write_sender : ::std::sync::mpsc::Sender<WriterEvent>,
     reader_stream: ::bufstream::BufStream<::std::net::TcpStream>,
 }
@@ -28,14 +30,13 @@ impl IpcStream {
         let cloned_stream = try!(stream.try_clone().map_err(|e| ::errors::LauncherError::IpcStreamCloneError(e)));
         let (tx, rx) = ::std::sync::mpsc::channel();
 
-        let joiner = eval_result!(::std::thread::Builder::new().name(STREAM_WRITER_THREAD_NAME.to_string())
-                                                               .spawn(move || {
+        let joiner = thread!(STREAM_WRITER_THREAD_NAME, move || {
             IpcStream::handle_write(rx, cloned_stream);
             debug!("Exiting thread {:?}", STREAM_WRITER_THREAD_NAME);
-        }));
+        });
 
         Ok(IpcStream {
-            _raii_joiner : ::safe_core::utility::RAIIThreadJoiner::new(joiner),
+            _raii_joiner : RaiiThreadJoiner::new(joiner),
             write_sender : tx,
             reader_stream: ::bufstream::BufStream::new(stream),
         })

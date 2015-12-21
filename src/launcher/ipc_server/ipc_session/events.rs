@@ -49,9 +49,11 @@ impl From<event_data::AppDetail> for ExternalEvent {
 // --------------------------------------------------------------------------------------
 
 pub mod event_data {
+    use xor_name::XorName;
+
     pub struct AppDetail {
         pub client           : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-        pub app_id           : ::routing::NameType,
+        pub app_id           : XorName,
         pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
         pub safe_drive_access: bool,
     }

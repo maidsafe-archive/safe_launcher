@@ -15,6 +15,8 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use maidsafe_utilities::thread::RaiiThreadJoiner;
+
 const SECURE_COMM_THREAD_NAME: &'static str = "SecureCommunicationThread";
 
 pub struct SecureCommunication {
@@ -38,10 +40,8 @@ impl SecureCommunication {
                symm_nonce       : ::sodiumoxide::crypto::secretbox::Nonce,
                ipc_stream       : ::launcher::ipc_server::ipc_session::stream::IpcStream,
                app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
-               safe_drive_access: ::std::sync::Arc<::std::sync::Mutex<bool>>) -> ::safe_core::utility::RAIIThreadJoiner {
-        let joiner = eval_result!(::std::thread::Builder::new()
-                                                         .name(SECURE_COMM_THREAD_NAME.to_string())
-                                                         .spawn(move || {
+               safe_drive_access: ::std::sync::Arc<::std::sync::Mutex<bool>>) -> RaiiThreadJoiner {
+        let joiner = thread!(SECURE_COMM_THREAD_NAME, move || {
             let safe_drive_dir_key = {
                 let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(client.clone());
                 let user_root_dir_listing = eval_send_one!(dir_helper.get_user_root_directory_listing(), &observer);
@@ -68,9 +68,9 @@ impl SecureCommunication {
             secure_comm_obj.run();
 
             debug!("Exiting Thread {:?}", SECURE_COMM_THREAD_NAME);
-        }));
+        });
 
-        ::safe_core::utility::RAIIThreadJoiner::new(joiner)
+        RaiiThreadJoiner::new(joiner)
     }
 
     fn run(&mut self) {
@@ -118,7 +118,7 @@ impl SecureCommunication {
             // TODO(Spandan)
             // This is inefficient - encoding into a json_str and then again decoding that into a
             // JSON. Instead get directly into a JSON in ::launcher::parser::ResponseType
-            data: eval_result!(::rustc_serialize::json::Json::from_str(&data[..])),
+            data: unwrap_result!(::rustc_serialize::json::Json::from_str(&data[..])),
         };
 
         let json_str = try!(::rustc_serialize::json::encode(&normal_response));

@@ -91,7 +91,7 @@ mod test {
     use ::std::error::Error;
 
     fn generate_random_cstring(len: usize) -> Result<::std::ffi::CString, ::ffi::errors::FfiError> {
-        let mut cstring_vec = eval_result!(::safe_core::utility::generate_random_vector::<u8>(len));
+        let mut cstring_vec = unwrap_result!(::safe_core::utility::generate_random_vector::<u8>(len));
         // Avoid internal nulls and ensure valid ASCII (thus valid utf8)
         for it in cstring_vec.iter_mut() {
             *it %= 128;
@@ -105,9 +105,9 @@ mod test {
 
     #[test]
     fn account_creation_and_login() {
-        let cstring_pin = eval_result!(generate_random_cstring(10));
-        let cstring_keyword = eval_result!(generate_random_cstring(10));
-        let cstring_password = eval_result!(generate_random_cstring(10));
+        let cstring_pin = unwrap_result!(generate_random_cstring(10));
+        let cstring_keyword = unwrap_result!(generate_random_cstring(10));
+        let cstring_password = unwrap_result!(generate_random_cstring(10));
 
         {
             let mut launcher_handle = 0 as *const ::libc::c_void;

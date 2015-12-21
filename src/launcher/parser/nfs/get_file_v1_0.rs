@@ -31,7 +31,7 @@ impl ::launcher::parser::traits::Action for GetFile {
         use rustc_serialize::json::ToJson;
         use rustc_serialize::base64::ToBase64;
 
-        if self.is_path_shared && !*eval_result!(params.safe_drive_access.lock()) {
+        if self.is_path_shared && !*unwrap_result!(params.safe_drive_access.lock()) {
             return Err(::errors::LauncherError::PermissionDenied)
         }
 
@@ -98,7 +98,7 @@ impl ::rustc_serialize::json::ToJson for GetFileResponse {
         let mut response_tree = ::std::collections::BTreeMap::new();
         let _ = response_tree.insert("content".to_string(), self.content.to_json());
         if let Some(ref metadata) = self.metadata {
-            let json_metadata_str = eval_result!(::rustc_serialize::json::encode(metadata));
+            let json_metadata_str = unwrap_result!(::rustc_serialize::json::encode(metadata));
             let _ = response_tree.insert("metadata".to_string(), json_metadata_str.to_json());
         }
 
@@ -126,19 +126,19 @@ mod test {
     fn create_test_file(parameter_packet: &::launcher::parser::ParameterPacket) {
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(parameter_packet.client.clone());
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
-        let app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
-        let mut writer = eval_result!(file_helper.create(TEST_FILE_NAME.to_string(),
+        let app_root_dir = unwrap_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        let mut writer = unwrap_result!(file_helper.create(TEST_FILE_NAME.to_string(),
                                                          Vec::new(),
                                                          app_root_dir));
         let data = vec![10u8; 20];
         writer.write(&data[..], 0);
-        let _ = eval_result!(writer.close());
+        let _ = unwrap_result!(writer.close());
     }
 
 
     #[test]
     fn get_file() {
-        let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+        let parameter_packet = unwrap_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         create_test_file(&parameter_packet);
 
@@ -150,7 +150,7 @@ mod test {
             include_metadata: true,
         };
 
-        assert!(eval_result!(request.execute(parameter_packet.clone())).is_some());
+        assert!(unwrap_result!(request.execute(parameter_packet.clone())).is_some());
 
         request.file_path = "/does_not_exixts".to_string();
         assert!(request.execute(parameter_packet).is_err());

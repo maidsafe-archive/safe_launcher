@@ -78,20 +78,20 @@ fn module_dispatcher<D>(params              : ParameterPacket,
 mod test {
     #[test]
     fn parse_request() {
-        let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+        let parameter_packet = unwrap_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         let mut json_str = "{}";
-        let mut json_obj = eval_result!(::rustc_serialize::json::Json::from_str(&json_str));
+        let mut json_obj = unwrap_result!(::rustc_serialize::json::Json::from_str(&json_str));
         assert!(::launcher::parser::begin_parse(parameter_packet.clone(),
                 &mut ::rustc_serialize::json::Decoder::new(json_obj)).is_err());
 
         json_str = "{\"endpoint\": \"safe-api/v1.0/nfs/create-dir\", \"data\": {}}";
-        json_obj = eval_result!(::rustc_serialize::json::Json::from_str(&json_str));
+        json_obj = unwrap_result!(::rustc_serialize::json::Json::from_str(&json_str));
         assert!(::launcher::parser::begin_parse(parameter_packet.clone(),
                 &mut ::rustc_serialize::json::Decoder::new(json_obj)).is_err());
 
         json_str = "{\"endpoint\": \"safe-api/v1.0/nfs/create-dir\", \"data\": {\"dir_path\": \"/demo\",\"is_path_shared\": false,\"is_private\": true,\"is_versioned\": false,\"user_metadata\": \"\"}}";
-        json_obj = eval_result!(::rustc_serialize::json::Json::from_str(&json_str));
+        json_obj = unwrap_result!(::rustc_serialize::json::Json::from_str(&json_str));
         assert!(::launcher::parser::begin_parse(parameter_packet.clone(),
                 &mut ::rustc_serialize::json::Decoder::new(json_obj)).is_ok());
     }

@@ -15,15 +15,17 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use xor_name::XorName;
+
 /// This is an event subset to be used by external codes to communicate with the App Handling
 /// module. Observer registration facilities may be availed for notifications.
 pub enum AppHandlerEvent {
     /// Request Launcher to add and app to manage.
     AddApp(event_data::AppDetail),
     /// Request Launcher to remove a previously added app.
-    RemoveApp(::routing::NameType),
+    RemoveApp(XorName),
     /// Request Launcher to activate/start an app.
-    ActivateApp(::routing::NameType),
+    ActivateApp(XorName),
     /// Modify settings for an app
     ModifyAppSettings(event_data::ModifyAppSettings),
     /// Register an observer to receive notifications about status of adding of an app.
@@ -67,6 +69,8 @@ impl From<event_data::ModifyAppSettings> for AppHandlerEvent {
 /// Data that will be transferred during specific events to get a fine-grained detail about various
 /// parameters.
 pub mod event_data {
+    use xor_name::XorName;
+
     /// Details of applications. Contains fields required as manadatory parameters of the
     /// associated event.
     #[derive(Debug, Clone)]
@@ -81,7 +85,7 @@ pub mod event_data {
     #[derive(Debug, Clone)]
     pub struct ManagedApp {
         /// Unique id given to the app. This will be consistent across all machines.
-        pub id               : ::routing::NameType,
+        pub id               : XorName,
         /// Name of this app. Unless specifically changed it will be the name of the binary added
         /// to Launcher in the first machine for this app.
         pub name             : String,
@@ -100,7 +104,7 @@ pub mod event_data {
     #[derive(Debug, Clone)]
     pub struct ModifyAppSettings {
         /// Unique id given to the app. This will be consistent across all machines.
-        pub id               : ::routing::NameType,
+        pub id               : XorName,
         /// App name for this app stored in Launcher.
         pub name             : Option<String>,
         /// Modify local binary absolute path.

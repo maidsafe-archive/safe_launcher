@@ -17,6 +17,10 @@
 
 pub mod events;
 
+use xor_name::XorName;
+use maidsafe_utilities::thread::RaiiThreadJoiner;
+use maidsafe_utilities::serialisation::{serialise, deserialise};
+
 mod misc;
 
 const APP_HANDLER_THREAD_NAME: &'static str = "AppHandlerThread";
@@ -24,7 +28,7 @@ const APP_HANDLER_THREAD_NAME: &'static str = "AppHandlerThread";
 pub struct AppHandler {
     client                 : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
     launcher_endpoint      : String,
-    local_config_data      : ::std::collections::HashMap<::routing::NameType, String>,
+    local_config_data      : ::std::collections::HashMap<XorName, String>,
     app_add_observers      : Vec<::observer::AppHandlerObserver>,
     app_remove_observers   : Vec<::observer::AppHandlerObserver>,
     app_modify_observers   : Vec<::observer::AppHandlerObserver>,
@@ -42,19 +46,16 @@ impl AppHandler {
                              ::ipc_server
                              ::EventSenderToServer<::launcher
                                                    ::ipc_server
-                                                   ::events::ExternalEvent>) -> (::safe_core::utility::RAIIThreadJoiner,
+                                                   ::events::ExternalEvent>) -> (RaiiThreadJoiner,
                                                                                  ::std::sync::mpsc::Sender<events::AppHandlerEvent>) {
         let (event_tx, event_rx) = ::std::sync::mpsc::channel();
 
-        let joiner = eval_result!(::std::thread::Builder::new().name(APP_HANDLER_THREAD_NAME.to_string())
-                                                               .spawn(move || {
-            let raw_disk_data = eval_result!(misc::read_local_config_file());
+        let joiner = thread!(APP_HANDLER_THREAD_NAME, move || {
+            let raw_disk_data = unwrap_result!(misc::read_local_config_file());
             let mut local_config_data = ::std::collections::HashMap::with_capacity(raw_disk_data.len() + 1);
             if raw_disk_data.len() != 0 {
-                match eval_result!(client.lock()).hybrid_decrypt(&raw_disk_data, None) {
-                    Ok(plain_text) => local_config_data = misc::convert_vec_to_hashmap(eval_result!(::safe_core
-                                                                                                    ::utility
-                                                                                                    ::deserialise(&plain_text))),
+                match unwrap_result!(client.lock()).hybrid_decrypt(&raw_disk_data, None) {
+                    Ok(plain_text) => local_config_data = misc::convert_vec_to_hashmap(unwrap_result!(deserialise(&plain_text))),
                     Err(err) => debug!("{:?} -> Local config file could not be read - either tampered or corrupted. Starting afresh...", err),
                 }
             }
@@ -82,9 +83,9 @@ impl AppHandler {
             }
 
             debug!("Exiting thread {:?}", APP_HANDLER_THREAD_NAME);
-        }));
+        });
 
-        (::safe_core::utility::RAIIThreadJoiner::new(joiner), event_tx)
+        (RaiiThreadJoiner::new(joiner), event_tx)
     }
 
     fn run(&mut self, event_rx: ::std::sync::mpsc::Receiver<events::AppHandlerEvent>) {
@@ -127,7 +128,7 @@ impl AppHandler {
             }
         }
 
-        let app_id = ::routing::NameType::new(try!(::safe_core::utility::generate_random_array_u8_64()));
+        let app_id = XorName::new(try!(::safe_core::utility::generate_random_array_u8_64()));
 
         let mut tokens = AppHandler::tokenise_path(&app_detail.absolute_path);
         let app_name = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
@@ -170,12 +171,12 @@ impl AppHandler {
         })
     }
 
-    fn on_activate_app(&mut self, app_id: ::routing::NameType) {
+    fn on_activate_app(&mut self, app_id: XorName) {
         let event = ::observer::AppHandlingEvent::AppActivation(self.on_activate_app_impl(app_id).map(|()| app_id));
         group_send!(event, &mut self.app_activate_observers);
     }
 
-    fn on_activate_app_impl(&self, app_id: ::routing::NameType) -> Result<(), ::errors::LauncherError> {
+    fn on_activate_app_impl(&self, app_id: XorName) -> Result<(), ::errors::LauncherError> {
         let global_configs = try!(self.get_launcher_global_config());
 
         let app_info = try!(global_configs.iter().find(|config| config.app_id == app_id).ok_or(::errors::LauncherError::AppNotRegistered));
@@ -224,7 +225,7 @@ impl AppHandler {
         }
     }
 
-    fn on_remove_app(&mut self, app_id: ::routing::NameType) {
+    fn on_remove_app(&mut self, app_id: XorName) {
         let reply = match self.on_remove_app_impl(app_id) {
             Ok(data) => {
                 if let Err(err) = self.ipc_server_event_sender.send(::launcher
@@ -245,7 +246,7 @@ impl AppHandler {
         group_send!(reply, &mut self.app_remove_observers);
     }
 
-    fn on_remove_app_impl(&mut self, app_id: ::routing::NameType) -> Result<::observer::event_data::AppRemoval,
+    fn on_remove_app_impl(&mut self, app_id: XorName) -> Result<::observer::event_data::AppRemoval,
                                                                             ::errors::LauncherError> {
         let config_file_name = ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string();
 
@@ -265,9 +266,9 @@ impl AppHandler {
              config.reference_count -= 1;
         }
 
-        let file = eval_option!(dir_listing.find_file(&config_file_name).map(|file| file.clone()), "Configuration file not found");
+        let file = unwrap_option!(dir_listing.find_file(&config_file_name).map(|file| file.clone()), "Configuration file not found");
         let mut writer = try!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, dir_listing));
-        writer.write(&try!(::safe_core::utility::serialise(&launcher_configurations)), 0);
+        writer.write(&try!(serialise(&launcher_configurations)), 0);
         let _ = try!(writer.close());
 
         if self.local_config_data.remove(&app_id).is_none() {
@@ -336,10 +337,10 @@ impl AppHandler {
         if global_config_modified {
             let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
             // TODO(to Krishna) -> can we change nfs to not require the following clone() ?
-            let file = eval_option!(config_dir.find_file(&::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string())
+            let file = unwrap_option!(config_dir.find_file(&::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string())
                                               .map(|file| file.clone()), "Logic Error - Report as bug.");
             let mut writer = try!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, config_dir));
-            writer.write(&try!(::safe_core::utility::serialise(&global_configs)), 0);
+            writer.write(&try!(serialise(&global_configs)), 0);
             let _ = try!(writer.close());
         }
 
@@ -439,20 +440,20 @@ impl AppHandler {
         // - https://github.com/rust-lang/rust/issues/28449
         // then modify the following to use it.
         if let Some(pos) = global_configs.iter().position(|existing_config| existing_config.app_id == config.app_id) {
-            let existing_config = eval_option!(global_configs.get_mut(pos), "Logic Error - Report bug.");
+            let existing_config = unwrap_option!(global_configs.get_mut(pos), "Logic Error - Report bug.");
             *existing_config = config;
         } else {
             global_configs.push(config);
         }
 
-        let file = eval_option!(dir_listing.get_files()
+        let file = unwrap_option!(dir_listing.get_files()
                                            .iter()
                                            .find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME),
                                 "Logic Error - Launcher start-up should ensure the file must be present at this stage - Report bug.").clone();
 
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
         let mut writer = try!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, dir_listing));
-        writer.write(&try!(::safe_core::utility::serialise(&global_configs)), 0);
+        writer.write(&try!(serialise(&global_configs)), 0);
         let _ = try!(writer.close());
 
         Ok(())
@@ -465,7 +466,7 @@ impl AppHandler {
         let dir_listing = try!(dir_helper.get_configuration_directory_listing(::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string()));
 
         let global_configs = {
-            let file = eval_option!(dir_listing.get_files()
+            let file = unwrap_option!(dir_listing.get_files()
                                                .iter()
                                                .find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME),
                                     "Logic Error - Launcher start-up should ensure the file must be present at this stage - Report bug.");
@@ -476,7 +477,7 @@ impl AppHandler {
             let size = reader.size();
 
             if size != 0 {
-                try!(::safe_core::utility::deserialise(&try!(reader.read(0, size))))
+                try!(deserialise(&try!(reader.read(0, size))))
             } else {
                 Vec::new()
             }
@@ -488,10 +489,8 @@ impl AppHandler {
 
 impl Drop for AppHandler {
     fn drop(&mut self) {
-        let plain_text = eval_result!(::safe_core
-                                      ::utility
-                                      ::serialise(&misc::convert_hashmap_to_vec(&self.local_config_data)));
-        let cipher_text = eval_result!(eval_result!(self.client.lock()).hybrid_encrypt(&plain_text, None));
-        eval_result!(misc::flush_to_local_config(&cipher_text));
+        let plain_text = unwrap_result!(serialise(&misc::convert_hashmap_to_vec(&self.local_config_data)));
+        let cipher_text = unwrap_result!(unwrap_result!(self.client.lock()).hybrid_encrypt(&plain_text, None));
+        unwrap_result!(misc::flush_to_local_config(&cipher_text));
     }
 }

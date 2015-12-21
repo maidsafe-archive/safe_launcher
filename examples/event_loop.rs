@@ -15,6 +15,9 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use xor_name::XorName;
+use maidsafe_utilities::thread::RaiiThreadJoiner;
+
 const CLI_EVENT_LOOP_THREAD_NAME: &'static str = "CLI-Event-Loop";
 
 #[derive(Debug)]
@@ -24,14 +27,14 @@ pub struct EventLoop {
     ipc_rx             : ::std::sync::mpsc::Receiver<::safe_launcher::observer::IpcEvent>,
     owner_rx           : ::std::sync::mpsc::Receiver<Terminate>,
     managed_apps       : ::std::sync::Arc<::std::sync::Mutex<Vec<::safe_launcher::launcher::app_handler_event_data::ManagedApp>>>,
-    running_apps       : ::std::sync::Arc<::std::sync::Mutex<Vec<::routing::NameType>>>,
+    running_apps       : ::std::sync::Arc<::std::sync::Mutex<Vec<XorName>>>,
     app_handling_rx    : ::std::sync::mpsc::Receiver<::safe_launcher::observer::AppHandlingEvent>,
     pending_add_request: ::std::sync::Arc<::std::sync::Mutex<::std::collections::HashMap<String, bool>>>,
 }
 
 impl EventLoop {
     pub fn new(launcher : &::safe_launcher::launcher::Launcher,
-               app_lists: &::Lists) -> (::safe_core::utility::RAIIThreadJoiner,
+               app_lists: &::Lists) -> (RaiiThreadJoiner,
                                         ::safe_launcher::observer::Observer<Terminate>) {
         let cloned_managed_apps = app_lists.managed_apps.clone();
         let cloned_running_apps = app_lists.running_apps.clone();
@@ -44,9 +47,9 @@ impl EventLoop {
 
         // Sync the list the first time
         let (managed_apps_tx, managed_apps_rx) = ::std::sync::mpsc::channel();
-        eval_result!(launcher.get_app_handler_event_sender()
+        unwrap_result!(launcher.get_app_handler_event_sender()
                              .send(::safe_launcher::launcher::AppHandlerEvent::GetAllManagedApps(managed_apps_tx)));
-        *eval_result!(cloned_managed_apps.lock()) = eval_result!(eval_result!(managed_apps_rx.recv()));
+        *unwrap_result!(cloned_managed_apps.lock()) = unwrap_result!(unwrap_result!(managed_apps_rx.recv()));
 
         // Register observer to IPC events
         {
@@ -56,7 +59,7 @@ impl EventLoop {
                                                                                             ::IpcEvent,
                                                                             category_tx.clone());
 
-            eval_result!(launcher.get_ipc_event_sender().send(::safe_launcher
+            unwrap_result!(launcher.get_ipc_event_sender().send(::safe_launcher
                                                               ::launcher
                                                               ::IpcExternalEvent
                                                               ::RegisterVerifiedSessionObserver(ipc_event_obs)));
@@ -70,15 +73,15 @@ impl EventLoop {
                                                                                                   ::AppHandlingEvent,
                                                                                    category_tx.clone());
 
-            eval_result!(launcher.get_app_handler_event_sender().send(::safe_launcher
+            unwrap_result!(launcher.get_app_handler_event_sender().send(::safe_launcher
                                                                       ::launcher
                                                                       ::AppHandlerEvent
                                                                       ::RegisterAppAddObserver(app_event_obs.clone())));
-            eval_result!(launcher.get_app_handler_event_sender().send(::safe_launcher
+            unwrap_result!(launcher.get_app_handler_event_sender().send(::safe_launcher
                                                                       ::launcher
                                                                       ::AppHandlerEvent
                                                                       ::RegisterAppRemoveObserver(app_event_obs.clone())));
-            eval_result!(launcher.get_app_handler_event_sender().send(::safe_launcher
+            unwrap_result!(launcher.get_app_handler_event_sender().send(::safe_launcher
                                                                       ::launcher
                                                                       ::AppHandlerEvent
                                                                       ::RegisterAppModifyObserver(app_event_obs)));
@@ -92,9 +95,7 @@ impl EventLoop {
                                           ::safe_launcher::observer::LauncherEventCategoy::OwnerCategory,
                                           category_tx);
 
-        let joiner = eval_result!(::std::thread::Builder::new()
-                                                         .name(CLI_EVENT_LOOP_THREAD_NAME.to_string())
-                                                         .spawn(move || {
+        let joiner = thread!(CLI_EVENT_LOOP_THREAD_NAME, move || {
             let event_loop = EventLoop {
                 ipc_rx             : ipc_rx,
                 owner_rx           : owner_rx,
@@ -107,9 +108,9 @@ impl EventLoop {
             event_loop.run(category_rx);
 
             debug!("Exiting Thread {:?}", CLI_EVENT_LOOP_THREAD_NAME);
-        }));
+        });
 
-        (::safe_core::utility::RAIIThreadJoiner::new(joiner), internal_event_sender)
+        (RaiiThreadJoiner::new(joiner), internal_event_sender)
     }
 
     fn run(&self, category_rx: ::std::sync::mpsc::Receiver<::safe_launcher::observer::LauncherEventCategoy>) {
@@ -144,10 +145,10 @@ impl EventLoop {
 
     fn on_verified_session_update(&self, data: ::safe_launcher::observer::event_data::VerifiedSession) {
         match data.action {
-            ::safe_launcher::observer::event_data::Action::Added => eval_result!(self.running_apps.lock()).push(data.id),
+            ::safe_launcher::observer::event_data::Action::Added => unwrap_result!(self.running_apps.lock()).push(data.id),
             ::safe_launcher::observer::event_data::Action::Removed(err_opt) => {
-                let ref managed_apps = *eval_result!(self.managed_apps.lock());
-                let ref mut running_apps = *eval_result!(self.running_apps.lock());
+                let ref managed_apps = *unwrap_result!(self.managed_apps.lock());
+                let ref mut running_apps = *unwrap_result!(self.running_apps.lock());
 
                 let id = data.id;
                 if let Some(err) = err_opt {
@@ -166,7 +167,7 @@ impl EventLoop {
     }
 
     fn on_app_addition(&self, data: ::safe_launcher::observer::event_data::AppAddition) {
-        let safe_drive_access = eval_option!(eval_result!(self.pending_add_request.lock()).remove(&data.local_path),
+        let safe_drive_access = unwrap_option!(unwrap_result!(self.pending_add_request.lock()).remove(&data.local_path),
                                                           "Logic Error - Main thread should have put this data in here by now - Report a bug.");
         match data.result {
             Ok(detail) => {
@@ -177,7 +178,7 @@ impl EventLoop {
                     reference_count  : 1,
                     safe_drive_access: safe_drive_access,
                 };
-                eval_result!(self.managed_apps.lock()).push(managed_app);
+                unwrap_result!(self.managed_apps.lock()).push(managed_app);
             },
             Err(err) => println!("Launcher: Error {:?} adding app {:?} to Launcher", err, data.local_path),
         }
@@ -187,7 +188,7 @@ impl EventLoop {
         match data.result {
             Some(err) => println!("Launcher: Error {:?} removing app from Launcher", err),
             None => {
-                let ref mut managed_apps = *eval_result!(self.managed_apps.lock());
+                let ref mut managed_apps = *unwrap_result!(self.managed_apps.lock());
 
                 if let Some(pos) = managed_apps.iter().position(|element| element.id == data.id) {
                     let _ = managed_apps.remove(pos);
@@ -200,7 +201,7 @@ impl EventLoop {
         match data.result {
             Ok(detail) => {
                 let id = data.id;
-                let ref mut managed_apps = *eval_result!(self.managed_apps.lock());
+                let ref mut managed_apps = *unwrap_result!(self.managed_apps.lock());
 
                 if let Some(managed_app) = managed_apps.iter_mut().find(|element| element.id == id) {
                     if let Some(name) = detail.name {

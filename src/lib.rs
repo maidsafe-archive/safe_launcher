@@ -39,14 +39,16 @@
 
 extern crate libc;
 extern crate routing;
+extern crate xor_name;
 extern crate safe_dns;
 extern crate safe_nfs;
+extern crate safe_core;
 extern crate byteorder;
 extern crate bufstream;
 extern crate sodiumoxide;
 extern crate rustc_serialize;
 #[macro_use] extern crate log;
-#[macro_use] extern crate safe_core;
+#[macro_use] extern crate maidsafe_utilities;
 
 #[macro_use] mod macros;
 
@@ -61,7 +63,5 @@ pub mod launcher;
 /// that an interfacing crate (executable or another library) should make use of to easily tap into
 /// the information and events of interest happening in the core.
 pub mod observer;
-/// Mechanisms to help with event-subsetting.
-pub mod event_sender;
 
 mod config;
