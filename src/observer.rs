@@ -15,12 +15,15 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use xor_name::XorName;
+use maidsafe_utilities::event_sender::EventSender;
+
 /// All codes interfacing with Launcher are expected to be coded in observer pattern style for
 /// collecting notifications from core that they are interested in. This is a type alias for all
 /// events that Launcher will fire to interested listeners. Interfacing codes are expected to
 /// construct these senders and register them with appropriate core modules. The registration
 /// facility will be available with the main `launcher` module.
-pub type Observer<EventSubset> = ::event_sender::EventSender<LauncherEventCategoy, EventSubset>;
+pub type Observer<EventSubset> = EventSender<LauncherEventCategoy, EventSubset>;
 /// An convenience alias for registering for events/signals arising from IPC modules.
 pub type IpcObserver = Observer<IpcEvent>;
 /// An convenience alias for registering for events/signals arising from App Handling modules.
@@ -92,7 +95,7 @@ pub enum AppHandlingEvent {
     /// session. It just means that app has been started. It can still crash after start, fail
     /// authentication etc. Register obeservers in IPC module to get a more fine grained
     /// information.
-    AppActivation(Result<::routing::NameType, ::errors::LauncherError>),
+    AppActivation(Result<XorName, ::errors::LauncherError>),
     /// This event is triggered when an Application has been attempted to be modified.
     AppModification(event_data::AppModification),
 }
@@ -118,6 +121,8 @@ impl From<event_data::AppModification> for AppHandlingEvent {
 /// Data that will be transferred during specific events to get a fine-grained detail about various
 /// parameters.
 pub mod event_data {
+    use xor_name::XorName;
+
     /// If the object under considerating was added or removed.
     #[derive(Debug)]
     pub enum Action {
@@ -149,7 +154,7 @@ pub mod event_data {
     #[derive(Debug)]
     pub struct VerifiedSession {
         /// Unique id of the Application managed by Launcher.
-        pub id    : ::routing::NameType,
+        pub id    : XorName,
         /// Action taken for this Application.
         pub action: Action,
     }
@@ -167,7 +172,7 @@ pub mod event_data {
     #[derive(Debug)]
     pub struct AppAdditionData {
         /// Unique id of the Application managed by Launcher.
-        pub id  : ::routing::NameType,
+        pub id  : XorName,
         /// Name given to the App by Launcher,
         pub name: String
     }
@@ -176,7 +181,7 @@ pub mod event_data {
     #[derive(Debug)]
     pub struct AppRemoval {
         /// Unique id of the Application managed by Launcher.
-        pub id    : ::routing::NameType,
+        pub id    : XorName,
         /// Result of operation.
         pub result: Option<::errors::LauncherError>,
     }
@@ -185,7 +190,7 @@ pub mod event_data {
     #[derive(Debug)]
     pub struct AppModification {
         /// Unique id of the Application managed by Launcher.
-        pub id    : ::routing::NameType,
+        pub id    : XorName,
         /// Result of operation.
         pub result: Result<ModificationDetail, ::errors::LauncherError>,
     }

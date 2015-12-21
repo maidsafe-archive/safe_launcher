@@ -32,11 +32,13 @@
 #![allow(box_pointers, fat_ptr_transmutes, missing_copy_implementations,
          missing_debug_implementations)]
 
-extern crate routing;
+extern crate xor_name;
+extern crate safe_core;
 #[macro_use] extern crate log;
-#[macro_use] extern crate safe_core;
 #[macro_use] extern crate safe_launcher;
-#[allow(unused_extern_crates)] extern crate env_logger;
+#[macro_use] extern crate maidsafe_utilities;
+
+use xor_name::XorName;
 
 mod self_auth;
 mod event_loop;
@@ -44,7 +46,7 @@ mod event_loop;
 /// Contains lists of various categories of apps
 pub struct Lists {
     managed_apps       : std::sync::Arc<std::sync::Mutex<Vec<safe_launcher::launcher::app_handler_event_data::ManagedApp>>>,
-    running_apps       : std::sync::Arc<std::sync::Mutex<Vec<routing::NameType>>>,
+    running_apps       : std::sync::Arc<std::sync::Mutex<Vec<XorName>>>,
     pending_add_request: std::sync::Arc<std::sync::Mutex<std::collections::HashMap<String, bool>>>,
 }
 
@@ -54,23 +56,23 @@ fn on_add_app(lists   : &Lists,
 
     println!("\n=============== Add an application to be managed ===============\n");
 
-    print!("Enter absolute path to the binary [use only front-slashes]: "); eval_result!(std::io::stdout().flush());
+    print!("Enter absolute path to the binary [use only front-slashes]: "); unwrap_result!(std::io::stdout().flush());
     let mut local_path = String::with_capacity(20);
-    let _ = eval_result!(std::io::stdin().read_line(&mut local_path));
+    let _ = unwrap_result!(std::io::stdin().read_line(&mut local_path));
     local_path = local_path.trim().to_string();
 
-    print!("Permission to access \"SAFEDrive\" [Y if allowed] : "); eval_result!(std::io::stdout().flush());
+    print!("Permission to access \"SAFEDrive\" [Y if allowed] : "); unwrap_result!(std::io::stdout().flush());
     let mut permission = String::new();
-    let _ = eval_result!(std::io::stdin().read_line(&mut permission));
+    let _ = unwrap_result!(std::io::stdin().read_line(&mut permission));
     permission = permission.trim().to_string();
     let safe_drive_access = permission == "Y" || permission == "y";
 
-    let _ = eval_result!(lists.pending_add_request.lock()).insert(local_path.clone(), safe_drive_access);
+    let _ = unwrap_result!(lists.pending_add_request.lock()).insert(local_path.clone(), safe_drive_access);
     let data = safe_launcher::launcher::app_handler_event_data::AppDetail {
         absolute_path    : local_path,
         safe_drive_access: safe_drive_access,
     };
-    eval_result!(send_one!(data, launcher.get_app_handler_event_sender()));
+    unwrap_result!(send_one!(data, launcher.get_app_handler_event_sender()));
 }
 
 fn on_remove_app(lists   : &Lists,
@@ -79,15 +81,15 @@ fn on_remove_app(lists   : &Lists,
 
     println!("\n=============== Remove a managed application  ===============\n");
 
-    print!("Enter application serial number: "); eval_result!(std::io::stdout().flush());
+    print!("Enter application serial number: "); unwrap_result!(std::io::stdout().flush());
     let mut serial_no = String::with_capacity(3);
-    let _ = eval_result!(std::io::stdin().read_line(&mut serial_no));
+    let _ = unwrap_result!(std::io::stdin().read_line(&mut serial_no));
 
     if let Ok(serial_number) = serial_no.trim().parse::<usize>() {
-        let ref managed_apps = *eval_result!(lists.managed_apps.lock());
+        let ref managed_apps = *unwrap_result!(lists.managed_apps.lock());
 
         if serial_number > 0 && serial_number <= managed_apps.len() {
-            eval_result!(launcher.get_app_handler_event_sender()
+            unwrap_result!(launcher.get_app_handler_event_sender()
                                  .send(safe_launcher::launcher
                                                     ::AppHandlerEvent
                                                     ::RemoveApp(managed_apps[serial_number - 1].id)));
@@ -101,14 +103,14 @@ fn on_remove_app(lists   : &Lists,
 
 fn on_list_all_managed_apps(lists: &Lists) {
     println!("\n=============== Managed Applications ===============");
-    for it in eval_result!(lists.managed_apps.lock()).iter().enumerate() {
+    for it in unwrap_result!(lists.managed_apps.lock()).iter().enumerate() {
         let location = if let Some(ref loc) = it.1.local_path {
             loc.clone()
         } else {
             " -- N/A --".to_string()
         };
 
-        let is_activated = eval_result!(lists.running_apps.lock()).iter().find(|id| **id == it.1.id).is_some();
+        let is_activated = unwrap_result!(lists.running_apps.lock()).iter().find(|id| **id == it.1.id).is_some();
 
         println!("\n------------------- Application - Serial number {} -------------------\n", it.0 + 1);
         println!("Serial number: {}\nName: {}\nLocation on this machine: {}\nIs allowed \"SAFEDrive\" access: {}\
@@ -124,15 +126,15 @@ fn on_activate_app(lists   : &Lists,
 
     println!("\n=============== Activate a managed application  ===============\n");
 
-    print!("Enter application serial number: "); eval_result!(std::io::stdout().flush());
+    print!("Enter application serial number: "); unwrap_result!(std::io::stdout().flush());
     let mut serial_no = String::with_capacity(3);
-    let _ = eval_result!(std::io::stdin().read_line(&mut serial_no));
+    let _ = unwrap_result!(std::io::stdin().read_line(&mut serial_no));
 
     if let Ok(serial_number) = serial_no.trim().parse::<usize>() {
-        let ref managed_apps = *eval_result!(lists.managed_apps.lock());
+        let ref managed_apps = *unwrap_result!(lists.managed_apps.lock());
 
         if serial_number > 0 && serial_number <= managed_apps.len() {
-            eval_result!(launcher.get_app_handler_event_sender()
+            unwrap_result!(launcher.get_app_handler_event_sender()
                                  .send(safe_launcher::launcher
                                                     ::AppHandlerEvent
                                                     ::ActivateApp(managed_apps[serial_number - 1].id)));
@@ -150,12 +152,12 @@ fn on_modify_app(lists   : &Lists,
 
     println!("\n=============== Modify a managed application  ===============\n");
 
-    print!("Enter application serial number: "); eval_result!(std::io::stdout().flush());
+    print!("Enter application serial number: "); unwrap_result!(std::io::stdout().flush());
     let mut serial_no = String::with_capacity(3);
-    let _ = eval_result!(std::io::stdin().read_line(&mut serial_no));
+    let _ = unwrap_result!(std::io::stdin().read_line(&mut serial_no));
 
     if let Ok(serial_number) = serial_no.trim().parse::<usize>() {
-        let ref managed_apps = *eval_result!(lists.managed_apps.lock());
+        let ref managed_apps = *unwrap_result!(lists.managed_apps.lock());
 
         if serial_number > 0 && serial_number <= managed_apps.len() {
             let mut user_option = String::new();
@@ -170,27 +172,27 @@ fn on_modify_app(lists   : &Lists,
                 println!("\n<3> Change \"SAFEDrive\" access permission");
                 println!("\n<4> Apply and Exit");
                 print!("\nEnter Option [1-4]: ");
-                eval_result!(std::io::stdout().flush());
+                unwrap_result!(std::io::stdout().flush());
                 let _ = std::io::stdin().read_line(&mut user_option);
 
                 if let Ok(option) = user_option.trim().parse::<u8>() {
                     match option {
                         1 => {
                             name.clear();
-                            print!("\nEnter new name: "); eval_result!(std::io::stdout().flush());
-                            let _ = eval_result!(std::io::stdin().read_line(&mut name));
+                            print!("\nEnter new name: "); unwrap_result!(std::io::stdout().flush());
+                            let _ = unwrap_result!(std::io::stdin().read_line(&mut name));
                             name = name.trim().to_string();
                         },
                         2 => {
                             path.clear();
-                            print!("\nEnter new absolute path to binary [use only front-slashes]: "); eval_result!(std::io::stdout().flush());
-                            let _ = eval_result!(std::io::stdin().read_line(&mut path));
+                            print!("\nEnter new absolute path to binary [use only front-slashes]: "); unwrap_result!(std::io::stdout().flush());
+                            let _ = unwrap_result!(std::io::stdin().read_line(&mut path));
                             path = path.trim().to_string();
                         },
                         3 => {
                             safe_drive_access.clear();
-                            print!("Permission to access \"SAFEDrive\" [Y if allowed] : "); eval_result!(std::io::stdout().flush());
-                            let _ = eval_result!(std::io::stdin().read_line(&mut safe_drive_access));
+                            print!("Permission to access \"SAFEDrive\" [Y if allowed] : "); unwrap_result!(std::io::stdout().flush());
+                            let _ = unwrap_result!(std::io::stdin().read_line(&mut safe_drive_access));
                             safe_drive_access = safe_drive_access.trim().to_string();
                         },
                         4 => break,
@@ -209,7 +211,7 @@ fn on_modify_app(lists   : &Lists,
                 safe_drive_access: if safe_drive_access != "" { Some(safe_drive_access == "Y" || safe_drive_access == "y") } else { None },
             };
 
-            eval_result!(send_one!(modify_app_settings, &launcher.get_app_handler_event_sender()));
+            unwrap_result!(send_one!(modify_app_settings, &launcher.get_app_handler_event_sender()));
         } else {
             println!("Error: Invalid Serial Number.");
         }
@@ -227,11 +229,11 @@ fn main() {
         pending_add_request: ::std::sync::Arc::new(std::sync::Mutex::new(::std::collections::HashMap::new())),
     };
 
-    let client = eval_result!(self_auth::handle_self_authentication());
+    let client = unwrap_result!(self_auth::handle_self_authentication());
     println!("\nSelf-authentication Successful !!");
 
     println!("Initialising Launcher ...");
-    let launcher = eval_result!(safe_launcher::launcher::Launcher::new(client));
+    let launcher = unwrap_result!(safe_launcher::launcher::Launcher::new(client));
 
     let (_raii_joiner, internal_sender) = event_loop::EventLoop::new(&launcher, &app_lists);
 
@@ -247,7 +249,7 @@ fn main() {
         println!("\n<6> Exit");
 
         print!("\nEnter Option [1-6]: ");
-        eval_result!(std::io::stdout().flush());
+        unwrap_result!(std::io::stdout().flush());
         let _ = std::io::stdin().read_line(&mut user_option);
 
         if let Ok(option) = user_option.trim().parse::<u8>() {
@@ -267,5 +269,5 @@ fn main() {
         user_option.clear();
     }
 
-    eval_result!(internal_sender.send(event_loop::Terminate));
+    unwrap_result!(internal_sender.send(event_loop::Terminate));
 }

@@ -15,8 +15,11 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use xor_name::XorName;
+use maidsafe_utilities::thread::RaiiThreadJoiner;
+
 pub struct SessionInfo {
-    pub _raii_joiner: ::safe_core::utility::RAIIThreadJoiner,
+    pub _raii_joiner: RaiiThreadJoiner,
     pub event_sender: ::launcher
                       ::ipc_server
                       ::ipc_session::EventSenderToSession<::launcher::ipc_server::ipc_session
@@ -24,7 +27,7 @@ pub struct SessionInfo {
 }
 
 impl SessionInfo {
-    pub fn new(raii_joiner : ::safe_core::utility::RAIIThreadJoiner,
+    pub fn new(raii_joiner : RaiiThreadJoiner,
                event_sender: ::launcher::ipc_server
                                        ::ipc_session
                                        ::EventSenderToSession<::launcher::ipc_server::ipc_session
@@ -45,13 +48,13 @@ impl Drop for SessionInfo {
 }
 
 pub struct AppInfo {
-    pub app_id           : ::routing::NameType,
+    pub app_id           : XorName,
     pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
     pub safe_drive_access: bool,
 }
 
 impl AppInfo {
-    pub fn new(app_id           : ::routing::NameType,
+    pub fn new(app_id           : XorName,
                app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
                safe_drive_access: bool) -> AppInfo {
         AppInfo {

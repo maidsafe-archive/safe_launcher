@@ -15,9 +15,11 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use xor_name::XorName;
+
 #[derive(Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct LauncherConfiguration {
-    pub app_id           : ::routing::NameType,
+    pub app_id           : XorName,
     pub app_name         : String,
     pub reference_count  : u32,
     pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
@@ -27,14 +29,14 @@ pub struct LauncherConfiguration {
 // (Spandan)
 // This is a hack because presently cbor isn't able to decode/encode HashMap<NameType, String>
 // properly
-pub fn convert_hashmap_to_vec(hashmap: &::std::collections::HashMap<::routing::NameType, String>) -> Vec<(::routing::NameType, String)> {
+pub fn convert_hashmap_to_vec(hashmap: &::std::collections::HashMap<XorName, String>) -> Vec<(XorName, String)> {
     hashmap.iter().map(|a| (a.0.clone(), a.1.clone())).collect()
 }
 
 // (Spandan)
 // This is a hack because presently cbor isn't able to decode/encode HashMap<NameType, String>
 // properly
-pub fn convert_vec_to_hashmap(vec: Vec<(::routing::NameType, String)>) -> ::std::collections::HashMap<::routing::NameType, String> {
+pub fn convert_vec_to_hashmap(vec: Vec<(XorName, String)>) -> ::std::collections::HashMap<XorName, String> {
     vec.into_iter().collect()
 }
 
@@ -45,7 +47,7 @@ pub fn read_local_config_file() -> Result<Vec<u8>, ::errors::LauncherError> {
 
     match ::std::fs::File::open(path) {
         Ok(mut file) => {
-            let mut raw_disk_data = Vec::with_capacity(eval_result!(file.metadata()).len() as usize);
+            let mut raw_disk_data = Vec::with_capacity(unwrap_result!(file.metadata()).len() as usize);
             match file.read_to_end(&mut raw_disk_data) {
                 Ok(_) => return Ok(raw_disk_data),
                 Err(err) => debug!("{:?} - Unable to open local config file", err),

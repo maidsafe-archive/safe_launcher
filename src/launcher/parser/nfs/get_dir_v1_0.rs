@@ -24,7 +24,7 @@ pub struct GetDir {
 
 impl ::launcher::parser::traits::Action for GetDir {
     fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType {
-        if self.is_path_shared && !*eval_result!(params.safe_drive_access.lock()) {
+        if self.is_path_shared && !*unwrap_result!(params.safe_drive_access.lock()) {
             return Err(::errors::LauncherError::PermissionDenied)
         }
 
@@ -132,8 +132,8 @@ mod test {
 
     fn create_test_dir(parameter_packet: &::launcher::parser::ParameterPacket) {
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
-        let mut app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
-        let _ = eval_result!(dir_helper.create(TEST_DIR_NAME.to_string(),
+        let mut app_root_dir = unwrap_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        let _ = unwrap_result!(dir_helper.create(TEST_DIR_NAME.to_string(),
                                                ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
                                                Vec::new(),
                                                false,
@@ -143,7 +143,7 @@ mod test {
 
     #[test]
     fn get_dir() {
-        let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+        let parameter_packet = unwrap_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         create_test_dir(&parameter_packet);
 
@@ -153,7 +153,7 @@ mod test {
             is_path_shared: false,
         };
 
-        assert!(eval_result!(request.execute(parameter_packet.clone())).is_some());
+        assert!(unwrap_result!(request.execute(parameter_packet.clone())).is_some());
 
         request.dir_path = "/does_not_exixts".to_string();
         assert!(request.execute(parameter_packet).is_err());

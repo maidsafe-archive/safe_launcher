@@ -15,9 +15,13 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use xor_name::XorName;
+use maidsafe_utilities::thread::RaiiThreadJoiner;
+use maidsafe_utilities::event_sender::EventSender;
+
 pub mod events;
 
-pub type EventSenderToServer<EventSubset> = ::event_sender::EventSender<events::IpcServerEventCategory, EventSubset>;
+pub type EventSenderToServer<EventSubset> = EventSender<events::IpcServerEventCategory, EventSubset>;
 
 mod misc;
 mod ipc_session;
@@ -30,7 +34,7 @@ const LISTENER_FOURTH_OCTATE_START: u8 = 1;
 pub struct IpcServer {
     client                        : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
     temp_id                       : u32,
-    _raii_joiner                  : ::safe_core::utility::RAIIThreadJoiner,
+    _raii_joiner                  : RaiiThreadJoiner,
     session_event_tx              : ::std::sync::mpsc::Sender<events::IpcSessionEvent>,
     session_event_rx              : ::std::sync::mpsc::Receiver<events::IpcSessionEvent>,
     listener_event_rx             : ::std::sync::mpsc::Receiver<events::IpcListenerEvent>,
@@ -38,7 +42,7 @@ pub struct IpcServer {
     event_catagory_tx             : ::std::sync::mpsc::Sender<events::IpcServerEventCategory>,
     listener_endpoint             : String,
     listener_stop_flag            : ::std::sync::Arc<::std::sync::atomic::AtomicBool>,
-    verified_sessions             : ::std::collections::HashMap<::routing::NameType, misc::SessionInfo>,
+    verified_sessions             : ::std::collections::HashMap<XorName, misc::SessionInfo>,
     unverified_sessions           : ::std::collections::HashMap<u32, misc::SessionInfo>,
     pending_verifications         : ::std::collections::HashMap<String, misc::AppInfo>,
     verified_session_observers    : Vec<::observer::IpcObserver>,
@@ -47,7 +51,7 @@ pub struct IpcServer {
 }
 
 impl IpcServer {
-    pub fn new(client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>) -> Result<(::safe_core::utility::RAIIThreadJoiner,
+    pub fn new(client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>) -> Result<(RaiiThreadJoiner,
                                                                                                      EventSenderToServer<events::ExternalEvent>),
                                                                                                     ::errors::LauncherError> {
         let (session_event_tx, session_event_rx) = ::std::sync::mpsc::channel();
@@ -61,13 +65,10 @@ impl IpcServer {
                                                              events::IpcServerEventCategory::IpcListenerEvent,
                                                              event_catagory_tx.clone());
 
-        let (joiner, endpoint) = try!(IpcServer::spawn_acceptor(listener_event_sender,
-                                                                stop_flag.clone()));
+        let (joiner, endpoint) = try!(IpcServer::spawn_acceptor(listener_event_sender, stop_flag.clone()));
         let cloned_event_catagory_tx = event_catagory_tx.clone();
 
-        let ipc_server_joiner = eval_result!(::std::thread::Builder::new().name(IPC_SERVER_THREAD_NAME.to_string())
-                                                                          .spawn(move || {
-
+        let ipc_server_joiner = thread!(IPC_SERVER_THREAD_NAME, move || {
             let mut ipc_server = IpcServer {
                 client                        : client,
                 temp_id                       : 0,
@@ -90,14 +91,14 @@ impl IpcServer {
             ipc_server.run(event_catagory_rx);
 
             debug!("Exiting Thread {:?}", IPC_SERVER_THREAD_NAME);
-        }));
+        });
 
         let external_event_sender = EventSenderToServer::<events::ExternalEvent>
                                                        ::new(external_event_tx,
                                                              events::IpcServerEventCategory::ExternalEvent,
                                                              event_catagory_tx);
 
-        Ok((::safe_core::utility::RAIIThreadJoiner::new(ipc_server_joiner), external_event_sender))
+        Ok((RaiiThreadJoiner::new(ipc_server_joiner), external_event_sender))
     }
 
     fn run(&mut self, event_catagory_rx: ::std::sync::mpsc::Receiver<events::IpcServerEventCategory>) {
@@ -241,9 +242,9 @@ impl IpcServer {
                                                                               detail.app_root_dir_key,
                                                                               detail.safe_drive_access)) {
             // TODO(Spandan) handle this security hole.
-            debug!("Same nonce was already given to an app pending verification. This is a security hole not fixed in this iteration.");
-            debug!("Issues like mixed-up safe drive access could arise.");
-            debug!("Dropping the previous app information and re-assigning nonce to a new app");
+            error!("Same nonce was already given to an app pending verification. This is a security hole not fixed in this iteration.");
+            error!("Issues like mixed-up safe drive access could arise.");
+            error!("Dropping the previous app information and re-assigning nonce to a new app");
         } else {
             let data = ::observer::event_data::PendingVerification {
                 nonce : detail.nonce,
@@ -253,7 +254,7 @@ impl IpcServer {
         }
     }
 
-    fn on_change_safe_drive_access(&mut self, app_id: ::routing::NameType, is_allowed: bool) {
+    fn on_change_safe_drive_access(&mut self, app_id: XorName, is_allowed: bool) {
         let mut send_failed = false;
 
         if let Some(session_info) = self.verified_sessions.get_mut(&app_id) {
@@ -300,7 +301,7 @@ impl IpcServer {
         self.pending_verification_observers.push(observer);
     }
 
-    fn on_end_session(&mut self, app_id: ::routing::NameType) {
+    fn on_end_session(&mut self, app_id: XorName) {
         if self.verified_sessions.remove(&app_id).is_none() {
             let mut found = None;
             for (launcher_nonce, app_info) in &self.pending_verifications {
@@ -311,7 +312,7 @@ impl IpcServer {
             }
 
             if let Some(launcher_nonce) = found {
-                let _ = eval_option!(self.pending_verifications.remove(&launcher_nonce), "Logic Error - Report a bug.");
+                let _ = unwrap_option!(self.pending_verifications.remove(&launcher_nonce), "Logic Error - Report a bug.");
             } else {
                 debug!("IPC Server has no knowledge of the given App-Id {:?} for removal", app_id);
             }
@@ -319,7 +320,7 @@ impl IpcServer {
     }
 
     fn spawn_acceptor(event_sender: EventSenderToServer<events::IpcListenerEvent>,
-                      stop_flag   : ::std::sync::Arc<::std::sync::atomic::AtomicBool>) -> Result<(::safe_core::utility::RAIIThreadJoiner,
+                      stop_flag   : ::std::sync::Arc<::std::sync::atomic::AtomicBool>) -> Result<(RaiiThreadJoiner,
                                                                                                   String),
                                                                                                  ::errors::LauncherError> {
         let mut third_octate = LISTENER_THIRD_OCTATE_START;
@@ -354,18 +355,17 @@ impl IpcServer {
             }
         }
 
-        let local_endpoint = format!("{}", eval_result!(ipc_listener.local_addr()));
+        let local_endpoint = format!("{}", unwrap_result!(ipc_listener.local_addr()));
 
-        let joiner = eval_result!(::std::thread::Builder::new().name(IPC_LISTENER_THREAD_NAME.to_string())
-                                                               .spawn(move || {
+        let joiner = thread!(IPC_LISTENER_THREAD_NAME, move || {
             IpcServer::handle_accept(ipc_listener,
                                      event_sender,
                                      stop_flag);
 
             debug!("Exiting Thread {:?}", IPC_LISTENER_THREAD_NAME);
-        }));
+        });
 
-        Ok((::safe_core::utility::RAIIThreadJoiner::new(joiner), local_endpoint))
+        Ok((RaiiThreadJoiner::new(joiner), local_endpoint))
     }
 
     fn handle_accept(ipc_listener: ::std::net::TcpListener,
@@ -407,38 +407,31 @@ impl Drop for IpcServer {
 mod test {
     use super::*;
     use std::io::Read;
+    use std::sync::{Arc, Mutex};
+    use maidsafe_utilities::thread::RaiiThreadJoiner;
 
     #[test]
     fn spawn_and_shut_ipc_server() {
-        let client = ::std
-                     ::sync
-                     ::Arc::new(::std
-                                ::sync
-                                ::Mutex::new(eval_result!(::safe_core::utility::test_utils::get_client())));
+        let client = Arc::new(Mutex::new(unwrap_result!(::safe_core::utility::test_utils::get_client())));
 
-        let (_raii_joiner_0, event_sender) = eval_result!(IpcServer::new(client));
+        let (_raii_joiner_0, event_sender) = unwrap_result!(IpcServer::new(client));
 
         let (tx, rx) = ::std::sync::mpsc::channel();
-        eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::GetListenerEndpoint(tx)));
-        let listener_ep = eval_result!(rx.recv());
+        unwrap_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::GetListenerEndpoint(tx)));
+        let listener_ep = unwrap_result!(rx.recv());
 
-        let mut stream = eval_result!(::std::net::TcpStream::connect(&listener_ep[..]));
+        let mut stream = unwrap_result!(::std::net::TcpStream::connect(&listener_ep[..]));
 
-        let _raii_joiner_1 = ::safe_core
-                             ::utility
-                             ::RAIIThreadJoiner
-                             ::new(eval_result!(::std
-                                                ::thread
-                                                ::Builder::new().name("ReaderThread".to_string()).spawn(move || {
+        let _raii_joiner_1 = RaiiThreadJoiner::new(thread!("ReaderThread", move || {
             let mut buffer = [0; 5];
-            assert_eq!(eval_result!(stream.read(&mut buffer)), 0);
-        })));
+            assert_eq!(unwrap_result!(stream.read(&mut buffer)), 0);
+        }));
 
         let duration = ::std::time::Duration::from_millis(3000);
         ::std::thread::sleep(duration);
         // Terminate to exit this test - otherwise the raii_joiners will hang this test - this is
         // by design. So there is no way out but graceful termination which is what this entire
         // design strives for.
-        eval_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::Terminate));
+        unwrap_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::Terminate));
     }
 }

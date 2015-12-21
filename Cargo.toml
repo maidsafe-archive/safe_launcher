@@ -1,42 +1,36 @@
 [package]
-name          = "safe_launcher"
-version       = "0.1.1"
-authors       = ["MaidSafe Developers <dev@maidsafe.net>"]
-description   = "SAFE Launcher library"
+authors = ["MaidSafe Developers <dev@maidsafe.net>"]
+description = "SAFE Launcher library"
 documentation = "http://maidsafe.github.io/safe_launcher/latest/"
-repository    = "https://github.com/maidsafe/safe_launcher"
-readme        = "README.md"
-license       = "GPL-3.0"
-homepage      = "http://maidsafe.net"
-
-[lib]
-name       = "safe_launcher"
-crate_type = ["staticlib", "dylib", "rlib"]
+homepage = "http://maidsafe.net"
+license = "GPL-3.0"
+name = "safe_launcher"
+readme = "README.md"
+repository = "https://github.com/maidsafe/safe_launcher"
+version = "0.1.1"
 
 [dependencies]
-# ---- Maidsafe ----
-routing     = "~0.4.2"
-safe_nfs    = "~0.3.1"
-safe_dns    = "~0.3.1"
-safe_core   = "~0.3.1"
-
-# ---- Others ----
-log             = "~0.3.3"
-libc            = "~0.2.2"
-byteorder       = "~0.4.2"
-bufstream       = "~0.1.1"
-sodiumoxide     = "~0.0.9"
+bufstream = "~0.1.1"
+byteorder = "~0.4.2"
+libc = "~0.2.4"
+log = "~0.3.4"
+maidsafe_utilities = "~0.1.5"
+routing = "~0.5.2"
 rustc-serialize = "~0.3.16"
-
-[dev-dependencies]
-env_logger = "~0.3.2"
+safe_core = "~0.4.0"
+safe_dns = "~0.4.0"
+safe_nfs = "~0.4.0"
+sodiumoxide = "~0.0.9"
+xor_name = "~0.0.1"
 
 [[example]]
-name  = "launcher_cli"
-test  = true
 bench = false
+name = "launcher_cli"
+test = true
 
 [features]
-use-mock-routing = ["safe_dns/use-mock-routing",
-                    "safe_nfs/use-mock-routing",
-                    "safe_core/use-mock-routing"]
+use-mock-routing = ["safe_dns/use-mock-routing", "safe_nfs/use-mock-routing", "safe_core/use-mock-routing"]
+
+[lib]
+crate_type = ["staticlib", "dylib", "rlib"]
+name = "safe_launcher"

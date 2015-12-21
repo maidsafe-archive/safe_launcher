@@ -15,6 +15,8 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use routing::Data;
+
 #[derive(RustcDecodable, Debug)]
 pub struct AddService {
     pub long_name            : String,
@@ -25,7 +27,7 @@ pub struct AddService {
 
 impl ::launcher::parser::traits::Action for AddService {
     fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType {
-        if self.is_path_shared && !*eval_result!(params.safe_drive_access.lock()) {
+        if self.is_path_shared && !*unwrap_result!(params.safe_drive_access.lock()) {
             return Err(::errors::LauncherError::PermissionDenied)
         }
 
@@ -41,13 +43,13 @@ impl ::launcher::parser::traits::Action for AddService {
                                                                                  &tokens,
                                                                                  Some(start_dir_key)));
 
-       let signing_key = try!(eval_result!(params.client.lock()).get_secret_signing_key()).clone();
+       let signing_key = try!(unwrap_result!(params.client.lock()).get_secret_signing_key()).clone();
        let dns_operation = try!(::safe_dns::dns_operations::DnsOperations::new(params.client.clone()));
        let struct_data = try!(dns_operation.add_service(&self.long_name,
                                                         (self.service_name.clone(), dir_to_map.get_key().clone()),
                                                         &signing_key,
                                                         None));
-       eval_result!(params.client.lock()).post(::routing::data::Data::StructuredData(struct_data), None);
+       try!(unwrap_result!(params.client.lock()).post(Data::StructuredData(struct_data), None));
        Ok(None)
     }
 }
@@ -61,17 +63,17 @@ mod test {
 
     #[test]
     fn add_dns_service() {
-        let parameter_packet = eval_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+        let parameter_packet = unwrap_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
-        let mut app_root_dir = eval_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
-        let _ = eval_result!(dir_helper.create(TEST_DIR_NAME.to_string(),
+        let mut app_root_dir = unwrap_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
+        let _ = unwrap_result!(dir_helper.create(TEST_DIR_NAME.to_string(),
                                                ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
                                                Vec::new(),
                                                false,
                                                ::safe_nfs::AccessLevel::Public,
                                                Some(&mut app_root_dir)));
-        let public_name = eval_result!(::safe_core::utility::generate_random_string(10));
+        let public_name = unwrap_result!(::safe_core::utility::generate_random_string(10));
         let mut register_request = ::launcher::parser::dns::register_dns_v1_0::RegisterDns {
             long_name            : public_name.clone(),
             service_name         : "www".to_string(),

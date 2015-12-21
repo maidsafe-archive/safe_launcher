@@ -20,6 +20,8 @@ pub use self::ipc_server::events::ExternalEvent as IpcExternalEvent;
 /// Events that can be communicated to the app-handling module.
 pub use self::app_handler::events::{AppHandlerEvent, event_data as app_handler_event_data};
 
+use maidsafe_utilities::thread::RaiiThreadJoiner;
+
 mod parser;
 mod ipc_server;
 mod app_handler;
@@ -33,7 +35,7 @@ mod app_handler;
 /// event senders, clone it and distribute it to other threads. These event senders will help
 /// communicate with the core library in a completely asynchronous and thread safe manner.
 pub struct Launcher {
-    _raii_joiners           : Vec<::safe_core::utility::RAIIThreadJoiner>,
+    _raii_joiners           : Vec<RaiiThreadJoiner>,
     ipc_event_sender        : ipc_server::EventSenderToServer<IpcExternalEvent>,
     app_handler_event_sender: ::std::sync::mpsc::Sender<AppHandlerEvent>,
 }
@@ -111,13 +113,13 @@ mod tests {
 
     #[test]
     fn initialise_safe_drive_dir() {
-        let pin = eval_result!(::safe_core::utility::generate_random_string(10));
-        let keyword = eval_result!(::safe_core::utility::generate_random_string(10));
-        let password = eval_result!(::safe_core::utility::generate_random_string(10));
+        let pin = unwrap_result!(::safe_core::utility::generate_random_string(10));
+        let keyword = unwrap_result!(::safe_core::utility::generate_random_string(10));
+        let password = unwrap_result!(::safe_core::utility::generate_random_string(10));
 
-        let client = eval_result!(::safe_core::client::Client::create_account(keyword.clone(),
-                                                                              pin.clone(),
-                                                                              password.clone()));
+        let client = unwrap_result!(::safe_core::client::Client::create_account(keyword.clone(),
+                                                                                pin.clone(),
+                                                                                password.clone()));
 
         let safe_drive_directory_name = ::config::SAFE_DRIVE_DIR_NAME.to_string();
         let arc_client = ::std::sync::Arc::new(::std::sync::Mutex::new(client));
@@ -125,19 +127,19 @@ mod tests {
 
         // client should not have SAFEDrive in user root directory
         {
-            let user_root_directory = eval_result!(directory_helper.get_user_root_directory_listing());
+            let user_root_directory = unwrap_result!(directory_helper.get_user_root_directory_listing());
             assert!(user_root_directory.find_sub_directory(&safe_drive_directory_name).is_none());
         }
 
         // Create Launcher instance
         {
-            let client = eval_result!(::safe_core::client::Client::log_in(keyword, pin, password));
+            let client = unwrap_result!(::safe_core::client::Client::log_in(keyword, pin, password));
             let _ = Launcher::new(client);
         }
 
         // client should have SAFEDrive in user root directory
         {
-            let user_root_directory = eval_result!(directory_helper.get_user_root_directory_listing());
+            let user_root_directory = unwrap_result!(directory_helper.get_user_root_directory_listing());
             assert!(user_root_directory.find_sub_directory(&safe_drive_directory_name).is_some());
         }
     }

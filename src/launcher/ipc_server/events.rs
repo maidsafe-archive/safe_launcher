@@ -15,6 +15,8 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use xor_name::XorName;
+
 #[derive(Clone, Debug)]
 pub enum IpcServerEventCategory {
     IpcListenerEvent,
@@ -56,11 +58,11 @@ pub enum ExternalEvent {
     #[doc(hidden)]
     AppActivated(Box<event_data::ActivationDetail>),
     #[doc(hidden)]
-    ChangeSafeDriveAccess(::routing::NameType, bool),
+    ChangeSafeDriveAccess(XorName, bool),
     /// Obtain the endpoint on which the Launcher IPC is listening to for incoming connections.
     GetListenerEndpoint(::std::sync::mpsc::Sender<String>),
     /// Request IPC Server to forget a session with given app-id. The session will be terminated.
-    EndSession(::routing::NameType),
+    EndSession(XorName),
     /// Register an observer to receive notifications about changes in verified sessions.
     RegisterVerifiedSessionObserver(::observer::IpcObserver),
     /// Register an observer to receive notifications about changes in unverified sessions.
@@ -91,10 +93,12 @@ impl From<event_data::ActivationDetail> for ExternalEvent {
 // --------------------------------------------------------------------------------------
 
 pub mod event_data {
+    use xor_name::XorName;
+
     #[derive(Debug, Clone)]
     pub struct ActivationDetail {
         pub nonce            : String,
-        pub app_id           : ::routing::NameType,
+        pub app_id           : XorName,
         pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
         pub safe_drive_access: bool,
     }
@@ -107,7 +111,7 @@ pub mod event_data {
 
     #[derive(Debug, Clone)]
     pub enum SessionId {
-        AppId(Box<::routing::NameType>),
+        AppId(Box<XorName>),
         TempId(u32),
     }
 }

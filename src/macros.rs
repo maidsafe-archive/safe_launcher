@@ -22,7 +22,6 @@
 ///
 /// ```
 /// # #[macro_use] extern crate log;
-/// # #[macro_use] extern crate safe_core;
 /// # #[macro_use] extern crate safe_launcher;
 /// fn f() -> Result<(), safe_launcher::errors::LauncherError> {
 ///     let some_result = Err(safe_launcher::errors::LauncherError::from("An Example Error"));
@@ -63,8 +62,8 @@ macro_rules! eval_break {
 /// #Examples
 ///
 /// ```
-/// # #[macro_use] extern crate safe_core;
 /// # #[macro_use] extern crate safe_launcher;
+/// # #[macro_use] extern crate maidsafe_utilities;
 /// struct DataType {
 ///     field: String,
 /// }
@@ -85,11 +84,9 @@ macro_rules! eval_break {
 ///
 /// fn main() {
 ///     let (tx, rx) = std::sync::mpsc::channel();
-///     let joiner = eval_result!(std::thread::Builder::new()
-///                                           .name("Doc-group_send-thread".to_string())
-///                                           .spawn(move || {
-///         let data: DataType = eval_result!(rx.recv());
-///     }));
+///     let joiner = thread!("Doc-group_send-thread", move || {
+///         let data: DataType = unwrap_result!(rx.recv());
+///     });
 ///
 ///     let mut notifier = Notifier {
 ///         observers: vec![tx],
@@ -97,7 +94,7 @@ macro_rules! eval_break {
 ///
 ///     notifier.notify_all();
 ///
-///     eval_result!(joiner.join());
+///     unwrap_result!(joiner.join());
 /// }
 /// ```
 #[macro_export]
@@ -107,7 +104,7 @@ macro_rules! group_send {
         // - cannot move out of captured outer variable in an `FnMut` closure
         // while doing a move in the closure provided to `retain()` below
         let mut option_dance = Some($data);
-        $senders.retain(|tx| tx.send(::std::convert::From::from(eval_option!(option_dance.take(), "Logic Error - Report a bug.")))
+        $senders.retain(|tx| tx.send(::std::convert::From::from(unwrap_option!(option_dance.take(), "Logic Error - Report a bug.")))
                                .is_ok());
     }}
 }
@@ -119,8 +116,8 @@ macro_rules! group_send {
 /// #Examples
 ///
 /// ```
-/// # #[macro_use] extern crate safe_core;
 /// # #[macro_use] extern crate safe_launcher;
+/// # #[macro_use] extern crate maidsafe_utilities;
 /// struct DataType {
 ///     field: String,
 /// }
@@ -141,11 +138,9 @@ macro_rules! group_send {
 ///
 /// fn main() {
 ///     let (tx, rx) = std::sync::mpsc::channel();
-///     let joiner = eval_result!(std::thread::Builder::new()
-///                                           .name("Doc-group_send-thread".to_string())
-///                                           .spawn(move || {
-///         let data: DataType = eval_result!(rx.recv());
-///     }));
+///     let joiner = thread!("Doc-group_send-thread", move || {
+///         let data: DataType = unwrap_result!(rx.recv());
+///     });
 ///
 ///     let mut notifier = Notifier {
 ///         observer: tx,
@@ -153,7 +148,7 @@ macro_rules! group_send {
 ///
 ///     notifier.notify_one();
 ///
-///     eval_result!(joiner.join());
+///     unwrap_result!(joiner.join());
 /// }
 /// ```
 #[macro_export]
@@ -172,8 +167,8 @@ macro_rules! send_one {
 /// #Examples
 ///
 /// ```
-/// # #[macro_use] extern crate safe_core;
 /// # #[macro_use] extern crate safe_launcher;
+/// # #[macro_use] extern crate maidsafe_utilities;
 /// struct DataType {
 ///     field: String,
 /// }
@@ -194,17 +189,15 @@ macro_rules! send_one {
 ///
 /// fn main() {
 ///     let (tx, rx) = std::sync::mpsc::channel();
-///     let joiner = eval_result!(std::thread::Builder::new()
-///                                           .name("Doc-eval_send_one-thread".to_string())
-///                                           .spawn(move || {
+///     let joiner = thread!("Doc-eval_send_one-thread", move || {
 ///         let result: Result<DataType,
-///                            safe_launcher::errors::LauncherError> = eval_result!(rx.recv());
+///                            safe_launcher::errors::LauncherError> = unwrap_result!(rx.recv());
 ///         assert!(result.is_err());
-///     }));
+///     });
 ///
 ///     f(tx);
 ///
-///     eval_result!(joiner.join());
+///     unwrap_result!(joiner.join());
 /// }
 /// ```
 #[macro_export]
@@ -296,10 +289,9 @@ macro_rules! parse_result {
 /// #Examples
 ///
 /// ```
-/// # #[macro_use] extern crate safe_core;
 /// # #[macro_use] extern crate safe_launcher;
 /// fn f() -> i32 {
-///     let some_result: Result<String, safe_core::errors::CoreError> = Ok("Hello".to_string());
+///     let some_result: Result<String, safe_launcher::errors::LauncherError> = Ok("Hello".to_string());
 ///     let string_length = ffi_try!(some_result).len();
 ///     assert_eq!(string_length, 5);
 ///     0

@@ -15,6 +15,8 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use maidsafe_utilities::serialisation::SerialisationError;
+
 /// Intended for converting Launcher Errors into numeric codes for propagating some error information
 /// across FFI boundaries and specially to C.
 pub const LAUNCHER_ERROR_START_RANGE: i32 = ::safe_dns::errors::DNS_ERROR_START_RANGE - 500;
@@ -72,8 +74,15 @@ pub enum LauncherError {
     LocalConfigAccessFailed(String),
     /// Unexpected - Probably a Logic error
     Unexpected(String),
+    /// Could not serialise or deserialise data
+    UnsuccessfulEncodeDecode(SerialisationError),
 }
 
+impl From<SerialisationError> for LauncherError {
+    fn from(error: SerialisationError) -> LauncherError {
+        LauncherError::UnsuccessfulEncodeDecode(error)
+    }
+}
 impl<'a> From<&'a str> for LauncherError {
     fn from(error: &'a str) -> LauncherError {
         LauncherError::Unexpected(error.to_string())
@@ -143,6 +152,7 @@ impl Into<i32> for LauncherError {
             LauncherError::ReadPayloadSizeProhibitive       => LAUNCHER_ERROR_START_RANGE - 19,
             LauncherError::LocalConfigAccessFailed(_)       => LAUNCHER_ERROR_START_RANGE - 20,
             LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 21,
+            LauncherError::UnsuccessfulEncodeDecode(_)      => LAUNCHER_ERROR_START_RANGE - 22,
         }
     }
 }
@@ -174,6 +184,7 @@ impl ::std::fmt::Debug for LauncherError {
             LauncherError::ReadPayloadSizeProhibitive         => write!(f, "LauncherError::ReadPayloadSizeProhibitive"),
             LauncherError::LocalConfigAccessFailed(ref error) => write!(f, "LauncherError::LocalConfigAccessFailed -> {:?}", error),
             LauncherError::Unexpected(ref error)              => write!(f, "LauncherError::Unexpected{{{:?}}}", error),
+            LauncherError::UnsuccessfulEncodeDecode(ref err)  => write!(f, "LauncherError::UnsuccessfulEncodeDecode -> {:?}", err),
         }
     }
 }
