@@ -19,24 +19,26 @@ use xor_name::XorName;
 
 #[derive(Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct LauncherConfiguration {
-    pub app_id           : XorName,
-    pub app_name         : String,
-    pub reference_count  : u32,
-    pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
+    pub app_id: XorName,
+    pub app_name: String,
+    pub reference_count: u32,
+    pub app_root_dir_key: ::safe_nfs::metadata::directory_key::DirectoryKey,
     pub safe_drive_access: bool,
 }
 
 // (Spandan)
 // This is a hack because presently cbor isn't able to decode/encode HashMap<NameType, String>
 // properly
-pub fn convert_hashmap_to_vec(hashmap: &::std::collections::HashMap<XorName, String>) -> Vec<(XorName, String)> {
+pub fn convert_hashmap_to_vec(hashmap: &::std::collections::HashMap<XorName, String>)
+                              -> Vec<(XorName, String)> {
     hashmap.iter().map(|a| (a.0.clone(), a.1.clone())).collect()
 }
 
 // (Spandan)
 // This is a hack because presently cbor isn't able to decode/encode HashMap<NameType, String>
 // properly
-pub fn convert_vec_to_hashmap(vec: Vec<(XorName, String)>) -> ::std::collections::HashMap<XorName, String> {
+pub fn convert_vec_to_hashmap(vec: Vec<(XorName, String)>)
+                              -> ::std::collections::HashMap<XorName, String> {
     vec.into_iter().collect()
 }
 
@@ -47,12 +49,13 @@ pub fn read_local_config_file() -> Result<Vec<u8>, ::errors::LauncherError> {
 
     match ::std::fs::File::open(path) {
         Ok(mut file) => {
-            let mut raw_disk_data = Vec::with_capacity(unwrap_result!(file.metadata()).len() as usize);
+            let mut raw_disk_data =
+                Vec::with_capacity(unwrap_result!(file.metadata()).len() as usize);
             match file.read_to_end(&mut raw_disk_data) {
                 Ok(_) => return Ok(raw_disk_data),
                 Err(err) => debug!("{:?} - Unable to open local config file", err),
             }
-        },
+        }
         Err(err) => debug!("{:?} - Unable to open local config file", err),
     }
 
@@ -64,18 +67,23 @@ pub fn flush_to_local_config(raw_data: &[u8]) -> Result<(), ::errors::LauncherEr
 
     let path = try!(get_local_config_file());
 
-    let mut file = try!(::std::fs::File::create(path).map_err(|e| ::errors
-                                                                  ::LauncherError
-                                                                  ::LocalConfigAccessFailed(format!("{:?} - Unable to create.", e))));
-    try!(file.write_all(&raw_data).map_err(|e| ::errors::LauncherError::LocalConfigAccessFailed(format!("{:?} - Unable to write.", e))));
+    let mut file = try!(::std::fs::File::create(path).map_err(|e| {
+        ::errors::LauncherError::LocalConfigAccessFailed(format!("{:?} - Unable to create.", e))
+    }));
+    try!(file.write_all(&raw_data).map_err(|e| {
+        ::errors::LauncherError::LocalConfigAccessFailed(format!("{:?} - Unable to write.", e))
+    }));
 
-    Ok(try!(file.sync_all().map_err(|e| ::errors::LauncherError::LocalConfigAccessFailed(format!("{:?} - Unable to sync.", e)))))
+    Ok(try!(file.sync_all().map_err(|e| {
+        ::errors::LauncherError::LocalConfigAccessFailed(format!("{:?} - Unable to sync.", e))
+    })))
 }
 
 fn get_local_config_file() -> Result<::std::path::PathBuf, ::errors::LauncherError> {
-    let mut config_dir_pathbuf = try!(::std::env::home_dir().ok_or(::errors
-                                                                   ::LauncherError
-                                                                   ::LocalConfigAccessFailed("Unable to get user's Home Directory.".to_string())));
+    let mut config_dir_pathbuf = try!(::std::env::home_dir()
+                 .ok_or(::errors::LauncherError::LocalConfigAccessFailed("Unable to get user's \
+                                                                          Home Directory."
+                                                                             .to_string())));
     config_dir_pathbuf.push(::config::LAUNCHER_LOCAL_CONFIG_FILE_NAME);
 
     Ok(config_dir_pathbuf)

@@ -17,12 +17,14 @@
 
 #[derive(RustcDecodable, Debug)]
 pub struct DeleteDir {
-    dir_path      : String,
+    dir_path: String,
     is_path_shared: bool,
 }
 
 impl ::launcher::parser::traits::Action for DeleteDir {
-    fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType {
+    fn execute(&mut self,
+               params: ::launcher::parser::ParameterPacket)
+               -> ::launcher::parser::ResponseType {
 
         let mut tokens = ::launcher::parser::helper::tokenise_path(&self.dir_path, false);
         let dir_to_delete = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
@@ -35,8 +37,7 @@ impl ::launcher::parser::traits::Action for DeleteDir {
             try!(dir_helper.get(&params.app_root_dir_key))
         };
 
-        let _ = try!(dir_helper.delete(&mut parent_dir,
-                                       &dir_to_delete));
+        let _ = try!(dir_helper.delete(&mut parent_dir, &dir_to_delete));
 
         Ok(None)
     }
@@ -45,24 +46,27 @@ impl ::launcher::parser::traits::Action for DeleteDir {
 #[cfg(test)]
 mod test {
     use super::*;
-    use ::launcher::parser::traits::Action;
+    use launcher::parser::traits::Action;
 
     #[test]
     fn delete_dir() {
-        let parameter_packet = unwrap_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+        let parameter_packet =
+            unwrap_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
-        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
+        let dir_helper =
+            ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client
+                                                                                       .clone());
         let mut app_root_dir = unwrap_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
         let _ = unwrap_result!(dir_helper.create("test_dir".to_string(),
-                                               ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
-                                               Vec::new(),
-                                               false,
-                                               ::safe_nfs::AccessLevel::Private,
-                                               Some(&mut app_root_dir)));
+                                                 ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
+                                                 Vec::new(),
+                                                 false,
+                                                 ::safe_nfs::AccessLevel::Private,
+                                                 Some(&mut app_root_dir)));
 
 
         let mut request = DeleteDir {
-            dir_path      : "/test_dir2".to_string(),
+            dir_path: "/test_dir2".to_string(),
             is_path_shared: false,
         };
         assert!(request.execute(parameter_packet.clone()).is_err());

@@ -97,15 +97,15 @@ pub mod event_data {
 
     #[derive(Debug, Clone)]
     pub struct ActivationDetail {
-        pub nonce            : String,
-        pub app_id           : XorName,
-        pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
+        pub nonce: String,
+        pub app_id: XorName,
+        pub app_root_dir_key: ::safe_nfs::metadata::directory_key::DirectoryKey,
         pub safe_drive_access: bool,
     }
 
     #[derive(Debug)]
     pub struct SessionTerminationDetail {
-        pub id    : SessionId,
+        pub id: SessionId,
         pub reason: ::errors::LauncherError,
     }
 

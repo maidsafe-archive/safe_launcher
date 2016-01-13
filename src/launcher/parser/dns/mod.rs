@@ -18,37 +18,71 @@
 mod add_service_v1_0;
 mod register_dns_v1_0;
 
-pub fn action_dispatcher<D>(params              : ::launcher::parser::ParameterPacket,
+pub fn action_dispatcher<D>(params: ::launcher::parser::ParameterPacket,
                             mut remaining_tokens: Vec<String>,
-                            version             : f32,
-                            decoder             : &mut D) -> ::launcher::parser::ResponseType
-                                                             where D: ::rustc_serialize::Decoder, D::Error: ::std::fmt::Debug {
+                            version: f32,
+                            decoder: &mut D)
+                            -> ::launcher::parser::ResponseType
+    where D: ::rustc_serialize::Decoder,
+          D::Error: ::std::fmt::Debug
+{
     if remaining_tokens.len() > 1 {
-        return Err(::errors::LauncherError::SpecificParseError("Extra unrecognised tokens in endpoint.".to_string()))
+        return Err(::errors::LauncherError::SpecificParseError("Extra unrecognised tokens in \
+                                                                endpoint."
+                                                                   .to_string()));
     }
 
-    let action_str = try!(parse_option!(remaining_tokens.pop(), "Invalid endpoint - Action not found."));
+    let action_str = try!(parse_option!(remaining_tokens.pop(),
+                                        "Invalid endpoint - Action not found."));
 
     let mut action = try!(get_action(&action_str, version, decoder));
 
     action.execute(params)
 }
 
-fn get_action<D>(action_str: &str, version: f32, decoder: &mut D) -> Result<Box<::launcher::parser::traits::Action>, ::errors::LauncherError>
-                                                                     where D: ::rustc_serialize::Decoder, D::Error: ::std::fmt::Debug {
+fn get_action<D>(action_str: &str,
+                 version: f32,
+                 decoder: &mut D)
+                 -> Result<Box<::launcher::parser::traits::Action>, ::errors::LauncherError>
+    where D: ::rustc_serialize::Decoder,
+          D::Error: ::std::fmt::Debug
+{
     use rustc_serialize::Decodable;
 
-    let version_err = Err(::errors::LauncherError::SpecificParseError(format!("Unsupported version {:?} for this endpoint.", version)));
+    let version_err = Err(::errors::LauncherError::SpecificParseError(format!("Unsupported \
+                                                                               version {:?} \
+                                                                               for this endpoin\
+                                                                               t.",
+                                                                              version)));
 
     Ok(match action_str {
-        "register-dns" => match version {
-            1.0 => Box::new(try!(parse_result!(decoder.read_struct_field("data", 0, |d| register_dns_v1_0::RegisterDns::decode(d)), ""))),
-            _   => return version_err,
-        },
-        "add-service" => match version {
-            1.0 => Box::new(try!(parse_result!(decoder.read_struct_field("data", 0, |d| add_service_v1_0::AddService::decode(d)), ""))),
-            _   => return version_err,
-        },
-        _ => return Err(::errors::LauncherError::SpecificParseError(format!("Unsupported action {:?} for this endpoint.", action_str))),
+        "register-dns" => {
+            match version {
+                1.0 => {
+                    Box::new(try!(parse_result!(decoder.read_struct_field("data", 0, |d| {
+                                                    register_dns_v1_0::RegisterDns::decode(d)
+                                                }),
+                                                "")))
+                }
+                _ => return version_err,
+            }
+        }
+        "add-service" => {
+            match version {
+                1.0 => {
+                    Box::new(try!(parse_result!(decoder.read_struct_field("data", 0, |d| {
+                                                    add_service_v1_0::AddService::decode(d)
+                                                }),
+                                                "")))
+                }
+                _ => return version_err,
+            }
+        }
+        _ => {
+            return Err(::errors::LauncherError::SpecificParseError(format!("Unsupported action \
+                                                                            {:?} for this \
+                                                                            endpoint.",
+                                                                           action_str)))
+        }
     })
 }

@@ -17,9 +17,11 @@
 
 /// Converts c character pointer into Rust String
 #[allow(unsafe_code)]
-pub fn c_char_ptr_to_string(c_char_ptr: *const ::libc::c_char) -> Result<String, ::ffi::errors::FfiError> {
-    use ::std::error::Error;
+pub fn c_char_ptr_to_string(c_char_ptr: *const ::libc::c_char)
+                            -> Result<String, ::ffi::errors::FfiError> {
+    use std::error::Error;
 
     let cstr = unsafe { ::std::ffi::CStr::from_ptr(c_char_ptr) };
-    Ok(try!(String::from_utf8(cstr.to_bytes().iter().map(|a| *a).collect()).map_err(|error| ::ffi::errors::FfiError::from(error.description()))))
+    Ok(try!(String::from_utf8(cstr.to_bytes().iter().map(|a| *a).collect())
+                .map_err(|error| ::ffi::errors::FfiError::from(error.description()))))
 }

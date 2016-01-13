@@ -35,8 +35,8 @@ mod app_handler;
 /// event senders, clone it and distribute it to other threads. These event senders will help
 /// communicate with the core library in a completely asynchronous and thread safe manner.
 pub struct Launcher {
-    _raii_joiners           : Vec<RaiiThreadJoiner>,
-    ipc_event_sender        : ipc_server::EventSenderToServer<IpcExternalEvent>,
+    _raii_joiners: Vec<RaiiThreadJoiner>,
+    ipc_event_sender: ipc_server::EventSenderToServer<IpcExternalEvent>,
     app_handler_event_sender: ::std::sync::mpsc::Sender<AppHandlerEvent>,
 }
 
@@ -47,26 +47,31 @@ impl Launcher {
     pub fn new(client: ::safe_core::client::Client) -> Result<Launcher, ::errors::LauncherError> {
         let client = ::std::sync::Arc::new(::std::sync::Mutex::new(client));
 
-        let directory_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(client.clone());
+        let directory_helper =
+            ::safe_nfs::helper::directory_helper::DirectoryHelper::new(client.clone());
 
         let launcher_config_dir_name = ::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string();
-        let launcher_config_dir = try!(directory_helper.get_configuration_directory_listing(launcher_config_dir_name));
+        let launcher_config_dir =
+            try!(directory_helper.get_configuration_directory_listing(launcher_config_dir_name));
 
         if launcher_config_dir.get_files()
                               .iter()
-                              .find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME)
+                              .find(|file| {
+                                  file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME
+                              })
                               .is_none() {
             let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(client.clone());
-            let writer = try!(file_helper.create(::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string(),
-                                                 Vec::new(),
-                                                 launcher_config_dir));
+            let writer =
+                try!(file_helper.create(::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string(),
+                                        Vec::new(),
+                                        launcher_config_dir));
             let _ = try!(writer.close());
         }
 
         let mut user_root_directory = try!(directory_helper.get_user_root_directory_listing());
         let safe_drive_dir_name = ::config::SAFE_DRIVE_DIR_NAME.to_string();
         if user_root_directory.find_sub_directory(&safe_drive_dir_name).is_none() {
-           let _  = try!(directory_helper.create(safe_drive_dir_name,
+            let _ = try!(directory_helper.create(safe_drive_dir_name,
                                                  ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
                                                  Vec::new(),
                                                  false,
@@ -75,11 +80,12 @@ impl Launcher {
         }
 
         let (ipc_raii_joiner, ipc_event_sender) = try!(ipc_server::IpcServer::new(client.clone()));
-        let (app_raii_joiner, app_event_sender) = app_handler::AppHandler::new(client, ipc_event_sender.clone());
+        let (app_raii_joiner, app_event_sender) =
+            app_handler::AppHandler::new(client, ipc_event_sender.clone());
 
         Ok(Launcher {
-            _raii_joiners           : vec![app_raii_joiner, ipc_raii_joiner],
-            ipc_event_sender        : ipc_event_sender,
+            _raii_joiners: vec![app_raii_joiner, ipc_raii_joiner],
+            ipc_event_sender: ipc_event_sender,
             app_handler_event_sender: app_event_sender,
         })
     }
@@ -99,10 +105,12 @@ impl Launcher {
 impl Drop for Launcher {
     fn drop(&mut self) {
         if let Err(err) = self.ipc_event_sender.send(IpcExternalEvent::Terminate) {
-            debug!("Error {:?} terminating IPC-Server - Probably already terminated.", err);
+            debug!("Error {:?} terminating IPC-Server - Probably already terminated.",
+                   err);
         }
         if let Err(err) = self.app_handler_event_sender.send(AppHandlerEvent::Terminate) {
-            debug!("Error {:?} terminating App-Handler - Probably already terminated.", err);
+            debug!("Error {:?} terminating App-Handler - Probably already terminated.",
+                   err);
         }
     }
 }
@@ -123,23 +131,28 @@ mod tests {
 
         let safe_drive_directory_name = ::config::SAFE_DRIVE_DIR_NAME.to_string();
         let arc_client = ::std::sync::Arc::new(::std::sync::Mutex::new(client));
-        let directory_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(arc_client.clone());
+        let directory_helper =
+            ::safe_nfs::helper::directory_helper::DirectoryHelper::new(arc_client.clone());
 
         // client should not have SAFEDrive in user root directory
         {
-            let user_root_directory = unwrap_result!(directory_helper.get_user_root_directory_listing());
+            let user_root_directory =
+                unwrap_result!(directory_helper.get_user_root_directory_listing());
             assert!(user_root_directory.find_sub_directory(&safe_drive_directory_name).is_none());
         }
 
         // Create Launcher instance
         {
-            let client = unwrap_result!(::safe_core::client::Client::log_in(keyword, pin, password));
+            let client = unwrap_result!(::safe_core::client::Client::log_in(keyword,
+                                                                            pin,
+                                                                            password));
             let _ = Launcher::new(client);
         }
 
         // client should have SAFEDrive in user root directory
         {
-            let user_root_directory = unwrap_result!(directory_helper.get_user_root_directory_listing());
+            let user_root_directory =
+                unwrap_result!(directory_helper.get_user_root_directory_listing());
             assert!(user_root_directory.find_sub_directory(&safe_drive_directory_name).is_some());
         }
     }

@@ -41,7 +41,8 @@ pub enum AppHandlerEvent {
     /// Register an observer to receive notifications about status of modification of an app.
     RegisterAppModifyObserver(::observer::AppHandlerObserver),
     /// Obtain all apps currently being managed by Launcher.
-    GetAllManagedApps(::std::sync::mpsc::Sender<Result<Vec<event_data::ManagedApp>, ::errors::LauncherError>>),
+    GetAllManagedApps(::std::sync::mpsc::Sender<Result<Vec<event_data::ManagedApp>,
+                                                         ::errors::LauncherError>>),
     /// Gracefully exit the app handling module. After a call to this Launcher will no longer cater
     /// to any requests handled by this module. This is essentially Launcher-close scenario and
     /// Launcher must be restarted to be functional again.
@@ -76,7 +77,7 @@ pub mod event_data {
     #[derive(Debug, Clone)]
     pub struct AppDetail {
         /// Absolute path to the app binary on this machine.
-        pub absolute_path    : String,
+        pub absolute_path: String,
         /// If this app is allowed to have access to `SAFEDrive`.
         pub safe_drive_access: bool,
     }
@@ -85,16 +86,16 @@ pub mod event_data {
     #[derive(Debug, Clone)]
     pub struct ManagedApp {
         /// Unique id given to the app. This will be consistent across all machines.
-        pub id               : XorName,
+        pub id: XorName,
         /// Name of this app. Unless specifically changed it will be the name of the binary added
         /// to Launcher in the first machine for this app.
-        pub name             : String,
+        pub name: String,
         /// If the app was added to this machine, this will contain the absolute path to the
         /// application binary. Otherwise it will be `None` indicating that app was added to
         /// Launcher but not yet on this machine.
-        pub local_path       : Option<String>,
+        pub local_path: Option<String>,
         /// Number of machines this app is currently added to Launcher in.
-        pub reference_count  : u32,
+        pub reference_count: u32,
         /// If this app is allowed to have access to `SAFEDrive`.
         pub safe_drive_access: bool,
     }
@@ -104,11 +105,11 @@ pub mod event_data {
     #[derive(Debug, Clone)]
     pub struct ModifyAppSettings {
         /// Unique id given to the app. This will be consistent across all machines.
-        pub id               : XorName,
+        pub id: XorName,
         /// App name for this app stored in Launcher.
-        pub name             : Option<String>,
+        pub name: Option<String>,
         /// Modify local binary absolute path.
-        pub local_path       : Option<String>,
+        pub local_path: Option<String>,
         /// If this app is allowed to have access to `SAFEDrive`.
         pub safe_drive_access: Option<bool>,
     }

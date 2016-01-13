@@ -18,5 +18,7 @@
 /// ICommand trait
 pub trait Action {
     /// ICommand executer
-    fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType;
+    fn execute(&mut self,
+               params: ::launcher::parser::ParameterPacket)
+               -> ::launcher::parser::ResponseType;
 }

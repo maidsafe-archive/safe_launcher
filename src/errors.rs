@@ -17,8 +17,8 @@
 
 use maidsafe_utilities::serialisation::SerialisationError;
 
-/// Intended for converting Launcher Errors into numeric codes for propagating some error information
-/// across FFI boundaries and specially to C.
+/// Intended for converting Launcher Errors into numeric codes for propagating some error
+/// information across FFI boundaries and specially to C.
 pub const LAUNCHER_ERROR_START_RANGE: i32 = ::safe_dns::errors::DNS_ERROR_START_RANGE - 500;
 
 /// Launcher Errors
@@ -128,31 +128,31 @@ impl From<::rustc_serialize::json::DecoderError> for LauncherError {
 impl Into<i32> for LauncherError {
     fn into(self) -> i32 {
         match self {
-            LauncherError::CoreError(error)                 => (*error).into(),
-            LauncherError::NfsError(error)                  => (*error).into(),
-            LauncherError::DnsError(error)                  => (*error).into(),
-            LauncherError::IpcListenerCouldNotBeBound       => LAUNCHER_ERROR_START_RANGE - 1,
-            LauncherError::IpcListenerAborted(_)            => LAUNCHER_ERROR_START_RANGE - 2,
-            LauncherError::IpcStreamCloneError(_)           => LAUNCHER_ERROR_START_RANGE - 3,
-            LauncherError::ReceiverChannelDisconnected      => LAUNCHER_ERROR_START_RANGE - 4,
-            LauncherError::IpcSessionTerminated(_)          => LAUNCHER_ERROR_START_RANGE - 5,
-            LauncherError::FailedReadingStreamPayloadSize   => LAUNCHER_ERROR_START_RANGE - 6,
-            LauncherError::FailedWritingStreamPayloadSize   => LAUNCHER_ERROR_START_RANGE - 7,
-            LauncherError::PathNotFound                     => LAUNCHER_ERROR_START_RANGE - 8,
-            LauncherError::InvalidPath                      => LAUNCHER_ERROR_START_RANGE - 9,
-            LauncherError::PermissionDenied                 => LAUNCHER_ERROR_START_RANGE - 10,
-            LauncherError::JsonParseError(_)                => LAUNCHER_ERROR_START_RANGE - 11,
-            LauncherError::JsonDecodeError(_)               => LAUNCHER_ERROR_START_RANGE - 12,
-            LauncherError::SpecificParseError(_)            => LAUNCHER_ERROR_START_RANGE - 13,
-            LauncherError::JsonEncodeError(_)               => LAUNCHER_ERROR_START_RANGE - 14,
-            LauncherError::SymmetricDecipherFailure         => LAUNCHER_ERROR_START_RANGE - 15,
-            LauncherError::AppAlreadyAdded                  => LAUNCHER_ERROR_START_RANGE - 16,
-            LauncherError::AppNotRegistered                 => LAUNCHER_ERROR_START_RANGE - 17,
-            LauncherError::AppActivationFailed(_)           => LAUNCHER_ERROR_START_RANGE - 18,
-            LauncherError::ReadPayloadSizeProhibitive       => LAUNCHER_ERROR_START_RANGE - 19,
-            LauncherError::LocalConfigAccessFailed(_)       => LAUNCHER_ERROR_START_RANGE - 20,
-            LauncherError::Unexpected(_)                    => LAUNCHER_ERROR_START_RANGE - 21,
-            LauncherError::UnsuccessfulEncodeDecode(_)      => LAUNCHER_ERROR_START_RANGE - 22,
+            LauncherError::CoreError(error) => (*error).into(),
+            LauncherError::NfsError(error) => (*error).into(),
+            LauncherError::DnsError(error) => (*error).into(),
+            LauncherError::IpcListenerCouldNotBeBound => LAUNCHER_ERROR_START_RANGE - 1,
+            LauncherError::IpcListenerAborted(_) => LAUNCHER_ERROR_START_RANGE - 2,
+            LauncherError::IpcStreamCloneError(_) => LAUNCHER_ERROR_START_RANGE - 3,
+            LauncherError::ReceiverChannelDisconnected => LAUNCHER_ERROR_START_RANGE - 4,
+            LauncherError::IpcSessionTerminated(_) => LAUNCHER_ERROR_START_RANGE - 5,
+            LauncherError::FailedReadingStreamPayloadSize => LAUNCHER_ERROR_START_RANGE - 6,
+            LauncherError::FailedWritingStreamPayloadSize => LAUNCHER_ERROR_START_RANGE - 7,
+            LauncherError::PathNotFound => LAUNCHER_ERROR_START_RANGE - 8,
+            LauncherError::InvalidPath => LAUNCHER_ERROR_START_RANGE - 9,
+            LauncherError::PermissionDenied => LAUNCHER_ERROR_START_RANGE - 10,
+            LauncherError::JsonParseError(_) => LAUNCHER_ERROR_START_RANGE - 11,
+            LauncherError::JsonDecodeError(_) => LAUNCHER_ERROR_START_RANGE - 12,
+            LauncherError::SpecificParseError(_) => LAUNCHER_ERROR_START_RANGE - 13,
+            LauncherError::JsonEncodeError(_) => LAUNCHER_ERROR_START_RANGE - 14,
+            LauncherError::SymmetricDecipherFailure => LAUNCHER_ERROR_START_RANGE - 15,
+            LauncherError::AppAlreadyAdded => LAUNCHER_ERROR_START_RANGE - 16,
+            LauncherError::AppNotRegistered => LAUNCHER_ERROR_START_RANGE - 17,
+            LauncherError::AppActivationFailed(_) => LAUNCHER_ERROR_START_RANGE - 18,
+            LauncherError::ReadPayloadSizeProhibitive => LAUNCHER_ERROR_START_RANGE - 19,
+            LauncherError::LocalConfigAccessFailed(_) => LAUNCHER_ERROR_START_RANGE - 20,
+            LauncherError::Unexpected(_) => LAUNCHER_ERROR_START_RANGE - 21,
+            LauncherError::UnsuccessfulEncodeDecode(_) => LAUNCHER_ERROR_START_RANGE - 22,
         }
     }
 }
@@ -160,31 +160,71 @@ impl Into<i32> for LauncherError {
 impl ::std::fmt::Debug for LauncherError {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         match *self {
-            LauncherError::CoreError(ref error)               => write!(f, "LauncherError::CoreError -> {:?}", error),
-            LauncherError::NfsError(ref error)                => write!(f, "LauncherError::NfsError -> {:?}", error),
-            LauncherError::DnsError(ref error)                => write!(f, "LauncherError::DnsError -> {:?}", error),
-            LauncherError::IpcListenerCouldNotBeBound         => write!(f, "LauncherError::IpcListenerCouldNotBeBound"),
-            LauncherError::IpcListenerAborted(ref error)      => write!(f, "LauncherError::IpcListenerAborted -> {:?}", error),
-            LauncherError::IpcStreamCloneError(ref error)     => write!(f, "LauncherError::IpcStreamCloneError -> {:?}", error),
-            LauncherError::ReceiverChannelDisconnected        => write!(f, "LauncherError::ReceiverChannelDisconnected"),
-            LauncherError::IpcSessionTerminated(ref error)    => write!(f, "LauncherError::IpcSessionTerminated -> {:?}", error),
-            LauncherError::FailedReadingStreamPayloadSize     => write!(f, "LauncherError::FailedReadingStreamPayloadSize"),
-            LauncherError::FailedWritingStreamPayloadSize     => write!(f, "LauncherError::FailedWritingStreamPayloadSize"),
-            LauncherError::PathNotFound                       => write!(f, "LauncherError::PathNotFound"),
-            LauncherError::InvalidPath                        => write!(f, "LauncherError::InvalidPath"),
-            LauncherError::PermissionDenied                   => write!(f, "LauncherError::PermissionDenied"),
-            LauncherError::JsonParseError(ref error)          => write!(f, "LauncherError::JsonParseError -> {:?}", error),
-            LauncherError::JsonDecodeError(ref error)         => write!(f, "LauncherError::JsonDecodeError -> {:?}", error),
-            LauncherError::SpecificParseError(ref error)      => write!(f, "LauncherError::SpecificParseError -> {:?}", error),
-            LauncherError::JsonEncodeError(ref error)         => write!(f, "LauncherError::JsonEncodeError -> {:?}", error),
-            LauncherError::SymmetricDecipherFailure           => write!(f, "LauncherError::SymmetricDecipherFailure"),
-            LauncherError::AppAlreadyAdded                    => write!(f, "LauncherError::AppAlreadyAdded"),
-            LauncherError::AppNotRegistered                   => write!(f, "LauncherError::AppNotRegistered"),
-            LauncherError::AppActivationFailed(ref error)     => write!(f, "LauncherError::AppActivationFailed -> {:?}", error),
-            LauncherError::ReadPayloadSizeProhibitive         => write!(f, "LauncherError::ReadPayloadSizeProhibitive"),
-            LauncherError::LocalConfigAccessFailed(ref error) => write!(f, "LauncherError::LocalConfigAccessFailed -> {:?}", error),
-            LauncherError::Unexpected(ref error)              => write!(f, "LauncherError::Unexpected{{{:?}}}", error),
-            LauncherError::UnsuccessfulEncodeDecode(ref err)  => write!(f, "LauncherError::UnsuccessfulEncodeDecode -> {:?}", err),
+            LauncherError::CoreError(ref error) => {
+                write!(f, "LauncherError::CoreError -> {:?}", error)
+            }
+            LauncherError::NfsError(ref error) => {
+                write!(f, "LauncherError::NfsError -> {:?}", error)
+            }
+            LauncherError::DnsError(ref error) => {
+                write!(f, "LauncherError::DnsError -> {:?}", error)
+            }
+            LauncherError::IpcListenerCouldNotBeBound => {
+                write!(f, "LauncherError::IpcListenerCouldNotBeBound")
+            }
+            LauncherError::IpcListenerAborted(ref error) => {
+                write!(f, "LauncherError::IpcListenerAborted -> {:?}", error)
+            }
+            LauncherError::IpcStreamCloneError(ref error) => {
+                write!(f, "LauncherError::IpcStreamCloneError -> {:?}", error)
+            }
+            LauncherError::ReceiverChannelDisconnected => {
+                write!(f, "LauncherError::ReceiverChannelDisconnected")
+            }
+            LauncherError::IpcSessionTerminated(ref error) => {
+                write!(f, "LauncherError::IpcSessionTerminated -> {:?}", error)
+            }
+            LauncherError::FailedReadingStreamPayloadSize => {
+                write!(f, "LauncherError::FailedReadingStreamPayloadSize")
+            }
+            LauncherError::FailedWritingStreamPayloadSize => {
+                write!(f, "LauncherError::FailedWritingStreamPayloadSize")
+            }
+            LauncherError::PathNotFound => write!(f, "LauncherError::PathNotFound"),
+            LauncherError::InvalidPath => write!(f, "LauncherError::InvalidPath"),
+            LauncherError::PermissionDenied => write!(f, "LauncherError::PermissionDenied"),
+            LauncherError::JsonParseError(ref error) => {
+                write!(f, "LauncherError::JsonParseError -> {:?}", error)
+            }
+            LauncherError::JsonDecodeError(ref error) => {
+                write!(f, "LauncherError::JsonDecodeError -> {:?}", error)
+            }
+            LauncherError::SpecificParseError(ref error) => {
+                write!(f, "LauncherError::SpecificParseError -> {:?}", error)
+            }
+            LauncherError::JsonEncodeError(ref error) => {
+                write!(f, "LauncherError::JsonEncodeError -> {:?}", error)
+            }
+            LauncherError::SymmetricDecipherFailure => {
+                write!(f, "LauncherError::SymmetricDecipherFailure")
+            }
+            LauncherError::AppAlreadyAdded => write!(f, "LauncherError::AppAlreadyAdded"),
+            LauncherError::AppNotRegistered => write!(f, "LauncherError::AppNotRegistered"),
+            LauncherError::AppActivationFailed(ref error) => {
+                write!(f, "LauncherError::AppActivationFailed -> {:?}", error)
+            }
+            LauncherError::ReadPayloadSizeProhibitive => {
+                write!(f, "LauncherError::ReadPayloadSizeProhibitive")
+            }
+            LauncherError::LocalConfigAccessFailed(ref error) => {
+                write!(f, "LauncherError::LocalConfigAccessFailed -> {:?}", error)
+            }
+            LauncherError::Unexpected(ref error) => {
+                write!(f, "LauncherError::Unexpected{{{:?}}}", error)
+            }
+            LauncherError::UnsuccessfulEncodeDecode(ref err) => {
+                write!(f, "LauncherError::UnsuccessfulEncodeDecode -> {:?}", err)
+            }
         }
     }
 }

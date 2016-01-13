@@ -19,49 +19,57 @@ mod errors;
 mod implementation;
 
 /// Create an account with SafeNetwork. This or any one of the other companion functions to get a
-/// launcher must be called before initiating any operation allowed by this crate. `launcher_handle` is
-/// a pointer to a pointer and must point to a valid pointer not junk, else the consequences are
+/// launcher must be called before initiating any operation allowed by this crate. `launcher_handle`
+/// is a pointer to a pointer and must point to a valid pointer not junk, else the consequences are
 /// undefined.
 #[no_mangle]
 #[allow(unsafe_code)]
-pub extern fn create_account(c_keyword      : *const ::libc::c_char,
-                             c_pin          : *const ::libc::c_char,
-                             c_password     : *const ::libc::c_char,
-                             launcher_handle: *mut *const ::libc::c_void) -> ::libc::int32_t {
-    let client = ffi_try!(::safe_core::client::Client::create_account(ffi_try!(implementation::c_char_ptr_to_string(c_keyword)),
-                                                                      ffi_try!(implementation::c_char_ptr_to_string(c_pin)),
-                                                                      ffi_try!(implementation::c_char_ptr_to_string(c_password))));
+pub extern "C" fn create_account(c_keyword: *const ::libc::c_char,
+                                 c_pin: *const ::libc::c_char,
+                                 c_password: *const ::libc::c_char,
+                                 launcher_handle: *mut *const ::libc::c_void)
+                                 -> ::libc::int32_t {
+    let client = ffi_try!(::safe_core::client::Client::create_account(
+        ffi_try!(implementation::c_char_ptr_to_string(c_keyword)),
+        ffi_try!(implementation::c_char_ptr_to_string(c_pin)),
+        ffi_try!(implementation::c_char_ptr_to_string(c_password))));
     let launcher = ffi_try!(::launcher::Launcher::new(client));
-    unsafe { *launcher_handle = cast_to_launcher_ffi_handle(launcher); }
+    unsafe {
+        *launcher_handle = cast_to_launcher_ffi_handle(launcher);
+    }
 
     0
 }
 
-/// Log into Safenetwork with an already registered account. This or any one of the other companion functions to get a
-/// launcher must be called before initiating any operation allowed by this crate. `launcher_handle` is
-/// a pointer to a pointer and must point to a valid pointer not junk, else the consequences are
-/// undefined.
+/// Log into Safenetwork with an already registered account. This or any one of the other companion
+/// functions to get a launcher must be called before initiating any operation allowed by this
+/// crate. `launcher_handle` is a pointer to a pointer and must point to a valid pointer not junk,
+/// else the consequences are undefined.
 #[no_mangle]
 #[allow(unsafe_code)]
-pub extern fn log_in(c_keyword      : *const ::libc::c_char,
-                     c_pin          : *const ::libc::c_char,
-                     c_password     : *const ::libc::c_char,
-                     launcher_handle: *mut *const ::libc::c_void) -> ::libc::int32_t {
-    let client = ffi_try!(::safe_core::client::Client::log_in(ffi_try!(implementation::c_char_ptr_to_string(c_keyword)),
-                                                              ffi_try!(implementation::c_char_ptr_to_string(c_pin)),
-                                                              ffi_try!(implementation::c_char_ptr_to_string(c_password))));
+pub extern "C" fn log_in(c_keyword: *const ::libc::c_char,
+                         c_pin: *const ::libc::c_char,
+                         c_password: *const ::libc::c_char,
+                         launcher_handle: *mut *const ::libc::c_void)
+                         -> ::libc::int32_t {
+    let client = ffi_try!(::safe_core::client::Client::log_in(
+        ffi_try!(implementation::c_char_ptr_to_string(c_keyword)),
+        ffi_try!(implementation::c_char_ptr_to_string(c_pin)),
+        ffi_try!(implementation::c_char_ptr_to_string(c_password))));
     let launcher = ffi_try!(::launcher::Launcher::new(client));
-    unsafe { *launcher_handle = cast_to_launcher_ffi_handle(launcher); }
+    unsafe {
+        *launcher_handle = cast_to_launcher_ffi_handle(launcher);
+    }
 
     0
 }
 
-/// Discard and clean up the previously allocated launcher. Use this only if the launcher is obtained
-/// from one of the client obtainment functions in this crate (`create_account`, `log_in`).
-/// Using `launcher_handle` after a call to this functions is undefined behaviour.
+/// Discard and clean up the previously allocated launcher. Use this only if the launcher is
+/// obtained from one of the client obtainment functions in this crate (`create_account`,
+///  `log_in`). Using `launcher_handle` after a call to this functions is undefined behaviour.
 #[no_mangle]
 #[allow(unsafe_code)]
-pub extern fn drop_launcher(launcher_handle: *const ::libc::c_void) {
+pub extern "C" fn drop_launcher(launcher_handle: *const ::libc::c_void) {
     let _ = unsafe { ::std::mem::transmute::<_, Box<::launcher::Launcher>>(launcher_handle) };
 }
 
@@ -73,14 +81,15 @@ fn cast_to_launcher_ffi_handle(launcher: ::launcher::Launcher) -> *const ::libc:
 
 // TODO(Spandan) ***W A R N I N G*** This will be UB - make sure to modify after uncommenting
 // #[allow(unsafe_code)]
-// fn cast_from_launcher_ffi_handle(launcher_handle: *const ::libc::c_void) -> ::launcher::Launcher {
+// fn cast_from_launcher_ffi_handle(launcher_handle: *const ::libc::c_void)
+//         -> ::launcher::Launcher {
 //     let boxed_launcher: Box<::launcher::Launcher> = unsafe {
 //         ::std::mem::transmute(launcher_handle)
 //     };
-// 
+//
 //     let launcher = *boxed_launcher;
 //     ::std::mem::forget(boxed_launcher);
-// 
+//
 //     launcher
 // }
 
@@ -88,10 +97,11 @@ fn cast_to_launcher_ffi_handle(launcher: ::launcher::Launcher) -> *const ::libc:
 #[cfg(test)]
 mod test {
     use super::*;
-    use ::std::error::Error;
+    use std::error::Error;
 
     fn generate_random_cstring(len: usize) -> Result<::std::ffi::CString, ::ffi::errors::FfiError> {
-        let mut cstring_vec = unwrap_result!(::safe_core::utility::generate_random_vector::<u8>(len));
+        let mut cstring_vec =
+            unwrap_result!(::safe_core::utility::generate_random_vector::<u8>(len));
         // Avoid internal nulls and ensure valid ASCII (thus valid utf8)
         for it in cstring_vec.iter_mut() {
             *it %= 128;
@@ -100,7 +110,8 @@ mod test {
             }
         }
 
-        ::std::ffi::CString::new(cstring_vec).map_err(|error| ::ffi::errors::FfiError::from(error.description()))
+        ::std::ffi::CString::new(cstring_vec)
+            .map_err(|error| ::ffi::errors::FfiError::from(error.description()))
     }
 
     #[test]

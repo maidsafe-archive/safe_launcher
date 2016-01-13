@@ -24,9 +24,9 @@ pub const MAX_ALLOWED_READ_PAYLOAD_SIZE_BYTES: u64 = 300 * 1024 * 1024;
 
 pub fn get_base64_config() -> ::rustc_serialize::base64::Config {
     ::rustc_serialize::base64::Config {
-        char_set   : ::rustc_serialize::base64::CharacterSet::Standard,
-        newline    : ::rustc_serialize::base64::Newline::LF,
-        pad        : true,
+        char_set: ::rustc_serialize::base64::CharacterSet::Standard,
+        newline: ::rustc_serialize::base64::Newline::LF,
+        pad: true,
         line_length: None,
     }
 }

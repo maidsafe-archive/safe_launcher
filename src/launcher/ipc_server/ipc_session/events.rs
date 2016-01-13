@@ -17,7 +17,7 @@
 
 #[derive(Clone, Debug)]
 pub enum IpcSessionEventCategory {
-    AppAuthenticationEvent,    
+    AppAuthenticationEvent,
     SecureCommunicationEvent,
     ExternalEvent,
 }
@@ -52,23 +52,26 @@ pub mod event_data {
     use xor_name::XorName;
 
     pub struct AppDetail {
-        pub client           : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-        pub app_id           : XorName,
-        pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
+        pub client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+        pub app_id: XorName,
+        pub app_root_dir_key: ::safe_nfs::metadata::directory_key::DirectoryKey,
         pub safe_drive_access: bool,
     }
 
     impl ::std::fmt::Debug for AppDetail {
         fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-            write!(f, "AppDetail {{ client: Arc<Mutex<Client>>, app_id: {:?}, safe_drive_access: {:?}, }}",
-                   self.app_id, self.safe_drive_access)
+            write!(f,
+                   "AppDetail {{ client: Arc<Mutex<Client>>, app_id: {:?}, safe_drive_access: \
+                    {:?}, }}",
+                   self.app_id,
+                   self.safe_drive_access)
         }
     }
 
     #[derive(Debug)]
     pub struct AuthData {
-        pub str_nonce    : String,
-        pub asymm_nonce  : ::sodiumoxide::crypto::box_::Nonce,
+        pub str_nonce: String,
+        pub asymm_nonce: ::sodiumoxide::crypto::box_::Nonce,
         pub asymm_pub_key: ::sodiumoxide::crypto::box_::PublicKey,
     }
 }

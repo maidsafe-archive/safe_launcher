@@ -19,20 +19,22 @@
 
 #[derive(RustcDecodable, Debug)]
 pub struct GetFile {
-    offset          : i64,
-    length          : i64,
-    file_path       : String,
-    is_path_shared  : bool,
+    offset: i64,
+    length: i64,
+    file_path: String,
+    is_path_shared: bool,
     include_metadata: bool,
 }
 
 impl ::launcher::parser::traits::Action for GetFile {
-    fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType {
+    fn execute(&mut self,
+               params: ::launcher::parser::ParameterPacket)
+               -> ::launcher::parser::ResponseType {
         use rustc_serialize::json::ToJson;
         use rustc_serialize::base64::ToBase64;
 
         if self.is_path_shared && !*unwrap_result!(params.safe_drive_access.lock()) {
-            return Err(::errors::LauncherError::PermissionDenied)
+            return Err(::errors::LauncherError::PermissionDenied);
         }
 
         let mut tokens = ::launcher::parser::helper::tokenise_path(&self.file_path, false);
@@ -44,10 +46,12 @@ impl ::launcher::parser::traits::Action for GetFile {
             &params.app_root_dir_key
         };
 
-        let file_dir = try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
-                                                                               &tokens,
-                                                                               Some(start_dir_key)));
-        let file = try!(file_dir.find_file(&file_name).ok_or(::errors::LauncherError::InvalidPath));
+        let file_dir =
+            try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
+                                                                    &tokens,
+                                                                    Some(start_dir_key)));
+        let file = try!(file_dir.find_file(&file_name)
+                                .ok_or(::errors::LauncherError::InvalidPath));
 
         let file_metadata = if self.include_metadata {
             Some(get_file_metadata(file.get_metadata()))
@@ -63,7 +67,8 @@ impl ::launcher::parser::traits::Action for GetFile {
             size = reader.size();
         };
         let response = GetFileResponse {
-            content : try!(reader.read(self.offset as u64, size)).to_base64(::config::get_base64_config()),
+            content: try!(reader.read(self.offset as u64, size))
+                         .to_base64(::config::get_base64_config()),
             metadata: file_metadata,
         };
 
@@ -77,19 +82,20 @@ fn get_file_metadata(file_metadata: &::safe_nfs::metadata::file_metadata::FileMe
     let created_time = file_metadata.get_created_time().to_timespec();
     let modified_time = file_metadata.get_modified_time().to_timespec();
     Metadata {
-        name                  : file_metadata.get_name().clone(),
-        size                  : file_metadata.get_size() as i64,
-        user_metadata         : (*file_metadata.get_user_metadata()).to_base64(::config::get_base64_config()),
-        creation_time_sec     : created_time.sec,
-        creation_time_nsec    : created_time.nsec as i64,
-        modification_time_sec : modified_time.sec,
+        name: file_metadata.get_name().clone(),
+        size: file_metadata.get_size() as i64,
+        user_metadata: (*file_metadata.get_user_metadata())
+                           .to_base64(::config::get_base64_config()),
+        creation_time_sec: created_time.sec,
+        creation_time_nsec: created_time.nsec as i64,
+        modification_time_sec: modified_time.sec,
         modification_time_nsec: modified_time.nsec as i64,
     }
 }
 
 #[derive(Debug)]
 struct GetFileResponse {
-    content : String,
+    content: String,
     metadata: Option<Metadata>,
 }
 
@@ -108,28 +114,31 @@ impl ::rustc_serialize::json::ToJson for GetFileResponse {
 
 #[derive(RustcEncodable, Debug)]
 struct Metadata {
-    name                  : String,
-    size                  : i64,
-    user_metadata         : String,
-    creation_time_sec     : i64,
-    creation_time_nsec    : i64,
-    modification_time_sec : i64,
+    name: String,
+    size: i64,
+    user_metadata: String,
+    creation_time_sec: i64,
+    creation_time_nsec: i64,
+    modification_time_sec: i64,
     modification_time_nsec: i64,
 }
 
 #[cfg(test)]
 mod test {
-    use ::launcher::parser::traits::Action;
+    use launcher::parser::traits::Action;
 
     const TEST_FILE_NAME: &'static str = "test_file.txt";
 
     fn create_test_file(parameter_packet: &::launcher::parser::ParameterPacket) {
-        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(parameter_packet.client.clone());
-        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
+        let file_helper =
+            ::safe_nfs::helper::file_helper::FileHelper::new(parameter_packet.client.clone());
+        let dir_helper =
+            ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client
+                                                                                       .clone());
         let app_root_dir = unwrap_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
         let mut writer = unwrap_result!(file_helper.create(TEST_FILE_NAME.to_string(),
-                                                         Vec::new(),
-                                                         app_root_dir));
+                                                           Vec::new(),
+                                                           app_root_dir));
         let data = vec![10u8; 20];
         writer.write(&data[..], 0);
         let _ = unwrap_result!(writer.close());
@@ -138,15 +147,16 @@ mod test {
 
     #[test]
     fn get_file() {
-        let parameter_packet = unwrap_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+        let parameter_packet =
+            unwrap_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
         create_test_file(&parameter_packet);
 
         let mut request = super::GetFile {
-            offset          : 0,
-            length          : 0,
-            file_path       : format!("/{}", TEST_FILE_NAME),
-            is_path_shared  : false,
+            offset: 0,
+            length: 0,
+            file_path: format!("/{}", TEST_FILE_NAME),
+            is_path_shared: false,
             include_metadata: true,
         };
 

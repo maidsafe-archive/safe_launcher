@@ -28,10 +28,8 @@ pub struct SessionInfo {
 
 impl SessionInfo {
     pub fn new(raii_joiner : RaiiThreadJoiner,
-               event_sender: ::launcher::ipc_server
-                                       ::ipc_session
-                                       ::EventSenderToSession<::launcher::ipc_server::ipc_session
-                                                              ::events::ExternalEvent>) -> SessionInfo {
+               event_sender: ::launcher::ipc_server::ipc_session::EventSenderToSession<
+                   ::launcher::ipc_server::ipc_session::events::ExternalEvent>) -> SessionInfo {
         SessionInfo {
             _raii_joiner: raii_joiner,
             event_sender: event_sender,
@@ -41,25 +39,28 @@ impl SessionInfo {
 
 impl Drop for SessionInfo {
     fn drop(&mut self) {
-        if let Err(err) = self.event_sender.send(::launcher::ipc_server::ipc_session::events::ExternalEvent::Terminate) {
+        if let Err(err) =
+               self.event_sender
+                   .send(::launcher::ipc_server::ipc_session::events::ExternalEvent::Terminate) {
             debug!("Failed to send terminate event to session {:?}", err);
         }
     }
 }
 
 pub struct AppInfo {
-    pub app_id           : XorName,
-    pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
+    pub app_id: XorName,
+    pub app_root_dir_key: ::safe_nfs::metadata::directory_key::DirectoryKey,
     pub safe_drive_access: bool,
 }
 
 impl AppInfo {
-    pub fn new(app_id           : XorName,
-               app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
-               safe_drive_access: bool) -> AppInfo {
+    pub fn new(app_id: XorName,
+               app_root_dir_key: ::safe_nfs::metadata::directory_key::DirectoryKey,
+               safe_drive_access: bool)
+               -> AppInfo {
         AppInfo {
-            app_id           : app_id,
-            app_root_dir_key : app_root_dir_key,
+            app_id: app_id,
+            app_root_dir_key: app_root_dir_key,
             safe_drive_access: safe_drive_access,
         }
     }

@@ -17,12 +17,14 @@
 
 #[derive(RustcDecodable, Debug)]
 pub struct DeleteFile {
-    file_path     : String,
+    file_path: String,
     is_path_shared: bool,
 }
 
 impl ::launcher::parser::traits::Action for DeleteFile {
-    fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType {
+    fn execute(&mut self,
+               params: ::launcher::parser::ParameterPacket)
+               -> ::launcher::parser::ResponseType {
 
         let start_dir_key = if self.is_path_shared {
             &params.safe_drive_dir_key
@@ -32,13 +34,13 @@ impl ::launcher::parser::traits::Action for DeleteFile {
 
         let mut tokens = ::launcher::parser::helper::tokenise_path(&self.file_path, false);
         let file_name = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
-        let mut dir_of_file = try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
-                                                                                      &tokens,
-                                                                                      Some(start_dir_key)));
+        let mut dir_of_file =
+            try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
+                                                                    &tokens,
+                                                                    Some(start_dir_key)));
 
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(params.client);
-        let _ = try!(file_helper.delete(file_name,
-                                        &mut dir_of_file));
+        let _ = try!(file_helper.delete(file_name, &mut dir_of_file));
 
         Ok(None)
     }
@@ -48,22 +50,26 @@ impl ::launcher::parser::traits::Action for DeleteFile {
 #[cfg(test)]
 mod test {
     use super::*;
-    use ::launcher::parser::traits::Action;
+    use launcher::parser::traits::Action;
 
     #[test]
     fn delete_file() {
-        let parameter_packet = unwrap_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+        let parameter_packet =
+            unwrap_result!(::launcher::parser::test_utils::get_parameter_packet(false));
 
-        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(parameter_packet.client.clone());
-        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client.clone());
+        let file_helper =
+            ::safe_nfs::helper::file_helper::FileHelper::new(parameter_packet.client.clone());
+        let dir_helper =
+            ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client
+                                                                                       .clone());
         let mut app_root_dir = unwrap_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
         let writer = unwrap_result!(file_helper.create("test_file.txt".to_string(),
-                                                     Vec::new(),
-                                                     app_root_dir));
+                                                       Vec::new(),
+                                                       app_root_dir));
         let _ = unwrap_result!(writer.close());
 
         let mut request = DeleteFile {
-            file_path     : "/test_file.txt".to_string(),
+            file_path: "/test_file.txt".to_string(),
             is_path_shared: false,
         };
 

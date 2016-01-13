@@ -46,22 +46,31 @@ impl AppHandler {
                              ::ipc_server
                              ::EventSenderToServer<::launcher
                                                    ::ipc_server
-                                                   ::events::ExternalEvent>) -> (RaiiThreadJoiner,
-                                                                                 ::std::sync::mpsc::Sender<events::AppHandlerEvent>) {
+                                                   ::events::ExternalEvent>)
+            -> (RaiiThreadJoiner, ::std::sync::mpsc::Sender<events::AppHandlerEvent>) {
         let (event_tx, event_rx) = ::std::sync::mpsc::channel();
 
         let joiner = thread!(APP_HANDLER_THREAD_NAME, move || {
             let raw_disk_data = unwrap_result!(misc::read_local_config_file());
-            let mut local_config_data = ::std::collections::HashMap::with_capacity(raw_disk_data.len() + 1);
+            let mut local_config_data =
+                ::std::collections::HashMap::with_capacity(raw_disk_data.len() + 1);
             if raw_disk_data.len() != 0 {
                 match unwrap_result!(client.lock()).hybrid_decrypt(&raw_disk_data, None) {
-                    Ok(plain_text) => local_config_data = misc::convert_vec_to_hashmap(unwrap_result!(deserialise(&plain_text))),
-                    Err(err) => debug!("{:?} -> Local config file could not be read - either tampered or corrupted. Starting afresh...", err),
+                    Ok(plain_text) => {
+                        local_config_data =
+                            misc::convert_vec_to_hashmap(unwrap_result!(deserialise(&plain_text)))
+                    }
+                    Err(err) => {
+                        debug!("{:?} -> Local config file could not be read - either tampered or \
+                                corrupted. Starting afresh...",
+                               err)
+                    }
                 }
             }
 
             let (tx, rx) = ::std::sync::mpsc::channel();
-            if event_sender.send(::launcher::ipc_server::events::ExternalEvent::GetListenerEndpoint(tx)).is_ok() {
+            if event_sender.send(::launcher::ipc_server::events::
+                    ExternalEvent::GetListenerEndpoint(tx)).is_ok() {
                 if let Ok(launcher_endpoint) = rx.recv() {
                     let mut app_handler = AppHandler {
                         client                 : client,
@@ -76,10 +85,12 @@ impl AppHandler {
 
                     app_handler.run(event_rx);
                 } else {
-                    debug!("AppHandler <-> IPC-Server Communication failed - Probably Launcher was closed too soon.");
+                    debug!("AppHandler <-> IPC-Server Communication failed - \
+                            Probably Launcher was closed too soon.");
                 }
             } else {
-                debug!("AppHandler <-> IPC-Server Communication failed - Probably Launcher was closed too soon.");
+                debug!("AppHandler <-> IPC-Server Communication failed - \
+                        Probably Launcher was closed too soon.");
             }
 
             debug!("Exiting thread {:?}", APP_HANDLER_THREAD_NAME);
@@ -91,15 +102,27 @@ impl AppHandler {
     fn run(&mut self, event_rx: ::std::sync::mpsc::Receiver<events::AppHandlerEvent>) {
         for event in event_rx.iter() {
             match event {
-                events::AppHandlerEvent::AddApp(app_detail)               => self.on_add_app(app_detail),
-                events::AppHandlerEvent::RemoveApp(app_id)                => self.on_remove_app(app_id),
-                events::AppHandlerEvent::ActivateApp(app_id)              => self.on_activate_app(app_id),
-                events::AppHandlerEvent::GetAllManagedApps(obs)           => self.on_get_all_managed_apps(obs),
-                events::AppHandlerEvent::ModifyAppSettings(data)          => self.on_modify_app_settings(data),
-                events::AppHandlerEvent::RegisterAppAddObserver(obs)      => self.on_register_app_add_observer(obs),
-                events::AppHandlerEvent::RegisterAppRemoveObserver(obs)   => self.on_register_app_remove_observer(obs),
-                events::AppHandlerEvent::RegisterAppModifyObserver(obs)   => self.on_register_app_modify_observer(obs),
-                events::AppHandlerEvent::RegisterAppActivateObserver(obs) => self.on_register_app_activate_observer(obs),
+                events::AppHandlerEvent::AddApp(app_detail) => self.on_add_app(app_detail),
+                events::AppHandlerEvent::RemoveApp(app_id) => self.on_remove_app(app_id),
+                events::AppHandlerEvent::ActivateApp(app_id) => self.on_activate_app(app_id),
+                events::AppHandlerEvent::GetAllManagedApps(obs) => {
+                    self.on_get_all_managed_apps(obs)
+                }
+                events::AppHandlerEvent::ModifyAppSettings(data) => {
+                    self.on_modify_app_settings(data)
+                }
+                events::AppHandlerEvent::RegisterAppAddObserver(obs) => {
+                    self.on_register_app_add_observer(obs)
+                }
+                events::AppHandlerEvent::RegisterAppRemoveObserver(obs) => {
+                    self.on_register_app_remove_observer(obs)
+                }
+                events::AppHandlerEvent::RegisterAppModifyObserver(obs) => {
+                    self.on_register_app_modify_observer(obs)
+                }
+                events::AppHandlerEvent::RegisterAppActivateObserver(obs) => {
+                    self.on_register_app_activate_observer(obs)
+                }
                 events::AppHandlerEvent::Terminate => break,
             }
         }
@@ -110,21 +133,24 @@ impl AppHandler {
 
         let reply = match self.on_add_app_impl(app_detail) {
             Ok(data) => data,
-            Err(err) => ::observer::event_data::AppAddition {
-                result    : Err(err),
-                local_path: abs_path,
-            },
+            Err(err) => {
+                ::observer::event_data::AppAddition {
+                    result: Err(err),
+                    local_path: abs_path,
+                }
+            }
         };
 
         group_send!(reply, &mut self.app_add_observers);
     }
 
-    fn on_add_app_impl(&mut self, app_detail: events::event_data::AppDetail) -> Result<::observer::event_data::AppAddition,
-                                                                                       ::errors::LauncherError> {
+    fn on_add_app_impl(&mut self,
+                       app_detail: events::event_data::AppDetail)
+                       -> Result<::observer::event_data::AppAddition, ::errors::LauncherError> {
         {
             let mut paths = self.local_config_data.values();
             if let Some(_) = paths.find(|stored_path| **stored_path == app_detail.absolute_path) {
-                return Err(::errors::LauncherError::AppAlreadyAdded)
+                return Err(::errors::LauncherError::AppAlreadyAdded);
             }
         }
 
@@ -133,11 +159,13 @@ impl AppHandler {
         let mut tokens = AppHandler::tokenise_path(&app_detail.absolute_path);
         let app_name = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
 
-        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client
+                                                                                        .clone());
         let mut root_dir_listing = try!(dir_helper.get_user_root_directory_listing());
 
         let app_dir_name = AppHandler::get_app_dir_name(&app_name, &root_dir_listing);
-        let app_root_dir_key = match root_dir_listing.find_sub_directory(&app_dir_name).map(|dir| dir.clone()) {
+        let app_root_dir_key = match root_dir_listing.find_sub_directory(&app_dir_name)
+                                                     .map(|dir| dir.clone()) {
             Some(app_dir) => app_dir.get_key().clone(),
             None => {
                 try!(dir_helper.create(app_dir_name,
@@ -145,15 +173,18 @@ impl AppHandler {
                                        Vec::new(),
                                        false,
                                        ::safe_nfs::AccessLevel::Private,
-                                       Some(&mut root_dir_listing))).0.get_key().clone()
-            },
+                                       Some(&mut root_dir_listing)))
+                    .0
+                    .get_key()
+                    .clone()
+            }
         };
 
         let new_launcher_config = misc::LauncherConfiguration {
-            app_id           : app_id,
-            app_name         : app_name.clone(),
-            reference_count  : 1,
-            app_root_dir_key : app_root_dir_key,
+            app_id: app_id,
+            app_name: app_name.clone(),
+            reference_count: 1,
+            app_root_dir_key: app_root_dir_key,
             safe_drive_access: app_detail.safe_drive_access,
         };
         try!(self.upsert_to_launcher_global_config(new_launcher_config));
@@ -161,28 +192,34 @@ impl AppHandler {
         let _ = self.local_config_data.insert(app_id, app_detail.absolute_path.clone());
 
         let app_addition_data = ::observer::event_data::AppAdditionData {
-            id  : app_id,
+            id: app_id,
             name: app_name,
         };
 
         Ok(::observer::event_data::AppAddition {
-            result    : Ok(app_addition_data),
+            result: Ok(app_addition_data),
             local_path: app_detail.absolute_path,
         })
     }
 
     fn on_activate_app(&mut self, app_id: XorName) {
-        let event = ::observer::AppHandlingEvent::AppActivation(self.on_activate_app_impl(app_id).map(|()| app_id));
+        let event = ::observer::AppHandlingEvent::AppActivation(self.on_activate_app_impl(app_id)
+                                                                    .map(|()| app_id));
         group_send!(event, &mut self.app_activate_observers);
     }
 
     fn on_activate_app_impl(&self, app_id: XorName) -> Result<(), ::errors::LauncherError> {
         let global_configs = try!(self.get_launcher_global_config());
 
-        let app_info = try!(global_configs.iter().find(|config| config.app_id == app_id).ok_or(::errors::LauncherError::AppNotRegistered));
-        let app_binary_path = try!(self.local_config_data.get(&app_info.app_id).ok_or(::errors::LauncherError::PathNotFound));
+        let app_info = try!(global_configs.iter()
+                                          .find(|config| config.app_id == app_id)
+                                          .ok_or(::errors::LauncherError::AppNotRegistered));
+        let app_binary_path = try!(self.local_config_data
+                                       .get(&app_info.app_id)
+                                       .ok_or(::errors::LauncherError::PathNotFound));
 
-        let mut rand_vec = try!(::safe_core::utility::generate_random_vector::<u8>(::config::LAUNCHER_NONCE_LENGTH));
+        let mut rand_vec = try!(
+            ::safe_core::utility::generate_random_vector::<u8>(::config::LAUNCHER_NONCE_LENGTH));
         // Ensure valid ASCII and hence valid UTF-8. Keep it in ASCII range [48, 122].
         for it in rand_vec.iter_mut() {
             *it %= 123;
@@ -190,32 +227,31 @@ impl AppHandler {
                 *it += 48;
             }
         }
-        let str_nonce = try!(String::from_utf8(rand_vec).map_err(|e| ::errors
-                                                                     ::LauncherError
-                                                                     ::Unexpected(format!("{:?} -> Logic Error - Report a bug.", e))));
+        let str_nonce = try!(String::from_utf8(rand_vec).map_err(|e| {
+            ::errors::LauncherError::Unexpected(format!("{:?} -> Logic Error - Report a bug.", e))
+        }));
 
         let activation_detail = ::launcher::ipc_server::events::event_data::ActivationDetail {
-            nonce            : str_nonce.clone(),
-            app_id           : app_info.app_id.clone(),
-            app_root_dir_key : app_info.app_root_dir_key.clone(),
+            nonce: str_nonce.clone(),
+            app_id: app_info.app_id.clone(),
+            app_root_dir_key: app_info.app_root_dir_key.clone(),
             safe_drive_access: app_info.safe_drive_access,
         };
 
-        try!(send_one!(activation_detail,
-                       &self.ipc_server_event_sender).map_err(|e| ::errors
-                                                                  ::LauncherError
-                                                                  ::Unexpected(format!("{:?} Could not communicate activation detail \
-                                                                                       to IPC Server", e))));
+        try!(send_one!(activation_detail, &self.ipc_server_event_sender).map_err(|e| {
+            ::errors::LauncherError::Unexpected(format!("{:?} Could not communicate activation \
+                                                         detail to IPC Server",
+                                                        e))
+        }));
         let command_line_arg = format!("tcp:{}:{}", self.launcher_endpoint, str_nonce);
 
         if let Err(err) = ::std::process::Command::new(app_binary_path)
-                                                  .arg("--launcher")
-                                                  .arg(command_line_arg)
-                                                  .spawn() {
-            if let Err(err) = self.ipc_server_event_sender.send(::launcher
-                                                                ::ipc_server
-                                                                ::events
-                                                                ::ExternalEvent::EndSession(app_id)) {
+                              .arg("--launcher")
+                              .arg(command_line_arg)
+                              .spawn() {
+            if let Err(err) =
+                   self.ipc_server_event_sender
+                       .send(::launcher::ipc_server::events::ExternalEvent::EndSession(app_id)) {
                 debug!("{:?} Error sending end-session signal to IPC Server.", err);
             }
 
@@ -228,46 +264,54 @@ impl AppHandler {
     fn on_remove_app(&mut self, app_id: XorName) {
         let reply = match self.on_remove_app_impl(app_id) {
             Ok(data) => {
-                if let Err(err) = self.ipc_server_event_sender.send(::launcher
-                                                                    ::ipc_server
-                                                                    ::events
-                                                                    ::ExternalEvent::EndSession(app_id)) {
+                if let Err(err) =
+                       self.ipc_server_event_sender
+                           .send(::launcher::ipc_server::events::ExternalEvent::EndSession(app_id)) {
                     debug!("{:?} Error sending end-session signal to IPC Server.", err);
                 }
 
                 data
-            },
-            Err(err) => ::observer::event_data::AppRemoval {
-                id    : app_id,
-                result: Some(err),
-            },
+            }
+            Err(err) => {
+                ::observer::event_data::AppRemoval {
+                    id: app_id,
+                    result: Some(err),
+                }
+            }
         };
 
         group_send!(reply, &mut self.app_remove_observers);
     }
 
-    fn on_remove_app_impl(&mut self, app_id: XorName) -> Result<::observer::event_data::AppRemoval,
-                                                                            ::errors::LauncherError> {
+    fn on_remove_app_impl
+        (&mut self,
+         app_id: XorName)
+         -> Result<::observer::event_data::AppRemoval, ::errors::LauncherError> {
         let config_file_name = ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string();
 
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
-        let (mut launcher_configurations, dir_listing) = try!(self.get_launcher_global_config_and_dir());
+        let (mut launcher_configurations, dir_listing) =
+            try!(self.get_launcher_global_config_and_dir());
 
         let position = try!(launcher_configurations.iter()
-                                                   .position(|config| config.app_id == app_id)
-                                                   .ok_or(::errors::LauncherError::AppNotRegistered));
+                                        .position(|config| config.app_id == app_id)
+                                        .ok_or(::errors::LauncherError::AppNotRegistered));
         let reference_count = launcher_configurations[position].reference_count;
 
         if reference_count == 1 {
             let _ = launcher_configurations.remove(position);
         } else {
-             let config = try!(launcher_configurations.get_mut(position)
-                                                      .ok_or(::errors::LauncherError::AppNotRegistered));
-             config.reference_count -= 1;
+            let config = try!(launcher_configurations.get_mut(position)
+                                            .ok_or(::errors::LauncherError::AppNotRegistered));
+            config.reference_count -= 1;
         }
 
-        let file = unwrap_option!(dir_listing.find_file(&config_file_name).map(|file| file.clone()), "Configuration file not found");
-        let mut writer = try!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, dir_listing));
+        let file = unwrap_option!(dir_listing.find_file(&config_file_name)
+                                             .map(|file| file.clone()),
+                                  "Configuration file not found");
+        let mut writer = try!(file_helper.update_content(file,
+                                            ::safe_nfs::helper::writer::Mode::Overwrite,
+                                            dir_listing));
         writer.write(&try!(serialise(&launcher_configurations)), 0);
         let _ = try!(writer.close());
 
@@ -276,7 +320,7 @@ impl AppHandler {
         }
 
         Ok(::observer::event_data::AppRemoval {
-            id    : app_id,
+            id: app_id,
             result: None,
         })
     }
@@ -287,40 +331,41 @@ impl AppHandler {
             Ok(data) => data,
             Err(err) => {
                 ::observer::event_data::AppModification {
-                    id    : id,
+                    id: id,
                     result: Err(err),
                 }
-            },
+            }
         };
 
         group_send!(reply, &mut self.app_modify_observers);
     }
 
-    fn on_modify_app_settings_impl(&mut self,
-                                   data: events::event_data::ModifyAppSettings) -> Result<::observer::event_data::AppModification,
-                                                                                          ::errors::LauncherError> {
+    fn on_modify_app_settings_impl
+        (&mut self,
+         data: events::event_data::ModifyAppSettings)
+         -> Result<::observer::event_data::AppModification, ::errors::LauncherError> {
         let (mut global_configs, config_dir) = try!(self.get_launcher_global_config_and_dir());
 
         let mut global_config_modified = false;
 
         let mut modification_detail = ::observer::event_data::ModificationDetail {
-            name             : None,
-            local_path       : None,
+            name: None,
+            local_path: None,
             safe_drive_access: None,
         };
 
         {
-            let app_info = try!(global_configs.iter_mut().find(|config| config.app_id == data.id).ok_or(::errors::LauncherError::AppNotRegistered));
+            let app_info = try!(global_configs.iter_mut()
+                                              .find(|config| config.app_id == data.id)
+                                              .ok_or(::errors::LauncherError::AppNotRegistered));
 
             if let Some(safe_drive_access) = data.safe_drive_access {
                 app_info.safe_drive_access = safe_drive_access;
                 global_config_modified = true;
 
-                if self.ipc_server_event_sender.send(::launcher
-                                                     ::ipc_server
-                                                     ::events
-                                                     ::ExternalEvent
-                                                     ::ChangeSafeDriveAccess(data.id, safe_drive_access)).is_err() {
+                if self.ipc_server_event_sender.send(
+                        ::launcher::ipc_server::events::ExternalEvent
+                            ::ChangeSafeDriveAccess(data.id, safe_drive_access)).is_err() {
                     debug!("Error asking IPC Server to change \"SAFEDrive\" permission for an app");
                 }
 
@@ -337,9 +382,12 @@ impl AppHandler {
         if global_config_modified {
             let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
             // TODO(to Krishna) -> can we change nfs to not require the following clone() ?
-            let file = unwrap_option!(config_dir.find_file(&::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string())
-                                              .map(|file| file.clone()), "Logic Error - Report as bug.");
-            let mut writer = try!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, config_dir));
+            let file = unwrap_option!(config_dir.find_file(
+                &::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string())
+                    .map(|file| file.clone()), "Logic Error - Report as bug.");
+            let mut writer = try!(file_helper.update_content(file,
+                                                ::safe_nfs::helper::writer::Mode::Overwrite,
+                                                config_dir));
             writer.write(&try!(serialise(&global_configs)), 0);
             let _ = try!(writer.close());
         }
@@ -347,14 +395,15 @@ impl AppHandler {
 
         if let Some(new_path) = data.local_path {
             if let Some(prev_path) = self.local_config_data.insert(data.id, new_path.clone()) {
-                debug!("Replacing previous path {:?} for this app on this machine.", prev_path);
+                debug!("Replacing previous path {:?} for this app on this machine.",
+                       prev_path);
             }
 
             modification_detail.local_path = Some(new_path);
         }
 
         Ok(::observer::event_data::AppModification {
-            id    : data.id,
+            id: data.id,
             result: Ok(modification_detail),
         })
     }
@@ -375,8 +424,8 @@ impl AppHandler {
         self.app_modify_observers.push(observer);
     }
 
-    fn on_get_all_managed_apps(&self, observer: ::std::sync::mpsc::Sender<Result<Vec<events::event_data::ManagedApp>,
-                                                                                 ::errors::LauncherError>>) {
+    fn on_get_all_managed_apps(&self, observer: ::std::sync::mpsc::Sender<
+            Result<Vec<events::event_data::ManagedApp>, ::errors::LauncherError>>) {
         let global_configs = eval_send_one!(self.get_launcher_global_config(), &observer);
         let mut managed_apps = Vec::with_capacity(global_configs.len());
         for it in global_configs.iter() {
@@ -387,10 +436,10 @@ impl AppHandler {
             };
 
             let managed_app = events::event_data::ManagedApp {
-                id               : it.app_id,
-                name             : it.app_name.clone(),
-                local_path       : local_path,
-                reference_count  : it.reference_count,
+                id: it.app_id,
+                name: it.app_name.clone(),
+                local_path: local_path,
+                reference_count: it.reference_count,
                 safe_drive_access: it.safe_drive_access,
             };
 
@@ -398,7 +447,8 @@ impl AppHandler {
         }
 
         if let Err(err) = observer.send(Ok(managed_apps)) {
-            debug!("{:?} Error communicating all managed apps to observer.", err);
+            debug!("{:?} Error communicating all managed apps to observer.",
+                   err);
         }
     }
 
@@ -409,8 +459,9 @@ impl AppHandler {
             .collect()
     }
 
-    fn get_app_dir_name(app_name         : &String,
-                        directory_listing: &::safe_nfs::directory_listing::DirectoryListing) -> String {
+    fn get_app_dir_name(app_name: &String,
+                        directory_listing: &::safe_nfs::directory_listing::DirectoryListing)
+                        -> String {
         let mut dir_name = format!("{}-Root-Dir", &app_name);
         if directory_listing.find_sub_directory(&dir_name).is_some() {
             let mut index = 1u8;
@@ -427,32 +478,46 @@ impl AppHandler {
         dir_name
     }
 
-    fn get_launcher_global_config(&self) -> Result<Vec<misc::LauncherConfiguration>, ::errors::LauncherError> {
+    fn get_launcher_global_config
+        (&self)
+         -> Result<Vec<misc::LauncherConfiguration>, ::errors::LauncherError> {
         Ok(try!(self.get_launcher_global_config_and_dir()).0)
     }
 
-    fn upsert_to_launcher_global_config(&self, config: misc::LauncherConfiguration) -> Result<(), ::errors::LauncherError> {
+    fn upsert_to_launcher_global_config(&self,
+                                        config: misc::LauncherConfiguration)
+                                        -> Result<(), ::errors::LauncherError> {
         let (mut global_configs, dir_listing) = try!(self.get_launcher_global_config_and_dir());
 
         // (Spandan)
-        // Due to bug in the language, unable to use `if let Some() .. else` logic to upsert to a vector.
+        // Unable to use `if let Some() .. else` logic to upsert to a vector due to a language bug.
         // Once the bug is resolved
         // - https://github.com/rust-lang/rust/issues/28449
         // then modify the following to use it.
-        if let Some(pos) = global_configs.iter().position(|existing_config| existing_config.app_id == config.app_id) {
-            let existing_config = unwrap_option!(global_configs.get_mut(pos), "Logic Error - Report bug.");
+        if let Some(pos) = global_configs.iter().position(|existing_config| {
+            existing_config.app_id == config.app_id
+        }) {
+            let existing_config = unwrap_option!(global_configs.get_mut(pos),
+                                                 "Logic Error - Report bug.");
             *existing_config = config;
         } else {
             global_configs.push(config);
         }
 
         let file = unwrap_option!(dir_listing.get_files()
-                                           .iter()
-                                           .find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME),
-                                "Logic Error - Launcher start-up should ensure the file must be present at this stage - Report bug.").clone();
+                                             .iter()
+                                             .find(|file| {
+                                                 file.get_name() ==
+                                                 ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME
+                                             }),
+                                  "Logic Error - Launcher start-up should ensure the file must \
+                                   be present at this stage - Report bug.")
+                       .clone();
 
         let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
-        let mut writer = try!(file_helper.update_content(file, ::safe_nfs::helper::writer::Mode::Overwrite, dir_listing));
+        let mut writer = try!(file_helper.update_content(file,
+                                            ::safe_nfs::helper::writer::Mode::Overwrite,
+                                            dir_listing));
         writer.write(&try!(serialise(&global_configs)), 0);
         let _ = try!(writer.close());
 
@@ -460,16 +525,21 @@ impl AppHandler {
     }
 
     fn get_launcher_global_config_and_dir(&self) -> Result<(Vec<misc::LauncherConfiguration>,
-                                                            ::safe_nfs::directory_listing::DirectoryListing),
-                                                           ::errors::LauncherError> {
-        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client.clone());
-        let dir_listing = try!(dir_helper.get_configuration_directory_listing(::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string()));
+            ::safe_nfs::directory_listing::DirectoryListing), ::errors::LauncherError> {
+        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(self.client
+                                                                                        .clone());
+        let dir_listing = try!(dir_helper.get_configuration_directory_listing(
+            ::config::LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string()));
 
         let global_configs = {
             let file = unwrap_option!(dir_listing.get_files()
-                                               .iter()
-                                               .find(|file| file.get_name() == ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME),
-                                    "Logic Error - Launcher start-up should ensure the file must be present at this stage - Report bug.");
+                                                 .iter()
+                                                 .find(|file| {
+                                                     file.get_name() ==
+                                                     ::config::LAUNCHER_GLOBAL_CONFIG_FILE_NAME
+                                                 }),
+                                      "Logic Error - Launcher start-up should ensure the file \
+                                       must be present at this stage - Report bug.");
 
             let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(self.client.clone());
             let mut reader = file_helper.read(file);
@@ -489,8 +559,10 @@ impl AppHandler {
 
 impl Drop for AppHandler {
     fn drop(&mut self) {
-        let plain_text = unwrap_result!(serialise(&misc::convert_hashmap_to_vec(&self.local_config_data)));
-        let cipher_text = unwrap_result!(unwrap_result!(self.client.lock()).hybrid_encrypt(&plain_text, None));
+        let plain_text =
+            unwrap_result!(serialise(&misc::convert_hashmap_to_vec(&self.local_config_data)));
+        let cipher_text = unwrap_result!(unwrap_result!(self.client.lock())
+                                             .hybrid_encrypt(&plain_text, None));
         unwrap_result!(misc::flush_to_local_config(&cipher_text));
     }
 }

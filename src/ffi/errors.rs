@@ -30,9 +30,11 @@ pub enum FfiError {
 impl ::std::fmt::Debug for FfiError {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         match *self {
-            FfiError::CoreError(ref error)      => write!(f, "FfiError::CoreError -> {:?}", error),
-            FfiError::LauncherError(ref error)  => write!(f, "FfiError::LauncherError -> {:?}", error),
-            FfiError::Unexpected(ref error)     => write!(f, "FfiError::Unexpected::{{{:?}}}", error),
+            FfiError::CoreError(ref error) => write!(f, "FfiError::CoreError -> {:?}", error),
+            FfiError::LauncherError(ref error) => {
+                write!(f, "FfiError::LauncherError -> {:?}", error)
+            }
+            FfiError::Unexpected(ref error) => write!(f, "FfiError::Unexpected::{{{:?}}}", error),
         }
     }
 }
@@ -58,9 +60,9 @@ impl<'a> From<&'a str> for FfiError {
 impl Into<i32> for FfiError {
     fn into(self) -> i32 {
         match self {
-            FfiError::CoreError(error)      => (*error).into(),
-            FfiError::LauncherError(error)  => (*error).into(),
-            FfiError::Unexpected(_)         => FFI_ERROR_START_RANGE - 1,
+            FfiError::CoreError(error) => (*error).into(),
+            FfiError::LauncherError(error) => (*error).into(),
+            FfiError::Unexpected(_) => FFI_ERROR_START_RANGE - 1,
         }
     }
 }
