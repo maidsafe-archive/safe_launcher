@@ -15,31 +15,40 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use std::io;
+use std::fmt;
+
+use rustc_serialize::json;
+
+use safe_core::errors::CoreError;
+use safe_dns::errors::{DNS_ERROR_START_RANGE, DnsError};
+use safe_nfs::errors::NfsError;
+
 use maidsafe_utilities::serialisation::SerialisationError;
 
 /// Intended for converting Launcher Errors into numeric codes for propagating some error
 /// information across FFI boundaries and specially to C.
-pub const LAUNCHER_ERROR_START_RANGE: i32 = ::safe_dns::errors::DNS_ERROR_START_RANGE - 500;
+pub const LAUNCHER_ERROR_START_RANGE: i32 = DNS_ERROR_START_RANGE - 500;
 
 /// Launcher Errors
 pub enum LauncherError {
     /// Error from safe_core. Boxed to hold a pointer instead of value so that this enum variant is
     /// not insanely bigger than others.
-    CoreError(Box<::safe_core::errors::CoreError>),
+    CoreError(Box<CoreError>),
     /// Errors from safe_nfs
-    NfsError(Box<::safe_nfs::errors::NfsError>),
+    NfsError(Box<NfsError>),
     /// Errors from safe_nfs
-    DnsError(Box<::safe_dns::errors::DnsError>),
+    DnsError(Box<DnsError>),
     /// Ipc Listener could not be bound to an endpoint
     IpcListenerCouldNotBeBound,
     /// The Ipc Listener has errored out. New apps will no longer be able to connect to Launcher
-    IpcListenerAborted(::std::io::Error),
+    IpcListenerAborted(io::Error),
     /// The Ipc Stream could not be cloned
-    IpcStreamCloneError(::std::io::Error),
+    IpcStreamCloneError(io::Error),
     /// mpsc receiver has hung up
     ReceiverChannelDisconnected,
     /// IpcSession has been terminated due to either graceful shutdown or some error as indicated
-    IpcSessionTerminated(Option<::std::io::Error>),
+    IpcSessionTerminated(Option<io::Error>),
     /// Could not read the payload size from stream
     FailedReadingStreamPayloadSize,
     /// Could not write the payload size to stream
@@ -51,15 +60,15 @@ pub enum LauncherError {
     /// Permission denied - e.g. permission to access SAFEDrive etc.
     PermissionDenied,
     /// Could not parse payload as a valid JSON
-    JsonParseError(::rustc_serialize::json::ParserError),
+    JsonParseError(json::ParserError),
     /// Could not decode valid JSON into expected Structures probably because a mandatory field was
     /// missing or a field was wrongly named etc.
-    JsonDecodeError(::rustc_serialize::json::DecoderError),
+    JsonDecodeError(json::DecoderError),
     /// JSON non-conforming to the Launcher RFC and not covered by JsonDecodeError, e.g. things
     /// like invalid base64 formatting, unreasonable/unexpected indexing, ranges etc.
     SpecificParseError(String),
     /// Error encoding into Json String
-    JsonEncodeError(::rustc_serialize::json::EncoderError),
+    JsonEncodeError(json::EncoderError),
     /// Symmetric Deciphering failed for a cipher text
     SymmetricDecipherFailure,
     /// This path to binary has already been added on this machine
@@ -67,7 +76,7 @@ pub enum LauncherError {
     /// The given app is not managed by Launcher
     AppNotRegistered,
     /// Starting of App as an external process has failed
-    AppActivationFailed(::std::io::Error),
+    AppActivationFailed(io::Error),
     /// Payload to read is prohibitive in size
     ReadPayloadSizeProhibitive,
     /// Unable to Read from or Write to a Local Config file.
@@ -89,38 +98,38 @@ impl<'a> From<&'a str> for LauncherError {
     }
 }
 
-impl From<::safe_core::errors::CoreError> for LauncherError {
-    fn from(error: ::safe_core::errors::CoreError) -> LauncherError {
+impl From<CoreError> for LauncherError {
+    fn from(error: CoreError) -> LauncherError {
         LauncherError::CoreError(Box::new(error))
     }
 }
 
-impl From<::safe_nfs::errors::NfsError> for LauncherError {
-    fn from(error: ::safe_nfs::errors::NfsError) -> LauncherError {
+impl From<NfsError> for LauncherError {
+    fn from(error: NfsError) -> LauncherError {
         LauncherError::NfsError(Box::new(error))
     }
 }
 
-impl From<::safe_dns::errors::DnsError> for LauncherError {
-    fn from(error: ::safe_dns::errors::DnsError) -> LauncherError {
+impl From<DnsError> for LauncherError {
+    fn from(error: DnsError) -> LauncherError {
         LauncherError::DnsError(Box::new(error))
     }
 }
 
-impl From<::rustc_serialize::json::ParserError> for LauncherError {
-    fn from(error: ::rustc_serialize::json::ParserError) -> LauncherError {
+impl From<json::ParserError> for LauncherError {
+    fn from(error: json::ParserError) -> LauncherError {
         LauncherError::JsonParseError(error)
     }
 }
 
-impl From<::rustc_serialize::json::EncoderError> for LauncherError {
-    fn from(error: ::rustc_serialize::json::EncoderError) -> LauncherError {
+impl From<json::EncoderError> for LauncherError {
+    fn from(error: json::EncoderError) -> LauncherError {
         LauncherError::JsonEncodeError(error)
     }
 }
 
-impl From<::rustc_serialize::json::DecoderError> for LauncherError {
-    fn from(error: ::rustc_serialize::json::DecoderError) -> LauncherError {
+impl From<json::DecoderError> for LauncherError {
+    fn from(error: json::DecoderError) -> LauncherError {
         LauncherError::JsonDecodeError(error)
     }
 }
@@ -157,8 +166,8 @@ impl Into<i32> for LauncherError {
     }
 }
 
-impl ::std::fmt::Debug for LauncherError {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl fmt::Debug for LauncherError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             LauncherError::CoreError(ref error) => {
                 write!(f, "LauncherError::CoreError -> {:?}", error)

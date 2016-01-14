@@ -15,6 +15,11 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use std::fmt;
+use std::sync::mpsc;
+
+use errors::LauncherError;
+use observer::AppHandlerObserver;
 use xor_name::XorName;
 
 /// This is an event subset to be used by external codes to communicate with the App Handling
@@ -29,28 +34,27 @@ pub enum AppHandlerEvent {
     /// Modify settings for an app
     ModifyAppSettings(event_data::ModifyAppSettings),
     /// Register an observer to receive notifications about status of adding of an app.
-    RegisterAppAddObserver(::observer::AppHandlerObserver),
+    RegisterAppAddObserver(AppHandlerObserver),
     /// Register an observer to receive notifications about status of removal of an app.
-    RegisterAppRemoveObserver(::observer::AppHandlerObserver),
+    RegisterAppRemoveObserver(AppHandlerObserver),
     /// Register an observer to receive notifications about an app being activated. Note however
     /// that a successful activation does not necessarily translate into successfully managed
     /// session. It just means that app has been started. It can still crash after start, fail
     /// authentication etc. Register obeservers in IPC module to get a more fine grained
     /// information.
-    RegisterAppActivateObserver(::observer::AppHandlerObserver),
+    RegisterAppActivateObserver(AppHandlerObserver),
     /// Register an observer to receive notifications about status of modification of an app.
-    RegisterAppModifyObserver(::observer::AppHandlerObserver),
+    RegisterAppModifyObserver(AppHandlerObserver),
     /// Obtain all apps currently being managed by Launcher.
-    GetAllManagedApps(::std::sync::mpsc::Sender<Result<Vec<event_data::ManagedApp>,
-                                                         ::errors::LauncherError>>),
+    GetAllManagedApps(mpsc::Sender<Result<Vec<event_data::ManagedApp>, LauncherError>>),
     /// Gracefully exit the app handling module. After a call to this Launcher will no longer cater
     /// to any requests handled by this module. This is essentially Launcher-close scenario and
     /// Launcher must be restarted to be functional again.
     Terminate,
 }
 
-impl ::std::fmt::Debug for AppHandlerEvent {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl fmt::Debug for AppHandlerEvent {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}", *self)
     }
 }

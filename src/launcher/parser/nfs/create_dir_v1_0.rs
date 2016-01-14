@@ -15,6 +15,13 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use errors::LauncherError;
+use launcher::parser::{helper, ParameterPacket, ResponseType, traits};
+use safe_nfs::{AccessLevel,
+               UNVERSIONED_DIRECTORY_LISTING_TAG,
+               VERSIONED_DIRECTORY_LISTING_TAG};
+use safe_nfs::helper::directory_helper::DirectoryHelper;
+
 #[derive(RustcDecodable, Debug)]
 pub struct CreateDir {
     dir_path: String,
@@ -24,18 +31,16 @@ pub struct CreateDir {
     is_path_shared: bool,
 }
 
-impl ::launcher::parser::traits::Action for CreateDir {
-    fn execute(&mut self,
-               params: ::launcher::parser::ParameterPacket)
-               -> ::launcher::parser::ResponseType {
+impl traits::Action for CreateDir {
+    fn execute(&mut self, params: ParameterPacket) -> ResponseType {
         use rustc_serialize::base64::FromBase64;
 
         if self.is_path_shared && !*unwrap_result!(params.safe_drive_access.lock()) {
-            return Err(::errors::LauncherError::PermissionDenied);
+            return Err(LauncherError::PermissionDenied);
         }
 
-        let mut tokens = ::launcher::parser::helper::tokenise_path(&self.dir_path, false);
-        let dir_to_create = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
+        let mut tokens = helper::tokenise_path(&self.dir_path, false);
+        let dir_to_create = try!(tokens.pop().ok_or(LauncherError::InvalidPath));
 
         let start_dir_key = if self.is_path_shared {
             &params.safe_drive_dir_key
@@ -44,22 +49,22 @@ impl ::launcher::parser::traits::Action for CreateDir {
         };
 
         let mut parent_sub_dir =
-            try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
-                                                                    &tokens,
-                                                                    Some(start_dir_key)));
+            try!(helper::get_final_subdirectory(params.client.clone(),
+                                                &tokens,
+                                                Some(start_dir_key)));
 
-        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(params.client);
+        let dir_helper = DirectoryHelper::new(params.client);
 
         let access_level = if self.is_private {
-            ::safe_nfs::AccessLevel::Private
+            AccessLevel::Private
         } else {
-            ::safe_nfs::AccessLevel::Public
+            AccessLevel::Public
         };
 
         let tag = if self.is_versioned {
-            ::safe_nfs::VERSIONED_DIRECTORY_LISTING_TAG
+            VERSIONED_DIRECTORY_LISTING_TAG
         } else {
-            ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG
+            UNVERSIONED_DIRECTORY_LISTING_TAG
         };
 
         let bin_metadata = try!(parse_result!(self.user_metadata.from_base64(),
@@ -80,11 +85,12 @@ impl ::launcher::parser::traits::Action for CreateDir {
 mod test {
     use super::*;
     use launcher::parser::traits::Action;
+    use launcher::parser::test_utils;
+    use safe_nfs::helper::directory_helper::DirectoryHelper;
 
     #[test]
     fn create_dir() {
-        let parameter_packet =
-            unwrap_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+        let parameter_packet = unwrap_result!(test_utils::get_parameter_packet(false));
 
         let mut request = CreateDir {
             dir_path: "/".to_string(),
@@ -107,8 +113,7 @@ mod test {
         request.dir_path = "/test_dir/secondlevel".to_string();
         assert!(request.execute(parameter_packet.clone()).is_ok());
 
-        let dir_helper =
-            ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client);
+        let dir_helper = DirectoryHelper::new(parameter_packet.client);
         let app_dir = unwrap_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
         assert!(app_dir.find_sub_directory(&"test_dir".to_string()).is_some());
         assert!(app_dir.find_sub_directory(&"test_dir2".to_string()).is_some());

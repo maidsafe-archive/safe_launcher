@@ -15,21 +15,22 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use errors::LauncherError;
+use launcher::parser::{helper, ParameterPacket, ResponseType, traits};
+use safe_nfs::helper::directory_helper::DirectoryHelper;
+
 #[derive(RustcDecodable, Debug)]
 pub struct DeleteDir {
     dir_path: String,
     is_path_shared: bool,
 }
 
-impl ::launcher::parser::traits::Action for DeleteDir {
-    fn execute(&mut self,
-               params: ::launcher::parser::ParameterPacket)
-               -> ::launcher::parser::ResponseType {
+impl traits::Action for DeleteDir {
+    fn execute(&mut self, params: ParameterPacket) -> ResponseType {
+        let mut tokens = helper::tokenise_path(&self.dir_path, false);
+        let dir_to_delete = try!(tokens.pop().ok_or(LauncherError::InvalidPath));
 
-        let mut tokens = ::launcher::parser::helper::tokenise_path(&self.dir_path, false);
-        let dir_to_delete = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
-
-        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(params.client);
+        let dir_helper = DirectoryHelper::new(params.client);
 
         let mut parent_dir = if self.is_path_shared {
             try!(dir_helper.get(&params.safe_drive_dir_key))
@@ -47,21 +48,21 @@ impl ::launcher::parser::traits::Action for DeleteDir {
 mod test {
     use super::*;
     use launcher::parser::traits::Action;
+    use launcher::parser::test_utils;
+    use safe_nfs::{AccessLevel, UNVERSIONED_DIRECTORY_LISTING_TAG};
+    use safe_nfs::helper::directory_helper::DirectoryHelper;
 
     #[test]
     fn delete_dir() {
-        let parameter_packet =
-            unwrap_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+        let parameter_packet = unwrap_result!(test_utils::get_parameter_packet(false));
 
-        let dir_helper =
-            ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client
-                                                                                       .clone());
+        let dir_helper = DirectoryHelper::new(parameter_packet.client.clone());
         let mut app_root_dir = unwrap_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
         let _ = unwrap_result!(dir_helper.create("test_dir".to_string(),
-                                                 ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
+                                                 UNVERSIONED_DIRECTORY_LISTING_TAG,
                                                  Vec::new(),
                                                  false,
-                                                 ::safe_nfs::AccessLevel::Private,
+                                                 AccessLevel::Private,
                                                  Some(&mut app_root_dir)));
 
 

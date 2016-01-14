@@ -15,6 +15,14 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use std::sync::{Arc, Mutex};
+
+use errors::LauncherError;
+use safe_core::client::Client;
+use safe_nfs::metadata::directory_key::DirectoryKey;
+use safe_nfs::helper::directory_helper::DirectoryHelper;
+use safe_nfs::directory_listing::DirectoryListing;
+
 pub fn tokenise_path(path: &str, keep_empty_splits: bool) -> Vec<String> {
     path.split(|element| element == '/')
         .filter(|token| keep_empty_splits || token.len() != 0)
@@ -23,11 +31,11 @@ pub fn tokenise_path(path: &str, keep_empty_splits: bool) -> Vec<String> {
 }
 
 pub fn get_final_subdirectory
-    (client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+    (client: Arc<Mutex<Client>>,
      tokens: &Vec<String>,
-     starting_directory: Option<&::safe_nfs::metadata::directory_key::DirectoryKey>)
-     -> Result<::safe_nfs::directory_listing::DirectoryListing, ::errors::LauncherError> {
-    let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(client);
+     starting_directory: Option<&DirectoryKey>)
+     -> Result<DirectoryListing, LauncherError> {
+    let dir_helper = DirectoryHelper::new(client);
 
     let mut current_dir_listing = match starting_directory {
         Some(directory_key) => try!(dir_helper.get(directory_key)),
@@ -39,7 +47,7 @@ pub fn get_final_subdirectory
             let current_dir_metadata = try!(current_dir_listing.get_sub_directories()
                                         .iter()
                                         .find(|a| *a.get_name() == *it)
-                                        .ok_or(::errors::LauncherError::PathNotFound));
+                                        .ok_or(LauncherError::PathNotFound));
             try!(dir_helper.get(current_dir_metadata.get_key()))
         };
     }

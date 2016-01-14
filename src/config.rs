@@ -22,10 +22,12 @@ pub const LAUNCHER_LOCAL_CONFIG_FILE_NAME: &'static str = ".launcher.config";
 pub const LAUNCHER_GLOBAL_CONFIG_FILE_NAME: &'static str = "LauncherSpecificConfigurationFile";
 pub const MAX_ALLOWED_READ_PAYLOAD_SIZE_BYTES: u64 = 300 * 1024 * 1024;
 
-pub fn get_base64_config() -> ::rustc_serialize::base64::Config {
-    ::rustc_serialize::base64::Config {
-        char_set: ::rustc_serialize::base64::CharacterSet::Standard,
-        newline: ::rustc_serialize::base64::Newline::LF,
+use rustc_serialize::base64::{CharacterSet, Config, Newline};
+
+pub fn get_base64_config() -> Config {
+    Config {
+        char_set: CharacterSet::Standard,
+        newline: Newline::LF,
         pad: true,
         line_length: None,
     }

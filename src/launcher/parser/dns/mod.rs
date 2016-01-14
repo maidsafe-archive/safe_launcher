@@ -15,21 +15,26 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use std::fmt;
+
+use rustc_serialize::Decoder;
+
+use errors::LauncherError;
+use launcher::parser::{ParameterPacket, ResponseType, traits};
+
 mod add_service_v1_0;
 mod register_dns_v1_0;
 
-pub fn action_dispatcher<D>(params: ::launcher::parser::ParameterPacket,
+pub fn action_dispatcher<D>(params: ParameterPacket,
                             mut remaining_tokens: Vec<String>,
                             version: f32,
                             decoder: &mut D)
-                            -> ::launcher::parser::ResponseType
-    where D: ::rustc_serialize::Decoder,
-          D::Error: ::std::fmt::Debug
+                            -> ResponseType
+    where D: Decoder, D::Error: fmt::Debug
 {
     if remaining_tokens.len() > 1 {
-        return Err(::errors::LauncherError::SpecificParseError("Extra unrecognised tokens in \
-                                                                endpoint."
-                                                                   .to_string()));
+        return Err(LauncherError::SpecificParseError("Extra unrecognised tokens in \
+                                                      endpoint.".to_string()));
     }
 
     let action_str = try!(parse_option!(remaining_tokens.pop(),
@@ -43,17 +48,15 @@ pub fn action_dispatcher<D>(params: ::launcher::parser::ParameterPacket,
 fn get_action<D>(action_str: &str,
                  version: f32,
                  decoder: &mut D)
-                 -> Result<Box<::launcher::parser::traits::Action>, ::errors::LauncherError>
-    where D: ::rustc_serialize::Decoder,
-          D::Error: ::std::fmt::Debug
+                 -> Result<Box<traits::Action>, LauncherError>
+    where D: Decoder, D::Error: fmt::Debug
 {
     use rustc_serialize::Decodable;
 
-    let version_err = Err(::errors::LauncherError::SpecificParseError(format!("Unsupported \
-                                                                               version {:?} \
-                                                                               for this endpoin\
-                                                                               t.",
-                                                                              version)));
+    let version_err = Err(LauncherError::SpecificParseError(format!("Unsupported \
+                                                                     version {:?} \
+                                                                     for this endpoint.",
+                                                                    version)));
 
     Ok(match action_str {
         "register-dns" => {
@@ -79,10 +82,9 @@ fn get_action<D>(action_str: &str,
             }
         }
         _ => {
-            return Err(::errors::LauncherError::SpecificParseError(format!("Unsupported action \
-                                                                            {:?} for this \
-                                                                            endpoint.",
-                                                                           action_str)))
+            return Err(LauncherError::SpecificParseError(format!("Unsupported action \
+                                                                  {:?} for this endpoint.",
+                                                                 action_str)))
         }
     })
 }

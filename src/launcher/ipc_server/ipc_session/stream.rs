@@ -15,22 +15,28 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use std::net::TcpStream;
+use std::sync::mpsc;
+
+use bufstream::BufStream;
+
 use maidsafe_utilities::thread::RaiiThreadJoiner;
+use errors::LauncherError;
 
 const STREAM_WRITER_THREAD_NAME: &'static str = "IpcStreamWriterThread";
 
 pub struct IpcStream {
     _raii_joiner: RaiiThreadJoiner,
-    write_sender: ::std::sync::mpsc::Sender<WriterEvent>,
-    reader_stream: ::bufstream::BufStream<::std::net::TcpStream>,
+    write_sender: mpsc::Sender<WriterEvent>,
+    reader_stream: BufStream<::std::net::TcpStream>,
 }
 
 impl IpcStream {
-    pub fn new(stream: ::std::net::TcpStream) -> Result<IpcStream, ::errors::LauncherError> {
+    pub fn new(stream: TcpStream) -> Result<IpcStream, LauncherError> {
         let cloned_stream = try!(stream.try_clone().map_err(|e| {
-            ::errors::LauncherError::IpcStreamCloneError(e)
+            LauncherError::IpcStreamCloneError(e)
         }));
-        let (tx, rx) = ::std::sync::mpsc::channel();
+        let (tx, rx) = mpsc::channel();
 
         let joiner = thread!(STREAM_WRITER_THREAD_NAME, move || {
             IpcStream::handle_write(rx, cloned_stream);
@@ -40,7 +46,7 @@ impl IpcStream {
         Ok(IpcStream {
             _raii_joiner: RaiiThreadJoiner::new(joiner),
             write_sender: tx,
-            reader_stream: ::bufstream::BufStream::new(stream),
+            reader_stream: BufStream::new(stream),
         })
     }
 
@@ -56,7 +62,7 @@ impl IpcStream {
     // Initialising it is an utter waste of cycles and will slow down networking without any
     // benefits if data exchanged are of considerable magnitude and frequency.
     #[allow(unsafe_code)]
-    pub fn read_payload(&mut self) -> Result<Vec<u8>, ::errors::LauncherError> {
+    pub fn read_payload(&mut self) -> Result<Vec<u8>, LauncherError> {
         use byteorder::ReadBytesExt;
 
         let mut size_buffer = [0; 8];
@@ -66,11 +72,11 @@ impl IpcStream {
                             .read_u64::<::byteorder::LittleEndian>()
                             .map_err(|err| {
                                 debug!("{:?}", err);
-                                ::errors::LauncherError::FailedReadingStreamPayloadSize
+                                LauncherError::FailedReadingStreamPayloadSize
                             }));
 
         if size > ::config::MAX_ALLOWED_READ_PAYLOAD_SIZE_BYTES {
-            return Err(::errors::LauncherError::ReadPayloadSizeProhibitive);
+            return Err(LauncherError::ReadPayloadSizeProhibitive);
         }
 
         let mut payload = Vec::with_capacity(size as usize);
@@ -83,20 +89,20 @@ impl IpcStream {
         Ok(payload)
     }
 
-    pub fn write(&mut self, payload: Vec<u8>) -> Result<(), ::errors::LauncherError> {
+    pub fn write(&mut self, payload: Vec<u8>) -> Result<(), LauncherError> {
         Ok(try!(self.write_sender
                     .send(WriterEvent::WritePayload(payload))
                     .map_err(|err| {
                         debug!("Error {:?} sending event {:?}", err, err.0);
-                        ::errors::LauncherError::IpcSessionTerminated(None)
+                        LauncherError::IpcSessionTerminated(None)
                     })))
     }
 
     // This will exit on any error condition the stream writer encounters. The stream reads can
     // continue. The next write event will however immediately notify the caller about the
     // writer channel being hung-up so that IPC Session can be terminated gracefully.
-    fn handle_write(rx: ::std::sync::mpsc::Receiver<WriterEvent>,
-                    mut stream: ::std::net::TcpStream) {
+    fn handle_write(rx: mpsc::Receiver<WriterEvent>,
+                    mut stream: TcpStream) {
         use std::io::Write;
         use byteorder::WriteBytesExt;
 
@@ -109,7 +115,7 @@ impl IpcStream {
                         little_endian_size_bytes.write_u64::<::byteorder::LittleEndian>(size)
                             .map_err(|err| {
                                 debug!("{:?}", err);
-                                ::errors::LauncherError::FailedWritingStreamPayloadSize
+                                LauncherError::FailedWritingStreamPayloadSize
                             }));
 
                     eval_break!(stream.write_all(&little_endian_size_bytes));
@@ -120,21 +126,21 @@ impl IpcStream {
         }
     }
 
-    fn fill_buffer(&mut self, mut buffer_view: &mut [u8]) -> Result<(), ::errors::LauncherError> {
+    fn fill_buffer(&mut self, mut buffer_view: &mut [u8]) -> Result<(), LauncherError> {
         use std::io::Read;
 
         while buffer_view.len() != 0 {
             match self.reader_stream.read(&mut buffer_view) {
                 Ok(rxd_bytes) => {
                     if rxd_bytes == 0 {
-                        return Err(::errors::LauncherError::IpcSessionTerminated(None));
+                        return Err(LauncherError::IpcSessionTerminated(None));
                     }
 
                     let temp_buffer_view = buffer_view;
                     buffer_view = &mut temp_buffer_view[rxd_bytes..];
                 }
                 Err(ref err) if err.kind() == ::std::io::ErrorKind::Interrupted => (),
-                Err(err) => return Err(::errors::LauncherError::IpcSessionTerminated(Some(err))),
+                Err(err) => return Err(LauncherError::IpcSessionTerminated(Some(err))),
             }
         }
 

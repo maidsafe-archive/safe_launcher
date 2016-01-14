@@ -15,6 +15,14 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use std::collections::HashMap;
+use std::net::{Ipv4Addr, TcpListener, TcpStream};
+use std::sync::{Arc, atomic, mpsc, Mutex};
+
+use errors::LauncherError;
+use launcher::ipc_server::ipc_session::events::ExternalEvent;
+use observer::{event_data, IpcObserver};
+use safe_core::client::Client;
 use xor_name::XorName;
 use maidsafe_utilities::thread::RaiiThreadJoiner;
 use maidsafe_utilities::event_sender::EventSender;
@@ -33,34 +41,34 @@ const LISTENER_THIRD_OCTATE_START: u8 = 0;
 const LISTENER_FOURTH_OCTATE_START: u8 = 1;
 
 pub struct IpcServer {
-    client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
+    client: Arc<Mutex<Client>>,
     temp_id: u32,
     _raii_joiner: RaiiThreadJoiner,
-    session_event_tx: ::std::sync::mpsc::Sender<events::IpcSessionEvent>,
-    session_event_rx: ::std::sync::mpsc::Receiver<events::IpcSessionEvent>,
-    listener_event_rx: ::std::sync::mpsc::Receiver<events::IpcListenerEvent>,
-    external_event_rx: ::std::sync::mpsc::Receiver<events::ExternalEvent>,
-    event_catagory_tx: ::std::sync::mpsc::Sender<events::IpcServerEventCategory>,
+    session_event_tx: mpsc::Sender<events::IpcSessionEvent>,
+    session_event_rx: mpsc::Receiver<events::IpcSessionEvent>,
+    listener_event_rx: mpsc::Receiver<events::IpcListenerEvent>,
+    external_event_rx: mpsc::Receiver<events::ExternalEvent>,
+    event_catagory_tx: mpsc::Sender<events::IpcServerEventCategory>,
     listener_endpoint: String,
-    listener_stop_flag: ::std::sync::Arc<::std::sync::atomic::AtomicBool>,
-    verified_sessions: ::std::collections::HashMap<XorName, misc::SessionInfo>,
-    unverified_sessions: ::std::collections::HashMap<u32, misc::SessionInfo>,
-    pending_verifications: ::std::collections::HashMap<String, misc::AppInfo>,
-    verified_session_observers: Vec<::observer::IpcObserver>,
-    unverified_session_observers: Vec<::observer::IpcObserver>,
-    pending_verification_observers: Vec<::observer::IpcObserver>,
+    listener_stop_flag: Arc<atomic::AtomicBool>,
+    verified_sessions: HashMap<XorName, misc::SessionInfo>,
+    unverified_sessions: HashMap<u32, misc::SessionInfo>,
+    pending_verifications: HashMap<String, misc::AppInfo>,
+    verified_session_observers: Vec<IpcObserver>,
+    unverified_session_observers: Vec<IpcObserver>,
+    pending_verification_observers: Vec<IpcObserver>,
 }
 
 impl IpcServer {
-    pub fn new(client: ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>)
+    pub fn new(client: Arc<Mutex<Client>>)
                -> Result<(RaiiThreadJoiner, EventSenderToServer<events::ExternalEvent>),
-                         ::errors::LauncherError> {
-        let (session_event_tx, session_event_rx) = ::std::sync::mpsc::channel();
-        let (listener_event_tx, listener_event_rx) = ::std::sync::mpsc::channel();
-        let (external_event_tx, external_event_rx) = ::std::sync::mpsc::channel();
-        let (event_catagory_tx, event_catagory_rx) = ::std::sync::mpsc::channel();
+                         LauncherError> {
+        let (session_event_tx, session_event_rx) = mpsc::channel();
+        let (listener_event_tx, listener_event_rx) = mpsc::channel();
+        let (external_event_tx, external_event_rx) = mpsc::channel();
+        let (event_catagory_tx, event_catagory_rx) = mpsc::channel();
 
-        let stop_flag = ::std::sync::Arc::new(::std::sync::atomic::AtomicBool::new(false));
+        let stop_flag = Arc::new(atomic::AtomicBool::new(false));
         let listener_event_sender =
             EventSenderToServer::<events::IpcListenerEvent>::new(listener_event_tx,
                 events::IpcServerEventCategory::IpcListenerEvent, event_catagory_tx.clone());
@@ -81,9 +89,9 @@ impl IpcServer {
                 event_catagory_tx: cloned_event_catagory_tx,
                 listener_endpoint: endpoint,
                 listener_stop_flag: stop_flag,
-                verified_sessions: ::std::collections::HashMap::new(),
-                unverified_sessions: ::std::collections::HashMap::new(),
-                pending_verifications: ::std::collections::HashMap::new(),
+                verified_sessions: HashMap::new(),
+                unverified_sessions: HashMap::new(),
+                pending_verifications: HashMap::new(),
                 verified_session_observers: Vec::with_capacity(2),
                 unverified_session_observers: Vec::with_capacity(2),
                 pending_verification_observers: Vec::with_capacity(2),
@@ -103,7 +111,7 @@ impl IpcServer {
     }
 
     fn run(&mut self,
-           event_catagory_rx: ::std::sync::mpsc::Receiver<events::IpcServerEventCategory>) {
+           event_catagory_rx: mpsc::Receiver<events::IpcServerEventCategory>) {
         for event_category in event_catagory_rx.iter() {
             match event_category {
                 events::IpcServerEventCategory::IpcListenerEvent => {
@@ -162,7 +170,7 @@ impl IpcServer {
         }
     }
 
-    fn on_spawn_ipc_session(&mut self, stream: ::std::net::TcpStream) {
+    fn on_spawn_ipc_session(&mut self, stream: TcpStream) {
         let event_sender = EventSenderToServer::<events::IpcSessionEvent>
                                               ::new(self.session_event_tx.clone(),
                                                     events::IpcServerEventCategory::IpcSessionEvent,
@@ -175,9 +183,9 @@ impl IpcServer {
                     debug!("Unverified session existed even after all temporary ids are \
                             exhausted. Terminating that session ...");
                 } else {
-                    let data = ::observer::event_data::UnverifiedSession {
+                    let data = event_data::UnverifiedSession {
                         id: self.temp_id,
-                        action: ::observer::event_data::Action::Added,
+                        action: event_data::Action::Added,
                     };
                     group_send!(data, &mut self.unverified_session_observers);
                 }
@@ -188,7 +196,7 @@ impl IpcServer {
     }
 
     #[allow(unused)]
-    fn on_ipc_listener_aborted(&self, error: Box<::errors::LauncherError>) {
+    fn on_ipc_listener_aborted(&self, error: Box<LauncherError>) {
         let error = *error;
     }
 
@@ -213,9 +221,9 @@ impl IpcServer {
                     debug!("Detected an attempt by an app to connect twice. Previous instance \
                             will be terminated.");
                 } else {
-                    let data = ::observer::event_data::VerifiedSession {
+                    let data = event_data::VerifiedSession {
                         id: app_info.app_id,
-                        action: ::observer::event_data::Action::Added,
+                        action: event_data::Action::Added,
                     };
                     group_send!(data, &mut self.verified_session_observers);
                 }
@@ -228,15 +236,15 @@ impl IpcServer {
             }
         }
 
-        let data = ::observer::event_data::UnverifiedSession {
+        let data = event_data::UnverifiedSession {
             id: temp_id,
-            action: ::observer::event_data::Action::Removed(None),
+            action: event_data::Action::Removed(None),
         };
         group_send!(data, &mut self.unverified_session_observers);
 
-        let data = ::observer::event_data::PendingVerification {
+        let data = event_data::PendingVerification {
             nonce: nonce,
-            action: ::observer::event_data::Action::Removed(None),
+            action: event_data::Action::Removed(None),
         };
         group_send!(data, &mut self.pending_verification_observers);
     }
@@ -249,18 +257,18 @@ impl IpcServer {
             events::event_data::SessionId::AppId(app_id) => {
                 let _ = self.verified_sessions.remove(&*app_id);
 
-                let data = ::observer::event_data::VerifiedSession {
+                let data = event_data::VerifiedSession {
                     id: *app_id,
-                    action: ::observer::event_data::Action::Removed(Some(detail.reason)),
+                    action: event_data::Action::Removed(Some(detail.reason)),
                 };
                 group_send!(data, &mut self.verified_session_observers);
             }
             events::event_data::SessionId::TempId(temp_id) => {
                 let _ = self.unverified_sessions.remove(&temp_id);
 
-                let data = ::observer::event_data::UnverifiedSession {
+                let data = event_data::UnverifiedSession {
                     id: temp_id,
-                    action: ::observer::event_data::Action::Removed(Some(detail.reason)),
+                    action: event_data::Action::Removed(Some(detail.reason)),
                 };
                 group_send!(data, &mut self.unverified_session_observers);
             }
@@ -280,9 +288,9 @@ impl IpcServer {
             error!("Issues like mixed-up safe drive access could arise.");
             error!("Dropping the previous app information and re-assigning nonce to a new app");
         } else {
-            let data = ::observer::event_data::PendingVerification {
+            let data = event_data::PendingVerification {
                 nonce: detail.nonce,
-                action: ::observer::event_data::Action::Added,
+                action: event_data::Action::Added,
             };
             group_send!(data, &mut self.pending_verification_observers);
         }
@@ -293,8 +301,7 @@ impl IpcServer {
 
         if let Some(session_info) = self.verified_sessions.get_mut(&app_id) {
             send_failed = session_info.event_sender.send(
-                ::launcher::ipc_server::ipc_session::events
-                ::ExternalEvent::ChangeSafeDriveAccess(is_allowed)).is_err();
+                ExternalEvent::ChangeSafeDriveAccess(is_allowed)).is_err();
         } else {
             for (_, app_info) in self.pending_verifications.iter_mut() {
                 if app_info.app_id == app_id {
@@ -307,10 +314,10 @@ impl IpcServer {
         if send_failed {
             let _ = self.verified_sessions.remove(&app_id);
 
-            let data = ::observer::event_data::VerifiedSession {
+            let data = event_data::VerifiedSession {
                 id    : app_id,
-                action: ::observer::event_data::Action::Removed(
-                    Some(::errors::LauncherError::ReceiverChannelDisconnected)),
+                action: event_data::Action::Removed(
+                    Some(LauncherError::ReceiverChannelDisconnected)),
             };
             group_send!(data, &mut self.verified_session_observers);
         }
@@ -322,15 +329,15 @@ impl IpcServer {
         }
     }
 
-    fn on_register_verified_session_observer(&mut self, observer: ::observer::IpcObserver) {
+    fn on_register_verified_session_observer(&mut self, observer: IpcObserver) {
         self.verified_session_observers.push(observer);
     }
 
-    fn on_register_unverified_session_observer(&mut self, observer: ::observer::IpcObserver) {
+    fn on_register_unverified_session_observer(&mut self, observer: IpcObserver) {
         self.unverified_session_observers.push(observer);
     }
 
-    fn on_register_pending_verification_observer(&mut self, observer: ::observer::IpcObserver) {
+    fn on_register_pending_verification_observer(&mut self, observer: IpcObserver) {
         self.pending_verification_observers.push(observer);
     }
 
@@ -355,18 +362,18 @@ impl IpcServer {
     }
 
     fn spawn_acceptor(event_sender: EventSenderToServer<events::IpcListenerEvent>,
-                      stop_flag: ::std::sync::Arc<::std::sync::atomic::AtomicBool>)
-                      -> Result<(RaiiThreadJoiner, String), ::errors::LauncherError> {
+                      stop_flag: Arc<atomic::AtomicBool>)
+                      -> Result<(RaiiThreadJoiner, String), LauncherError> {
         let mut third_octate = LISTENER_THIRD_OCTATE_START;
         let mut fourth_octate = LISTENER_FOURTH_OCTATE_START;
 
         let ipc_listener;
 
         loop {
-            let local_ip = ::std::net::Ipv4Addr::new(127, 0, third_octate, fourth_octate);
+            let local_ip = Ipv4Addr::new(127, 0, third_octate, fourth_octate);
             let local_endpoint = (local_ip, 0);
 
-            match ::std::net::TcpListener::bind(local_endpoint) {
+            match TcpListener::bind(local_endpoint) {
                 Ok(listener) => {
                     ipc_listener = listener;
                     break;
@@ -380,7 +387,7 @@ impl IpcServer {
 
                     if fourth_octate == 255 {
                         if third_octate == 255 {
-                            return Err(::errors::LauncherError::IpcListenerCouldNotBeBound);
+                            return Err(LauncherError::IpcListenerCouldNotBeBound);
                         } else {
                             third_octate += 1;
                             fourth_octate = LISTENER_FOURTH_OCTATE_START;
@@ -403,14 +410,14 @@ impl IpcServer {
         Ok((RaiiThreadJoiner::new(joiner), local_endpoint))
     }
 
-    fn handle_accept(ipc_listener: ::std::net::TcpListener,
+    fn handle_accept(ipc_listener: TcpListener,
                      event_sender: EventSenderToServer<events::IpcListenerEvent>,
-                     stop_flag: ::std::sync::Arc<::std::sync::atomic::AtomicBool>) {
+                     stop_flag: Arc<atomic::AtomicBool>) {
         loop {
             match ipc_listener.accept()
-                              .map_err(|e| ::errors::LauncherError::IpcListenerAborted(e)) {
+                              .map_err(|e| LauncherError::IpcListenerAborted(e)) {
                 Ok((stream, _)) => {
-                    if stop_flag.load(::std::sync::atomic::Ordering::SeqCst) {
+                    if stop_flag.load(atomic::Ordering::SeqCst) {
                         break;
                     } else {
                         if let Err(_) =
@@ -432,8 +439,8 @@ impl IpcServer {
 
 impl Drop for IpcServer {
     fn drop(&mut self) {
-        self.listener_stop_flag.store(true, ::std::sync::atomic::Ordering::SeqCst);
-        if let Ok(stream) = ::std::net::TcpStream::connect(&self.listener_endpoint[..]) {
+        self.listener_stop_flag.store(true, atomic::Ordering::SeqCst);
+        if let Ok(stream) = TcpStream::connect(&self.listener_endpoint[..]) {
             if let Err(err) = stream.shutdown(::std::net::Shutdown::Both) {
                 debug!("Error shutting down terminator stream: {:?}", err);
             }
@@ -445,33 +452,36 @@ impl Drop for IpcServer {
 mod test {
     use super::*;
     use std::io::Read;
-    use std::sync::{Arc, Mutex};
+    use std::net::TcpStream;
+    use std::time::Duration;
+    use std::sync::{Arc, mpsc, Mutex};
     use maidsafe_utilities::thread::RaiiThreadJoiner;
+    use safe_core::utility::test_utils;
+    use launcher::ipc_server::events::ExternalEvent;
 
     #[test]
     fn spawn_and_shut_ipc_server() {
         let client =
-            Arc::new(Mutex::new(unwrap_result!(::safe_core::utility::test_utils::get_client())));
+            Arc::new(Mutex::new(unwrap_result!(test_utils::get_client())));
 
         let (_raii_joiner_0, event_sender) = unwrap_result!(IpcServer::new(client));
 
-        let (tx, rx) = ::std::sync::mpsc::channel();
-        unwrap_result!(event_sender.send(
-            ::launcher::ipc_server::events::ExternalEvent::GetListenerEndpoint(tx)));
+        let (tx, rx) = mpsc::channel();
+        unwrap_result!(event_sender.send(ExternalEvent::GetListenerEndpoint(tx)));
         let listener_ep = unwrap_result!(rx.recv());
 
-        let mut stream = unwrap_result!(::std::net::TcpStream::connect(&listener_ep[..]));
+        let mut stream = unwrap_result!(TcpStream::connect(&listener_ep[..]));
 
         let _raii_joiner_1 = RaiiThreadJoiner::new(thread!("ReaderThread", move || {
             let mut buffer = [0; 5];
             assert_eq!(unwrap_result!(stream.read(&mut buffer)), 0);
         }));
 
-        let duration = ::std::time::Duration::from_millis(3000);
+        let duration = Duration::from_millis(3000);
         ::std::thread::sleep(duration);
         // Terminate to exit this test - otherwise the raii_joiners will hang this test - this is
         // by design. So there is no way out but graceful termination which is what this entire
         // design strives for.
-        unwrap_result!(event_sender.send(::launcher::ipc_server::events::ExternalEvent::Terminate));
+        unwrap_result!(event_sender.send(ExternalEvent::Terminate));
     }
 }

@@ -18,22 +18,30 @@
 mod errors;
 mod implementation;
 
+use std::mem;
+
+use libc::{c_char, c_void, int32_t};
+
+use safe_core::client::Client;
+
+use launcher::Launcher;
+
 /// Create an account with SafeNetwork. This or any one of the other companion functions to get a
 /// launcher must be called before initiating any operation allowed by this crate. `launcher_handle`
 /// is a pointer to a pointer and must point to a valid pointer not junk, else the consequences are
 /// undefined.
 #[no_mangle]
 #[allow(unsafe_code)]
-pub extern "C" fn create_account(c_keyword: *const ::libc::c_char,
-                                 c_pin: *const ::libc::c_char,
-                                 c_password: *const ::libc::c_char,
-                                 launcher_handle: *mut *const ::libc::c_void)
-                                 -> ::libc::int32_t {
-    let client = ffi_try!(::safe_core::client::Client::create_account(
+pub extern "C" fn create_account(c_keyword: *const c_char,
+                                 c_pin: *const c_char,
+                                 c_password: *const c_char,
+                                 launcher_handle: *mut *const c_void)
+                                 -> int32_t {
+    let client = ffi_try!(Client::create_account(
         ffi_try!(implementation::c_char_ptr_to_string(c_keyword)),
         ffi_try!(implementation::c_char_ptr_to_string(c_pin)),
         ffi_try!(implementation::c_char_ptr_to_string(c_password))));
-    let launcher = ffi_try!(::launcher::Launcher::new(client));
+    let launcher = ffi_try!(Launcher::new(client));
     unsafe {
         *launcher_handle = cast_to_launcher_ffi_handle(launcher);
     }
@@ -47,16 +55,16 @@ pub extern "C" fn create_account(c_keyword: *const ::libc::c_char,
 /// else the consequences are undefined.
 #[no_mangle]
 #[allow(unsafe_code)]
-pub extern "C" fn log_in(c_keyword: *const ::libc::c_char,
-                         c_pin: *const ::libc::c_char,
-                         c_password: *const ::libc::c_char,
-                         launcher_handle: *mut *const ::libc::c_void)
-                         -> ::libc::int32_t {
-    let client = ffi_try!(::safe_core::client::Client::log_in(
+pub extern "C" fn log_in(c_keyword: *const c_char,
+                         c_pin: *const c_char,
+                         c_password: *const c_char,
+                         launcher_handle: *mut *const c_void)
+                         -> int32_t {
+    let client = ffi_try!(Client::log_in(
         ffi_try!(implementation::c_char_ptr_to_string(c_keyword)),
         ffi_try!(implementation::c_char_ptr_to_string(c_pin)),
         ffi_try!(implementation::c_char_ptr_to_string(c_password))));
-    let launcher = ffi_try!(::launcher::Launcher::new(client));
+    let launcher = ffi_try!(Launcher::new(client));
     unsafe {
         *launcher_handle = cast_to_launcher_ffi_handle(launcher);
     }
@@ -69,26 +77,25 @@ pub extern "C" fn log_in(c_keyword: *const ::libc::c_char,
 ///  `log_in`). Using `launcher_handle` after a call to this functions is undefined behaviour.
 #[no_mangle]
 #[allow(unsafe_code)]
-pub extern "C" fn drop_launcher(launcher_handle: *const ::libc::c_void) {
-    let _ = unsafe { ::std::mem::transmute::<_, Box<::launcher::Launcher>>(launcher_handle) };
+pub extern "C" fn drop_launcher(launcher_handle: *const c_void) {
+    let _ = unsafe { mem::transmute::<_, Box<Launcher>>(launcher_handle) };
 }
 
 #[allow(unsafe_code)]
-fn cast_to_launcher_ffi_handle(launcher: ::launcher::Launcher) -> *const ::libc::c_void {
+fn cast_to_launcher_ffi_handle(launcher: Launcher) -> *const c_void {
     let boxed_launcher = Box::new(launcher);
-    unsafe { ::std::mem::transmute(boxed_launcher) }
+    unsafe { mem::transmute(boxed_launcher) }
 }
 
 // TODO(Spandan) ***W A R N I N G*** This will be UB - make sure to modify after uncommenting
 // #[allow(unsafe_code)]
-// fn cast_from_launcher_ffi_handle(launcher_handle: *const ::libc::c_void)
-//         -> ::launcher::Launcher {
+// fn cast_from_launcher_ffi_handle(launcher_handle: *const c_void) -> Launcher {
 //     let boxed_launcher: Box<::launcher::Launcher> = unsafe {
-//         ::std::mem::transmute(launcher_handle)
+//         mem::transmute(launcher_handle)
 //     };
 //
 //     let launcher = *boxed_launcher;
-//     ::std::mem::forget(boxed_launcher);
+//     mem::forget(boxed_launcher);
 //
 //     launcher
 // }
@@ -97,11 +104,15 @@ fn cast_to_launcher_ffi_handle(launcher: ::launcher::Launcher) -> *const ::libc:
 #[cfg(test)]
 mod test {
     use super::*;
+    use libc::c_void;
     use std::error::Error;
+    use std::ffi::CString;
+    use ffi::errors::FfiError;
+    use safe_core::utility;
 
-    fn generate_random_cstring(len: usize) -> Result<::std::ffi::CString, ::ffi::errors::FfiError> {
+    fn generate_random_cstring(len: usize) -> Result<CString, FfiError> {
         let mut cstring_vec =
-            unwrap_result!(::safe_core::utility::generate_random_vector::<u8>(len));
+            unwrap_result!(utility::generate_random_vector::<u8>(len));
         // Avoid internal nulls and ensure valid ASCII (thus valid utf8)
         for it in cstring_vec.iter_mut() {
             *it %= 128;
@@ -110,8 +121,8 @@ mod test {
             }
         }
 
-        ::std::ffi::CString::new(cstring_vec)
-            .map_err(|error| ::ffi::errors::FfiError::from(error.description()))
+        CString::new(cstring_vec)
+            .map_err(|error| FfiError::from(error.description()))
     }
 
     #[test]
@@ -121,8 +132,8 @@ mod test {
         let cstring_password = unwrap_result!(generate_random_cstring(10));
 
         {
-            let mut launcher_handle = 0 as *const ::libc::c_void;
-            assert_eq!(launcher_handle, 0 as *const ::libc::c_void);
+            let mut launcher_handle = 0 as *const c_void;
+            assert_eq!(launcher_handle, 0 as *const c_void);
 
             {
                 let ptr_to_launcher_handle = &mut launcher_handle;
@@ -134,13 +145,13 @@ mod test {
                                    0);
             }
 
-            assert!(launcher_handle != 0 as *const ::libc::c_void);
+            assert!(launcher_handle != 0 as *const c_void);
             drop_launcher(launcher_handle);
         }
 
         {
-            let mut launcher_handle = 0 as *const ::libc::c_void;
-            assert_eq!(launcher_handle, 0 as *const ::libc::c_void);
+            let mut launcher_handle = 0 as *const c_void;
+            assert_eq!(launcher_handle, 0 as *const c_void);
 
             {
                 let ptr_to_launcher_handle = &mut launcher_handle;
@@ -152,7 +163,7 @@ mod test {
                                    0);
             }
 
-            assert!(launcher_handle != 0 as *const ::libc::c_void);
+            assert!(launcher_handle != 0 as *const c_void);
             drop_launcher(launcher_handle);
         }
     }

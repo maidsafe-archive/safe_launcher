@@ -15,6 +15,11 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use errors::LauncherError;
+use launcher::parser::{helper, ParameterPacket, ResponseType, traits};
+use safe_nfs::helper::file_helper::FileHelper;
+use safe_nfs::helper::writer::Mode;
+
 #[derive(RustcDecodable, Debug)]
 pub struct ModifyFile {
     file_path: String,
@@ -22,19 +27,17 @@ pub struct ModifyFile {
     is_path_shared: bool,
 }
 
-impl ::launcher::parser::traits::Action for ModifyFile {
-    fn execute(&mut self,
-               params: ::launcher::parser::ParameterPacket)
-               -> ::launcher::parser::ResponseType {
+impl traits::Action for ModifyFile {
+    fn execute(&mut self, params: ParameterPacket) -> ResponseType {
         use rustc_serialize::base64::FromBase64;
 
         if self.is_path_shared && !*unwrap_result!(params.safe_drive_access.lock()) {
-            return Err(::errors::LauncherError::PermissionDenied);
+            return Err(LauncherError::PermissionDenied);
         }
 
         if self.new_values.name.is_none() && self.new_values.user_metadata.is_none() &&
            self.new_values.content.is_none() {
-            return Err(::errors::LauncherError::from("Optional parameters could not be parsed"));
+            return Err(LauncherError::from("Optional parameters could not be parsed"));
         }
 
         let start_dir_key = if self.is_path_shared {
@@ -43,18 +46,17 @@ impl ::launcher::parser::traits::Action for ModifyFile {
             &params.app_root_dir_key
         };
 
-        let mut tokens = ::launcher::parser::helper::tokenise_path(&self.file_path, false);
-        let file_name = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
-        let mut dir_of_file =
-            try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
-                                                                    &tokens,
-                                                                    Some(start_dir_key)));
+        let mut tokens = helper::tokenise_path(&self.file_path, false);
+        let file_name = try!(tokens.pop().ok_or(LauncherError::InvalidPath));
+        let mut dir_of_file = try!(helper::get_final_subdirectory(params.client.clone(),
+                                                                  &tokens,
+                                                                  Some(start_dir_key)));
 
         let mut file = try!(dir_of_file.find_file(&file_name)
                                        .map(|file| file.clone())
-                                       .ok_or(::errors::LauncherError::InvalidPath));
+                                       .ok_or(LauncherError::InvalidPath));
 
-        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(params.client);
+        let file_helper = FileHelper::new(params.client);
 
         let mut metadata_updated = false;
         if let Some(ref name) = self.new_values.name {
@@ -75,8 +77,8 @@ impl ::launcher::parser::traits::Action for ModifyFile {
 
         if let Some(ref file_content_params) = self.new_values.content {
             let (mode, offset) = match file_content_params.offset {
-                Some(offset) => (::safe_nfs::helper::writer::Mode::Modify, offset),
-                None => (::safe_nfs::helper::writer::Mode::Overwrite, 0),
+                Some(offset) => (Mode::Modify, offset),
+                None => (Mode::Overwrite, 0),
             };
             let mut writer = try!(file_helper.update_content(file.clone(), mode, dir_of_file));
             let bytes = try!(parse_result!(file_content_params.bytes.from_base64(),
@@ -106,17 +108,18 @@ struct FileContentParams {
 mod test {
     use super::{ModifyFile, FileContentParams, OptionalParams};
     use launcher::parser::traits::Action;
+    use launcher::parser::test_utils;
     use rustc_serialize::base64::ToBase64;
+    use launcher::parser::ParameterPacket;
+    use safe_nfs::helper::directory_helper::DirectoryHelper;
+    use safe_nfs::helper::file_helper::FileHelper;
 
     const TEST_FILE_NAME: &'static str = "test_file.txt";
     const METADATA_BASE64: &'static str = "c2FtcGxlIHRleHQ=";
 
-    fn create_test_file(parameter_packet: &::launcher::parser::ParameterPacket) {
-        let file_helper =
-            ::safe_nfs::helper::file_helper::FileHelper::new(parameter_packet.client.clone());
-        let dir_helper =
-            ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client
-                                                                                       .clone());
+    fn create_test_file(parameter_packet: &ParameterPacket) {
+        let file_helper = FileHelper::new(parameter_packet.client.clone());
+        let dir_helper = DirectoryHelper::new(parameter_packet.client.clone());
         let app_root_dir = unwrap_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
         let writer = unwrap_result!(file_helper.create(TEST_FILE_NAME.to_string(),
                                                        Vec::new(),
@@ -126,8 +129,7 @@ mod test {
 
     #[test]
     fn file_rename() {
-        let parameter_packet =
-            unwrap_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+        let parameter_packet = unwrap_result!(test_utils::get_parameter_packet(false));
 
         create_test_file(&parameter_packet);
 
@@ -143,9 +145,7 @@ mod test {
             is_path_shared: false,
         };
 
-        let dir_helper =
-            ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client
-                                                                                       .clone());
+        let dir_helper = DirectoryHelper::new(parameter_packet.client.clone());
         let mut app_root_dir = unwrap_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
         assert_eq!(app_root_dir.get_files().len(), 1);
         assert!(app_root_dir.find_file(&TEST_FILE_NAME.to_string()).is_some());
@@ -159,8 +159,7 @@ mod test {
 
     #[test]
     fn file_update_user_metadata() {
-        let parameter_packet =
-            unwrap_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+        let parameter_packet = unwrap_result!(test_utils::get_parameter_packet(false));
 
         create_test_file(&parameter_packet);
 
@@ -176,9 +175,7 @@ mod test {
             is_path_shared: false,
         };
 
-        let dir_helper =
-            ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client
-                                                                                       .clone());
+        let dir_helper = DirectoryHelper::new(parameter_packet.client.clone());
         let app_root_dir = unwrap_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
         let file = unwrap_option!(app_root_dir.find_file(&TEST_FILE_NAME.to_string()),
                                   "File not found");
@@ -197,8 +194,7 @@ mod test {
 
     #[test]
     fn file_update_content() {
-        let parameter_packet =
-            unwrap_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+        let parameter_packet = unwrap_result!(test_utils::get_parameter_packet(false));
 
         create_test_file(&parameter_packet);
 
@@ -219,9 +215,7 @@ mod test {
             is_path_shared: false,
         };
 
-        let dir_helper =
-            ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client
-                                                                                       .clone());
+        let dir_helper = DirectoryHelper::new(parameter_packet.client.clone());
         let app_root_dir = unwrap_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
         let file = unwrap_option!(app_root_dir.find_file(&TEST_FILE_NAME.to_string()),
                                   "File not found");

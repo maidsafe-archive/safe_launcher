@@ -17,19 +17,17 @@
 
 use xor_name::XorName;
 use maidsafe_utilities::thread::RaiiThreadJoiner;
+use launcher::ipc_server::ipc_session::{events, EventSenderToSession};
+use safe_nfs::metadata::directory_key::DirectoryKey;
 
 pub struct SessionInfo {
     pub _raii_joiner: RaiiThreadJoiner,
-    pub event_sender: ::launcher
-                      ::ipc_server
-                      ::ipc_session::EventSenderToSession<::launcher::ipc_server::ipc_session
-                                                          ::events::ExternalEvent>,
+    pub event_sender: EventSenderToSession<events::ExternalEvent>,
 }
 
 impl SessionInfo {
     pub fn new(raii_joiner : RaiiThreadJoiner,
-               event_sender: ::launcher::ipc_server::ipc_session::EventSenderToSession<
-                   ::launcher::ipc_server::ipc_session::events::ExternalEvent>) -> SessionInfo {
+               event_sender: EventSenderToSession<events::ExternalEvent>) -> SessionInfo {
         SessionInfo {
             _raii_joiner: raii_joiner,
             event_sender: event_sender,
@@ -39,9 +37,7 @@ impl SessionInfo {
 
 impl Drop for SessionInfo {
     fn drop(&mut self) {
-        if let Err(err) =
-               self.event_sender
-                   .send(::launcher::ipc_server::ipc_session::events::ExternalEvent::Terminate) {
+        if let Err(err) = self.event_sender.send(events::ExternalEvent::Terminate) {
             debug!("Failed to send terminate event to session {:?}", err);
         }
     }
@@ -49,13 +45,13 @@ impl Drop for SessionInfo {
 
 pub struct AppInfo {
     pub app_id: XorName,
-    pub app_root_dir_key: ::safe_nfs::metadata::directory_key::DirectoryKey,
+    pub app_root_dir_key: DirectoryKey,
     pub safe_drive_access: bool,
 }
 
 impl AppInfo {
     pub fn new(app_id: XorName,
-               app_root_dir_key: ::safe_nfs::metadata::directory_key::DirectoryKey,
+               app_root_dir_key: DirectoryKey,
                safe_drive_access: bool)
                -> AppInfo {
         AppInfo {

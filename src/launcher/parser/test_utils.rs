@@ -15,30 +15,36 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use std::sync::{Arc, Mutex};
+
+use errors::LauncherError;
+use launcher::parser::ParameterPacket;
+use safe_core::utility::test_utils;
+use safe_nfs::helper::directory_helper::DirectoryHelper;
+use safe_nfs::{AccessLevel, UNVERSIONED_DIRECTORY_LISTING_TAG};
+
 pub fn get_parameter_packet
     (has_safe_drive_access: bool)
-     -> Result<::launcher::parser::ParameterPacket, ::errors::LauncherError> {
-    let client = ::std::sync::Arc::new(::std::sync::Mutex::new(
-        try!(::safe_core::utility::test_utils::get_client())));
-    let directory_helper =
-        ::safe_nfs::helper::directory_helper::DirectoryHelper::new(client.clone());
+     -> Result<ParameterPacket, LauncherError> {
+    let client = Arc::new(Mutex::new(try!(test_utils::get_client())));
+    let directory_helper = DirectoryHelper::new(client.clone());
     let mut user_root_dir = try!(directory_helper.get_user_root_directory_listing());
     let (safe_drive, _) = try!(directory_helper.create(::config::SAFE_DRIVE_DIR_NAME.to_string(),
-                                     ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
-                                     Vec::new(),
-                                     false,
-                                     ::safe_nfs::AccessLevel::Private,
-                                     Some(&mut user_root_dir)));
+                               UNVERSIONED_DIRECTORY_LISTING_TAG,
+                               Vec::new(),
+                               false,
+                               AccessLevel::Private,
+                               Some(&mut user_root_dir)));
     let (test_app, _) = try!(directory_helper.create("Test_Application".to_string(),
-                                                     ::safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG,
+                                                     UNVERSIONED_DIRECTORY_LISTING_TAG,
                                                      Vec::new(),
                                                      false,
-                                                     ::safe_nfs::AccessLevel::Private,
+                                                     AccessLevel::Private,
                                                      Some(&mut user_root_dir)));
-    Ok(::launcher::parser::ParameterPacket {
+    Ok(ParameterPacket {
         client: client,
         app_root_dir_key: test_app.get_key().clone(),
-        safe_drive_access: ::std::sync::Arc::new(::std::sync::Mutex::new(has_safe_drive_access)),
+        safe_drive_access: Arc::new(Mutex::new(has_safe_drive_access)),
         safe_drive_dir_key: safe_drive.get_key().clone(),
     })
 }

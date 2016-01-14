@@ -15,30 +15,29 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
-pub fn perform_ecdh_exchange(ipc_stream : &mut ::launcher::ipc_server::ipc_session
-                                               ::stream::IpcStream,
-                             app_nonce  : ::sodiumoxide::crypto::box_::Nonce,
-                             app_pub_key: ::sodiumoxide::crypto::box_::PublicKey)
-        -> Result<(::sodiumoxide::crypto::secretbox::Nonce,
-                   ::sodiumoxide::crypto::secretbox::Key),
-                   ::errors::LauncherError> {
+use sodiumoxide::crypto::{box_, secretbox};
+
+use errors::LauncherError;
+use launcher::ipc_server::ipc_session::stream::IpcStream;
+
+pub fn perform_ecdh_exchange(ipc_stream : &mut IpcStream,
+                             app_nonce  : box_::Nonce,
+                             app_pub_key: box_::PublicKey)
+        -> Result<(secretbox::Nonce, secretbox::Key), LauncherError> {
     use rustc_serialize::base64::ToBase64;
+    use rustc_serialize::json;
 
-    let key = ::sodiumoxide::crypto::secretbox::gen_key();
-    let nonce = ::sodiumoxide::crypto::secretbox::gen_nonce();
+    let key = secretbox::gen_key();
+    let nonce = secretbox::gen_nonce();
 
-    let (launcher_public_key, launcher_secret_key) = ::sodiumoxide::crypto::box_::gen_keypair();
+    let (launcher_public_key, launcher_secret_key) = box_::gen_keypair();
 
-    let mut data = [0u8; ::sodiumoxide::crypto::secretbox::NONCEBYTES +
-                         ::sodiumoxide::crypto::secretbox::KEYBYTES];
+    let mut data = [0u8; secretbox::NONCEBYTES + secretbox::KEYBYTES];
     for (i, item) in nonce.0.iter().chain(key.0.iter()).enumerate() {
         data[i] = *item;
     }
 
-    let cipher_text = ::sodiumoxide::crypto::box_::seal(&data,
-                                                        &app_nonce,
-                                                        &app_pub_key,
-                                                        &launcher_secret_key);
+    let cipher_text = box_::seal(&data, &app_nonce, &app_pub_key, &launcher_secret_key);
 
     let b64_config = ::config::get_base64_config();
     let launcher_pub_key_base64 = launcher_public_key.0.to_base64(b64_config);
@@ -54,7 +53,7 @@ pub fn perform_ecdh_exchange(ipc_stream : &mut ::launcher::ipc_server::ipc_sessi
         data: response,
     };
 
-    let payload = try!(::rustc_serialize::json::encode(&json_packet));
+    let payload = try!(json::encode(&json_packet));
 
     try!(ipc_stream.write(payload.into_bytes()));
 
