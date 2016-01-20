@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Blob","Blob represents a File - Music, Video, Text etc"],["Container","Container Repersents a Directory. Container can have its own metadata, sub-containers and files"],["ContainerInfo","Wrapper over DirectoryInfo to present Rest-friendly name to the Restful interface users"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Data","This is the data types routing handles in the public interface"],["DataRequest","DataRequest."],["ImmutableDataType","The type of an individual copy of immutable data."]],"struct":[["ImmutableData","An immutable chunk of data."],["PlainData","Plain data with a name and a value."],["StructuredData","Mutable structured data."]]});

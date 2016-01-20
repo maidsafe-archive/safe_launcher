@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Node` struct in crate `routing`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Node">
+
+    <title>routing::Node - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../routing/index.html'><img src='https://raw.githubusercontent.com/maidsafe/QA/master/Images/maidsafe_logo.png' alt='' width='100'></a>
+        <p class='location'><a href='index.html'>routing</a></p><script>window.sidebarCurrent = {name: 'Node', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>routing</a>::<wbr><a class='struct' href=''>Node</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-4658' class='srclink' href='../src/routing/node.rs.html#42-47' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Node {
+    // some fields omitted
+}</pre><div class='docblock'><p>Interface for sending and receiving messages to and from other nodes, in the role of a full
+routing node.</p>
+
+<p>A node is a part of the network that can route messages and be member of a group authority. Its
+methods can be used to send requests and responses as either an individual <code>ManagedNode</code> or as
+a part of a group authority. Their <code>src</code> argument indicates that role, so it must always either
+be the <code>ManagedNode</code> with this node&#39;s name, or the <code>ClientManager</code> or <code>NodeManager</code> or
+<code>NaeManager</code> with the address of a client, node or data element that this node is close to.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../routing/struct.Node.html' title='routing::Node'>Node</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(event_sender: <a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mpsc/struct.Sender.html' title='std::sync::mpsc::Sender'>Sender</a>&lt;<a class='enum' href='../routing/enum.Event.html' title='routing::Event'>Event</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../routing/struct.Node.html' title='routing::Node'>Node</a>, <a class='enum' href='../routing/enum.RoutingError.html' title='routing::RoutingError'>RoutingError</a>&gt;</code></h4>
+<div class='docblock'><p>Create a new <code>Node</code>.</p>
+
+<p>It will automatically connect to the network in the same way a client does, but then
+request a new name and integrate itself into the network using the new name.</p>
+
+<p>The intial <code>Node</code> object will have newly generated keys.</p>
+</div><h4 id='method.send_get_request' class='method'><code>fn <a href='#method.send_get_request' class='fnname'>send_get_request</a>(&amp;self, src: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, dst: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, data_request: <a class='enum' href='../routing/enum.DataRequest.html' title='routing::DataRequest'>DataRequest</a>, id: <a class='struct' href='../routing/struct.MessageId.html' title='routing::MessageId'>MessageId</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../routing/enum.InterfaceError.html' title='routing::InterfaceError'>InterfaceError</a>&gt;</code></h4>
+<div class='docblock'><p>Send a <code>Get</code> request to <code>dst</code> to retrieve data from the network.</p>
+</div><h4 id='method.send_put_request' class='method'><code>fn <a href='#method.send_put_request' class='fnname'>send_put_request</a>(&amp;self, src: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, dst: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, data: <a class='enum' href='../routing/enum.Data.html' title='routing::Data'>Data</a>, id: <a class='struct' href='../routing/struct.MessageId.html' title='routing::MessageId'>MessageId</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../routing/enum.InterfaceError.html' title='routing::InterfaceError'>InterfaceError</a>&gt;</code></h4>
+<div class='docblock'><p>Send a <code>Put</code> request to <code>dst</code> to store data on the network.</p>
+</div><h4 id='method.send_post_request' class='method'><code>fn <a href='#method.send_post_request' class='fnname'>send_post_request</a>(&amp;self, src: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, dst: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, data: <a class='enum' href='../routing/enum.Data.html' title='routing::Data'>Data</a>, id: <a class='struct' href='../routing/struct.MessageId.html' title='routing::MessageId'>MessageId</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../routing/enum.InterfaceError.html' title='routing::InterfaceError'>InterfaceError</a>&gt;</code></h4>
+<div class='docblock'><p>Send a <code>Post</code> request to <code>dst</code> to modify data on the network.</p>
+</div><h4 id='method.send_delete_request' class='method'><code>fn <a href='#method.send_delete_request' class='fnname'>send_delete_request</a>(&amp;self, src: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, dst: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, data: <a class='enum' href='../routing/enum.Data.html' title='routing::Data'>Data</a>, id: <a class='struct' href='../routing/struct.MessageId.html' title='routing::MessageId'>MessageId</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../routing/enum.InterfaceError.html' title='routing::InterfaceError'>InterfaceError</a>&gt;</code></h4>
+<div class='docblock'><p>Send a <code>Delete</code> request to <code>dst</code> to remove data from the network.</p>
+</div><h4 id='method.send_get_success' class='method'><code>fn <a href='#method.send_get_success' class='fnname'>send_get_success</a>(&amp;self, src: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, dst: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, data: <a class='enum' href='../routing/enum.Data.html' title='routing::Data'>Data</a>, id: <a class='struct' href='../routing/struct.MessageId.html' title='routing::MessageId'>MessageId</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../routing/enum.InterfaceError.html' title='routing::InterfaceError'>InterfaceError</a>&gt;</code></h4>
+<div class='docblock'><p>Respond to a <code>Get</code> request indicating success and sending the requested data.</p>
+</div><h4 id='method.send_get_failure' class='method'><code>fn <a href='#method.send_get_failure' class='fnname'>send_get_failure</a>(&amp;self, src: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, dst: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, request: <a class='struct' href='../routing/struct.RequestMessage.html' title='routing::RequestMessage'>RequestMessage</a>, external_error_indicator: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;, id: <a class='struct' href='../routing/struct.MessageId.html' title='routing::MessageId'>MessageId</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../routing/enum.InterfaceError.html' title='routing::InterfaceError'>InterfaceError</a>&gt;</code></h4>
+<div class='docblock'><p>Respond to a <code>Get</code> request indicating failure.</p>
+</div><h4 id='method.send_put_success' class='method'><code>fn <a href='#method.send_put_success' class='fnname'>send_put_success</a>(&amp;self, src: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, dst: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, request_hash: <a class='struct' href='../sodiumoxide/crypto/hash/sha512/struct.Digest.html' title='sodiumoxide::crypto::hash::sha512::Digest'>Digest</a>, id: <a class='struct' href='../routing/struct.MessageId.html' title='routing::MessageId'>MessageId</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../routing/enum.InterfaceError.html' title='routing::InterfaceError'>InterfaceError</a>&gt;</code></h4>
+<div class='docblock'><p>Respond to a <code>Put</code> request indicating success.</p>
+</div><h4 id='method.send_put_failure' class='method'><code>fn <a href='#method.send_put_failure' class='fnname'>send_put_failure</a>(&amp;self, src: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, dst: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, request: <a class='struct' href='../routing/struct.RequestMessage.html' title='routing::RequestMessage'>RequestMessage</a>, external_error_indicator: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;, id: <a class='struct' href='../routing/struct.MessageId.html' title='routing::MessageId'>MessageId</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../routing/enum.InterfaceError.html' title='routing::InterfaceError'>InterfaceError</a>&gt;</code></h4>
+<div class='docblock'><p>Respond to a <code>Put</code> request indicating failure.</p>
+</div><h4 id='method.send_post_success' class='method'><code>fn <a href='#method.send_post_success' class='fnname'>send_post_success</a>(&amp;self, src: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, dst: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, request_hash: <a class='struct' href='../sodiumoxide/crypto/hash/sha512/struct.Digest.html' title='sodiumoxide::crypto::hash::sha512::Digest'>Digest</a>, id: <a class='struct' href='../routing/struct.MessageId.html' title='routing::MessageId'>MessageId</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../routing/enum.InterfaceError.html' title='routing::InterfaceError'>InterfaceError</a>&gt;</code></h4>
+<div class='docblock'><p>Respond to a <code>Post</code> request indicating success.</p>
+</div><h4 id='method.send_post_failure' class='method'><code>fn <a href='#method.send_post_failure' class='fnname'>send_post_failure</a>(&amp;self, src: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, dst: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, request: <a class='struct' href='../routing/struct.RequestMessage.html' title='routing::RequestMessage'>RequestMessage</a>, external_error_indicator: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;, id: <a class='struct' href='../routing/struct.MessageId.html' title='routing::MessageId'>MessageId</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../routing/enum.InterfaceError.html' title='routing::InterfaceError'>InterfaceError</a>&gt;</code></h4>
+<div class='docblock'><p>Respond to a <code>Post</code> request indicating failure.</p>
+</div><h4 id='method.send_delete_success' class='method'><code>fn <a href='#method.send_delete_success' class='fnname'>send_delete_success</a>(&amp;self, src: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, dst: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, request_hash: <a class='struct' href='../sodiumoxide/crypto/hash/sha512/struct.Digest.html' title='sodiumoxide::crypto::hash::sha512::Digest'>Digest</a>, id: <a class='struct' href='../routing/struct.MessageId.html' title='routing::MessageId'>MessageId</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../routing/enum.InterfaceError.html' title='routing::InterfaceError'>InterfaceError</a>&gt;</code></h4>
+<div class='docblock'><p>Respond to a <code>Delete</code> request indicating success.</p>
+</div><h4 id='method.send_delete_failure' class='method'><code>fn <a href='#method.send_delete_failure' class='fnname'>send_delete_failure</a>(&amp;self, src: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, dst: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, request: <a class='struct' href='../routing/struct.RequestMessage.html' title='routing::RequestMessage'>RequestMessage</a>, external_error_indicator: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;, id: <a class='struct' href='../routing/struct.MessageId.html' title='routing::MessageId'>MessageId</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../routing/enum.InterfaceError.html' title='routing::InterfaceError'>InterfaceError</a>&gt;</code></h4>
+<div class='docblock'><p>Respond to a <code>Delete</code> request indicating failure.</p>
+</div><h4 id='method.send_refresh_request' class='method'><code>fn <a href='#method.send_refresh_request' class='fnname'>send_refresh_request</a>(&amp;self, src: <a class='enum' href='../routing/enum.Authority.html' title='routing::Authority'>Authority</a>, content: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../routing/enum.InterfaceError.html' title='routing::InterfaceError'>InterfaceError</a>&gt;</code></h4>
+<div class='docblock'><p>Send a <code>Refresh</code> request from <code>src</code> to <code>src</code> to trigger churn.</p>
+
+<p>This is intended to be sent from a group authority (<code>src</code>) to itself whenever a node joins
+or leaves the group. If the quorum is reached, i. e. enough members agree that a change has
+happened, the churn mechanism is triggered to adapt to the change.</p>
+</div><h4 id='method.close_group' class='method'><code>fn <a href='#method.close_group' class='fnname'>close_group</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../xor_name/struct.XorName.html' title='xor_name::XorName'>XorName</a>&gt;, <a class='enum' href='../routing/enum.InterfaceError.html' title='routing::InterfaceError'>InterfaceError</a>&gt;</code></h4>
+<div class='docblock'><p>Returns the names of the nodes in the routing table which are closest to this one.</p>
+</div><h4 id='method.name' class='method'><code>fn <a href='#method.name' class='fnname'>name</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../xor_name/struct.XorName.html' title='xor_name::XorName'>XorName</a>, <a class='enum' href='../routing/enum.InterfaceError.html' title='routing::InterfaceError'>InterfaceError</a>&gt;</code></h4>
+<div class='docblock'><p>Returns the name of this node.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../routing/struct.Node.html' title='routing::Node'>Node</a></code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "routing";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script async src="../search-index.js"></script>
+</body>
+</html>

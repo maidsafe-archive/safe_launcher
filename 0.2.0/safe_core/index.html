@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `safe_core` crate.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, safe_core">
+
+    <title>safe_core - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../safe_core/index.html'><img src='https://raw.githubusercontent.com/maidsafe/QA/master/Images/maidsafe_logo.png' alt='' width='100'></a>
+        <p class='location'></p><script>window.sidebarCurrent = {name: 'safe_core', ty: 'mod', relpath: '../'};</script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>safe_core</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-0' class='srclink' href='../src/safe_core/lib.rs.html#18-72' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'>
+<h1 id='safe-core-library' class='section-header'><a href='#safe-core-library'>Safe-Core Library</a></h1>
+<p><a href="https://github.com/maidsafe/safe_core">Project github page</a></p>
+</div><h2 id='reexports' class='section-header'><a href="#reexports">Reexports</a></h2>
+<table><tr><td><code>pub use self_encryption_storage::<a class='struct' href='../safe_core/self_encryption_storage/struct.SelfEncryptionStorage.html' title='safe_core::self_encryption_storage::SelfEncryptionStorage'>SelfEncryptionStorage</a>;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='client/index.html'
+                               title='safe_core::client'>client</a></td>
+                        <td class='docblock short'>
+                             <p>Self-Authentication and Gateway Module</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='errors/index.html'
+                               title='safe_core::errors'>errors</a></td>
+                        <td class='docblock short'>
+                             <p>Safe-Core Errors</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='id/index.html'
+                               title='safe_core::id'>id</a></td>
+                        <td class='docblock short'>
+                             <p>Public and Private Id types</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='self_encryption_storage/index.html'
+                               title='safe_core::self_encryption_storage'>self_encryption_storage</a></td>
+                        <td class='docblock short'>
+                             <p>Implements the Self Encryption storage trait</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='structured_data_operations/index.html'
+                               title='safe_core::structured_data_operations'>structured_data_operations</a></td>
+                        <td class='docblock short'>
+                             <p>Helper functions to handle StructuredData related operations</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='translated_events/index.html'
+                               title='safe_core::translated_events'>translated_events</a></td>
+                        <td class='docblock short'>
+                             <p>Events filtered from set of Routing provided events, on which the Client Modules must
+specifically act</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='utility/index.html'
+                               title='safe_core::utility'>utility</a></td>
+                        <td class='docblock short'>
+                             <p>Utility functions</p>
+
+                        </td>
+                    </tr>
+                </table><h2 id='constants' class='section-header'><a href="#constants">Constants</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='constant' href='constant.CLIENT_STRUCTURED_DATA_TAG.html'
+                               title='safe_core::CLIENT_STRUCTURED_DATA_TAG'>CLIENT_STRUCTURED_DATA_TAG</a></td>
+                        <td class='docblock short'>
+                             <p>All StructuredData tagging should positive-offset from this if the operation needs to go
+through this safe_core crate</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='constant' href='constant.MAIDSAFE_TAG.html'
+                               title='safe_core::MAIDSAFE_TAG'>MAIDSAFE_TAG</a></td>
+                        <td class='docblock short'>
+                             <p>All Maidsafe tagging should positive-offset from this</p>
+
+                        </td>
+                    </tr>
+                </table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "safe_core";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script defer src="../search-index.js"></script>
+</body>
+</html>

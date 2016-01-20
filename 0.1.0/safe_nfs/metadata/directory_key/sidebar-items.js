@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["DirectoryKey","DirectoryKey represnts the meta information about a directory A directory can be feteched with the DirectoryKey"]]});

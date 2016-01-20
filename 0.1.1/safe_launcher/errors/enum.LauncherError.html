@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `LauncherError` enum in crate `safe_launcher`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, LauncherError">
+
+    <title>safe_launcher::errors::LauncherError - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../../safe_launcher/index.html'><img src='https://raw.githubusercontent.com/maidsafe/QA/master/Images/maidsafe_logo.png' alt='' width='100'></a>
+        <p class='location'><a href='../index.html'>safe_launcher</a>::<wbr><a href='index.html'>errors</a></p><script>window.sidebarCurrent = {name: 'LauncherError', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content enum">
+<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>safe_launcher</a>::<wbr><a href='index.html'>errors</a>::<wbr><a class='enum' href=''>LauncherError</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-160' class='srclink' href='../../src/safe_launcher/errors.rs.html#23-75' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum LauncherError {
+    CoreError(<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;),
+    NfsError(<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;),
+    DnsError(<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='enum' href='../../safe_dns/errors/enum.DnsError.html' title='safe_dns::errors::DnsError'>DnsError</a>&gt;),
+    IpcListenerCouldNotBeBound,
+    IpcListenerAborted(<a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>),
+    IpcStreamCloneError(<a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>),
+    ReceiverChannelDisconnected,
+    IpcSessionTerminated(<a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt;),
+    FailedReadingStreamPayloadSize,
+    FailedWritingStreamPayloadSize,
+    PathNotFound,
+    InvalidPath,
+    PermissionDenied,
+    JsonParseError(<a class='enum' href='../../rustc_serialize/json/enum.ParserError.html' title='rustc_serialize::json::ParserError'>ParserError</a>),
+    JsonDecodeError(<a class='enum' href='../../rustc_serialize/json/enum.DecoderError.html' title='rustc_serialize::json::DecoderError'>DecoderError</a>),
+    SpecificParseError(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>),
+    JsonEncodeError(<a class='enum' href='../../rustc_serialize/json/enum.EncoderError.html' title='rustc_serialize::json::EncoderError'>EncoderError</a>),
+    SymmetricDecipherFailure,
+    AppAlreadyAdded,
+    AppNotRegistered,
+    AppActivationFailed(<a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>),
+    ReadPayloadSizeProhibitive,
+    LocalConfigAccessFailed(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>),
+    Unexpected(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>),
+}</pre><div class='docblock'><p>Launcher Errors</p>
+</div><h2 class='variants'>Variants</h2>
+<table><tr><td id='variant.CoreError'><code>CoreError</code></td><td><div class='docblock'><p>Error from safe_core. Boxed to hold a pointer instead of value so that this enum variant is
+not insanely bigger than others.</p>
+</div></td></tr><tr><td id='variant.NfsError'><code>NfsError</code></td><td><div class='docblock'><p>Errors from safe_nfs</p>
+</div></td></tr><tr><td id='variant.DnsError'><code>DnsError</code></td><td><div class='docblock'><p>Errors from safe_nfs</p>
+</div></td></tr><tr><td id='variant.IpcListenerCouldNotBeBound'><code>IpcListenerCouldNotBeBound</code></td><td><div class='docblock'><p>Ipc Listener could not be bound to an endpoint</p>
+</div></td></tr><tr><td id='variant.IpcListenerAborted'><code>IpcListenerAborted</code></td><td><div class='docblock'><p>The Ipc Listener has errored out. New apps will no longer be able to connect to Launcher</p>
+</div></td></tr><tr><td id='variant.IpcStreamCloneError'><code>IpcStreamCloneError</code></td><td><div class='docblock'><p>The Ipc Stream could not be cloned</p>
+</div></td></tr><tr><td id='variant.ReceiverChannelDisconnected'><code>ReceiverChannelDisconnected</code></td><td><div class='docblock'><p>mpsc receiver has hung up</p>
+</div></td></tr><tr><td id='variant.IpcSessionTerminated'><code>IpcSessionTerminated</code></td><td><div class='docblock'><p>IpcSession has been terminated due to either graceful shutdown or some error as indicated</p>
+</div></td></tr><tr><td id='variant.FailedReadingStreamPayloadSize'><code>FailedReadingStreamPayloadSize</code></td><td><div class='docblock'><p>Could not read the payload size from stream</p>
+</div></td></tr><tr><td id='variant.FailedWritingStreamPayloadSize'><code>FailedWritingStreamPayloadSize</code></td><td><div class='docblock'><p>Could not write the payload size to stream</p>
+</div></td></tr><tr><td id='variant.PathNotFound'><code>PathNotFound</code></td><td><div class='docblock'><p>Unable to find/traverse directory or file path</p>
+</div></td></tr><tr><td id='variant.InvalidPath'><code>InvalidPath</code></td><td><div class='docblock'><p>Supplied path was invalid</p>
+</div></td></tr><tr><td id='variant.PermissionDenied'><code>PermissionDenied</code></td><td><div class='docblock'><p>Permission denied - e.g. permission to access SAFEDrive etc.</p>
+</div></td></tr><tr><td id='variant.JsonParseError'><code>JsonParseError</code></td><td><div class='docblock'><p>Could not parse payload as a valid JSON</p>
+</div></td></tr><tr><td id='variant.JsonDecodeError'><code>JsonDecodeError</code></td><td><div class='docblock'><p>Could not decode valid JSON into expected Structures probably because a mandatory field was
+missing or a field was wrongly named etc.</p>
+</div></td></tr><tr><td id='variant.SpecificParseError'><code>SpecificParseError</code></td><td><div class='docblock'><p>JSON non-conforming to the Launcher RFC and not covered by JsonDecodeError, e.g. things
+like invalid base64 formatting, unreasonable/unexpected indexing, ranges etc.</p>
+</div></td></tr><tr><td id='variant.JsonEncodeError'><code>JsonEncodeError</code></td><td><div class='docblock'><p>Error encoding into Json String</p>
+</div></td></tr><tr><td id='variant.SymmetricDecipherFailure'><code>SymmetricDecipherFailure</code></td><td><div class='docblock'><p>Symmetric Deciphering failed for a cipher text</p>
+</div></td></tr><tr><td id='variant.AppAlreadyAdded'><code>AppAlreadyAdded</code></td><td><div class='docblock'><p>This path to binary has already been added on this machine</p>
+</div></td></tr><tr><td id='variant.AppNotRegistered'><code>AppNotRegistered</code></td><td><div class='docblock'><p>The given app is not managed by Launcher</p>
+</div></td></tr><tr><td id='variant.AppActivationFailed'><code>AppActivationFailed</code></td><td><div class='docblock'><p>Starting of App as an external process has failed</p>
+</div></td></tr><tr><td id='variant.ReadPayloadSizeProhibitive'><code>ReadPayloadSizeProhibitive</code></td><td><div class='docblock'><p>Payload to read is prohibitive in size</p>
+</div></td></tr><tr><td id='variant.LocalConfigAccessFailed'><code>LocalConfigAccessFailed</code></td><td><div class='docblock'><p>Unable to Read from or Write to a Local Config file.</p>
+</div></td></tr><tr><td id='variant.Unexpected'><code>Unexpected</code></td><td><div class='docblock'><p>Unexpected - Probably a Logic error</p>
+</div></td></tr></table><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;&amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt; for <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a></code></h3><div class='impl-items'><h4 id='method.from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html#method.from' class='fnname'>from</a>(error: &amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;<a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt; for <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a></code></h3><div class='impl-items'><h4 id='method.from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html#method.from' class='fnname'>from</a>(error: <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>) -&gt; <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;<a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt; for <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a></code></h3><div class='impl-items'><h4 id='method.from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html#method.from' class='fnname'>from</a>(error: <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>) -&gt; <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;<a class='enum' href='../../safe_dns/errors/enum.DnsError.html' title='safe_dns::errors::DnsError'>DnsError</a>&gt; for <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a></code></h3><div class='impl-items'><h4 id='method.from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html#method.from' class='fnname'>from</a>(error: <a class='enum' href='../../safe_dns/errors/enum.DnsError.html' title='safe_dns::errors::DnsError'>DnsError</a>) -&gt; <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;<a class='enum' href='../../rustc_serialize/json/enum.ParserError.html' title='rustc_serialize::json::ParserError'>ParserError</a>&gt; for <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a></code></h3><div class='impl-items'><h4 id='method.from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html#method.from' class='fnname'>from</a>(error: <a class='enum' href='../../rustc_serialize/json/enum.ParserError.html' title='rustc_serialize::json::ParserError'>ParserError</a>) -&gt; <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;<a class='enum' href='../../rustc_serialize/json/enum.EncoderError.html' title='rustc_serialize::json::EncoderError'>EncoderError</a>&gt; for <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a></code></h3><div class='impl-items'><h4 id='method.from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html#method.from' class='fnname'>from</a>(error: <a class='enum' href='../../rustc_serialize/json/enum.EncoderError.html' title='rustc_serialize::json::EncoderError'>EncoderError</a>) -&gt; <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;<a class='enum' href='../../rustc_serialize/json/enum.DecoderError.html' title='rustc_serialize::json::DecoderError'>DecoderError</a>&gt; for <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a></code></h3><div class='impl-items'><h4 id='method.from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html#method.from' class='fnname'>from</a>(error: <a class='enum' href='../../rustc_serialize/json/enum.DecoderError.html' title='rustc_serialize::json::DecoderError'>DecoderError</a>) -&gt; <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>&gt; for <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a></code></h3><div class='impl-items'><h4 id='method.into' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html#method.into' class='fnname'>into</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#method.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "safe_launcher";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script async src="../../search-index.js"></script>
+</body>
+</html>

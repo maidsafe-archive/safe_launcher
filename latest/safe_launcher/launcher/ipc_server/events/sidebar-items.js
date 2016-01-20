@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ExternalEvent","This is an event subset to be used by external codes to communicate with the IPC handling module. Observer registration facilities may be availed for notifications."]]});

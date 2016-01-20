@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["FileHelper","File provides helper functions to perform Operations on Files"]]});

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `safe_nfs` crate.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, safe_nfs">
+
+    <title>safe_nfs - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../safe_nfs/index.html'><img src='https://raw.githubusercontent.com/maidsafe/QA/master/Images/maidsafe_logo.png' alt='' width='100'></a>
+        <p class='location'></p><script>window.sidebarCurrent = {name: 'safe_nfs', ty: 'mod', relpath: '../'};</script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>safe_nfs</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-0' class='srclink' href='../src/safe_nfs/lib.rs.html#18-79' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'>
+<h1 id='safe-nfs-library' class='section-header'><a href='#safe-nfs-library'>Safe-Nfs Library</a></h1>
+<p><a href="https://github.com/maidsafe/safe_nfs">Project github page</a></p>
+</div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='directory_listing/index.html'
+                               title='safe_nfs::directory_listing'>directory_listing</a></td>
+                        <td class='docblock short'>
+                             <p>Module for directory reltaed structs - DirectoryListin, DirectoryInfo</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='errors/index.html'
+                               title='safe_nfs::errors'>errors</a></td>
+                        <td class='docblock short'>
+                             <p>Errors</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='file/index.html'
+                               title='safe_nfs::file'>file</a></td>
+                        <td class='docblock short'>
+                             <p>Module for File struct</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='helper/index.html'
+                               title='safe_nfs::helper'>helper</a></td>
+                        <td class='docblock short'>
+                             <p>Helper for directory_listing and File for NFS Low level API</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='metadata/index.html'
+                               title='safe_nfs::metadata'>metadata</a></td>
+                        <td class='docblock short'>
+                             <p>Directory and File Metadata</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='rest/index.html'
+                               title='safe_nfs::rest'>rest</a></td>
+                        <td class='docblock short'>
+                             <p>Module for Restful interfaces for storage</p>
+
+                        </td>
+                    </tr>
+                </table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.AccessLevel.html'
+                               title='safe_nfs::AccessLevel'>AccessLevel</a></td>
+                        <td class='docblock short'>
+                             <p>AccessLevel indicates whether the container is Private or Public shared</p>
+
+                        </td>
+                    </tr>
+                </table><h2 id='constants' class='section-header'><a href="#constants">Constants</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='constant' href='constant.CONFIGURATION_DIRECTORY_NAME.html'
+                               title='safe_nfs::CONFIGURATION_DIRECTORY_NAME'>CONFIGURATION_DIRECTORY_NAME</a></td>
+                        <td class='docblock short'>
+                             <p>Configuration directory Name stored in the session packet</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='constant' href='constant.ROOT_DIRECTORY_NAME.html'
+                               title='safe_nfs::ROOT_DIRECTORY_NAME'>ROOT_DIRECTORY_NAME</a></td>
+                        <td class='docblock short'>
+                             <p>Root directory name</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='constant' href='constant.UNVERSIONED_DIRECTORY_LISTING_TAG.html'
+                               title='safe_nfs::UNVERSIONED_DIRECTORY_LISTING_TAG'>UNVERSIONED_DIRECTORY_LISTING_TAG</a></td>
+                        <td class='docblock short'>
+                             <p>Tag representing the Versioned Directory Listing</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='constant' href='constant.VERSIONED_DIRECTORY_LISTING_TAG.html'
+                               title='safe_nfs::VERSIONED_DIRECTORY_LISTING_TAG'>VERSIONED_DIRECTORY_LISTING_TAG</a></td>
+                        <td class='docblock short'>
+                             <p>Tag representing the Versioned Directory Listing</p>
+
+                        </td>
+                    </tr>
+                </table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "safe_nfs";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script defer src="../search-index.js"></script>
+</body>
+</html>

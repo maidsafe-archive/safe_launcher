@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Container` struct in crate `safe_nfs`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Container">
+
+    <title>safe_nfs::rest::Container - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../../safe_nfs/index.html'><img src='https://raw.githubusercontent.com/maidsafe/QA/master/Images/maidsafe_logo.png' alt='' width='100'></a>
+        <p class='location'><a href='../index.html'>safe_nfs</a>::<wbr><a href='index.html'>rest</a></p><script>window.sidebarCurrent = {name: 'Container', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>safe_nfs</a>::<wbr><a href='index.html'>rest</a>::<wbr><a class='struct' href=''>Container</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-171' class='srclink' href='../../src/safe_nfs/rest/container.rs.html#21-24' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Container {
+    // some fields omitted
+}</pre><div class='docblock'><p>Container Repersents a Directory.
+Container can have its own metadata, sub-containers and files</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../safe_nfs/rest/struct.Container.html' title='safe_nfs::rest::Container'>Container</a></code></h3><div class='impl-items'><h4 id='method.authorise' class='method'><code>fn <a href='#method.authorise' class='fnname'>authorise</a>(client: <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/arc/struct.Arc.html' title='alloc::arc::Arc'>Arc</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mutex/struct.Mutex.html' title='std::sync::mutex::Mutex'>Mutex</a>&lt;<a class='struct' href='../../safe_core/client/struct.Client.html' title='safe_core::client::Client'>Client</a>&gt;&gt;, container_info: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../safe_nfs/rest/struct.ContainerInfo.html' title='safe_nfs::rest::ContainerInfo'>ContainerInfo</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../safe_nfs/rest/struct.Container.html' title='safe_nfs::rest::Container'>Container</a>, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Authorises the directory access.
+This sevrves as the initial access point of the Rest API. Operations can only be performed on a Container object.
+If the ContainerInfo parameter is None, then the user&#39;s root directory is returned.
+Returns the Container, if authorisation is successful.</p>
+</div><h4 id='method.create' class='method'><code>fn <a href='#method.create' class='fnname'>create</a>(&amp;mut self, name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, versioned: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>, access_level: <a class='enum' href='../../safe_nfs/enum.AccessLevel.html' title='safe_nfs::AccessLevel'>AccessLevel</a>, metadata: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='struct' href='../../safe_nfs/rest/struct.Container.html' title='safe_nfs::rest::Container'>Container</a>, <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../safe_nfs/rest/struct.Container.html' title='safe_nfs::rest::Container'>Container</a>&gt;)</a>, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>This functions is incoked to create a new container
+Say there are nested containers,
+    Home
+      -  Pictures
+In the above example, <code>Home</code> is top level container and <code>Pictures</code> container is a child of <code>Home</code>
+When a new Conatiner <code>Tour</code> is created within <code>Pictures</code>, the following updates are carried out.
+    1. A new container is created
+    2. The metadata of the new Container (<code>Tour</code>) is added to the list of containers of <code>Pictures</code>.
+       Modified time of <code>Tour</code> Container is also updated.
+    3. Metadata of <code>Tour</code> is updated in <code>Home</code>.
+Thus when a Container is created, the function returns the created Container and also the parent of the Container in which the new Container is being returned.
+Based on the above example, when the Container <code>Tour</code> is created in <code>Pictures</code>, this function would return a tpule of (Tour, Home)
+In case if there is no parent for the Container then <code>None</code> is returned.
+Returns tuple of created_container &amp; parent_container of the the current</p>
+</div><h4 id='method.get_created_time' class='method'><code>fn <a href='#method.get_created_time' class='fnname'>get_created_time</a>(&amp;self) -&gt; &amp;<a class='struct' href='../../time/struct.Tm.html' title='time::Tm'>Tm</a></code></h4>
+<div class='docblock'><p>Returns the created time of the container</p>
+</div><h4 id='method.get_modified_time' class='method'><code>fn <a href='#method.get_modified_time' class='fnname'>get_modified_time</a>(&amp;self) -&gt; &amp;<a class='struct' href='../../time/struct.Tm.html' title='time::Tm'>Tm</a></code></h4>
+<div class='docblock'><p>Returns the last modified time of the container</p>
+</div><h4 id='method.get_info' class='method'><code>fn <a href='#method.get_info' class='fnname'>get_info</a>(&amp;self) -&gt; <a class='struct' href='../../safe_nfs/rest/struct.ContainerInfo.html' title='safe_nfs::rest::ContainerInfo'>ContainerInfo</a></code></h4>
+<div class='docblock'><p>Return the unique id of the container</p>
+</div><h4 id='method.get_metadata' class='method'><code>fn <a href='#method.get_metadata' class='fnname'>get_metadata</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></h4>
+<div class='docblock'><p>Returns the user metadata saved as String.</p>
+</div><h4 id='method.get_name' class='method'><code>fn <a href='#method.get_name' class='fnname'>get_name</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></h4>
+<div class='docblock'><p>Returns the name of the container</p>
+</div><h4 id='method.get_blobs' class='method'><code>fn <a href='#method.get_blobs' class='fnname'>get_blobs</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../safe_nfs/rest/struct.Blob.html' title='safe_nfs::rest::Blob'>Blob</a>&gt;</code></h4>
+<div class='docblock'><p>Returns the list of Blobs in the container</p>
+</div><h4 id='method.get_blob' class='method'><code>fn <a href='#method.get_blob' class='fnname'>get_blob</a>(&amp;self, name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../safe_nfs/rest/struct.Blob.html' title='safe_nfs::rest::Blob'>Blob</a>, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Returns a Blob from the container</p>
+</div><h4 id='method.get_containers' class='method'><code>fn <a href='#method.get_containers' class='fnname'>get_containers</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../safe_nfs/rest/struct.ContainerInfo.html' title='safe_nfs::rest::ContainerInfo'>ContainerInfo</a>&gt;</code></h4>
+<div class='docblock'><p>Returns the list of child containers</p>
+</div><h4 id='method.update_metadata' class='method'><code>fn <a href='#method.update_metadata' class='fnname'>update_metadata</a>(&amp;mut self, metadata: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../safe_nfs/rest/struct.Container.html' title='safe_nfs::rest::Container'>Container</a>&gt;, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Updates the metadata of the container</p>
+</div><h4 id='method.get_versions' class='method'><code>fn <a href='#method.get_versions' class='fnname'>get_versions</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>; 64]</a>&gt;, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Retrieves Versions for the container</p>
+</div><h4 id='method.get_container_versions' class='method'><code>fn <a href='#method.get_container_versions' class='fnname'>get_container_versions</a>(&amp;self, container_info: &amp;<a class='struct' href='../../safe_nfs/rest/struct.ContainerInfo.html' title='safe_nfs::rest::ContainerInfo'>ContainerInfo</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>; 64]</a>&gt;, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Retrieves Versions for the container being referred by the container_id</p>
+</div><h4 id='method.get_container' class='method'><code>fn <a href='#method.get_container' class='fnname'>get_container</a>(&amp;mut self, container_info: &amp;<a class='struct' href='../../safe_nfs/rest/struct.ContainerInfo.html' title='safe_nfs::rest::ContainerInfo'>ContainerInfo</a>, version: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>; 64]</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../safe_nfs/rest/struct.Container.html' title='safe_nfs::rest::Container'>Container</a>, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Fetches the latest version of the child container.
+Can fetch a specific version of the Container by passing the corresponding VersionId.</p>
+</div><h4 id='method.delete_container' class='method'><code>fn <a href='#method.delete_container' class='fnname'>delete_container</a>(&amp;mut self, name: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../safe_nfs/rest/struct.Container.html' title='safe_nfs::rest::Container'>Container</a>&gt;, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Deletes the child container</p>
+</div><h4 id='method.create_blob' class='method'><code>fn <a href='#method.create_blob' class='fnname'>create_blob</a>(&amp;mut self, name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, metadata: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../safe_nfs/helper/writer/struct.Writer.html' title='safe_nfs::helper::writer::Writer'>Writer</a>, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Creates a Blob within the container
+Returns a Writter object
+The content of the blob is written using the writter.
+The blob is created only after the writter.close() is invoked</p>
+</div><h4 id='method.update_blob_content' class='method'><code>fn <a href='#method.update_blob_content' class='fnname'>update_blob_content</a>(&amp;mut self, blob: &amp;<a class='struct' href='../../safe_nfs/rest/struct.Blob.html' title='safe_nfs::rest::Blob'>Blob</a>, data: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../safe_nfs/rest/struct.Container.html' title='safe_nfs::rest::Container'>Container</a>&gt;, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Updates the blob content. Writes the complete data and updates the Blob</p>
+</div><h4 id='method.get_blob_writer' class='method'><code>fn <a href='#method.get_blob_writer' class='fnname'>get_blob_writer</a>(&amp;mut self, blob: &amp;<a class='struct' href='../../safe_nfs/rest/struct.Blob.html' title='safe_nfs::rest::Blob'>Blob</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../safe_nfs/helper/writer/struct.Writer.html' title='safe_nfs::helper::writer::Writer'>Writer</a>, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Return a writter object for the Blob, through which the content of the blob can be updated
+This is useful while handling larger files, to enable writting content in parts</p>
+</div><h4 id='method.get_blob_content' class='method'><code>fn <a href='#method.get_blob_content' class='fnname'>get_blob_content</a>(&amp;self, blob: &amp;<a class='struct' href='../../safe_nfs/rest/struct.Blob.html' title='safe_nfs::rest::Blob'>Blob</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Reads the content of the blob and returns the complete content</p>
+</div><h4 id='method.get_blob_reader' class='method'><code>fn <a href='#method.get_blob_reader' class='fnname'>get_blob_reader</a>&lt;'a&gt;(&amp;self, blob: &amp;'a <a class='struct' href='../../safe_nfs/rest/struct.Blob.html' title='safe_nfs::rest::Blob'>Blob</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../safe_nfs/helper/reader/struct.Reader.html' title='safe_nfs::helper::reader::Reader'>Reader</a>&lt;'a&gt;, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Returns a reader for the blob
+Using a Reader helps in handling large file contents and also fetch data in a specific range</p>
+</div><h4 id='method.get_blob_versions' class='method'><code>fn <a href='#method.get_blob_versions' class='fnname'>get_blob_versions</a>(&amp;self, name: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../safe_nfs/rest/struct.Blob.html' title='safe_nfs::rest::Blob'>Blob</a>&gt;, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Returns the list of versions_id for the blob</p>
+</div><h4 id='method.update_blob_metadata' class='method'><code>fn <a href='#method.update_blob_metadata' class='fnname'>update_blob_metadata</a>(&amp;mut self, blob: <a class='struct' href='../../safe_nfs/rest/struct.Blob.html' title='safe_nfs::rest::Blob'>Blob</a>, metadata: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../safe_nfs/rest/struct.Container.html' title='safe_nfs::rest::Container'>Container</a>&gt;, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Update the metadata of the Blob in the container
+Returns Updated parent container, if the parent container exists.</p>
+</div><h4 id='method.delete_blob' class='method'><code>fn <a href='#method.delete_blob' class='fnname'>delete_blob</a>(&amp;mut self, name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Delete blob from the container</p>
+</div><h4 id='method.copy_blob' class='method'><code>fn <a href='#method.copy_blob' class='fnname'>copy_blob</a>(&amp;mut self, blob_name: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, to_container: &amp;<a class='struct' href='../../safe_nfs/rest/struct.ContainerInfo.html' title='safe_nfs::rest::ContainerInfo'>ContainerInfo</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Copies the latest blob version from the container to the specified destination container</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "safe_nfs";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script async src="../../search-index.js"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `ResponseGetter` struct in crate `safe_core`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, ResponseGetter">
+
+    <title>safe_core::client::response_getter::ResponseGetter - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../main.css">
+
+    <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../../../safe_core/index.html'><img src='https://raw.githubusercontent.com/maidsafe/QA/master/Images/maidsafe_logo.png' alt='' width='100'></a>
+        <p class='location'><a href='../../index.html'>safe_core</a>::<wbr><a href='../index.html'>client</a>::<wbr><a href='index.html'>response_getter</a></p><script>window.sidebarCurrent = {name: 'ResponseGetter', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../../index.html'>safe_core</a>::<wbr><a href='../index.html'>client</a>::<wbr><a href='index.html'>response_getter</a>::<wbr><a class='struct' href=''>ResponseGetter</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-477' class='srclink' href='../../../src/safe_core/client/response_getter.rs.html#20-26' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct ResponseGetter {
+    // some fields omitted
+}</pre><div class='docblock'><p>ResponseGetter is a lazy evaluated response getter. It will fetch either from local cache or
+wait for the MessageQueue to notify it of the incoming response from the network.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../safe_core/client/response_getter/struct.ResponseGetter.html' title='safe_core::client::response_getter::ResponseGetter'>ResponseGetter</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(data_channel: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mpsc/struct.Sender.html' title='std::sync::mpsc::Sender'>Sender</a>&lt;<a class='enum' href='../../../safe_core/translated_events/enum.DataReceivedEvent.html' title='safe_core::translated_events::DataReceivedEvent'>DataReceivedEvent</a>&gt;, <a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mpsc/struct.Receiver.html' title='std::sync::mpsc::Receiver'>Receiver</a>&lt;<a class='enum' href='../../../safe_core/translated_events/enum.DataReceivedEvent.html' title='safe_core::translated_events::DataReceivedEvent'>DataReceivedEvent</a>&gt;)</a>&gt;, message_queue: <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/arc/struct.Arc.html' title='alloc::arc::Arc'>Arc</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mutex/struct.Mutex.html' title='std::sync::mutex::Mutex'>Mutex</a>&lt;MessageQueue&gt;&gt;, requested_type: <a class='enum' href='../../../routing/data/enum.DataRequest.html' title='routing::data::DataRequest'>DataRequest</a>) -&gt; <a class='struct' href='../../../safe_core/client/response_getter/struct.ResponseGetter.html' title='safe_core::client::response_getter::ResponseGetter'>ResponseGetter</a></code></h4>
+<div class='docblock'><p>Create a new instance of ResponseGetter</p>
+</div><h4 id='method.get' class='method'><code>fn <a href='#method.get' class='fnname'>get</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='enum' href='../../../routing/data/enum.Data.html' title='routing::data::Data'>Data</a>, <a class='enum' href='../../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>Get either from local cache or (if not available there) get it when it comes from the
+network as informed by MessageQueue. This is blocking.</p>
+</div><h4 id='method.get_sender' class='method'><code>fn <a href='#method.get_sender' class='fnname'>get_sender</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mpsc/struct.Sender.html' title='std::sync::mpsc::Sender'>Sender</a>&lt;<a class='enum' href='../../../safe_core/translated_events/enum.DataReceivedEvent.html' title='safe_core::translated_events::DataReceivedEvent'>DataReceivedEvent</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Extract associated sender. This will help cancel the blocking wait at will if so desired.
+All that is needed is to extract the sender before doing a <code>get()</code> and then while blocking
+on <code>get()</code> fire <code>sender.send(::translated_events::DataReceivedEvent::Terminated)</code> to
+gracefully exit the receiver.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../";
+        window.currentCrate = "safe_core";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../../jquery.js"></script>
+    <script src="../../../main.js"></script>
+    
+    <script async src="../../../search-index.js"></script>
+</body>
+</html>

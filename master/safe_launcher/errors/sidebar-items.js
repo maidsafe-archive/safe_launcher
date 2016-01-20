@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["LAUNCHER_ERROR_START_RANGE","Intended for converting Launcher Errors into numeric codes for propagating some error information across FFI boundaries and specially to C."]],"enum":[["LauncherError","Launcher Errors"]]});

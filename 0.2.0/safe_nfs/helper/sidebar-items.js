@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["directory_helper","DirectoryHelper provides functions for CRUD on DirectoryListing"],["file_helper","FileHelper provides functions for CRUD on file"],["reader","Data from a file can be read using Reader"],["writer","Data for the file can be written using Wirter"]]});

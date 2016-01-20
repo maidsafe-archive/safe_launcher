@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Event` enum in crate `routing`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Event">
+
+    <title>routing::event::Event - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../../routing/index.html'><img src='https://raw.githubusercontent.com/maidsafe/QA/master/Images/maidsafe_logo.png' alt='' width='100'></a>
+        <p class='location'><a href='../index.html'>routing</a>::<wbr><a href='index.html'>event</a></p><script>window.sidebarCurrent = {name: 'Event', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content enum">
+<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>routing</a>::<wbr><a href='index.html'>event</a>::<wbr><a class='enum' href=''>Event</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-5210' class='srclink' href='../../src/routing/event.rs.html#24-89' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum Event {
+    Request {
+        request: <a class='enum' href='../../routing/enum.ExternalRequest.html' title='routing::ExternalRequest'>ExternalRequest</a>,
+        our_authority: <a class='enum' href='../../routing/authority/enum.Authority.html' title='routing::authority::Authority'>Authority</a>,
+        from_authority: <a class='enum' href='../../routing/authority/enum.Authority.html' title='routing::authority::Authority'>Authority</a>,
+        response_token: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../routing/struct.SignedToken.html' title='routing::SignedToken'>SignedToken</a>&gt;,
+    },
+    Response {
+        response: <a class='enum' href='../../routing/enum.ExternalResponse.html' title='routing::ExternalResponse'>ExternalResponse</a>,
+        our_authority: <a class='enum' href='../../routing/authority/enum.Authority.html' title='routing::authority::Authority'>Authority</a>,
+        from_authority: <a class='enum' href='../../routing/authority/enum.Authority.html' title='routing::authority::Authority'>Authority</a>,
+    },
+    FailedRequest {
+        request: <a class='enum' href='../../routing/enum.ExternalRequest.html' title='routing::ExternalRequest'>ExternalRequest</a>,
+        our_authority: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='../../routing/authority/enum.Authority.html' title='routing::authority::Authority'>Authority</a>&gt;,
+        location: <a class='enum' href='../../routing/authority/enum.Authority.html' title='routing::authority::Authority'>Authority</a>,
+        interface_error: <a class='enum' href='../../routing/error/enum.InterfaceError.html' title='routing::error::InterfaceError'>InterfaceError</a>,
+    },
+    FailedResponse {
+        response: <a class='enum' href='../../routing/enum.ExternalResponse.html' title='routing::ExternalResponse'>ExternalResponse</a>,
+        our_authority: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='../../routing/authority/enum.Authority.html' title='routing::authority::Authority'>Authority</a>&gt;,
+        location: <a class='enum' href='../../routing/authority/enum.Authority.html' title='routing::authority::Authority'>Authority</a>,
+        interface_error: <a class='enum' href='../../routing/error/enum.InterfaceError.html' title='routing::error::InterfaceError'>InterfaceError</a>,
+    },
+    Refresh(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, <a class='enum' href='../../routing/authority/enum.Authority.html' title='routing::authority::Authority'>Authority</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;&gt;),
+    Churn(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../routing/struct.NameType.html' title='routing::NameType'>NameType</a>&gt;, <a class='struct' href='../../routing/struct.NameType.html' title='routing::NameType'>NameType</a>),
+    DoRefresh(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, <a class='enum' href='../../routing/authority/enum.Authority.html' title='routing::authority::Authority'>Authority</a>, <a class='struct' href='../../routing/struct.NameType.html' title='routing::NameType'>NameType</a>),
+    Bootstrapped,
+    Connected,
+    Disconnected,
+    Terminated,
+}</pre><div class='docblock'><p>An Event is received at the effective close group of B of a message flow &lt; A | B &gt;</p>
+</div><h2 class='variants'>Variants</h2>
+<table><tr><td id='variant.Request'><code>Request</code></td><td><div class='docblock'><p>Request.</p>
+</div><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.Request.field.request'><code>request</code></td><td><div class='docblock'><p>External request.</p>
+</div></td></tr><tr><td id='variant.Request.field.our_authority'><code>our_authority</code></td><td><div class='docblock'><p>Our authority.</p>
+</div></td></tr><tr><td id='variant.Request.field.from_authority'><code>from_authority</code></td><td><div class='docblock'><p>From authority.</p>
+</div></td></tr><tr><td id='variant.Request.field.response_token'><code>response_token</code></td><td><div class='docblock'><p>Not set when the request came from a group.</p>
+</div></td></tr></table></td></tr><tr><td id='variant.Response'><code>Response</code></td><td><div class='docblock'><p>Response.</p>
+</div><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.Response.field.response'><code>response</code></td><td><div class='docblock'><p>External response.</p>
+</div></td></tr><tr><td id='variant.Response.field.our_authority'><code>our_authority</code></td><td><div class='docblock'><p>Our authority.</p>
+</div></td></tr><tr><td id='variant.Response.field.from_authority'><code>from_authority</code></td><td><div class='docblock'><p>From authority.</p>
+</div></td></tr></table></td></tr><tr><td id='variant.FailedRequest'><code>FailedRequest</code></td><td><div class='docblock'><p>FailedRequest.</p>
+</div><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.FailedRequest.field.request'><code>request</code></td><td><div class='docblock'><p>External request.</p>
+</div></td></tr><tr><td id='variant.FailedRequest.field.our_authority'><code>our_authority</code></td><td><div class='docblock'><p>Our authority.</p>
+</div></td></tr><tr><td id='variant.FailedRequest.field.location'><code>location</code></td><td><div class='docblock'><p>From authority.</p>
+</div></td></tr><tr><td id='variant.FailedRequest.field.interface_error'><code>interface_error</code></td><td><div class='docblock'><p>Interface error.</p>
+</div></td></tr></table></td></tr><tr><td id='variant.FailedResponse'><code>FailedResponse</code></td><td><div class='docblock'><p>FailedResponse.</p>
+</div><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.FailedResponse.field.response'><code>response</code></td><td><div class='docblock'><p>External response.</p>
+</div></td></tr><tr><td id='variant.FailedResponse.field.our_authority'><code>our_authority</code></td><td><div class='docblock'><p>Our authority.</p>
+</div></td></tr><tr><td id='variant.FailedResponse.field.location'><code>location</code></td><td><div class='docblock'><p>From authority.</p>
+</div></td></tr><tr><td id='variant.FailedResponse.field.interface_error'><code>interface_error</code></td><td><div class='docblock'><p>Interface error.</p>
+</div></td></tr></table></td></tr><tr><td id='variant.Refresh'><code>Refresh</code></td><td><div class='docblock'><p>Refresh reports to the user the collected accounts for a given refresh event,
+the arguments are type_tag:u64, authority: Authority, vector_of_bytes: Vec<Vec<u8>&gt;</p>
+</div></td></tr><tr><td id='variant.Churn'><code>Churn</code></td><td><div class='docblock'><p>Churn reports whenever our close group is changed, and provides our new close group
+as a Vec<NameType> and the name of the node that joined or left our close group
+as NameType.  Our close group is sorted from our name and always includes our own name
+as the first element.</p>
+</div></td></tr><tr><td id='variant.DoRefresh'><code>DoRefresh</code></td><td><div class='docblock'><p>DoRefresh reports that a Refresh message is circulating the effective close group
+of the given Authority, but that the user is outside of the close group of the churn
+that initiated the call for refresh.  To ensure that the account of the current user is
+also accumulated a DoRefresh indicates precisely one account routing will expect the
+user to do a ::routing::request_refresh for, if a matching account is held by the user.</p>
+</div></td></tr><tr><td id='variant.Bootstrapped'><code>Bootstrapped</code></td><td><div class='docblock'><p>Bootstrapped.</p>
+</div></td></tr><tr><td id='variant.Connected'><code>Connected</code></td><td><div class='docblock'><p>Connected.</p>
+</div></td></tr><tr><td id='variant.Disconnected'><code>Disconnected</code></td><td><div class='docblock'><p>Disconnected.</p>
+</div></td></tr><tr><td id='variant.Terminated'><code>Terminated</code></td><td><div class='docblock'><p>Event::Terminated is called after RoutingNode::stop() has terminated internal processes</p>
+</div></td></tr></table><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../../routing/event/enum.Event.html' title='routing::event::Event'>Event</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#method.fmt' class='fnname'>fmt</a>(&amp;self, formatter: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Error.html' title='core::fmt::Error'>Error</a>&gt;</code></h4>
+</div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='enum' href='../../routing/event/enum.Event.html' title='routing::event::Event'>Event</a></code></h3><div class='impl-items'><h4 id='method.eq' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../../routing/event/enum.Event.html' title='routing::event::Event'>Event</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<h4 id='method.ne' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../../routing/event/enum.Event.html' title='routing::event::Event'>Event</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='enum' href='../../routing/event/enum.Event.html' title='routing::event::Event'>Event</a></code></h3><div class='impl-items'></div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='enum' href='../../routing/event/enum.Event.html' title='routing::event::Event'>Event</a></code></h3><div class='impl-items'><h4 id='method.clone' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='enum' href='../../routing/event/enum.Event.html' title='routing::event::Event'>Event</a></code></h4>
+<h4 id='method.clone_from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "routing";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script async src="../../search-index.js"></script>
+</body>
+</html>

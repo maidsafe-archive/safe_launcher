@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `routing` crate.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, routing">
+
+    <title>routing - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../routing/index.html'><img src='https://raw.githubusercontent.com/maidsafe/QA/master/Images/maidsafe_logo.png' alt='' width='100'></a>
+        <p class='location'></p><script>window.sidebarCurrent = {name: 'routing', ty: 'mod', relpath: '../'};</script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>routing</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-0' class='srclink' href='../src/routing/lib.rs.html#18-203' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Client and node implementations for a resilient decentralised network.</p>
+
+<p>The network is based on the <a href="../kademlia_routing_table/index.html">kademlia_routing_table</a> and uses the XOR metric to define the
+&quot;distance&quot; between two <a href="../xor_name/struct.XorName.html"><code>XorName</code></a>s. <code>XorName</code>s are used as addresses of nodes, clients as
+well as data.</p>
+
+<p>Messages are exchanged between <em>authorities</em>, where an <code>Authority</code> can be an
+individual client or node, or a group of nodes. In both cases, messages are cryptographically
+signed by the sender, and in the latter case it is verified that a sufficient number of group
+members agree on the message: Only if that quorum is reached, the message is delivered. In
+addition, each message has a unique ID, and is delivered only once.</p>
+
+<p>Group authorities are also addressed using a single <code>XorName</code>. The members of that group are
+the nodes that are closest to that name. Since nodes are assigned their name by the network,
+this provides redundancy and resilience: A node has no control over which group authorities it
+will be a member of, and without a majority in the group it cannot forge a message from that
+group.</p>
+
+<p>The library also provides different types for the messages&#39; data. The data types are encoded
+with Concise Binary Object Representation (CBOR).</p>
+
+<h2 id='usage' class='section-header'><a href='#usage'>Usage</a></h2>
+<p>A decentralised service based on the <code>routing</code> library uses <code>Client</code> to send requests to the
+network of nodes and receive responses.</p>
+
+<p><code>Node</code> is used to handle and send requests within that network, and to implement its
+functionality, e. g. storing and retrieving data, validating permissions, managing metadata etc.</p>
+
+<h1 id='client-creation' class='section-header'><a href='#client-creation'>Client creation</a></h1>
+<p>A client&#39;s name is a hash of its public keys. Upon creation, the client will attempt to connect
+to the network through any node, and exchange public keys with it. That node becomes a
+bootstrap node for the client, and messages to and from the client will be routed over it.</p>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>mpsc</span>;
+<span class='kw'>use</span> <span class='ident'>routing</span>::{<span class='ident'>Client</span>, <span class='ident'>Event</span>, <span class='ident'>FullId</span>};
+
+<span class='kw'>let</span> (<span class='ident'>sender</span>, <span class='ident'>receiver</span>) <span class='op'>=</span> <span class='ident'>mpsc</span>::<span class='ident'>channel</span>::<span class='op'>&lt;</span><span class='ident'>Event</span><span class='op'>&gt;</span>();
+<span class='kw'>let</span> <span class='ident'>full_id</span> <span class='op'>=</span> <span class='ident'>FullId</span>::<span class='ident'>new</span>(); <span class='comment'>// Generate new keys.</span>
+<span class='kw'>let</span> <span class='ident'>client</span> <span class='op'>=</span> <span class='ident'>Client</span>::<span class='ident'>new</span>(<span class='ident'>sender</span>, <span class='prelude-val'>Some</span>(<span class='ident'>full_id</span>.<span class='ident'>clone</span>())).<span class='ident'>unwrap</span>();
+
+<span class='kw'>let</span> <span class='ident'>client_name</span> <span class='op'>=</span> <span class='ident'>full_id</span>.<span class='ident'>public_id</span>().<span class='ident'>name</span>();</pre>
+
+<p>Messages can be sent using the methods of <code>client</code>, and received as <code>Event</code>s from the
+<code>receiver</code>.</p>
+
+<h1 id='node-creation' class='section-header'><a href='#node-creation'>Node creation</a></h1>
+<p>Creating a node looks even simpler:</p>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>mpsc</span>;
+<span class='kw'>use</span> <span class='ident'>routing</span>::{<span class='ident'>Node</span>, <span class='ident'>Event</span>};
+
+<span class='kw'>let</span> (<span class='ident'>sender</span>, <span class='ident'>receiver</span>) <span class='op'>=</span> <span class='ident'>mpsc</span>::<span class='ident'>channel</span>::<span class='op'>&lt;</span><span class='ident'>Event</span><span class='op'>&gt;</span>();
+<span class='kw'>let</span> <span class='ident'>node</span> <span class='op'>=</span> <span class='ident'>Node</span>::<span class='ident'>new</span>(<span class='ident'>sender</span>).<span class='ident'>unwrap</span>();</pre>
+
+<p>Upon creation, the node will first connect to the network as a client. Once it has client
+status, it requests a new name from the network, and then integrates itself in the network with
+that new name, adding close nodes to its routing table.</p>
+
+<p>Messages can be sent using the methods of <code>node</code>, and received as <code>Event</code>s from the <code>receiver</code>.
+The node can act as an individual node or as part of a group authority. Sending a message as a
+group authority only has an effect if sufficiently many other nodes in that authority send the
+same message.</p>
+
+<h1 id='example-put-message-flow-for-immutable-data' class='section-header'><a href='#example-put-message-flow-for-immutable-data'>Example: Put message flow for immutable data</a></h1>
+<p>An example implementation of a vault for storing and retrieving <code>ImmutableData</code> is included
+with the code of this library. The flow of a <code>Put</code> request there moves through the following
+authorities:</p>
+
+<ul>
+<li>A <code>Client</code> that wants to store a piece of data on the network.</li>
+<li>The <code>ClientManager</code> group authority that is responsible for that particular client. The nodes
+in this group have access to metadata about this client and can e. g. verify that it has
+required permissions or quota to store the data. The <code>ClientManager</code>&#39;s address is the <code>XorName</code>
+of the client itself, so it consists of the nodes closest to that name.</li>
+<li>The <code>NaeManager</code> group authority which is responsible for that particular piece of data and
+knows where in the network it should be stored. Its address is the <code>XorName</code> of the data.</li>
+<li>The <code>ManagedNode</code>s are the individual nodes that actually store the data. This could be just
+one, but let&#39;s assume that data is stored redundantly in more than one place.</li>
+</ul>
+
+<p>The message flow from the client to the managed nodes looks like this:</p>
+
+<ul>
+<li>The client sends a <code>Put</code> request to the <code>ClientManager</code>, i. e. the sender is the individual
+<code>Client</code> and the receiver is a group of nodes with addresses close to the client&#39;s name.</li>
+<li>Each node in the <code>ClientManager</code> group performs validation and updates metadata (which may
+involve further messages not considered in this example). If valid, it sends a <code>PutSuccess</code>
+response back to the client, and a <code>Put</code> request to the <code>NaeManager</code> with the data&#39;s <code>XorName</code>.
+In both cases, the sender is the <code>ClientManager</code>, not the individual node.</li>
+<li>Each node in the <code>NaeManager</code> chooses a number of individual nodes that are responsible for
+storing this specific piece of data. This needs to happen in a deterministic way so that the
+members of the <code>NaeManager</code> agree on the responsible nodes. Then they finally send a <code>Put</code>
+request to each of these. Here the sender is the <code>NaeManager</code>, but the recipient is the
+individual <code>ManagedNode</code>.</li>
+<li>Each <code>ManagedNode</code> locally stores the data.</li>
+</ul>
+
+<p>These steps need to be implemented by the user of the library. Each node needs to handle all
+these cases, as it can be simultaneously a <code>ManagedNode</code> and a member of several different
+<code>ClientManager</code>s and <code>NaeManager</code>s. A client, however, does not act as a node or vice versa.</p>
+
+<p>Transparently to the user, the <code>routing</code> library deals with message quora, so the user will only
+receive a message from a <code>Client</code> or <code>Node</code> if it was either sent</p>
+
+<ul>
+<li>by a client or individual node, or</li>
+<li>by a sufficient number of members of a group authority.</li>
+</ul>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.Client.html'
+                               title='routing::Client'>Client</a></td>
+                        <td class='docblock short'>
+                             <p>Interface for sending and receiving messages to and from a network of nodes in the role of a
+client.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.FullId.html'
+                               title='routing::FullId'>FullId</a></td>
+                        <td class='docblock short'>
+                             <p>Network identity component containing name, and public and private keys.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.ImmutableData.html'
+                               title='routing::ImmutableData'>ImmutableData</a></td>
+                        <td class='docblock short'>
+                             <p>An immutable chunk of data.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.MessageId.html'
+                               title='routing::MessageId'>MessageId</a></td>
+                        <td class='docblock short'>
+                             <p>Unique ID for messages</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.Node.html'
+                               title='routing::Node'>Node</a></td>
+                        <td class='docblock short'>
+                             <p>Interface for sending and receiving messages to and from other nodes, in the role of a full
+routing node.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.PlainData.html'
+                               title='routing::PlainData'>PlainData</a></td>
+                        <td class='docblock short'>
+                             <p>Plain data with a name and a value.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.PublicId.html'
+                               title='routing::PublicId'>PublicId</a></td>
+                        <td class='docblock short'>
+                             <p>Network identity component containing name and public keys.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.RequestMessage.html'
+                               title='routing::RequestMessage'>RequestMessage</a></td>
+                        <td class='docblock short'>
+                             <p>A request message wrapper</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.ResponseMessage.html'
+                               title='routing::ResponseMessage'>ResponseMessage</a></td>
+                        <td class='docblock short'>
+                             <p>A response message wrapper</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.SignedMessage.html'
+                               title='routing::SignedMessage'>SignedMessage</a></td>
+                        <td class='docblock short'>
+                             <p>Wrapper around a routing message, signed by the originator of the message.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.StructuredData.html'
+                               title='routing::StructuredData'>StructuredData</a></td>
+                        <td class='docblock short'>
+                             <p>Mutable structured data.</p>
+
+                        </td>
+                    </tr>
+                </table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.Authority.html'
+                               title='routing::Authority'>Authority</a></td>
+                        <td class='docblock short'>
+                             <p>An entity that can act as a source or destination of a message.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.Data.html'
+                               title='routing::Data'>Data</a></td>
+                        <td class='docblock short'>
+                             <p>This is the data types routing handles in the public interface</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.DataRequest.html'
+                               title='routing::DataRequest'>DataRequest</a></td>
+                        <td class='docblock short'>
+                             <p>DataRequest.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.Event.html'
+                               title='routing::Event'>Event</a></td>
+                        <td class='docblock short'>
+                             <p>An Event raised by a <code>Node</code> or <code>Client</code> via its event sender.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.ImmutableDataType.html'
+                               title='routing::ImmutableDataType'>ImmutableDataType</a></td>
+                        <td class='docblock short'>
+                             <p>The type of an individual copy of immutable data.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.InterfaceError.html'
+                               title='routing::InterfaceError'>InterfaceError</a></td>
+                        <td class='docblock short'>
+                             <p>InterfaceError.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.RequestContent.html'
+                               title='routing::RequestContent'>RequestContent</a></td>
+                        <td class='docblock short'>
+                             <p>The request types</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.ResponseContent.html'
+                               title='routing::ResponseContent'>ResponseContent</a></td>
+                        <td class='docblock short'>
+                             <p>The response types</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.RoutingError.html'
+                               title='routing::RoutingError'>RoutingError</a></td>
+                        <td class='docblock short'>
+                             <p>RoutingError.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.RoutingMessage.html'
+                               title='routing::RoutingMessage'>RoutingMessage</a></td>
+                        <td class='docblock short'>
+                             <p>Variant type to hold <code>either</code> a request or response.</p>
+
+                        </td>
+                    </tr>
+                </table><h2 id='constants' class='section-header'><a href="#constants">Constants</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='constant' href='constant.MAX_STRUCTURED_DATA_SIZE_IN_BYTES.html'
+                               title='routing::MAX_STRUCTURED_DATA_SIZE_IN_BYTES'>MAX_STRUCTURED_DATA_SIZE_IN_BYTES</a></td>
+                        <td class='docblock short'>
+                             <p>Maximum allowed size for a Structured Data to grow to</p>
+
+                        </td>
+                    </tr>
+                </table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "routing";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script async src="../search-index.js"></script>
+</body>
+</html>

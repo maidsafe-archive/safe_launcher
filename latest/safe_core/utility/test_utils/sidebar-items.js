@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["generate_public_keys","Gnerates Random Public Keys"],["generate_secret_keys","Gnerates Random Secret Keys"],["get_client","Gnerates a random mock client for testing"],["get_max_sized_public_keys","Gnerates public keys of maximun size"],["get_max_sized_secret_keys","Gnerates secret keys of maximun size"]]});

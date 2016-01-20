@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["DirectoryMetadata","Metadata about a File or a Directory"]]});

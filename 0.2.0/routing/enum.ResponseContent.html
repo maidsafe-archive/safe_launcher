@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `ResponseContent` enum in crate `routing`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, ResponseContent">
+
+    <title>routing::ResponseContent - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../routing/index.html'><img src='https://raw.githubusercontent.com/maidsafe/QA/master/Images/maidsafe_logo.png' alt='' width='100'></a>
+        <p class='location'><a href='index.html'>routing</a></p><script>window.sidebarCurrent = {name: 'ResponseContent', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content enum">
+<h1 class='fqn'><span class='in-band'>Enum <a href='index.html'>routing</a>::<wbr><a class='enum' href=''>ResponseContent</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-2404' class='srclink' href='../src/routing/messages.rs.html#274-343' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum ResponseContent {
+    GetNetworkName {
+        relocated_id: <a class='struct' href='../routing/struct.PublicId.html' title='routing::PublicId'>PublicId</a>,
+    },
+    GetPublicId {
+        public_id: <a class='struct' href='../routing/struct.PublicId.html' title='routing::PublicId'>PublicId</a>,
+    },
+    GetPublicIdWithEndpoints {
+        public_id: <a class='struct' href='../routing/struct.PublicId.html' title='routing::PublicId'>PublicId</a>,
+        encrypted_endpoints: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;,
+        nonce_bytes: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>; box_::NONCEBYTES]</a>,
+    },
+    GetCloseGroup {
+        close_group_ids: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../routing/struct.PublicId.html' title='routing::PublicId'>PublicId</a>&gt;,
+    },
+    GetSuccess(<a class='enum' href='../routing/enum.Data.html' title='routing::Data'>Data</a>),
+    PutSuccess(<a class='struct' href='../sodiumoxide/crypto/hash/sha512/struct.Digest.html' title='sodiumoxide::crypto::hash::sha512::Digest'>Digest</a>),
+    PostSuccess(<a class='struct' href='../sodiumoxide/crypto/hash/sha512/struct.Digest.html' title='sodiumoxide::crypto::hash::sha512::Digest'>Digest</a>),
+    DeleteSuccess(<a class='struct' href='../sodiumoxide/crypto/hash/sha512/struct.Digest.html' title='sodiumoxide::crypto::hash::sha512::Digest'>Digest</a>),
+    GetFailure {
+        request: <a class='struct' href='../routing/struct.RequestMessage.html' title='routing::RequestMessage'>RequestMessage</a>,
+        external_error_indicator: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;,
+    },
+    PutFailure {
+        request: <a class='struct' href='../routing/struct.RequestMessage.html' title='routing::RequestMessage'>RequestMessage</a>,
+        external_error_indicator: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;,
+    },
+    PostFailure {
+        request: <a class='struct' href='../routing/struct.RequestMessage.html' title='routing::RequestMessage'>RequestMessage</a>,
+        external_error_indicator: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;,
+    },
+    DeleteFailure {
+        request: <a class='struct' href='../routing/struct.RequestMessage.html' title='routing::RequestMessage'>RequestMessage</a>,
+        external_error_indicator: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;,
+    },
+}</pre><div class='docblock'><p>Types of respnses to exepect on the network.
+All responses will map to a specific request and where request was from a single node
+or client the response will contatin the singed request. This prevents forgery or co-ersion
+attacks.</p>
+</div><h2 class='variants'>Variants</h2>
+<table><tr><td id='variant.GetNetworkName'><code>GetNetworkName</code></td><td><div class='docblock'><p>Reply with the altered publicId
+NaeManager -&gt; Client</p>
+</div><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.GetNetworkName.field.relocated_id'><code>relocated_id</code></td><td><div class='docblock'><p>Supplied publicId with name altered</p>
+</div></td></tr></table></td></tr><tr><td id='variant.GetPublicId'><code>GetPublicId</code></td><td><div class='docblock'><p>Reply with the requested PublciId
+NodeManager -&gt; Client | ManagedNode</p>
+</div><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.GetPublicId.field.public_id'><code>public_id</code></td><td><div class='docblock'><p>The relocatted PublciId</p>
+</div></td></tr></table></td></tr><tr><td id='variant.GetPublicIdWithEndpoints'><code>GetPublicIdWithEndpoints</code></td><td><div class='docblock'><p>Send our publicId along with senders encrypted endpoints bak to sender
+ManagedNode -&gt; ManagedNode | client</p>
+</div><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.GetPublicIdWithEndpoints.field.public_id'><code>public_id</code></td><td><div class='docblock'><p>Our publicId</p>
+</div></td></tr><tr><td id='variant.GetPublicIdWithEndpoints.field.encrypted_endpoints'><code>encrypted_endpoints</code></td><td><div class='docblock'><p>their endpoints</p>
+</div></td></tr><tr><td id='variant.GetPublicIdWithEndpoints.field.nonce_bytes'><code>nonce_bytes</code></td><td><div class='docblock'><p>message salt</p>
+</div></td></tr></table></td></tr><tr><td id='variant.GetCloseGroup'><code>GetCloseGroup</code></td><td><div class='docblock'><p>Return the close PublicId&#39;s back to requestor
+NodeManager -&gt; client | ManagedNode</p>
+</div><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.GetCloseGroup.field.close_group_ids'><code>close_group_ids</code></td><td><div class='docblock'><p>Our close group publci Id&#39;s</p>
+</div></td></tr></table></td></tr><tr><td id='variant.GetSuccess'><code>GetSuccess</code></td><td><div class='docblock'><p>Should not be ignored. The data requested sent back
+(ManagedNode (cache) | NaeManagers) -&gt; client
+ManagedNode -&gt; NaeManagers</p>
+</div></td></tr><tr><td id='variant.PutSuccess'><code>PutSuccess</code></td><td><div class='docblock'><p>Success token for Put (may be ignored)</p>
+</div></td></tr><tr><td id='variant.PostSuccess'><code>PostSuccess</code></td><td><div class='docblock'><p>Success token for Post  (may be ignored)</p>
+</div></td></tr><tr><td id='variant.DeleteSuccess'><code>DeleteSuccess</code></td><td><div class='docblock'><p>Success token for delete  (may be ignored)</p>
+</div></td></tr><tr><td id='variant.GetFailure'><code>GetFailure</code></td><td><div class='docblock'><p>Error for Get, includes signed request to prevent injection attacks</p>
+</div><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.GetFailure.field.request'><code>request</code></td><td><div class='docblock'><p>Originators signed reuest</p>
+</div></td></tr><tr><td id='variant.GetFailure.field.external_error_indicator'><code>external_error_indicator</code></td><td><div class='docblock'><p>Error type sent back, may be injected form upper layers</p>
+</div></td></tr></table></td></tr><tr><td id='variant.PutFailure'><code>PutFailure</code></td><td><div class='docblock'><p>Error for Put, includes signed request to prevent injection attacks</p>
+</div><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.PutFailure.field.request'><code>request</code></td><td><div class='docblock'><p>Originators signed reuest</p>
+</div></td></tr><tr><td id='variant.PutFailure.field.external_error_indicator'><code>external_error_indicator</code></td><td><div class='docblock'><p>Error type sent back, may be injected form upper layers</p>
+</div></td></tr></table></td></tr><tr><td id='variant.PostFailure'><code>PostFailure</code></td><td><div class='docblock'><p>Error for Post, includes signed request to prevent injection attacks</p>
+</div><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.PostFailure.field.request'><code>request</code></td><td><div class='docblock'><p>Originators signed reuest</p>
+</div></td></tr><tr><td id='variant.PostFailure.field.external_error_indicator'><code>external_error_indicator</code></td><td><div class='docblock'><p>Error type sent back, may be injected form upper layers</p>
+</div></td></tr></table></td></tr><tr><td id='variant.DeleteFailure'><code>DeleteFailure</code></td><td><div class='docblock'><p>Error for delete, includes signed request to prevent injection attacks</p>
+</div><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.DeleteFailure.field.request'><code>request</code></td><td><div class='docblock'><p>Originators signed reuest</p>
+</div></td></tr><tr><td id='variant.DeleteFailure.field.external_error_indicator'><code>external_error_indicator</code></td><td><div class='docblock'><p>Error type sent back, may be injected form upper layers</p>
+</div></td></tr></table></td></tr></table><h2 id='implementations'>Trait Implementations</h2><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='../rustc_serialize/serialize/trait.Decodable.html' title='rustc_serialize::serialize::Decodable'>Decodable</a> for <a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a></code></h3><div class='impl-items'><h4 id='method.decode' class='method'><code>fn <a href='../rustc_serialize/serialize/trait.Decodable.html#method.decode' class='fnname'>decode</a>&lt;__D: <a class='trait' href='../rustc_serialize/serialize/trait.Decoder.html' title='rustc_serialize::serialize::Decoder'>Decoder</a>&gt;(__arg_0: &amp;mut __D) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a>, __D::Error&gt;</code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='../rustc_serialize/serialize/trait.Encodable.html' title='rustc_serialize::serialize::Encodable'>Encodable</a> for <a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a></code></h3><div class='impl-items'><h4 id='method.encode' class='method'><code>fn <a href='../rustc_serialize/serialize/trait.Encodable.html#method.encode' class='fnname'>encode</a>&lt;__S: <a class='trait' href='../rustc_serialize/serialize/trait.Encoder.html' title='rustc_serialize::serialize::Encoder'>Encoder</a>&gt;(&amp;self, __arg_0: &amp;mut __S) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, __S::Error&gt;</code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#method.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/hash/trait.Hash.html' title='core::hash::Hash'>Hash</a> for <a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a></code></h3><div class='impl-items'><h4 id='method.hash' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/hash/trait.Hash.html#method.hash' class='fnname'>hash</a>&lt;__H: <a class='trait' href='https://doc.rust-lang.org/nightly/core/hash/trait.Hasher.html' title='core::hash::Hasher'>Hasher</a>&gt;(&amp;self, __arg_0: &amp;mut __H)</code></h4>
+<h4 id='method.hash_slice' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/hash/trait.Hash.html#method.hash_slice' class='fnname'>hash_slice</a>&lt;H&gt;(data: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[Self]</a>, state: &amp;mut H) <span class='where'>where H: <a class='trait' href='https://doc.rust-lang.org/nightly/core/hash/trait.Hasher.html' title='core::hash::Hasher'>Hasher</a></span></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a></code></h3><div class='impl-items'><h4 id='method.clone' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a></code></h4>
+<h4 id='method.clone_from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a></code></h3><div class='impl-items'><h4 id='method.eq' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<h4 id='method.ne' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a></code></h3><div class='impl-items'></div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html' title='core::cmp::PartialOrd'>PartialOrd</a> for <a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a></code></h3><div class='impl-items'><h4 id='method.partial_cmp' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html#method.partial_cmp' class='fnname'>partial_cmp</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/core/cmp/enum.Ordering.html' title='core::cmp::Ordering'>Ordering</a>&gt;</code></h4>
+<h4 id='method.lt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html#method.lt' class='fnname'>lt</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<h4 id='method.le' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html#method.le' class='fnname'>le</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<h4 id='method.gt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html#method.gt' class='fnname'>gt</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<h4 id='method.ge' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html#method.ge' class='fnname'>ge</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.Ord.html' title='core::cmp::Ord'>Ord</a> for <a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a></code></h3><div class='impl-items'><h4 id='method.cmp' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.Ord.html#method.cmp' class='fnname'>cmp</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../routing/enum.ResponseContent.html' title='routing::ResponseContent'>ResponseContent</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/cmp/enum.Ordering.html' title='core::cmp::Ordering'>Ordering</a></code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "routing";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script defer src="../search-index.js"></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `create` fn in crate `safe_client`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, create">
+
+    <title>safe_client::structured_data_operations::versioned::create - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../main.css">
+
+    <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../../../safe_client/index.html'><img src='https://raw.githubusercontent.com/maidsafe/QA/master/Images/maidsafe_logo.png' alt='' width='100'></a>
+        <p class='location'><a href='../../index.html'>safe_client</a>::<wbr><a href='../index.html'>structured_data_operations</a>::<wbr><a href='index.html'>versioned</a></p><script>window.sidebarCurrent = {name: 'create', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content fn">
+<h1 class='fqn'><span class='in-band'>Function <a href='../../index.html'>safe_client</a>::<wbr><a href='../index.html'>structured_data_operations</a>::<wbr><a href='index.html'>versioned</a>::<wbr><a class='fn' href=''>create</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-13376' class='srclink' href='../../../src/safe_client/structured_data_operations/versioned.rs.html#19-35' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn create(client: &amp;<a class='struct' href='../../../safe_client/client/struct.Client.html' title='safe_client::client::Client'>Client</a>, version_name_to_store: <a class='struct' href='../../../routing/name_type/struct.NameType.html' title='routing::name_type::NameType'>NameType</a>, tag_type: <a href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, identifier: <a class='struct' href='../../../routing/name_type/struct.NameType.html' title='routing::name_type::NameType'>NameType</a>, version: <a href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, owner_keys: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../../sodiumoxide/crypto/sign/ed25519/struct.PublicKey.html' title='sodiumoxide::crypto::sign::ed25519::PublicKey'>PublicKey</a>&gt;, prev_owner_keys: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../../sodiumoxide/crypto/sign/ed25519/struct.PublicKey.html' title='sodiumoxide::crypto::sign::ed25519::PublicKey'>PublicKey</a>&gt;, private_signing_key: &amp;<a class='struct' href='../../../sodiumoxide/crypto/sign/ed25519/struct.SecretKey.html' title='sodiumoxide::crypto::sign::ed25519::SecretKey'>SecretKey</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../../routing/structured_data/struct.StructuredData.html' title='routing::structured_data::StructuredData'>StructuredData</a>, <a class='enum' href='../../../safe_client/errors/enum.ClientError.html' title='safe_client::errors::ClientError'>ClientError</a>&gt;</pre><div class='docblock'><p>Create the StructuredData to manage versioned data.</p>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../";
+        window.currentCrate = "safe_client";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../../jquery.js"></script>
+    <script src="../../../main.js"></script>
+    
+    <script async src="../../../search-index.js"></script>
+</body>
+</html>

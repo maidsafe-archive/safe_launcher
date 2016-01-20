@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `safe_launcher` crate.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, safe_launcher">
+
+    <title>safe_launcher - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../safe_launcher/index.html'><img src='https://raw.githubusercontent.com/maidsafe/QA/master/Images/maidsafe_logo.png' alt='' width='100'></a>
+        <p class='location'></p><script>window.sidebarCurrent = {name: 'safe_launcher', ty: 'mod', relpath: '../'};</script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>safe_launcher</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-0' class='srclink' href='../src/safe_launcher/lib.rs.html#18-67' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'>
+<h1 id='safe-launcher-library' class='section-header'><a href='#safe-launcher-library'>Safe-Launcher Library</a></h1>
+<p><a href="https://github.com/maidsafe/safe_launcher">Project github page</a></p>
+</div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='errors/index.html'
+                               title='safe_launcher::errors'>errors</a></td>
+                        <td class='docblock short'>
+                             <p>Safe-Launcher Errors.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='event_sender/index.html'
+                               title='safe_launcher::event_sender'>event_sender</a></td>
+                        <td class='docblock short'>
+                             <p>Mechanisms to help with event-subsetting.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='ffi/index.html'
+                               title='safe_launcher::ffi'>ffi</a></td>
+                        <td class='docblock short'>
+                             <p>FFI interface.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='launcher/index.html'
+                               title='safe_launcher::launcher'>launcher</a></td>
+                        <td class='docblock short'>
+                             <p>The gateway to the Launcher core modules. It consumes <code>safe_core::client::Client</code> and is a
+packet that must be held for the duration the core library is activated.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='observer/index.html'
+                               title='safe_launcher::observer'>observer</a></td>
+                        <td class='docblock short'>
+                             <p>Since the entire core library is purely event driven, this module provides types and primitives
+that an interfacing crate (executable or another library) should make use of to easily tap into
+the information and events of interest happening in the core.</p>
+
+                        </td>
+                    </tr>
+                </table><h2 id='macros' class='section-header'><a href="#macros">Macros</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='macro' href='macro.eval_break!.html'
+                               title='safe_launcher::eval_break!'>eval_break!</a></td>
+                        <td class='docblock short'>
+                             <p>This macro is intended to be used in all cases where we get Result<T, U> and want to print a
+debug information about it and break out of some loop, for e.g. an event loop</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='macro' href='macro.eval_send_one!.html'
+                               title='safe_launcher::eval_send_one!'>eval_send_one!</a></td>
+                        <td class='docblock short'>
+                             <p>This macro is intended to be used in all cases where we get an Err out of Result<T, U> and
+want to send it to a single <code>std::sync::mpsc::Sender&lt;Result&lt;T, U&gt;&gt;</code>, for e.g.  an observer,
+and subsequently return from the function.
+Additionally it will purge all the dead observers (i.e. those no longer existing or interested
+in observing).</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='macro' href='macro.ffi_try!.html'
+                               title='safe_launcher::ffi_try!'>ffi_try!</a></td>
+                        <td class='docblock short'>
+                             <p>This macro is intended to be used in all cases where we get Result<T, U> and want to convert it
+to C friendly error code to inform about error conditions accross library boundaries</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='macro' href='macro.group_send!.html'
+                               title='safe_launcher::group_send!'>group_send!</a></td>
+                        <td class='docblock short'>
+                             <p>This macro is intended to be used in all cases when we want to send a value to a group
+(Vector) of <code>std::sync::mpsc::Sender&lt;T&gt;</code>, for e.g. an observer pattern with senders. It
+performs necessary trait conversion for sending the given data if such a conversion was
+defined.
+Additionally it will purge all the dead observers (i.e. those no longer existing or
+interested in observing).</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='macro' href='macro.parse_option!.html'
+                               title='safe_launcher::parse_option!'>parse_option!</a></td>
+                        <td class='docblock short'>
+                             <p>This macro is intended to be used in all cases where we get a None out of Option<T> and want to
+package it into <code>safe_launcher::errors::LauncherError::SpecificParseError(String)</code>. This is
+useful because there may be miscellaneous erros while parsing through a valid JSON due to JSON
+not conforming to certain mandatory requirements. This can then be communicated back to the
+JSON sending client.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='macro' href='macro.parse_result!.html'
+                               title='safe_launcher::parse_result!'>parse_result!</a></td>
+                        <td class='docblock short'>
+                             <p>This macro is intended to be used in all cases where we get an Err out of Result<T, U> and want
+to package it into <code>safe_launcher::errors::LauncherError::SpecificParseError(String)</code>. This is
+useful because there may be miscellaneous erros while parsing through a valid JSON due to JSON
+not conforming to certain mandatory requirements. This can then be communicated back to the
+JSON sending client.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='macro' href='macro.send_one!.html'
+                               title='safe_launcher::send_one!'>send_one!</a></td>
+                        <td class='docblock short'>
+                             <p>This macro is intended to be used in all cases when we want to send a value to a single
+<code>std::sync::mpsc::Sender&lt;T&gt;</code>, for e.g. an observer. It performs necessary trait conversion for
+sending the given data if such a conversion was defined.</p>
+
+                        </td>
+                    </tr>
+                </table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "safe_launcher";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script async src="../search-index.js"></script>
+</body>
+</html>

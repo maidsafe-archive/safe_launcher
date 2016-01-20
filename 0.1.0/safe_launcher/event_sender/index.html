@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `event_sender` mod in crate `safe_launcher`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, event_sender">
+
+    <title>safe_launcher::event_sender - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../../safe_launcher/index.html'><img src='https://raw.githubusercontent.com/maidsafe/QA/master/Images/maidsafe_logo.png' alt='' width='100'></a>
+        <p class='location'><a href='../index.html'>safe_launcher</a></p><script>window.sidebarCurrent = {name: 'event_sender', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>safe_launcher</a>::<wbr><a class='mod' href=''>event_sender</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-3626' class='srclink' href='../../src/safe_launcher/event_sender.rs.html#18-84' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Mechanisms to help with event-subsetting.</p>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.EventSender.html'
+                               title='safe_launcher::event_sender::EventSender'>EventSender</a></td>
+                        <td class='docblock short'>
+                             <p>This structure is coded to achieve event-subsetting. Receivers in Rust are blocking. One cannot
+listen to multiple receivers at the same time except by using <code>try_recv</code> which again is bad for
+the same reasons spin-lock based on some sleep is bad (wasting cycles, 50% efficienct on an
+average etc.). Consider a module that listens to signals from various other modules. Different
+modules want to talk to this one. So one solution is make a common event set and all senders
+(registered in all the interested modules) send events from the same set. This is bad for
+maintenance. Wrong modules might use events not expected to originate from them since it is just
+one huge event-set. Thus there is a need of event-subsetting and distribute this module-wise so
+we prevent modules from using wrong events, completely by design and code-mechanics. Also we
+don&#39;t want to spawn threads listening to different receivers (which will force to share ownership
+which is against design philosophy of Launcher). This is what <code>EventSender</code> helps to salvage. A
+simple mechanism that does what a <code>skip-list</code> in linked list does. It brings forth a concept of
+an Umbrella event-category and an event subset. The creator of <code>EventSender</code> hard-codes the
+category for different observers. Each category only links to a particular event-subset and
+type information of this is put into <code>EventSender</code> to during it&#39;s construction. Thus when
+distributed, modules cannot cheat (do the wrong thing) by trying to fire an event they are not
+permitted. Also a single thread listens to various receivers. All problems solved.</p>
+
+                        </td>
+                    </tr>
+                </table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "safe_launcher";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script async src="../../search-index.js"></script>
+</body>
+</html>

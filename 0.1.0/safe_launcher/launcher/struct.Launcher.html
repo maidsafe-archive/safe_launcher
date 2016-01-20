@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Launcher` struct in crate `safe_launcher`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Launcher">
+
+    <title>safe_launcher::launcher::Launcher - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../../safe_launcher/index.html'><img src='https://raw.githubusercontent.com/maidsafe/QA/master/Images/maidsafe_logo.png' alt='' width='100'></a>
+        <p class='location'><a href='../index.html'>safe_launcher</a>::<wbr><a href='index.html'>launcher</a></p><script>window.sidebarCurrent = {name: 'Launcher', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>safe_launcher</a>::<wbr><a href='index.html'>launcher</a>::<wbr><a class='struct' href=''>Launcher</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-3425' class='srclink' href='../../src/safe_launcher/launcher/mod.rs.html#35-39' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Launcher {
+    // some fields omitted
+}</pre><div class='docblock'><p>A self-managed Launcher. This is a packet which will intilise and store the library state.
+Dropping this packet would be enough to gracefully exit the library by initiaing a domino
+effect via RAII.</p>
+
+<p>It is intended that the main thread be the owner of this. In order for multiple threads to tap
+into observer registration facility all that is need to be done is use one of the getters to
+event senders, clone it and distribute it to other threads. These event senders will help
+communicate with the core library in a completely asynchronous and thread safe manner.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../safe_launcher/launcher/struct.Launcher.html' title='safe_launcher::launcher::Launcher'>Launcher</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(client: <a class='struct' href='../../safe_core/client/struct.Client.html' title='safe_core::client::Client'>Client</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../safe_launcher/launcher/struct.Launcher.html' title='safe_launcher::launcher::Launcher'>Launcher</a>, <a class='enum' href='../../safe_launcher/errors/enum.LauncherError.html' title='safe_launcher::errors::LauncherError'>LauncherError</a>&gt;</code></h4>
+<div class='docblock'><p>Creates a new self-managed Launcher instance, which is a packet that will intilise and
+store the library state. Dropping this packet would be enough to gracefully exit the
+library by initiaing a domino effect via RAII.</p>
+</div><h4 id='method.get_ipc_event_sender' class='method'><code>fn <a href='#method.get_ipc_event_sender' class='fnname'>get_ipc_event_sender</a>(&amp;self) -&gt; &amp;EventSenderToServer&lt;<a class='enum' href='../../safe_launcher/launcher/enum.IpcExternalEvent.html' title='safe_launcher::launcher::IpcExternalEvent'>IpcExternalEvent</a>&gt;</code></h4>
+<div class='docblock'><p>Event Sender to communicate with the IPC Server, for e.g. to register observers etc.</p>
+</div><h4 id='method.get_app_handler_event_sender' class='method'><code>fn <a href='#method.get_app_handler_event_sender' class='fnname'>get_app_handler_event_sender</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mpsc/struct.Sender.html' title='std::sync::mpsc::Sender'>Sender</a>&lt;<a class='enum' href='../../safe_launcher/launcher/enum.AppHandlerEvent.html' title='safe_launcher::launcher::AppHandlerEvent'>AppHandlerEvent</a>&gt;</code></h4>
+<div class='docblock'><p>Event Sender to communicate with the App Handler, for e.g. to register observers, add an app
+to Laucher, remove or modify an already added app, etc.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../../safe_launcher/launcher/struct.Launcher.html' title='safe_launcher::launcher::Launcher'>Launcher</a></code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "safe_launcher";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script async src="../../search-index.js"></script>
+</body>
+</html>

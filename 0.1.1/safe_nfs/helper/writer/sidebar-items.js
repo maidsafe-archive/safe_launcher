@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Mode","Mode of the writter"]],"struct":[["Writer","Writer is used to write contents to a File and especially in chunks if the file happens to be too large"]]});

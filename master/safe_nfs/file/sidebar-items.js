@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["File","Representation of a File to be put into the network. Could be text, music, video etc any kind of file"]]});

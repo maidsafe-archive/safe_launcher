@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["AppHandlerEvent","This is an event subset to be used by external codes to communicate with the App Handling module. Observer registration facilities may be availed for notifications."]],"mod":[["event_data","Data that will be transferred during specific events to get a fine-grained detail about various parameters."]]});

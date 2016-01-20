@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["MAX_STRUCTURED_DATA_SIZE_IN_BYTES","Maximum allowed size for a Structured Data to grow to"]],"struct":[["StructuredData","StructuredData These types may be stored unsigned with previous and current owner keys set to the same keys. Updates though require a signature to validate"]]});

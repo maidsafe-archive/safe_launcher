@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Client` struct in crate `safe_core`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Client">
+
+    <title>safe_core::client::Client - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../../safe_core/index.html'><img src='https://raw.githubusercontent.com/maidsafe/QA/master/Images/maidsafe_logo.png' alt='' width='100'></a>
+        <p class='location'><a href='../index.html'>safe_core</a>::<wbr><a href='index.html'>client</a></p><script>window.sidebarCurrent = {name: 'Client', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>safe_core</a>::<wbr><a href='index.html'>client</a>::<wbr><a class='struct' href=''>Client</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-923' class='srclink' href='../../src/safe_core/client/mod.rs.html#51-59' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Client {
+    // some fields omitted
+}</pre><div class='docblock'><p>The main self-authentication client instance that will interface all the request from high
+level API&#39;s to the actual routing layer and manage all interactions with it. This is
+essentially a non-blocking Client with upper layers having an option to either block and wait
+on the returned ResponseGetter for receiving network response or spawn a new thread. The Client
+itself is however well equipped for parallel and non-blocking PUTs and GETS.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../safe_core/client/struct.Client.html' title='safe_core::client::Client'>Client</a></code></h3><div class='impl-items'><h4 id='method.create_unregistered_client' class='method'><code>fn <a href='#method.create_unregistered_client' class='fnname'>create_unregistered_client</a>() -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../safe_core/client/struct.Client.html' title='safe_core::client::Client'>Client</a>, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>This is a getter-only Gateway function to the Maidsafe network. It will create an
+unregistered random clinet, which can do very limited set of operations - eg., a
+Network-Get</p>
+</div><h4 id='method.create_account' class='method'><code>fn <a href='#method.create_account' class='fnname'>create_account</a>(keyword: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, pin: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, password: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../safe_core/client/struct.Client.html' title='safe_core::client::Client'>Client</a>, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>This is one of the two Gateway functions to the Maidsafe network, the other being the
+log_in. This will help create a fresh account for the user in the SAFE-network.</p>
+</div><h4 id='method.log_in' class='method'><code>fn <a href='#method.log_in' class='fnname'>log_in</a>(keyword: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, pin: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, password: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../safe_core/client/struct.Client.html' title='safe_core::client::Client'>Client</a>, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>This is one of the two Gateway functions to the Maidsafe network, the other being the
+create_account. This will help log into an already created account for the user in the
+SAFE-network.</p>
+</div><h4 id='method.set_user_root_directory_id' class='method'><code>fn <a href='#method.set_user_root_directory_id' class='fnname'>set_user_root_directory_id</a>(&amp;mut self, root_dir_id: <a class='struct' href='../../xor_name/struct.XorName.html' title='xor_name::XorName'>XorName</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>Create an entry for the Root Directory ID for the user into the session packet, encrypt and
+store it. It will be retireved when the user logs into his account. Root directory ID is
+necessary to fetch all of user&#39;s data as all further data is encoded as meta-information
+into the Root Directory or one of its subdirectories.</p>
+</div><h4 id='method.get_user_root_directory_id' class='method'><code>fn <a href='#method.get_user_root_directory_id' class='fnname'>get_user_root_directory_id</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='../../xor_name/struct.XorName.html' title='xor_name::XorName'>XorName</a>&gt;</code></h4>
+<div class='docblock'><p>Get User&#39;s Root Directory ID if available in session packet used for current login</p>
+</div><h4 id='method.set_configuration_root_directory_id' class='method'><code>fn <a href='#method.set_configuration_root_directory_id' class='fnname'>set_configuration_root_directory_id</a>(&amp;mut self, root_dir_id: <a class='struct' href='../../xor_name/struct.XorName.html' title='xor_name::XorName'>XorName</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>Create an entry for the Maidsafe configuration specific Root Directory ID into the
+session packet, encrypt and store it. It will be retireved when the user logs into
+his account. Root directory ID is necessary to fetch all of configuration data as all further
+data is encoded as meta-information into the config Root Directory or one of its subdirectories.</p>
+</div><h4 id='method.get_configuration_root_directory_id' class='method'><code>fn <a href='#method.get_configuration_root_directory_id' class='fnname'>get_configuration_root_directory_id</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='../../xor_name/struct.XorName.html' title='xor_name::XorName'>XorName</a>&gt;</code></h4>
+<div class='docblock'><p>Get Maidsafe specific configuration&#39;s Root Directory ID if available in session packet used
+for current login</p>
+</div><h4 id='method.hybrid_encrypt' class='method'><code>fn <a href='#method.hybrid_encrypt' class='fnname'>hybrid_encrypt</a>(&amp;self, data_to_encrypt: <a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>, nonce_opt: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='../../sodiumoxide/crypto/box_/curve25519xsalsa20poly1305/struct.Nonce.html' title='sodiumoxide::crypto::box_::curve25519xsalsa20poly1305::Nonce'>Nonce</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>Combined Asymmectric and Symmetric encryption. The data is encrypted using random Key and
+IV with Xsalsa-symmetric encryption. Random IV ensures that same plain text produces different
+cipher-texts for each fresh symmetric encryption. The Key and IV are then asymmetrically
+enrypted using Public-MAID and the whole thing is then serialised into a single Vec<u8>.</p>
+</div><h4 id='method.hybrid_decrypt' class='method'><code>fn <a href='#method.hybrid_decrypt' class='fnname'>hybrid_decrypt</a>(&amp;self, data_to_decrypt: <a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>, nonce_opt: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='../../sodiumoxide/crypto/box_/curve25519xsalsa20poly1305/struct.Nonce.html' title='sodiumoxide::crypto::box_::curve25519xsalsa20poly1305::Nonce'>Nonce</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>Reverse of hybrid_encrypt. Refer hybrid_encrypt.</p>
+</div><h4 id='method.get' class='method'><code>fn <a href='#method.get' class='fnname'>get</a>(&amp;mut self, request_for: <a class='enum' href='../../routing/data/enum.DataRequest.html' title='routing::data::DataRequest'>DataRequest</a>, opt_dst: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='../../routing/authority/enum.Authority.html' title='routing::authority::Authority'>Authority</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../safe_core/client/response_getter/struct.ResponseGetter.html' title='safe_core::client::response_getter::ResponseGetter'>ResponseGetter</a>, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>Get data from the network. This is non-blocking.</p>
+</div><h4 id='method.put' class='method'><code>fn <a href='#method.put' class='fnname'>put</a>(&amp;self, data: <a class='enum' href='../../routing/data/enum.Data.html' title='routing::data::Data'>Data</a>, opt_dst: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='../../routing/authority/enum.Authority.html' title='routing::authority::Authority'>Authority</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>Put data onto the network. This is non-blocking.</p>
+</div><h4 id='method.post' class='method'><code>fn <a href='#method.post' class='fnname'>post</a>(&amp;self, data: <a class='enum' href='../../routing/data/enum.Data.html' title='routing::data::Data'>Data</a>, opt_dst: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='../../routing/authority/enum.Authority.html' title='routing::authority::Authority'>Authority</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>Post data onto the network</p>
+</div><h4 id='method.delete' class='method'><code>fn <a href='#method.delete' class='fnname'>delete</a>(&amp;self, data: <a class='enum' href='../../routing/data/enum.Data.html' title='routing::data::Data'>Data</a>, opt_dst: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='../../routing/authority/enum.Authority.html' title='routing::authority::Authority'>Authority</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>Delete data from the network</p>
+</div><h4 id='method.get_public_encryption_key' class='method'><code>fn <a href='#method.get_public_encryption_key' class='fnname'>get_public_encryption_key</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;&amp;<a class='struct' href='../../sodiumoxide/crypto/box_/curve25519xsalsa20poly1305/struct.PublicKey.html' title='sodiumoxide::crypto::box_::curve25519xsalsa20poly1305::PublicKey'>PublicKey</a>, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>Returns the public encryption key</p>
+</div><h4 id='method.get_secret_encryption_key' class='method'><code>fn <a href='#method.get_secret_encryption_key' class='fnname'>get_secret_encryption_key</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;&amp;<a class='struct' href='../../sodiumoxide/crypto/box_/curve25519xsalsa20poly1305/struct.SecretKey.html' title='sodiumoxide::crypto::box_::curve25519xsalsa20poly1305::SecretKey'>SecretKey</a>, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>Returns the Secret encryption key</p>
+</div><h4 id='method.get_public_signing_key' class='method'><code>fn <a href='#method.get_public_signing_key' class='fnname'>get_public_signing_key</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;&amp;<a class='struct' href='../../sodiumoxide/crypto/sign/ed25519/struct.PublicKey.html' title='sodiumoxide::crypto::sign::ed25519::PublicKey'>PublicKey</a>, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>Returns the Public Signing key</p>
+</div><h4 id='method.get_secret_signing_key' class='method'><code>fn <a href='#method.get_secret_signing_key' class='fnname'>get_secret_signing_key</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;&amp;<a class='struct' href='../../sodiumoxide/crypto/sign/ed25519/struct.SecretKey.html' title='sodiumoxide::crypto::sign::ed25519::SecretKey'>SecretKey</a>, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>Returns the Secret Signing key</p>
+</div><h4 id='method.add_data_receive_event_observer' class='method'><code>fn <a href='#method.add_data_receive_event_observer' class='fnname'>add_data_receive_event_observer</a>(&amp;self, data_name: <a class='struct' href='../../xor_name/struct.XorName.html' title='xor_name::XorName'>XorName</a>, sender: <a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mpsc/struct.Sender.html' title='std::sync::mpsc::Sender'>Sender</a>&lt;<a class='enum' href='../../safe_core/translated_events/enum.DataReceivedEvent.html' title='safe_core::translated_events::DataReceivedEvent'>DataReceivedEvent</a>&gt;)</code></h4>
+<div class='docblock'><p>Add observers for Data Recieve Events</p>
+</div><h4 id='method.add_operation_failure_event_observer' class='method'><code>fn <a href='#method.add_operation_failure_event_observer' class='fnname'>add_operation_failure_event_observer</a>(&amp;self, sender: <a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mpsc/struct.Sender.html' title='std::sync::mpsc::Sender'>Sender</a>&lt;<a class='enum' href='../../safe_core/translated_events/enum.OperationFailureEvent.html' title='safe_core::translated_events::OperationFailureEvent'>OperationFailureEvent</a>&gt;)</code></h4>
+<div class='docblock'><p>Add observers for Operation Failure Events like <code>PutFailure</code>, <code>PostFailure</code>, <code>DeleteFailure</code>,
+<code>Terminated</code></p>
+</div><h4 id='method.add_network_event_observer' class='method'><code>fn <a href='#method.add_network_event_observer' class='fnname'>add_network_event_observer</a>(&amp;self, sender: <a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mpsc/struct.Sender.html' title='std::sync::mpsc::Sender'>Sender</a>&lt;<a class='enum' href='../../safe_core/translated_events/enum.NetworkEvent.html' title='safe_core::translated_events::NetworkEvent'>NetworkEvent</a>&gt;)</code></h4>
+<div class='docblock'><p>Add observers for Network Events like <code>Connected</code>, <code>Disconnected</code>, <code>Terminated</code></p>
+</div><h4 id='method.get_default_client_manager_address' class='method'><code>fn <a href='#method.get_default_client_manager_address' class='fnname'>get_default_client_manager_address</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;&amp;<a class='struct' href='../../xor_name/struct.XorName.html' title='xor_name::XorName'>XorName</a>, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>Get the default address where the PUTs will go to for this client</p>
+</div><h4 id='method.set_default_client_manager_address' class='method'><code>fn <a href='#method.set_default_client_manager_address' class='fnname'>set_default_client_manager_address</a>(&amp;mut self, address: <a class='struct' href='../../xor_name/struct.XorName.html' title='xor_name::XorName'>XorName</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
+<div class='docblock'><p>Set the default address where the PUTs and DELETEs will go to for this client</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "safe_core";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script async src="../../search-index.js"></script>
+</body>
+</html>

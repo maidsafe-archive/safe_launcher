@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `FileHelper` struct in crate `safe_nfs`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, FileHelper">
+
+    <title>safe_nfs::helper::file_helper::FileHelper - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../main.css">
+
+    <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../../../safe_nfs/index.html'><img src='https://raw.githubusercontent.com/maidsafe/QA/master/Images/maidsafe_logo.png' alt='' width='100'></a>
+        <p class='location'><a href='../../index.html'>safe_nfs</a>::<wbr><a href='../index.html'>helper</a>::<wbr><a href='index.html'>file_helper</a></p><script>window.sidebarCurrent = {name: 'FileHelper', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../../index.html'>safe_nfs</a>::<wbr><a href='../index.html'>helper</a>::<wbr><a href='index.html'>file_helper</a>::<wbr><a class='struct' href=''>FileHelper</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-554' class='srclink' href='../../../src/safe_nfs/helper/file_helper.rs.html#19-21' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct FileHelper {
+    // some fields omitted
+}</pre><div class='docblock'><p>File provides helper functions to perform Operations on Files</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../safe_nfs/helper/file_helper/struct.FileHelper.html' title='safe_nfs::helper::file_helper::FileHelper'>FileHelper</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(client: <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/arc/struct.Arc.html' title='alloc::arc::Arc'>Arc</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mutex/struct.Mutex.html' title='std::sync::mutex::Mutex'>Mutex</a>&lt;<a class='struct' href='../../../safe_core/client/struct.Client.html' title='safe_core::client::Client'>Client</a>&gt;&gt;) -&gt; <a class='struct' href='../../../safe_nfs/helper/file_helper/struct.FileHelper.html' title='safe_nfs::helper::file_helper::FileHelper'>FileHelper</a></code></h4>
+<div class='docblock'><p>Create a new FileHelper instance</p>
+</div><h4 id='method.create' class='method'><code>fn <a href='#method.create' class='fnname'>create</a>(&amp;self, name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, user_metatdata: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;, parent_directory: <a class='struct' href='../../../safe_nfs/directory_listing/struct.DirectoryListing.html' title='safe_nfs::directory_listing::DirectoryListing'>DirectoryListing</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../../safe_nfs/helper/writer/struct.Writer.html' title='safe_nfs::helper::writer::Writer'>Writer</a>, <a class='enum' href='../../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Helper function to create a file in a directory listing
+A writer object is returned, through which the data for the file can be written to the network
+The file is actually saved in the directory listing only after <code>writer.close()</code> is invoked</p>
+</div><h4 id='method.delete' class='method'><code>fn <a href='#method.delete' class='fnname'>delete</a>(&amp;self, file_name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, parent_directory: &amp;mut <a class='struct' href='../../../safe_nfs/directory_listing/struct.DirectoryListing.html' title='safe_nfs::directory_listing::DirectoryListing'>DirectoryListing</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../../safe_nfs/directory_listing/struct.DirectoryListing.html' title='safe_nfs::directory_listing::DirectoryListing'>DirectoryListing</a>&gt;, <a class='enum' href='../../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Delete a file from the DirectoryListing
+Returns Option<parent_directory's parent></p>
+</div><h4 id='method.update_metadata' class='method'><code>fn <a href='#method.update_metadata' class='fnname'>update_metadata</a>(&amp;self, file: <a class='struct' href='../../../safe_nfs/file/struct.File.html' title='safe_nfs::file::File'>File</a>, parent_directory: &amp;mut <a class='struct' href='../../../safe_nfs/directory_listing/struct.DirectoryListing.html' title='safe_nfs::directory_listing::DirectoryListing'>DirectoryListing</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../../safe_nfs/directory_listing/struct.DirectoryListing.html' title='safe_nfs::directory_listing::DirectoryListing'>DirectoryListing</a>&gt;, <a class='enum' href='../../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Updates the file metadata.
+Returns Option<parent_directory's parent></p>
+</div><h4 id='method.update_content' class='method'><code>fn <a href='#method.update_content' class='fnname'>update_content</a>(&amp;self, file: <a class='struct' href='../../../safe_nfs/file/struct.File.html' title='safe_nfs::file::File'>File</a>, mode: <a class='enum' href='../../../safe_nfs/helper/writer/enum.Mode.html' title='safe_nfs::helper::writer::Mode'>Mode</a>, parent_directory: <a class='struct' href='../../../safe_nfs/directory_listing/struct.DirectoryListing.html' title='safe_nfs::directory_listing::DirectoryListing'>DirectoryListing</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../../safe_nfs/helper/writer/struct.Writer.html' title='safe_nfs::helper::writer::Writer'>Writer</a>, <a class='enum' href='../../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Helper function to Update content of a file in a directory listing
+A writer object is returned, through which the data for the file can be written to the network
+The file is actually saved in the directory listing only after <code>writer.close()</code> is invoked</p>
+</div><h4 id='method.get_versions' class='method'><code>fn <a href='#method.get_versions' class='fnname'>get_versions</a>(&amp;self, file: &amp;<a class='struct' href='../../../safe_nfs/file/struct.File.html' title='safe_nfs::file::File'>File</a>, parent_directory: &amp;<a class='struct' href='../../../safe_nfs/directory_listing/struct.DirectoryListing.html' title='safe_nfs::directory_listing::DirectoryListing'>DirectoryListing</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../../safe_nfs/file/struct.File.html' title='safe_nfs::file::File'>File</a>&gt;, <a class='enum' href='../../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+<div class='docblock'><p>Return the versions of a directory containing modified versions of a file</p>
+</div><h4 id='method.read' class='method'><code>fn <a href='#method.read' class='fnname'>read</a>&lt;'a&gt;(&amp;self, file: &amp;'a <a class='struct' href='../../../safe_nfs/file/struct.File.html' title='safe_nfs::file::File'>File</a>) -&gt; <a class='struct' href='../../../safe_nfs/helper/reader/struct.Reader.html' title='safe_nfs::helper::reader::Reader'>Reader</a>&lt;'a&gt;</code></h4>
+<div class='docblock'><p>Returns a reader for reading the file contents</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../";
+        window.currentCrate = "safe_nfs";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../../jquery.js"></script>
+    <script src="../../../main.js"></script>
+    
+    <script async src="../../../search-index.js"></script>
+</body>
+</html>

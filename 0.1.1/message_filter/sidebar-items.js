@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["MessageFilter","Implementation of message filter."]]});
