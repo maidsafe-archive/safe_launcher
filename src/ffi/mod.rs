@@ -111,8 +111,7 @@ mod test {
     use safe_core::utility;
 
     fn generate_random_cstring(len: usize) -> Result<CString, FfiError> {
-        let mut cstring_vec =
-            unwrap_result!(utility::generate_random_vector::<u8>(len));
+        let mut cstring_vec = unwrap_result!(utility::generate_random_vector::<u8>(len));
         // Avoid internal nulls and ensure valid ASCII (thus valid utf8)
         for it in cstring_vec.iter_mut() {
             *it %= 128;
@@ -121,8 +120,7 @@ mod test {
             }
         }
 
-        CString::new(cstring_vec)
-            .map_err(|error| FfiError::from(error.description()))
+        CString::new(cstring_vec).map_err(|error| FfiError::from(error.description()))
     }
 
     #[test]

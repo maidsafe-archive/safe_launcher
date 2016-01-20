@@ -61,8 +61,8 @@ fn version_parser<D /* : */>(params: ParameterPacket,
 {
     let api_dest = try!(parse_option!(endpoint_tokens.pop(), "Invalid endpoint."));
     if api_dest != "safe-api" {
-        return Err(LauncherError::SpecificParseError(format!("Unrecognised token \
-                                                              \"{}\" in endpoint path.",
+        return Err(LauncherError::SpecificParseError(format!("Unrecognised token \"{}\" in \
+                                                              endpoint path.",
                                                              api_dest)));
     }
 
@@ -70,7 +70,7 @@ fn version_parser<D /* : */>(params: ParameterPacket,
                                              "Invalid endpoint - Version token not found."));
     if version_str.len() < 4 || version_str.remove(0) != 'v' {
         return Err(LauncherError::SpecificParseError("Unparsable version in endpoint path."
-                                                     .to_string()));
+                                                         .to_string()));
     }
     let version = try!(parse_result!(version_str.parse::<f32>(), "Unparsable version"));
 
@@ -91,9 +91,9 @@ fn module_dispatcher<D>(params: ParameterPacket,
         "nfs" => nfs::action_dispatcher(params, remaining_tokens, version, decoder),
         "dns" => dns::action_dispatcher(params, remaining_tokens, version, decoder),
         _ => {
-            Err(LauncherError::SpecificParseError(format!("Unrecognised module \"{}\" \
-                                                           in endpoint path.",
-                                                        module)))
+            Err(LauncherError::SpecificParseError(format!("Unrecognised module \"{}\" in \
+                                                           endpoint path.",
+                                                          module)))
         }
     }
 }
@@ -107,24 +107,23 @@ mod test {
 
     #[test]
     fn parse_request() {
-        let parameter_packet =
-            unwrap_result!(test_utils::get_parameter_packet(false));
+        let parameter_packet = unwrap_result!(test_utils::get_parameter_packet(false));
 
         let mut json_str = "{}";
         let mut json_obj = unwrap_result!(json::Json::from_str(&json_str));
-        assert!(parser::begin_parse(parameter_packet.clone(),
-                &mut json::Decoder::new(json_obj)).is_err());
+        assert!(parser::begin_parse(parameter_packet.clone(), &mut json::Decoder::new(json_obj))
+                    .is_err());
 
         json_str = "{\"endpoint\": \"safe-api/v1.0/nfs/create-dir\", \"data\": {}}";
         json_obj = unwrap_result!(json::Json::from_str(&json_str));
-        assert!(parser::begin_parse(parameter_packet.clone(),
-                &mut json::Decoder::new(json_obj)).is_err());
+        assert!(parser::begin_parse(parameter_packet.clone(), &mut json::Decoder::new(json_obj))
+                    .is_err());
 
         json_str = "{\"endpoint\": \"safe-api/v1.0/nfs/create-dir\", \"data\": {\"dir_path\": \
                     \"/demo\",\"is_path_shared\": false,\"is_private\": true,\"is_versioned\": \
                     false,\"user_metadata\": \"\"}}";
         json_obj = unwrap_result!(json::Json::from_str(&json_str));
-        assert!(parser::begin_parse(parameter_packet.clone(),
-                &mut json::Decoder::new(json_obj)).is_ok());
+        assert!(parser::begin_parse(parameter_packet.clone(), &mut json::Decoder::new(json_obj))
+                    .is_ok());
     }
 }

@@ -42,28 +42,29 @@ mod secure_communication;
 const IPC_SESSION_THREAD_NAME: &'static str = "IpcSessionThread";
 
 pub struct IpcSession {
-    app_id                 : Option<XorName>,
-    temp_id                : u32,
-    stream                 : TcpStream,
-    app_nonce              : Option<box_::Nonce>,
-    app_pub_key            : Option<box_::PublicKey>,
-    raii_joiner            : RaiiThreadJoiner,
+    app_id: Option<XorName>,
+    temp_id: u32,
+    stream: TcpStream,
+    app_nonce: Option<box_::Nonce>,
+    app_pub_key: Option<box_::PublicKey>,
+    raii_joiner: RaiiThreadJoiner,
     // TODO(Spandan) change to 3-level permission instead of 2
-    safe_drive_access      : Option<Arc<Mutex<bool>>>,
-    event_catagory_tx      : mpsc::Sender<events::IpcSessionEventCategory>,
-    external_event_rx      : mpsc::Receiver<events::ExternalEvent>,
-    secure_comm_event_rx   : mpsc::Receiver<events::SecureCommunicationEvent>,
-    secure_comm_event_tx   : mpsc::Sender<events::SecureCommunicationEvent>,
+    safe_drive_access: Option<Arc<Mutex<bool>>>,
+    event_catagory_tx: mpsc::Sender<events::IpcSessionEventCategory>,
+    external_event_rx: mpsc::Receiver<events::ExternalEvent>,
+    secure_comm_event_rx: mpsc::Receiver<events::SecureCommunicationEvent>,
+    secure_comm_event_tx: mpsc::Sender<events::SecureCommunicationEvent>,
     authentication_event_rx: mpsc::Receiver<events::AppAuthenticationEvent>,
     ipc_server_event_sender: EventSenderToServer<IpcSessionEvent>,
 }
 
 impl IpcSession {
     pub fn new(server_event_sender: EventSenderToServer<IpcSessionEvent>,
-               temp_id            : u32,
-               stream             : TcpStream) -> Result<(RaiiThreadJoiner,
-                                        EventSenderToSession<events::ExternalEvent>),
-                                        LauncherError> {
+               temp_id: u32,
+               stream: TcpStream)
+               -> Result<(RaiiThreadJoiner,
+                          EventSenderToSession<events::ExternalEvent>),
+                         LauncherError> {
         let ipc_stream = try!(stream::IpcStream::new(try!(stream.try_clone().map_err(|err| {
             LauncherError::IpcStreamCloneError(err)
         }))));
@@ -114,8 +115,7 @@ impl IpcSession {
             external_event_sender))
     }
 
-    fn run(&mut self,
-           event_catagory_rx: mpsc::Receiver<events::IpcSessionEventCategory>) {
+    fn run(&mut self, event_catagory_rx: mpsc::Receiver<events::IpcSessionEventCategory>) {
         for event_category in event_catagory_rx.iter() {
             match event_category {
                 events::IpcSessionEventCategory::AppAuthenticationEvent => {
@@ -163,8 +163,7 @@ impl IpcSession {
         let app_detail = *app_detail;
 
         self.app_id = Some(app_detail.app_id);
-        self.safe_drive_access =
-            Some(Arc::new(Mutex::new(app_detail.safe_drive_access)));
+        self.safe_drive_access = Some(Arc::new(Mutex::new(app_detail.safe_drive_access)));
 
         if let Some(mut ipc_stream) = self.get_ipc_stream_or_terminate() {
             match ecdh_key_exchange::perform_ecdh_exchange(&mut ipc_stream,
@@ -226,11 +225,10 @@ impl IpcSession {
             SessionId::TempId(self.temp_id)
         };
 
-        let termination_detail =
-            SessionTerminationDetail {
-                id: id,
-                reason: reason,
-            };
+        let termination_detail = SessionTerminationDetail {
+            id: id,
+            reason: reason,
+        };
 
         if let Err(err) = send_one!(termination_detail, &self.ipc_server_event_sender) {
             debug!("Error {:?} - Sending termination notice to server.", err);
@@ -330,16 +328,18 @@ mod tests {
 
         let app_id = XorName(unwrap_result!(utility::generate_random_array_u8_64()));
         let dir_id = XorName(unwrap_result!(utility::generate_random_array_u8_64()));
-        let directory_key = ::safe_nfs::metadata::directory_key::DirectoryKey::new(
-            dir_id, 10u64, false, AccessLevel::Private);
+        let directory_key =
+            ::safe_nfs::metadata::directory_key::DirectoryKey::new(dir_id,
+                                                                   10u64,
+                                                                   false,
+                                                                   AccessLevel::Private);
         let activation_details = ActivationDetail {
             nonce: "mock_nonce_string".to_string(),
             app_id: app_id,
             app_root_dir_key: directory_key,
             safe_drive_access: false,
         };
-        let activate_event = ExternalEvent::AppActivated(
-            Box::new(activation_details));
+        let activate_event = ExternalEvent::AppActivated(Box::new(activation_details));
         unwrap_result!(event_sender.send(activate_event));
 
         let stream = unwrap_result!(::std::net::TcpStream::connect(&listener_ep[..]));

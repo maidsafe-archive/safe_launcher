@@ -60,9 +60,9 @@ pub struct IpcServer {
 }
 
 impl IpcServer {
-    pub fn new(client: Arc<Mutex<Client>>)
-               -> Result<(RaiiThreadJoiner, EventSenderToServer<events::ExternalEvent>),
-                         LauncherError> {
+    pub fn new
+        (client: Arc<Mutex<Client>>)
+         -> Result<(RaiiThreadJoiner, EventSenderToServer<events::ExternalEvent>), LauncherError> {
         let (session_event_tx, session_event_rx) = mpsc::channel();
         let (listener_event_tx, listener_event_rx) = mpsc::channel();
         let (external_event_tx, external_event_rx) = mpsc::channel();
@@ -110,8 +110,7 @@ impl IpcServer {
             external_event_sender))
     }
 
-    fn run(&mut self,
-           event_catagory_rx: mpsc::Receiver<events::IpcServerEventCategory>) {
+    fn run(&mut self, event_catagory_rx: mpsc::Receiver<events::IpcServerEventCategory>) {
         for event_category in event_catagory_rx.iter() {
             match event_category {
                 events::IpcServerEventCategory::IpcListenerEvent => {
@@ -300,8 +299,9 @@ impl IpcServer {
         let mut send_failed = false;
 
         if let Some(session_info) = self.verified_sessions.get_mut(&app_id) {
-            send_failed = session_info.event_sender.send(
-                ExternalEvent::ChangeSafeDriveAccess(is_allowed)).is_err();
+            send_failed = session_info.event_sender
+                                      .send(ExternalEvent::ChangeSafeDriveAccess(is_allowed))
+                                      .is_err();
         } else {
             for (_, app_info) in self.pending_verifications.iter_mut() {
                 if app_info.app_id == app_id {
@@ -315,9 +315,9 @@ impl IpcServer {
             let _ = self.verified_sessions.remove(&app_id);
 
             let data = event_data::VerifiedSession {
-                id    : app_id,
-                action: event_data::Action::Removed(
-                    Some(LauncherError::ReceiverChannelDisconnected)),
+                id: app_id,
+                action:
+                    event_data::Action::Removed(Some(LauncherError::ReceiverChannelDisconnected)),
             };
             group_send!(data, &mut self.verified_session_observers);
         }
@@ -420,8 +420,8 @@ impl IpcServer {
                     if stop_flag.load(atomic::Ordering::SeqCst) {
                         break;
                     } else {
-                        if let Err(_) =
-                               event_sender.send(events::IpcListenerEvent::SpawnIpcSession(stream)) {
+                        if let Err(_) = event_sender.send(
+                                events::IpcListenerEvent::SpawnIpcSession(stream)) {
                             break;
                         }
                     }
@@ -461,8 +461,7 @@ mod test {
 
     #[test]
     fn spawn_and_shut_ipc_server() {
-        let client =
-            Arc::new(Mutex::new(unwrap_result!(test_utils::get_client())));
+        let client = Arc::new(Mutex::new(unwrap_result!(test_utils::get_client())));
 
         let (_raii_joiner_0, event_sender) = unwrap_result!(IpcServer::new(client));
 

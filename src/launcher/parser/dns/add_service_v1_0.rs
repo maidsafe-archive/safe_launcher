@@ -42,10 +42,9 @@ impl traits::Action for AddService {
             &params.app_root_dir_key
         };
 
-        let dir_to_map =
-            try!(helper::get_final_subdirectory(params.client.clone(),
-                                                &tokens,
-                                                Some(start_dir_key)));
+        let dir_to_map = try!(helper::get_final_subdirectory(params.client.clone(),
+                                                             &tokens,
+                                                             Some(start_dir_key)));
 
         let signing_key = try!(unwrap_result!(params.client.lock()).get_secret_signing_key())
                               .clone();
@@ -74,8 +73,7 @@ mod test {
 
     #[test]
     fn add_dns_service() {
-        let parameter_packet =
-            unwrap_result!(test_utils::get_parameter_packet(false));
+        let parameter_packet = unwrap_result!(test_utils::get_parameter_packet(false));
 
         let dir_helper = DirectoryHelper::new(parameter_packet.client.clone());
         let mut app_root_dir = unwrap_result!(dir_helper.get(&parameter_packet.app_root_dir_key));

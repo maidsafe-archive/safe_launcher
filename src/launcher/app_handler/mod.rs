@@ -25,8 +25,7 @@ use xor_name::XorName;
 use maidsafe_utilities::thread::RaiiThreadJoiner;
 use maidsafe_utilities::serialisation::{serialise, deserialise};
 
-use config::{LAUNCHER_GLOBAL_CONFIG_FILE_NAME,
-             LAUNCHER_GLOBAL_DIRECTORY_NAME,
+use config::{LAUNCHER_GLOBAL_CONFIG_FILE_NAME, LAUNCHER_GLOBAL_DIRECTORY_NAME,
              LAUNCHER_NONCE_LENGTH};
 use errors::LauncherError;
 use launcher::ipc_server::EventSenderToServer;
@@ -47,20 +46,20 @@ mod misc;
 const APP_HANDLER_THREAD_NAME: &'static str = "AppHandlerThread";
 
 pub struct AppHandler {
-    client                 : Arc<Mutex<Client>>,
-    launcher_endpoint      : String,
-    local_config_data      : HashMap<XorName, String>,
-    app_add_observers      : Vec<AppHandlerObserver>,
-    app_remove_observers   : Vec<AppHandlerObserver>,
-    app_modify_observers   : Vec<AppHandlerObserver>,
-    app_activate_observers : Vec<AppHandlerObserver>,
+    client: Arc<Mutex<Client>>,
+    launcher_endpoint: String,
+    local_config_data: HashMap<XorName, String>,
+    app_add_observers: Vec<AppHandlerObserver>,
+    app_remove_observers: Vec<AppHandlerObserver>,
+    app_modify_observers: Vec<AppHandlerObserver>,
+    app_activate_observers: Vec<AppHandlerObserver>,
     ipc_server_event_sender: EventSenderToServer<ExternalEvent>,
 }
 
 impl AppHandler {
-    pub fn new(client      : Arc<Mutex<Client>>,
+    pub fn new(client: Arc<Mutex<Client>>,
                event_sender: EventSenderToServer<ExternalEvent>)
-            -> (RaiiThreadJoiner, mpsc::Sender<events::AppHandlerEvent>) {
+               -> (RaiiThreadJoiner, mpsc::Sender<events::AppHandlerEvent>) {
         let (event_tx, event_rx) = mpsc::channel();
 
         let joiner = thread!(APP_HANDLER_THREAD_NAME, move || {
@@ -84,24 +83,24 @@ impl AppHandler {
             if event_sender.send(ExternalEvent::GetListenerEndpoint(tx)).is_ok() {
                 if let Ok(launcher_endpoint) = rx.recv() {
                     let mut app_handler = AppHandler {
-                        client                 : client,
-                        launcher_endpoint      : launcher_endpoint,
-                        local_config_data      : local_config_data,
-                        app_add_observers      : Vec::with_capacity(2),
-                        app_remove_observers   : Vec::with_capacity(2),
-                        app_modify_observers   : Vec::with_capacity(2),
-                        app_activate_observers : Vec::with_capacity(2),
+                        client: client,
+                        launcher_endpoint: launcher_endpoint,
+                        local_config_data: local_config_data,
+                        app_add_observers: Vec::with_capacity(2),
+                        app_remove_observers: Vec::with_capacity(2),
+                        app_modify_observers: Vec::with_capacity(2),
+                        app_activate_observers: Vec::with_capacity(2),
                         ipc_server_event_sender: event_sender,
                     };
 
                     app_handler.run(event_rx);
                 } else {
-                    debug!("AppHandler <-> IPC-Server Communication failed - \
-                            Probably Launcher was closed too soon.");
+                    debug!("AppHandler <-> IPC-Server Communication failed - Probably Launcher \
+                            was closed too soon.");
                 }
             } else {
-                debug!("AppHandler <-> IPC-Server Communication failed - \
-                        Probably Launcher was closed too soon.");
+                debug!("AppHandler <-> IPC-Server Communication failed - Probably Launcher was \
+                        closed too soon.");
             }
 
             debug!("Exiting thread {:?}", APP_HANDLER_THREAD_NAME);
@@ -258,9 +257,8 @@ impl AppHandler {
                               .arg("--launcher")
                               .arg(command_line_arg)
                               .spawn() {
-            if let Err(err) =
-                   self.ipc_server_event_sender
-                       .send(ExternalEvent::EndSession(app_id)) {
+            if let Err(err) = self.ipc_server_event_sender
+                                  .send(ExternalEvent::EndSession(app_id)) {
                 debug!("{:?} Error sending end-session signal to IPC Server.", err);
             }
 
@@ -273,9 +271,8 @@ impl AppHandler {
     fn on_remove_app(&mut self, app_id: XorName) {
         let reply = match self.on_remove_app_impl(app_id) {
             Ok(data) => {
-                if let Err(err) =
-                       self.ipc_server_event_sender
-                           .send(ExternalEvent::EndSession(app_id)) {
+                if let Err(err) = self.ipc_server_event_sender
+                                      .send(ExternalEvent::EndSession(app_id)) {
                     debug!("{:?} Error sending end-session signal to IPC Server.", err);
                 }
 
@@ -300,15 +297,15 @@ impl AppHandler {
             try!(self.get_launcher_global_config_and_dir());
 
         let position = try!(launcher_configurations.iter()
-                                        .position(|config| config.app_id == app_id)
-                                        .ok_or(LauncherError::AppNotRegistered));
+                                                   .position(|config| config.app_id == app_id)
+                                                   .ok_or(LauncherError::AppNotRegistered));
         let reference_count = launcher_configurations[position].reference_count;
 
         if reference_count == 1 {
             let _ = launcher_configurations.remove(position);
         } else {
             let config = try!(launcher_configurations.get_mut(position)
-                                            .ok_or(LauncherError::AppNotRegistered));
+                                                     .ok_or(LauncherError::AppNotRegistered));
             config.reference_count -= 1;
         }
 
@@ -344,10 +341,9 @@ impl AppHandler {
         group_send!(reply, &mut self.app_modify_observers);
     }
 
-    fn on_modify_app_settings_impl
-        (&mut self,
-         data: events::event_data::ModifyAppSettings)
-         -> Result<AppModification, LauncherError> {
+    fn on_modify_app_settings_impl(&mut self,
+                                   data: events::event_data::ModifyAppSettings)
+                                   -> Result<AppModification, LauncherError> {
         let (mut global_configs, config_dir) = try!(self.get_launcher_global_config_and_dir());
 
         let mut global_config_modified = false;
@@ -367,8 +363,9 @@ impl AppHandler {
                 app_info.safe_drive_access = safe_drive_access;
                 global_config_modified = true;
 
-                if self.ipc_server_event_sender.send(ExternalEvent
-                            ::ChangeSafeDriveAccess(data.id, safe_drive_access)).is_err() {
+                if self.ipc_server_event_sender
+                       .send(ExternalEvent::ChangeSafeDriveAccess(data.id, safe_drive_access))
+                       .is_err() {
                     debug!("Error asking IPC Server to change \"SAFEDrive\" permission for an app");
                 }
 
@@ -425,8 +422,9 @@ impl AppHandler {
         self.app_modify_observers.push(observer);
     }
 
-    fn on_get_all_managed_apps(&self, observer: mpsc::Sender<
-            Result<Vec<events::event_data::ManagedApp>, LauncherError>>) {
+    fn on_get_all_managed_apps(&self,
+                               observer: mpsc::Sender<Result<Vec<events::event_data::ManagedApp>,
+                                                             LauncherError>>) {
         let global_configs = eval_send_one!(self.get_launcher_global_config(), &observer);
         let mut managed_apps = Vec::with_capacity(global_configs.len());
         for it in global_configs.iter() {
@@ -477,9 +475,8 @@ impl AppHandler {
         dir_name
     }
 
-    fn get_launcher_global_config
-        (&self)
-         -> Result<Vec<misc::LauncherConfiguration>, LauncherError> {
+    fn get_launcher_global_config(&self)
+            -> Result<Vec<misc::LauncherConfiguration>, LauncherError> {
         Ok(try!(self.get_launcher_global_config_and_dir()).0)
     }
 
@@ -506,8 +503,7 @@ impl AppHandler {
         let file = unwrap_option!(dir_listing.get_files()
                                              .iter()
                                              .find(|file| {
-                                                 file.get_name() ==
-                                                 LAUNCHER_GLOBAL_CONFIG_FILE_NAME
+                                                 file.get_name() == LAUNCHER_GLOBAL_CONFIG_FILE_NAME
                                              }),
                                   "Logic Error - Launcher start-up should ensure the file must \
                                    be present at this stage - Report bug.")
@@ -521,8 +517,9 @@ impl AppHandler {
         Ok(())
     }
 
-    fn get_launcher_global_config_and_dir(&self) -> Result<(Vec<misc::LauncherConfiguration>,
-            DirectoryListing), LauncherError> {
+    fn get_launcher_global_config_and_dir
+        (&self)
+         -> Result<(Vec<misc::LauncherConfiguration>, DirectoryListing), LauncherError> {
         let dir_helper = DirectoryHelper::new(self.client.clone());
         let dir_listing = try!(dir_helper.get_configuration_directory_listing(
             LAUNCHER_GLOBAL_DIRECTORY_NAME.to_string()));

@@ -26,8 +26,9 @@ pub struct SessionInfo {
 }
 
 impl SessionInfo {
-    pub fn new(raii_joiner : RaiiThreadJoiner,
-               event_sender: EventSenderToSession<events::ExternalEvent>) -> SessionInfo {
+    pub fn new(raii_joiner: RaiiThreadJoiner,
+               event_sender: EventSenderToSession<events::ExternalEvent>)
+               -> SessionInfo {
         SessionInfo {
             _raii_joiner: raii_joiner,
             event_sender: event_sender,

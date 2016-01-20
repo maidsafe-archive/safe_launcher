@@ -37,13 +37,13 @@ pub fn verify_launcher_nonce(
         let payload_as_str = eval_send_one!(parse_result!(String::from_utf8(payload),
                                                           "Invalid UTF-8"),
                                             &event_sender);
-        let handshake_request: HandshakeRequest =
-            eval_send_one!(json::decode(&payload_as_str), &event_sender);
+        let handshake_request: HandshakeRequest = eval_send_one!(json::decode(&payload_as_str),
+                                                                 &event_sender);
 
         if handshake_request.endpoint != APP_AUTHENTICATION_ENDPOINT {
-            eval_send_one!(Err(LauncherError::SpecificParseError("Invalid endpoint \
-                                                                  for app-auhtentication"
-                                                                .to_string())),
+            eval_send_one!(Err(LauncherError::SpecificParseError("Invalid endpoint for \
+                                                                  app-auhtentication"
+                                                                     .to_string())),
                            &event_sender);
         }
 
@@ -53,9 +53,9 @@ pub fn verify_launcher_nonce(
                                                      "Nonce -> Base64"),
                                        &event_sender);
         if vec_nonce.len() != box_::NONCEBYTES {
-            eval_send_one!(Err(LauncherError::SpecificParseError("Invalid asymmetric \
-                                                                  nonce length."
-                                                                .to_string())),
+            eval_send_one!(Err(LauncherError::SpecificParseError("Invalid asymmetric nonce \
+                                                                  length."
+                                                                     .to_string())),
                            &event_sender);
         }
 
@@ -65,9 +65,9 @@ pub fn verify_launcher_nonce(
                                                        "PublicKey -> Base64"),
                                          &event_sender);
         if vec_pub_key.len() != box_::PUBLICKEYBYTES {
-            eval_send_one!(Err(LauncherError::SpecificParseError("Invalid asymmetric \
-                                                                  public key length."
-                                                                .to_string())),
+            eval_send_one!(Err(LauncherError::SpecificParseError("Invalid asymmetric public \
+                                                                  key length."
+                                                                     .to_string())),
                            &event_sender);
         }
 
@@ -81,13 +81,12 @@ pub fn verify_launcher_nonce(
             asymm_pub_key.0[it.0] = it.1;
         }
 
-        if let Err(err) =
-               send_one!(Ok(AuthData {
-                             str_nonce: handshake_request.data.launcher_string,
-                             asymm_nonce: asymm_nonce,
-                             asymm_pub_key: asymm_pub_key,
-                         }),
-                         &event_sender) {
+        if let Err(err) = send_one!(Ok(AuthData {
+                                        str_nonce: handshake_request.data.launcher_string,
+                                        asymm_nonce: asymm_nonce,
+                                        asymm_pub_key: asymm_pub_key,
+                                    }),
+                                    &event_sender) {
             debug!("{:?} Error sending authentication data to IPCSession.", err);
         }
 

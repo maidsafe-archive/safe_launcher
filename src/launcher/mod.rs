@@ -28,9 +28,7 @@ use safe_core::client::Client;
 use safe_nfs::{UNVERSIONED_DIRECTORY_LISTING_TAG, AccessLevel};
 use safe_nfs::helper::{file_helper, directory_helper};
 
-use ::config::{LAUNCHER_GLOBAL_DIRECTORY_NAME,
-               LAUNCHER_GLOBAL_CONFIG_FILE_NAME,
-               SAFE_DRIVE_DIR_NAME};
+use config::{LAUNCHER_GLOBAL_DIRECTORY_NAME, LAUNCHER_GLOBAL_CONFIG_FILE_NAME, SAFE_DRIVE_DIR_NAME};
 use errors::LauncherError;
 
 mod parser;
@@ -66,15 +64,12 @@ impl Launcher {
 
         if launcher_config_dir.get_files()
                               .iter()
-                              .find(|file| {
-                                  file.get_name() == LAUNCHER_GLOBAL_CONFIG_FILE_NAME
-                              })
+                              .find(|file| file.get_name() == LAUNCHER_GLOBAL_CONFIG_FILE_NAME)
                               .is_none() {
             let file_helper = file_helper::FileHelper::new(client.clone());
-            let writer =
-                try!(file_helper.create(LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string(),
-                                        Vec::new(),
-                                        launcher_config_dir));
+            let writer = try!(file_helper.create(LAUNCHER_GLOBAL_CONFIG_FILE_NAME.to_string(),
+                                                 Vec::new(),
+                                                 launcher_config_dir));
             let _ = try!(writer.close());
         }
 

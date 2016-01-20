@@ -36,8 +36,8 @@ pub fn action_dispatcher<D>(params: ParameterPacket,
           D::Error: ::std::fmt::Debug
 {
     if remaining_tokens.len() > 1 {
-        return Err(LauncherError::SpecificParseError("Extra unrecognised tokens in \
-                                                      endpoint.".to_string()));
+        return Err(LauncherError::SpecificParseError("Extra unrecognised tokens in endpoint."
+                                                         .to_string()));
     }
 
     let action_str = try!(parse_option!(remaining_tokens.pop(),
@@ -57,8 +57,7 @@ fn get_action<D>(action_str: &str,
 {
     use rustc_serialize::Decodable;
 
-    let version_err = Err(LauncherError::SpecificParseError(format!("Unsupported \
-                                                                     version {:?} \
+    let version_err = Err(LauncherError::SpecificParseError(format!("Unsupported version {:?} \
                                                                      for this endpoint.",
                                                                     version)));
 
@@ -152,8 +151,8 @@ fn get_action<D>(action_str: &str,
             }
         }
         _ => {
-            return Err(LauncherError::SpecificParseError(format!("Unsupported action \
-                                                                  {:?} for this endpoint.",
+            return Err(LauncherError::SpecificParseError(format!("Unsupported action {:?} for \
+                                                                  this endpoint.",
                                                                  action_str)))
         }
     })

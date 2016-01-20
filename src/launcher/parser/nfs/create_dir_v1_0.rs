@@ -17,9 +17,7 @@
 
 use errors::LauncherError;
 use launcher::parser::{helper, ParameterPacket, ResponseType, traits};
-use safe_nfs::{AccessLevel,
-               UNVERSIONED_DIRECTORY_LISTING_TAG,
-               VERSIONED_DIRECTORY_LISTING_TAG};
+use safe_nfs::{AccessLevel, UNVERSIONED_DIRECTORY_LISTING_TAG, VERSIONED_DIRECTORY_LISTING_TAG};
 use safe_nfs::helper::directory_helper::DirectoryHelper;
 
 #[derive(RustcDecodable, Debug)]
@@ -48,10 +46,9 @@ impl traits::Action for CreateDir {
             &params.app_root_dir_key
         };
 
-        let mut parent_sub_dir =
-            try!(helper::get_final_subdirectory(params.client.clone(),
-                                                &tokens,
-                                                Some(start_dir_key)));
+        let mut parent_sub_dir = try!(helper::get_final_subdirectory(params.client.clone(),
+                                                                     &tokens,
+                                                                     Some(start_dir_key)));
 
         let dir_helper = DirectoryHelper::new(params.client);
 

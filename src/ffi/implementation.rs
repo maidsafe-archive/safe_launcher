@@ -17,14 +17,13 @@
 
 use libc::c_char;
 
-use ::std::ffi::CStr;
+use std::ffi::CStr;
 
 use ffi::errors::FfiError;
 
 /// Converts c character pointer into Rust String
 #[allow(unsafe_code)]
-pub fn c_char_ptr_to_string(c_char_ptr: *const c_char)
-                            -> Result<String, FfiError> {
+pub fn c_char_ptr_to_string(c_char_ptr: *const c_char) -> Result<String, FfiError> {
     use std::error::Error;
 
     let cstr = unsafe { CStr::from_ptr(c_char_ptr) };

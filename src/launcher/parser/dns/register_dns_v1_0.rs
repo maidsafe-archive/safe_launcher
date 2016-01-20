@@ -44,10 +44,9 @@ impl traits::Action for RegisterDns {
             &params.app_root_dir_key
         };
 
-        let dir_to_map =
-            try!(helper::get_final_subdirectory(params.client.clone(),
-                                                &tokens,
-                                                Some(start_dir_key)));
+        let dir_to_map = try!(helper::get_final_subdirectory(params.client.clone(),
+                                                             &tokens,
+                                                             Some(start_dir_key)));
 
         let (msg_public_key, msg_secret_key) = box_::gen_keypair();
         let services = vec![(self.service_name.clone(), (dir_to_map.get_key().clone()))];
@@ -58,7 +57,7 @@ impl traits::Action for RegisterDns {
                                           .get_secret_signing_key())
                                      .clone();
         let dns_operation = try!(DnsOperations::new(params.client
-                                                                                      .clone()));
+                                                          .clone()));
         let struct_data = try!(dns_operation.register_dns(self.long_name.clone(),
                                                           &msg_public_key,
                                                           &msg_secret_key,

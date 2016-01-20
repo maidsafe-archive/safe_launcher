@@ -20,10 +20,10 @@ use sodiumoxide::crypto::{box_, secretbox};
 use errors::LauncherError;
 use launcher::ipc_server::ipc_session::stream::IpcStream;
 
-pub fn perform_ecdh_exchange(ipc_stream : &mut IpcStream,
-                             app_nonce  : box_::Nonce,
+pub fn perform_ecdh_exchange(ipc_stream: &mut IpcStream,
+                             app_nonce: box_::Nonce,
                              app_pub_key: box_::PublicKey)
-        -> Result<(secretbox::Nonce, secretbox::Key), LauncherError> {
+                             -> Result<(secretbox::Nonce, secretbox::Key), LauncherError> {
     use rustc_serialize::base64::ToBase64;
     use rustc_serialize::json;
 

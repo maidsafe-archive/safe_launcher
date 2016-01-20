@@ -30,11 +30,10 @@ pub fn tokenise_path(path: &str, keep_empty_splits: bool) -> Vec<String> {
         .collect()
 }
 
-pub fn get_final_subdirectory
-    (client: Arc<Mutex<Client>>,
-     tokens: &Vec<String>,
-     starting_directory: Option<&DirectoryKey>)
-     -> Result<DirectoryListing, LauncherError> {
+pub fn get_final_subdirectory(client: Arc<Mutex<Client>>,
+                              tokens: &Vec<String>,
+                              starting_directory: Option<&DirectoryKey>)
+                              -> Result<DirectoryListing, LauncherError> {
     let dir_helper = DirectoryHelper::new(client);
 
     let mut current_dir_listing = match starting_directory {
@@ -45,9 +44,9 @@ pub fn get_final_subdirectory
     for it in tokens.iter() {
         current_dir_listing = {
             let current_dir_metadata = try!(current_dir_listing.get_sub_directories()
-                                        .iter()
-                                        .find(|a| *a.get_name() == *it)
-                                        .ok_or(LauncherError::PathNotFound));
+                                                               .iter()
+                                                               .find(|a| *a.get_name() == *it)
+                                                               .ok_or(LauncherError::PathNotFound));
             try!(dir_helper.get(current_dir_metadata.get_key()))
         };
     }

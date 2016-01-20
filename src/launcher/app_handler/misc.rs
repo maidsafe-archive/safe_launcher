@@ -35,16 +35,14 @@ pub struct LauncherConfiguration {
 // (Spandan)
 // This is a hack because presently cbor isn't able to decode/encode HashMap<NameType, String>
 // properly
-pub fn convert_hashmap_to_vec(hashmap: &HashMap<XorName, String>)
-                              -> Vec<(XorName, String)> {
+pub fn convert_hashmap_to_vec(hashmap: &HashMap<XorName, String>) -> Vec<(XorName, String)> {
     hashmap.iter().map(|a| (a.0.clone(), a.1.clone())).collect()
 }
 
 // (Spandan)
 // This is a hack because presently cbor isn't able to decode/encode HashMap<NameType, String>
 // properly
-pub fn convert_vec_to_hashmap(vec: Vec<(XorName, String)>)
-                              -> HashMap<XorName, String> {
+pub fn convert_vec_to_hashmap(vec: Vec<(XorName, String)>) -> HashMap<XorName, String> {
     vec.into_iter().collect()
 }
 

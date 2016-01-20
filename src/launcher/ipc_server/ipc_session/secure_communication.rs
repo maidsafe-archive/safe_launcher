@@ -31,11 +31,10 @@ use safe_nfs::helper::directory_helper::DirectoryHelper;
 const SECURE_COMM_THREAD_NAME: &'static str = "SecureCommunicationThread";
 
 pub struct SecureCommunication {
-    observer         : ipc_session::EventSenderToSession<
-                           ipc_session::events::SecureCommunicationEvent>,
-    symm_key         : secretbox::Key,
-    symm_nonce       : secretbox::Nonce,
-    ipc_stream       : ipc_session::stream::IpcStream,
+    observer: ipc_session::EventSenderToSession<ipc_session::events::SecureCommunicationEvent>,
+    symm_key: secretbox::Key,
+    symm_nonce: secretbox::Nonce,
+    ipc_stream: ipc_session::stream::IpcStream,
     parser_parameters: parser::ParameterPacket,
 }
 
@@ -129,9 +128,7 @@ impl SecureCommunication {
 
     fn on_receive_payload(&self, cipher_text: &[u8]) -> parser::ResponseType {
         let plain_text = try!(secretbox::open(&cipher_text, &self.symm_nonce, &self.symm_key)
-                                  .map_err(|()| {
-                                      LauncherError::SymmetricDecipherFailure
-                                  }));
+                                  .map_err(|()| LauncherError::SymmetricDecipherFailure));
         let json_str = try!(parse_result!(String::from_utf8(plain_text), "Invalid UTF-8"));
         let json_request = try!(json::Json::from_str(&json_str));
 
@@ -153,9 +150,7 @@ impl SecureCommunication {
 
         let json_str = try!(json::encode(&normal_response));
 
-        let cipher_text = secretbox::seal(&json_str.into_bytes(),
-                                          &self.symm_nonce,
-                                          &self.symm_key);
+        let cipher_text = secretbox::seal(&json_str.into_bytes(), &self.symm_nonce, &self.symm_key);
 
         Ok(cipher_text)
     }
@@ -184,9 +179,7 @@ impl SecureCommunication {
 
         let json_str = try!(json::encode(&error_response));
 
-        let cipher_text = secretbox::seal(&json_str.into_bytes(),
-                                          &self.symm_nonce,
-                                          &self.symm_key);
+        let cipher_text = secretbox::seal(&json_str.into_bytes(), &self.symm_nonce, &self.symm_key);
 
         Ok(cipher_text)
     }

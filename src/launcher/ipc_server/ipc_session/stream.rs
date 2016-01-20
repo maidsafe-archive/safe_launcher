@@ -33,9 +33,8 @@ pub struct IpcStream {
 
 impl IpcStream {
     pub fn new(stream: TcpStream) -> Result<IpcStream, LauncherError> {
-        let cloned_stream = try!(stream.try_clone().map_err(|e| {
-            LauncherError::IpcStreamCloneError(e)
-        }));
+        let cloned_stream = try!(stream.try_clone()
+                                       .map_err(|e| LauncherError::IpcStreamCloneError(e)));
         let (tx, rx) = mpsc::channel();
 
         let joiner = thread!(STREAM_WRITER_THREAD_NAME, move || {
@@ -101,8 +100,7 @@ impl IpcStream {
     // This will exit on any error condition the stream writer encounters. The stream reads can
     // continue. The next write event will however immediately notify the caller about the
     // writer channel being hung-up so that IPC Session can be terminated gracefully.
-    fn handle_write(rx: mpsc::Receiver<WriterEvent>,
-                    mut stream: TcpStream) {
+    fn handle_write(rx: mpsc::Receiver<WriterEvent>, mut stream: TcpStream) {
         use std::io::Write;
         use byteorder::WriteBytesExt;
 
