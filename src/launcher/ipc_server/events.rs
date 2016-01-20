@@ -15,6 +15,12 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use std::fmt;
+use std::net::TcpStream;
+use std::sync::mpsc;
+
+use errors::LauncherError;
+use observer::IpcObserver;
 use xor_name::XorName;
 
 #[derive(Clone, Debug)]
@@ -28,8 +34,8 @@ pub enum IpcServerEventCategory {
 
 #[derive(Debug)]
 pub enum IpcListenerEvent {
-    IpcListenerAborted(Box<::errors::LauncherError>),
-    SpawnIpcSession(::std::net::TcpStream),
+    IpcListenerAborted(Box<LauncherError>),
+    SpawnIpcSession(TcpStream),
 }
 
 // --------------------------------------------------------------------------------------
@@ -60,22 +66,22 @@ pub enum ExternalEvent {
     #[doc(hidden)]
     ChangeSafeDriveAccess(XorName, bool),
     /// Obtain the endpoint on which the Launcher IPC is listening to for incoming connections.
-    GetListenerEndpoint(::std::sync::mpsc::Sender<String>),
+    GetListenerEndpoint(mpsc::Sender<String>),
     /// Request IPC Server to forget a session with given app-id. The session will be terminated.
     EndSession(XorName),
     /// Register an observer to receive notifications about changes in verified sessions.
-    RegisterVerifiedSessionObserver(::observer::IpcObserver),
+    RegisterVerifiedSessionObserver(IpcObserver),
     /// Register an observer to receive notifications about changes in unverified sessions.
-    RegisterUnverifiedSessionObserver(::observer::IpcObserver),
+    RegisterUnverifiedSessionObserver(IpcObserver),
     /// Register an observer to receive notifications about changes in pending verifications.
-    RegisterPendingVerificationObserver(::observer::IpcObserver),
+    RegisterPendingVerificationObserver(IpcObserver),
     /// Terminate Launcher IPC - this will essentially exit all sessions and close IPC down
     /// gracefully.
     Terminate,
 }
 
-impl ::std::fmt::Debug for ExternalEvent {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl fmt::Debug for ExternalEvent {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if let ExternalEvent::GetListenerEndpoint(_) = *self {
             write!(f, "ExternalEvent::GetListenerEndpoint")
         } else {
@@ -94,18 +100,19 @@ impl From<event_data::ActivationDetail> for ExternalEvent {
 
 pub mod event_data {
     use xor_name::XorName;
+    use safe_nfs::metadata::directory_key::DirectoryKey;
 
     #[derive(Debug, Clone)]
     pub struct ActivationDetail {
-        pub nonce            : String,
-        pub app_id           : XorName,
-        pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
+        pub nonce: String,
+        pub app_id: XorName,
+        pub app_root_dir_key: DirectoryKey,
         pub safe_drive_access: bool,
     }
 
     #[derive(Debug)]
     pub struct SessionTerminationDetail {
-        pub id    : SessionId,
+        pub id: SessionId,
         pub reason: ::errors::LauncherError,
     }
 

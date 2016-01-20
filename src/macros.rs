@@ -104,7 +104,9 @@ macro_rules! group_send {
         // - cannot move out of captured outer variable in an `FnMut` closure
         // while doing a move in the closure provided to `retain()` below
         let mut option_dance = Some($data);
-        $senders.retain(|tx| tx.send(::std::convert::From::from(unwrap_option!(option_dance.take(), "Logic Error - Report a bug.")))
+        $senders.retain(|tx| tx.send(::std::convert::From::from(
+                                         unwrap_option!(option_dance.take(),
+                                                        "Logic Error - Report a bug.")))
                                .is_ok());
     }}
 }
@@ -226,7 +228,8 @@ macro_rules! eval_send_one {
 /// # #[macro_use] extern crate safe_launcher;
 /// fn g() -> Result<(), safe_launcher::errors::LauncherError> {
 ///     let mut remaining_tokens = vec![];
-///     let _module = try!(parse_option!(remaining_tokens.pop(), "Invalid endpoint - Module token not found."));
+///     let _module = try!(parse_option!(remaining_tokens.pop(),
+///                                      "Invalid endpoint - Module token not found."));
 ///
 ///     Ok(())
 /// }
@@ -279,7 +282,8 @@ macro_rules! parse_option {
 #[macro_export]
 macro_rules! parse_result {
     ($output:expr, $err_statement:expr) => {
-        $output.map_err(|e| $crate::errors::LauncherError::SpecificParseError(format!("{} {:?}", $err_statement.to_string(), e)))
+        $output.map_err(|e| $crate::errors::LauncherError::SpecificParseError(
+            format!("{} {:?}", $err_statement.to_string(), e)))
     }
 }
 
@@ -291,7 +295,8 @@ macro_rules! parse_result {
 /// ```
 /// # #[macro_use] extern crate safe_launcher;
 /// fn f() -> i32 {
-///     let some_result: Result<String, safe_launcher::errors::LauncherError> = Ok("Hello".to_string());
+///     let some_result: Result<String, safe_launcher::errors::LauncherError> =
+///         Ok("Hello".to_string());
 ///     let string_length = ffi_try!(some_result).len();
 ///     assert_eq!(string_length, 5);
 ///     0

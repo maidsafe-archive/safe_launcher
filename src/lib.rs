@@ -47,10 +47,12 @@ extern crate byteorder;
 extern crate bufstream;
 extern crate sodiumoxide;
 extern crate rustc_serialize;
-#[macro_use] extern crate log;
-#[macro_use] extern crate maidsafe_utilities;
+#[macro_use]
+extern crate log;
+#[macro_use]
+extern crate maidsafe_utilities;
 
-#[macro_use] mod macros;
+#[macro_use]mod macros;
 
 /// FFI interface.
 pub mod ffi;

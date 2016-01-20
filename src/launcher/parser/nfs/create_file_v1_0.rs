@@ -15,19 +15,23 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use errors::LauncherError;
+use launcher::parser::{helper, ParameterPacket, ResponseType, traits};
+use safe_nfs::helper::file_helper::FileHelper;
+
 #[derive(RustcDecodable, Debug)]
 pub struct CreateFile {
-    file_path     : String,
-    user_metadata : String,
+    file_path: String,
+    user_metadata: String,
     is_path_shared: bool,
 }
 
-impl ::launcher::parser::traits::Action for CreateFile {
-    fn execute(&mut self, params: ::launcher::parser::ParameterPacket) -> ::launcher::parser::ResponseType {
+impl traits::Action for CreateFile {
+    fn execute(&mut self, params: ParameterPacket) -> ResponseType {
         use rustc_serialize::base64::FromBase64;
 
         if self.is_path_shared && !*unwrap_result!(params.safe_drive_access.lock()) {
-            return Err(::errors::LauncherError::PermissionDenied)
+            return Err(LauncherError::PermissionDenied);
         };
 
         let start_dir_key = if self.is_path_shared {
@@ -36,19 +40,18 @@ impl ::launcher::parser::traits::Action for CreateFile {
             &params.app_root_dir_key
         };
 
-        let mut tokens = ::launcher::parser::helper::tokenise_path(&self.file_path, false);
-        let file_name = try!(tokens.pop().ok_or(::errors::LauncherError::InvalidPath));
+        let mut tokens = helper::tokenise_path(&self.file_path, false);
+        let file_name = try!(tokens.pop().ok_or(LauncherError::InvalidPath));
 
-        let file_directory = try!(::launcher::parser::helper::get_final_subdirectory(params.client.clone(),
-                                                                                     &tokens,
-                                                                                     Some(start_dir_key)));
+        let file_directory = try!(helper::get_final_subdirectory(params.client.clone(),
+                                                                 &tokens,
+                                                                 Some(start_dir_key)));
 
-        let file_helper = ::safe_nfs::helper::file_helper::FileHelper::new(params.client);
-        let bin_metadata = try!(parse_result!(self.user_metadata.from_base64(), "Failed Converting from Base64."));
+        let file_helper = FileHelper::new(params.client);
+        let bin_metadata = try!(parse_result!(self.user_metadata.from_base64(),
+                                              "Failed Converting from Base64."));
 
-        let writer = try!(file_helper.create(file_name,
-                                             bin_metadata,
-                                             file_directory));
+        let writer = try!(file_helper.create(file_name, bin_metadata, file_directory));
         let _ = try!(writer.close());
 
         Ok(None)
@@ -58,20 +61,22 @@ impl ::launcher::parser::traits::Action for CreateFile {
 #[cfg(test)]
 mod test {
     use super::*;
-    use ::launcher::parser::traits::Action;
+    use launcher::parser::traits::Action;
+    use launcher::parser::test_utils;
+    use safe_nfs::helper::directory_helper::DirectoryHelper;
 
     #[test]
     fn create_file() {
-        let parameter_packet = unwrap_result!(::launcher::parser::test_utils::get_parameter_packet(false));
+        let parameter_packet = unwrap_result!(test_utils::get_parameter_packet(false));
 
         let mut request = CreateFile {
-            file_path     : "/test.txt".to_string(),
-            user_metadata : "InNhbXBsZSBtZXRhZGF0YSI=".to_string(),
+            file_path: "/test.txt".to_string(),
+            user_metadata: "InNhbXBsZSBtZXRhZGF0YSI=".to_string(),
             is_path_shared: false,
         };
         assert!(request.execute(parameter_packet.clone()).is_ok());
 
-        let dir_helper = ::safe_nfs::helper::directory_helper::DirectoryHelper::new(parameter_packet.client);
+        let dir_helper = DirectoryHelper::new(parameter_packet.client);
         let app_dir = unwrap_result!(dir_helper.get(&parameter_packet.app_root_dir_key));
         assert!(app_dir.find_file(&"test.txt".to_string()).is_some());
     }

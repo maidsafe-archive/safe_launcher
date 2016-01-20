@@ -136,7 +136,7 @@ pub mod event_data {
     #[derive(Debug)]
     pub struct PendingVerification {
         /// Launcher nonce that was give to the Application while starting it.
-        pub nonce : String,
+        pub nonce: String,
         /// Action taken for this Application.
         pub action: Action,
     }
@@ -145,7 +145,7 @@ pub mod event_data {
     #[derive(Debug)]
     pub struct UnverifiedSession {
         /// Temporary id for a session trying to pass the authentication stages.
-        pub id    : u32,
+        pub id: u32,
         /// Action taken for this Application.
         pub action: Action,
     }
@@ -154,7 +154,7 @@ pub mod event_data {
     #[derive(Debug)]
     pub struct VerifiedSession {
         /// Unique id of the Application managed by Launcher.
-        pub id    : XorName,
+        pub id: XorName,
         /// Action taken for this Application.
         pub action: Action,
     }
@@ -163,7 +163,7 @@ pub mod event_data {
     #[derive(Debug)]
     pub struct AppAddition {
         /// Result of operation.
-        pub result    : Result<AppAdditionData, ::errors::LauncherError>,
+        pub result: Result<AppAdditionData, ::errors::LauncherError>,
         /// Local path of application binary on this machine.
         pub local_path: String,
     }
@@ -172,16 +172,16 @@ pub mod event_data {
     #[derive(Debug)]
     pub struct AppAdditionData {
         /// Unique id of the Application managed by Launcher.
-        pub id  : XorName,
+        pub id: XorName,
         /// Name given to the App by Launcher,
-        pub name: String
+        pub name: String,
     }
 
     /// Data for an app that was attempted to be removed from Launcher.
     #[derive(Debug)]
     pub struct AppRemoval {
         /// Unique id of the Application managed by Launcher.
-        pub id    : XorName,
+        pub id: XorName,
         /// Result of operation.
         pub result: Option<::errors::LauncherError>,
     }
@@ -190,7 +190,7 @@ pub mod event_data {
     #[derive(Debug)]
     pub struct AppModification {
         /// Unique id of the Application managed by Launcher.
-        pub id    : XorName,
+        pub id: XorName,
         /// Result of operation.
         pub result: Result<ModificationDetail, ::errors::LauncherError>,
     }
@@ -200,9 +200,9 @@ pub mod event_data {
     #[derive(Debug)]
     pub struct ModificationDetail {
         /// Name of the app.
-        pub name             : Option<String>,
+        pub name: Option<String>,
         /// Absolute local path to binary.
-        pub local_path       : Option<String>,
+        pub local_path: Option<String>,
         /// If this app is allowed to have access to `SAFEDrive`.
         pub safe_drive_access: Option<bool>,
     }

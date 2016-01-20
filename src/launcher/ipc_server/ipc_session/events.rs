@@ -15,20 +15,22 @@
 // Please review the Licences for the specific language governing permissions and limitations
 // relating to use of the SAFE Network Software.
 
+use errors::LauncherError;
+
 #[derive(Clone, Debug)]
 pub enum IpcSessionEventCategory {
-    AppAuthenticationEvent,    
+    AppAuthenticationEvent,
     SecureCommunicationEvent,
     ExternalEvent,
 }
 
 // --------------------------------------------------------------------------------------
 
-pub type AppAuthenticationEvent = Result<event_data::AuthData, ::errors::LauncherError>;
+pub type AppAuthenticationEvent = Result<event_data::AuthData, LauncherError>;
 
 // --------------------------------------------------------------------------------------
 
-pub type SecureCommunicationEvent = Result<(), ::errors::LauncherError>;
+pub type SecureCommunicationEvent = Result<(), LauncherError>;
 
 // --------------------------------------------------------------------------------------
 
@@ -50,25 +52,32 @@ impl From<event_data::AppDetail> for ExternalEvent {
 
 pub mod event_data {
     use xor_name::XorName;
+    use std::fmt;
+    use std::sync::{Arc, Mutex};
+    use safe_core::client::Client;
+    use safe_nfs::metadata::directory_key::DirectoryKey;
 
     pub struct AppDetail {
-        pub client           : ::std::sync::Arc<::std::sync::Mutex<::safe_core::client::Client>>,
-        pub app_id           : XorName,
-        pub app_root_dir_key : ::safe_nfs::metadata::directory_key::DirectoryKey,
+        pub client: Arc<Mutex<Client>>,
+        pub app_id: XorName,
+        pub app_root_dir_key: DirectoryKey,
         pub safe_drive_access: bool,
     }
 
-    impl ::std::fmt::Debug for AppDetail {
-        fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-            write!(f, "AppDetail {{ client: Arc<Mutex<Client>>, app_id: {:?}, safe_drive_access: {:?}, }}",
-                   self.app_id, self.safe_drive_access)
+    impl fmt::Debug for AppDetail {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            write!(f,
+                   "AppDetail {{ client: Arc<Mutex<Client>>, app_id: {:?}, safe_drive_access: \
+                    {:?}, }}",
+                   self.app_id,
+                   self.safe_drive_access)
         }
     }
 
     #[derive(Debug)]
     pub struct AuthData {
-        pub str_nonce    : String,
-        pub asymm_nonce  : ::sodiumoxide::crypto::box_::Nonce,
+        pub str_nonce: String,
+        pub asymm_nonce: ::sodiumoxide::crypto::box_::Nonce,
         pub asymm_pub_key: ::sodiumoxide::crypto::box_::PublicKey,
     }
 }
