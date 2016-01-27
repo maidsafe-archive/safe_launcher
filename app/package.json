@@ -1,0 +1,13 @@
+{
+  "name": "safe_launcher",
+  "productName": "SAFELauncher",
+  "identifier": "com.maidsafe.safe_launcher",
+  "description": "SAFE launcher - gateway to the SAFE Network",
+  "version": "0.1.0",
+  "author": "Maidsafe",
+  "copyright": "",
+  "main": "background.js",
+  "dependencies": {
+    "fs-jetpack": "^0.7.0"
+  }
+}
