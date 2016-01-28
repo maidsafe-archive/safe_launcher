@@ -9,6 +9,8 @@ before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
 script:
+  - cd app && npm install
+  - cd ..
   - npm test
 env:
   - CXX=g++-4.8
@@ -17,4 +19,5 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
+      - xvfb
       - g++-4.8
