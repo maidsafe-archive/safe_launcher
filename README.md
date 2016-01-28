@@ -1,6 +1,5 @@
 safe_launcher
 ==============
-safe_launcher  
 
 # Quick start
 The only development dependency of this project is [Node.js](https://nodejs.org). So just make sure you have it installed.
@@ -69,7 +68,3 @@ npm run release -- --sign A123456789
 #### Installer
 
 The installer is built using [NSIS](http://nsis.sourceforge.net). You have to install NSIS version 3.0, and add its folder to PATH in Environment Variables, so it is reachable to scripts in this project. For example, `C:\Program Files (x86)\NSIS`.
-
-#### 32-bit build on 64-bit Windows
-
-There are still a lot of 32-bit Windows installations in use. If you want to support those systems and have 64-bit OS make sure you've installed 32-bit (instead of 64-bit) Node version. There are [versions managers](https://github.com/coreybutler/nvm-windows) if you feel the need for both architectures on the same machine.

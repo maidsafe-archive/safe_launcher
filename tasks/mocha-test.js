@@ -1,23 +1,39 @@
 'use strict'
-var childProcess = require('child_process');
-var pathUtil = require('path');
+
 var gulp = require('gulp');
+var pathUtil = require('path');
+var jscs = require('gulp-jscs');
+var jshint = require('gulp-jshint');
+var stylish = require('gulp-jscs-stylish');
+var childProcess = require('child_process');
 
 var gulpPath = pathUtil.resolve('./node_modules/.bin/electron-mocha');
 if (process.platform === 'win32') {
-    gulpPath += '.cmd';
+  gulpPath += '.cmd';
 }
 
 process.env['mocha-unfunk-style'] = 'plain';
 
-var runTests = function() {
+var runMochaTests = function() {
   childProcess.spawn(gulpPath, [
-      '-R',
-      'mocha-unfunk-reporter',
-      './tests/*'
+    '-R',
+    'mocha-unfunk-reporter',
+    './tests/*'
   ], {
-      stdio: 'inherit'
+    stdio: 'inherit'
   });
 }
 
-gulp.task('mocha-test', runTests);
+var executeTest = function() {
+  gulp.src(['./app/*.js'])
+    .pipe(jshint({
+      esnext: true
+    })) // hint (optional)
+    .pipe(jscs()) // enforce style guide
+    .pipe(stylish.combineWithHintResults()) // combine with jshint results
+    .pipe(jshint.reporter('jshint-stylish'));
+
+    runMochaTests();
+};
+
+gulp.task('test', executeTest);

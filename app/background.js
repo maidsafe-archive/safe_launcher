@@ -15,39 +15,38 @@ var mainWindow;
 
 // Preserver of the window size and position between app launches.
 var mainWindowState = windowStateKeeper('main', {
-    width: 1000,
-    height: 600
+  width: 1000,
+  height: 600
 });
 
-app.on('ready', function () {
+app.on('ready', function() {
+  mainWindow = new BrowserWindow({
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height
+  });
 
-    mainWindow = new BrowserWindow({
-        x: mainWindowState.x,
-        y: mainWindowState.y,
-        width: mainWindowState.width,
-        height: mainWindowState.height
-    });
+  if (mainWindowState.isMaximized) {
+    mainWindow.maximize();
+  }
 
-    if (mainWindowState.isMaximized) {
-        mainWindow.maximize();
-    }
+  if (env.name === 'test') {
+    mainWindow.loadURL('file://' + __dirname + '/spec.html');
+  } else {
+    mainWindow.loadURL('file://' + __dirname + '/app.html');
+  }
 
-    if (env.name === 'test') {
-        mainWindow.loadURL('file://' + __dirname + '/spec.html');
-    } else {
-        mainWindow.loadURL('file://' + __dirname + '/app.html');
-    }
+  if (env.name !== 'production') {
+    devHelper.setDevMenu();
+    mainWindow.openDevTools();
+  }
 
-    if (env.name !== 'production') {
-        devHelper.setDevMenu();
-        mainWindow.openDevTools();
-    }
-
-    mainWindow.on('close', function () {
-        mainWindowState.saveState(mainWindow);
-    });
+  mainWindow.on('close', function() {
+    mainWindowState.saveState(mainWindow);
+  });
 });
 
-app.on('window-all-closed', function () {
-    app.quit();
+app.on('window-all-closed', function() {
+  app.quit();
 });
