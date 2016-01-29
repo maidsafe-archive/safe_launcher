@@ -17,7 +17,8 @@
     "rollup": "^0.21.0",
     "should": "^8.2.1",
     "tree-kill": "^0.1.1",
-    "yargs": "^3.15.0"
+    "yargs": "^3.15.0",
+    "bower": "^1.7.7"
   },
   "optionalDependencies": {
     "appdmg": "^0.3.2",
@@ -29,5 +30,6 @@
     "release": "gulp release --env=production",
     "start": "node ./tasks/start",
     "test": "gulp test"
-  }
+  },
+  "dependencies": {}
 }
