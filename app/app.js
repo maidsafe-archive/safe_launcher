@@ -15,6 +15,7 @@ var appDir = jetpack.cwd(app.getAppPath());
 
 console.log('The author of this app is:', appDir.read('package.json', 'json').author);
 
-api.auth.register('krishna', '1234', 'password', function(e, d) {
-  console.log(e, d);
-});
+// Example usage of API
+// api.auth.register('krishna', '1234', 'password', function(e, d) {
+//   console.log(e, d);
+// });
