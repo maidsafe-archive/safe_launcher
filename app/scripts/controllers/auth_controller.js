@@ -1,5 +1,4 @@
-'use strict';
- /*global safeLauncher:false, $:false */
+/*global safeLauncher:false, $:false; console:false */
 
 safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
   function($scope, Auth) {
@@ -28,7 +27,8 @@ safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
         var validate = function(key) {
           var check = false;
           console.log($scope.safeNewUser);
-          if (!$scope.safeNewUser.hasOwnProperty(key) || !$scope.safeNewUser[key].hasOwnProperty('value') || !$scope.safeNewUser[key].hasOwnProperty('confirm')) {
+          if (!$scope.safeNewUser.hasOwnProperty(key) || !$scope.safeNewUser[key].hasOwnProperty('value') ||
+          !$scope.safeNewUser[key].hasOwnProperty('confirm')) {
             console.error('All field required');
             return check;
           }
@@ -97,4 +97,5 @@ safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
     };
 
     $scope.safeNewUser = {};
-  }]);
+  }
+]);

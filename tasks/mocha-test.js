@@ -25,7 +25,7 @@ var runMochaTests = function() {
 }
 
 var executeTest = function() {
-  gulp.src(['./app/*.js'])
+  gulp.src(['./app/*.js', './app/scripts/**/*js'])
     .pipe(jshint({
       esnext: true
     })) // hint (optional)

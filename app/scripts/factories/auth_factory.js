@@ -1,5 +1,4 @@
-'use strict';
- /*global safeLauncher:false */
+/*global safeLauncher:false */
 
 safeLauncher.factory('AuthFactory', [
   function() {
@@ -13,5 +12,5 @@ safeLauncher.factory('AuthFactory', [
     };
 
     return self;
-  }]
-);
+  }
+]);
