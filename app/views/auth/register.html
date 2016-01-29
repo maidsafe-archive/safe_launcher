@@ -1,0 +1,67 @@
+<!-- regiter -->
+<div class="msl-form msl-layout-1 msl-auth-form" ng-controller="AuthController">
+  <div class="msl-form-nav">
+    <div class="msl-form-nav-i"
+      ng-class="{active: registerTab.currentPos === 1}"
+      ng-click="registerTab.changePosition(1)">PIN</div>
+    <div class="msl-form-nav-i"
+      ng-class="{active: registerTab.currentPos === 2}"
+      ng-click="registerTab.changePosition(2)">Keyword</div>
+    <div class="msl-form-nav-i"
+      ng-class="{active: registerTab.currentPos === 3}"
+      ng-click="registerTab.changePosition(3)">Password</div>
+  </div>
+  <form>
+    <!-- pin base -->
+    <div ng-show="registerTab.currentPos === 1">
+      <!-- pin -->
+      <div class="msl-form-grp">
+        <input type="password" name="pin" placeholder="PIN" ng-model="safeNewUser.pin.value" />
+        <button type="button" name="clear-btn" class="clear-btn" ng-click="safeNewUser.pin.value = null">x</button>
+      </div>
+      <!-- confirm pin -->
+      <div class="msl-form-grp">
+        <input type="password" name="confirm_pin" placeholder="Confirm PIN" ng-model="safeNewUser.pin.confirm" />
+        <button type="button" name="clear-btn" class="clear-btn" ng-click="safeNewUser.pin.confirm = null">x</button>
+      </div>
+    </div><!-- /pin base -->
+
+    <!-- keyword base -->
+    <div ng-show="registerTab.currentPos === 2">
+      <!-- keyword -->
+      <div class="msl-form-grp">
+        <input type="password" name="keyword" placeholder="Keyword" ng-model="safeNewUser.keyword.value" />
+        <button type="button" name="clear-btn" class="clear-btn" ng-click="safeNewUser.keyword.value = null">x</button>
+      </div>
+      <!-- confirm keyword -->
+      <div class="msl-form-grp">
+        <input type="password" name="confirm_keyword" placeholder="Confirm Keyword" ng-model="safeNewUser.keyword.confirm" />
+        <button type="button" name="clear-btn" class="clear-btn" ng-click="safeNewUser.keyword.confirm = null">x</button>
+      </div>
+    </div><!-- /keyword base -->
+
+    <!-- password base -->
+    <div ng-show="registerTab.currentPos === 3">
+      <!-- password -->
+      <div class="msl-form-grp">
+        <input type="password" name="password" placeholder="Password" ng-model="safeNewUser.password.value" />
+        <button type="button" name="clear-btn" class="clear-btn" ng-click="safeNewUser.password.value = null">x</button>
+      </div>
+      <!-- confirm password -->
+      <div class="msl-form-grp">
+        <input type="password" name="confirm_password" placeholder="Confirm Password" ng-model="safeNewUser.password.confirm" />
+        <button type="button" name="clear-btn" class="clear-btn" ng-click="safeNewUser.password.confirm = null">x</button>
+      </div>
+    </div><!-- /password base -->
+
+    <!-- register btn -->
+    <div class="msl-form-grp">
+      <button type="submit"
+        name="register"
+        class="act-btn"
+        ng-click="registerTab.changePosition(registerTab.currentPos + 1)">
+        {{ registerTab.currentPos === registerTab.count ? "Register" : "Next" }}
+      </button>
+    </div>
+  </form>
+</div><!-- /regiter -->
