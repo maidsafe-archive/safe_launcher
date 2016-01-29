@@ -19,10 +19,10 @@ var unregisteredClient = function(lib, request) {
   var result = lib.create_unregistered_client(unregisteredClient);
   /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   if (result !== 0) {
-    return util.sendError(request.id, result);
+    return false;
   }
   unregisteredClientHandle = unregisteredClient.deref();
-  util.send(request.id);
+  return true;
 };
 
 var setSafeDriveKey = function(lib) {
@@ -93,6 +93,9 @@ exports.getSafeDriveKey = function() {
 };
 
 exports.getUnregisteredClient = function() {
+  if (!unregisteredClientHandle && !unregisteredClient()) {
+    return;
+  }
   return unregisteredClientHandle;
 };
 
@@ -111,20 +114,17 @@ exports.drop = function(lib) {
 
 exports.getMethods = function() {
   return {
-    'create_unregistered_client': [ 'int', [ clientHandlePtrPtr ] ],
-    'create_account': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
-    'log_in': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
-    'get_safe_drive_key_size': [ 'int', [ intPtr, clientHandlePtrPtr ] ],
-    'get_safe_drive_key': [ 'int', [ IntArray, clientHandlePtrPtr ] ],
-    'drop_client': [ 'void', [ clientHandlePtrPtr ] ]
+    'create_unregistered_client': ['int', [clientHandlePtrPtr]],
+    'create_account': ['int', ['string', 'string', 'string', clientHandlePtrPtr]],
+    'log_in': ['int', ['string', 'string', 'string', clientHandlePtrPtr]],
+    'get_safe_drive_key_size': ['int', [intPtr, clientHandlePtrPtr]],
+    'get_safe_drive_key': ['int', [IntArray, clientHandlePtrPtr]],
+    'drop_client': ['void', [clientHandlePtrPtr]]
   };
 };
 
 exports.execute = function(lib, request) {
   switch (request.action) {
-    case 'unregistered-client':
-      unregisteredClient(lib, request);
-      break;
     case 'register':
       register(lib, request);
       break;
