@@ -1,5 +1,7 @@
- /*global safeLauncher:false */
-safeLauncher.config(function($stateProvider, $urlRouterProvider) {
+/**
+ * Router
+ */
+window.safeLauncher.config(function($stateProvider, $urlRouterProvider) {
   $urlRouterProvider.otherwise('register');
   $stateProvider
   .state('register', {
