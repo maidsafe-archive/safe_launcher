@@ -2,7 +2,6 @@
  * Auth Controller
  * @param Auth - Auth factory dependency
  */
-
 window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
   function($scope, Auth) {
     var REGISTER_TAB_INIT_POS = 1;
@@ -16,7 +15,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
 
     // Reset login form
     var resetLogin = function() {
-      $scope.safeUser = {};
+      $scope.user = {};
     };
 
     // check value is alpha numeric
@@ -24,9 +23,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
       return (new RegExp(/^[a-z0-9]+$/i)).test(val);
     };
 
-    /**
-     * user registration
-     */
+    // User registration
     var register = function(payload) {
       Auth.register(payload, function(err, data) {
         resetRegistration();
@@ -42,21 +39,21 @@ window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
      * user login
      */
     var login = function() {
-      if (!$scope.safeUser.hasOwnProperty('pin') || !$scope.safeUser.hasOwnProperty('keyword') ||
-        !$scope.safeUser.hasOwnProperty('password')) {
+      if (!$scope.user.hasOwnProperty('pin') || !$scope.user.hasOwnProperty('keyword') ||
+        !$scope.user.hasOwnProperty('password')) {
         alert('All fields are required');
         return;
       }
-      if (isNaN($scope.safeUser.pin) || $scope.safeUser.pin.length < 4) {
+      if (isNaN($scope.user.pin) || $scope.user.pin.length < 4) {
         alert('Invalid PIN');
         return;
       }
-      if (!isAlphaNumeric($scope.safeUser.keyword) || !isAlphaNumeric($scope.safeUser.password) ||
-        $scope.safeUser.keyword.length < 6 || $scope.safeUser.password.length < 6) {
+      if (!isAlphaNumeric($scope.user.keyword) || !isAlphaNumeric($scope.user.password) ||
+        $scope.user.keyword.length < 6 || $scope.user.password.length < 6) {
         alert('Invalid Keyword or Password');
         return;
       }
-      Auth.login($scope.safeUser, function(err, data) {
+      Auth.login($scope.user, function(err, data) {
         resetLogin();
         if (err) {
           alert(err);
@@ -66,7 +63,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
       });
     };
 
-    // registation tabbing
+    // Registration tabbing
     $scope.registerTab = {
       currentPos: REGISTER_TAB_INIT_POS,
       count: REGISTER_TAB_COUNT,
@@ -100,7 +97,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
           }
 
           if (key === 'keyword' || key === 'password') {
-            if (!isAlphaNumeric($scope.safeNewUser[key].value)) {
+            if (!isAlphaNumeric($scope.user[key].value)) {
               alert('Keyword/Password must not contain special characters');
               return check;
             }
@@ -146,7 +143,6 @@ window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
     };
 
     $scope.user = {};
-    $scope.safeUser = {};
     $scope.login = login;
   }
 ]);
