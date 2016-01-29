@@ -16,13 +16,13 @@
     <div ng-show="registerTab.currentPos === 1">
       <!-- pin -->
       <div class="msl-form-grp">
-        <input type="password" name="pin" placeholder="PIN" ng-model="safeNewUser.pin.value" />
-        <button type="button" name="clear-btn" class="clear-btn" ng-click="safeNewUser.pin.value = null">x</button>
+        <input type="password" name="pin" placeholder="PIN" ng-model="user.pin.value" />
+        <button type="button" name="clear-btn" class="clear-btn" ng-click="user.pin.value = null">x</button>
       </div>
       <!-- confirm pin -->
       <div class="msl-form-grp">
-        <input type="password" name="confirm_pin" placeholder="Confirm PIN" ng-model="safeNewUser.pin.confirm" />
-        <button type="button" name="clear-btn" class="clear-btn" ng-click="safeNewUser.pin.confirm = null">x</button>
+        <input type="password" name="confirm_pin" placeholder="Confirm PIN" ng-model="user.pin.confirm" />
+        <button type="button" name="clear-btn" class="clear-btn" ng-click="user.pin.confirm = null">x</button>
       </div>
     </div><!-- /pin base -->
 
@@ -30,13 +30,13 @@
     <div ng-show="registerTab.currentPos === 2">
       <!-- keyword -->
       <div class="msl-form-grp">
-        <input type="password" name="keyword" placeholder="Keyword" ng-model="safeNewUser.keyword.value" />
-        <button type="button" name="clear-btn" class="clear-btn" ng-click="safeNewUser.keyword.value = null">x</button>
+        <input type="password" name="keyword" placeholder="Keyword" ng-model="user.keyword.value" />
+        <button type="button" name="clear-btn" class="clear-btn" ng-click="user.keyword.value = null">x</button>
       </div>
       <!-- confirm keyword -->
       <div class="msl-form-grp">
-        <input type="password" name="confirm_keyword" placeholder="Confirm Keyword" ng-model="safeNewUser.keyword.confirm" />
-        <button type="button" name="clear-btn" class="clear-btn" ng-click="safeNewUser.keyword.confirm = null">x</button>
+        <input type="password" name="confirm_keyword" placeholder="Confirm Keyword" ng-model="user.keyword.confirm" />
+        <button type="button" name="clear-btn" class="clear-btn" ng-click="user.keyword.confirm = null">x</button>
       </div>
     </div><!-- /keyword base -->
 
@@ -44,13 +44,13 @@
     <div ng-show="registerTab.currentPos === 3">
       <!-- password -->
       <div class="msl-form-grp">
-        <input type="password" name="password" placeholder="Password" ng-model="safeNewUser.password.value" />
-        <button type="button" name="clear-btn" class="clear-btn" ng-click="safeNewUser.password.value = null">x</button>
+        <input type="password" name="password" placeholder="Password" ng-model="user.password.value" />
+        <button type="button" name="clear-btn" class="clear-btn" ng-click="user.password.value = null">x</button>
       </div>
       <!-- confirm password -->
       <div class="msl-form-grp">
-        <input type="password" name="confirm_password" placeholder="Confirm Password" ng-model="safeNewUser.password.confirm" />
-        <button type="button" name="clear-btn" class="clear-btn" ng-click="safeNewUser.password.confirm = null">x</button>
+        <input type="password" name="confirm_password" placeholder="Confirm Password" ng-model="user.password.confirm" />
+        <button type="button" name="clear-btn" class="clear-btn" ng-click="user.password.confirm = null">x</button>
       </div>
     </div><!-- /password base -->
 
@@ -65,3 +65,8 @@
     </div>
   </form>
 </div><!-- /regiter -->
+<!-- footer -->
+<div class="msl-footer">
+  <span class="msl-footer-split"></span>
+  Already have an account? <a ui-sref="login">Log In</a>
+</div><!-- /footer -->

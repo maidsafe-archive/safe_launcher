@@ -1,19 +1,16 @@
-/*global safeLauncher:false */
-
-safeLauncher.factory('AuthFactory', [
+/**
+ * Auth Factory
+ */
+window.safeLauncher.factory('AuthFactory', [
   function() {
     var self = this;
 
-    /**
-     * Login
-     */
+    // Login
     self.login = function(payload, callback) {
       return callback(null, 'Login successfull');
     };
 
-    /**
-     * Register
-     */
+    // Register
     self.register = function(payload, callback) {
       return callback(null, 'Registered');
     };
