@@ -1,7 +1,11 @@
  /*global safeLauncher:false */
 safeLauncher.config(function($stateProvider, $urlRouterProvider) {
-  $urlRouterProvider.otherwise('register');
+  $urlRouterProvider.otherwise('login');
   $stateProvider
+  .state('login', {
+      url: '/login',
+      templateUrl: 'views/auth/login.html'
+    })
   .state('register', {
     url: '/register',
     templateUrl: 'views/auth/register.html'
