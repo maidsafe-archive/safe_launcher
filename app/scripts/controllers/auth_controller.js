@@ -2,7 +2,6 @@
 
 safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
   function($scope, Auth) {
-
     // Reset registration form
     var resetRegistration = function() {
       $scope.safeNewUser = {};
