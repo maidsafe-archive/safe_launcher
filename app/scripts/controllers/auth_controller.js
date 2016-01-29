@@ -46,12 +46,13 @@ window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
         alert('All fields are required');
         return;
       }
-      if (isNaN($scope.user.pin) || $scope.user.pin.length < 4) {
+      if (isNaN($scope.user.pin) || $scope.user.pin.length < USER_PIN_MIN_LENGTH) {
         alert('Invalid PIN');
         return;
       }
       if (!isAlphaNumeric($scope.user.keyword) || !isAlphaNumeric($scope.user.password) ||
-        $scope.user.keyword.length < 6 || $scope.user.password.length < 6) {
+        $scope.user.keyword.length < USER_PASSWORD_MIN_LENGTH ||
+        $scope.user.password.length < USER_PASSWORD_MIN_LENGTH) {
         alert('Invalid Keyword or Password');
         return;
       }
