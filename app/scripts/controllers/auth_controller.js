@@ -6,6 +6,8 @@ window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
   function($scope, Auth) {
     var REGISTER_TAB_INIT_POS = 1;
     var REGISTER_TAB_COUNT = 3;
+    var USER_PASSWORD_MIN_LENGTH = 6;
+    var USER_PIN_MIN_LENGTH = 4;
 
     // Reset registration form
     var resetRegistration = function() {
@@ -90,8 +92,8 @@ window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
               return check;
             }
 
-            if ($scope.user[key].value.length < 4) {
-              alert('PIN should contain atleast 4 characters');
+            if ($scope.user[key].value.length < USER_PIN_MIN_LENGTH) {
+              alert('PIN should contain atleast ' + USER_PIN_MIN_LENGTH + ' characters');
               return check;
             }
           }
@@ -102,8 +104,8 @@ window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
               return check;
             }
 
-            if ($scope.user[key].value.length < 6) {
-              alert('Keyword/Password should contain atleast 6 characters');
+            if ($scope.user[key].value.length < USER_PASSWORD_MIN_LENGTH) {
+              alert('Keyword/Password should contain atleast ' + USER_PASSWORD_MIN_LENGTH + ' characters');
               return check;
             }
           }
@@ -133,7 +135,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
             break;
           case self.count + 1:
             if (!validate('password')) {
-              self.currentPos = 3;
+              self.currentPos = self.count;
               return;
             }
             register($scope.user);
