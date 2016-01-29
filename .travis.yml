@@ -1,28 +1,22 @@
-env:
-  global:
-    - secure: mQ7ETO3exjlwT++1gxu/fGuEP3WihGIFlPCOKqSzhd09M6ngCjsLf7840l/gZoazQ/D+xYi57RRgU/TuGqaQ6M5Yj7nknWid+Sk4R6ZZc+aQKah8wQEmECuNR3c6luJIieYurv+tYvIjffkjFmoSfuUjEk287u21kpmC3j0WClxX1hB+pJRWT92FDKwPLDoalXZdGXg7AtzGRcpqnhBjxHEnJhZv+xp4CE9wQCkHKf0TbwseKg4+xGKGK8u/XwT9MEcatlV2E8A9duVTQIafyV2HbhZO7Geht7FO6ZGmoscFvS1kDLTLHzJGKffranGEiKk8By3tzGrMJ3xMFyH+H8eJ87TMiUWz+Ix15t6GDeRZ8v6Qbey4b0izj6bEukq5Mf++1To5ybJAvQsBrpzqTODt9khavad8nC+2ejzPtETBdYDJbBo+7aH+ZVfi0whwfXz16U2ovZaDvwf9HrrI2N08R0m8BKbjPSg4Ed+QID6Y1EqzzxzwO6RmEjaYUW3zdabESHDWF53FojZKGhNHZjlJcefpdCNnu577Cbatv9OqwBMfyaupwRmTbNGV8RffiEz0K7hmVXb9d5dF4LM0kVpruV1Ck/WsYt5/2HTgCW4uPW6Or6ZZysGbOjUrWu7SZhgQkwXKK34nnR/vDlxw1zAjAHUdFNriRRVtxwGZlNg=
-    - Features=use-mock-routing
+sudo: true
 os:
   - linux
-  - osx
-language: rust
-rust:
-  - stable
-sudo: false
-branches:
-  only:
-    - master
-cache:
-  directories:
-    - $HOME/libsodium
-    - $HOME/elfutils
-install:
-  - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
-  - . install_libsodium.sh
+language: node_js
+node_js:
+  - "5.1"
+before_install:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
 script:
-  - curl -sSL https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/build_and_run_tests.sh | bash
-before_cache:
-  - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_elfutils.sh
-  - . install_elfutils.sh
-after_success:
-  - curl -sSL https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/after_success.sh | bash
+  - cd app && npm install
+  - cd ..
+  - npm test
+env:
+  - CXX=g++-4.8
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - xvfb
+      - g++-4.8
