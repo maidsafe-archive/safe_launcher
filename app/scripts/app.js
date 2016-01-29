@@ -1,12 +1,11 @@
 /**
- * @name angularApp
+ * @name safeLauncher
  * @description
- * # angularApp
+ * SAFE launcher - gateway to the SAFE Network
  *
  * Main module of the application.
  */
-/*jshint unused:false*/
-var safeLauncher = angular
+window.safeLauncher = angular
   .module('safeLauncher', [ 'ui.router' ])
   .config([ '$httpProvider', function($httpProvider) {
     $httpProvider.defaults.useXDomain = true;

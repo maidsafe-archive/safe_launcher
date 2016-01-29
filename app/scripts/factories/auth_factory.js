@@ -1,6 +1,7 @@
-/*global safeLauncher:false */
-
-safeLauncher.factory('AuthFactory', [
+/**
+ * Auth Factory
+ */
+window.safeLauncher.factory('AuthFactory', [
   function() {
     var self = this;
 

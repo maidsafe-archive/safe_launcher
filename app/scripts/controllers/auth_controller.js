@@ -1,11 +1,17 @@
-/*global safeLauncher:false, $:false; alert:false */
+/**
+ * Auth Controller
+ * @param Auth - Auth factory dependency
+ */
 
-safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
+window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
   function($scope, Auth) {
+    var REGISTER_TAB_INIT_POS = 1;
+    var REGISTER_TAB_COUNT = 3;
+
     // Reset registration form
     var resetRegistration = function() {
-      $scope.safeNewUser = {};
-      $scope.registerTab.currentPos = 1;
+      $scope.user = {};
+      $scope.registerTab.currentPos = REGISTER_TAB_INIT_POS;
     };
 
     // Reset login form
@@ -62,32 +68,32 @@ safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
 
     // registation tabbing
     $scope.registerTab = {
-      currentPos: 1,
-      count: 3,
+      currentPos: REGISTER_TAB_INIT_POS,
+      count: REGISTER_TAB_COUNT,
       changePosition: function(pos) {
         var self = this;
 
         // validate
         var validate = function(key) {
           var check = false;
-          if (!$scope.safeNewUser.hasOwnProperty(key) || !$scope.safeNewUser[key].hasOwnProperty('value') ||
-          !$scope.safeNewUser[key].hasOwnProperty('confirm')) {
+          if (!$scope.user.hasOwnProperty(key) || !$scope.user[key].hasOwnProperty('value') ||
+          !$scope.user[key].hasOwnProperty('confirm')) {
             alert('All field required');
             return check;
           }
 
-          if (!$scope.safeNewUser[key].value || !$scope.safeNewUser[key].confirm) {
+          if (!$scope.user[key].value || !$scope.user[key].confirm) {
             alert('Field should not be left empty');
             return check;
           }
 
           if (key === 'pin') {
-            if (isNaN($scope.safeNewUser[key].value)) {
+            if (isNaN($scope.user[key].value)) {
               alert('PIN must contain only numeric');
               return check;
             }
 
-            if ($scope.safeNewUser[key].value.length < 4) {
+            if ($scope.user[key].value.length < 4) {
               alert('PIN should contain atleast 4 characters');
               return check;
             }
@@ -99,13 +105,13 @@ safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
               return check;
             }
 
-            if ($scope.safeNewUser[key].value.length < 6) {
+            if ($scope.user[key].value.length < 6) {
               alert('Keyword/Password should contain atleast 6 characters');
               return check;
             }
           }
 
-          if ($scope.safeNewUser[key].value !== $scope.safeNewUser[key].confirm) {
+          if ($scope.user[key].value !== $scope.user[key].confirm) {
             alert('Values must be same');
             return check;
           }
@@ -133,13 +139,13 @@ safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
               self.currentPos = 3;
               return;
             }
-            register($scope.safeNewUser);
+            register($scope.user);
             break;
         }
       }
     };
 
-    $scope.safeNewUser = {};
+    $scope.user = {};
     $scope.safeUser = {};
     $scope.login = login;
   }
