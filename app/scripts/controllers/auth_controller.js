@@ -3,16 +3,24 @@
 safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
   function($scope, Auth) {
     /**
+     * Reset registration form
+     */
+    var resetRegistration = function() {
+      $scope.safeNewUser = {};
+      $scope.registerTab.currentPos = 1;
+    };
+
+    /**
      * user registration
      */
     var register = function(payload) {
-      console.log(payload);
       Auth.register(payload, function(err, data) {
         if (err) {
-          console.error(err);
+          alert(err);
           return;
         }
-        console.log(data);
+        alert(data);
+        resetRegistration();
       });
     };
 
@@ -26,44 +34,43 @@ safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
         // validate
         var validate = function(key) {
           var check = false;
-          console.log($scope.safeNewUser);
           if (!$scope.safeNewUser.hasOwnProperty(key) || !$scope.safeNewUser[key].hasOwnProperty('value') ||
           !$scope.safeNewUser[key].hasOwnProperty('confirm')) {
-            console.error('All field required');
+            alert('All field required');
             return check;
           }
 
           if (!$scope.safeNewUser[key].value || !$scope.safeNewUser[key].confirm) {
-            console.error('Field should not be left empty');
+            alert('Field should not be left empty');
             return check;
           }
 
           if (key === 'pin') {
             if (isNaN($scope.safeNewUser[key].value)) {
-              console.error('PIN must contain only numeric');
+              alert('PIN must contain only numeric');
               return check;
             }
 
             if ($scope.safeNewUser[key].value.length < 4) {
-              console.error('PIN should contain atleast 4 characters');
+              alert('PIN should contain atleast 4 characters');
               return check;
             }
           }
 
           if (key === 'keyword' || key === 'password') {
             if (!(new RegExp(/^[a-z0-9]+$/i)).test($scope.safeNewUser[key].value)) {
-              console.error('Value must not contain special characters');
+              alert('Keyword/Password must not contain special characters');
               return check;
             }
 
             if ($scope.safeNewUser[key].value.length < 6) {
-              console.error('Value  should contain atleast 6 characters');
+              alert('Keyword/Password should contain atleast 6 characters');
               return check;
             }
           }
 
           if ($scope.safeNewUser[key].value !== $scope.safeNewUser[key].confirm) {
-            console.error('Value and Confirm value must be same');
+            alert('Values must be same');
             return check;
           }
           return !check;

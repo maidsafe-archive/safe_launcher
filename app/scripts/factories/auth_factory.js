@@ -8,7 +8,7 @@ safeLauncher.factory('AuthFactory', [
      * Register
      */
     self.register = function(payload, callback) {
-      return callback(null, 'Done');
+      return callback(null, 'Registered');
     };
 
     return self;
