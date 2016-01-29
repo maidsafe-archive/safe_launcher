@@ -41,4 +41,4 @@ export var send = function(msg, callback) {
 
 export var close = function() {
   workerProcess.exit();
-}
+};

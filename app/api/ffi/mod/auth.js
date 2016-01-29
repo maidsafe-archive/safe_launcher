@@ -114,12 +114,12 @@ exports.drop = function(lib) {
 
 exports.getMethods = function() {
   return {
-    'create_unregistered_client': ['int', [clientHandlePtrPtr]],
-    'create_account': ['int', ['string', 'string', 'string', clientHandlePtrPtr]],
-    'log_in': ['int', ['string', 'string', 'string', clientHandlePtrPtr]],
-    'get_safe_drive_key_size': ['int', [intPtr, clientHandlePtrPtr]],
-    'get_safe_drive_key': ['int', [IntArray, clientHandlePtrPtr]],
-    'drop_client': ['void', [clientHandlePtrPtr]]
+    'create_unregistered_client': [ 'int', [ clientHandlePtrPtr ] ],
+    'create_account': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
+    'log_in': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
+    'get_safe_drive_key_size': [ 'int', [ intPtr, clientHandlePtrPtr ] ],
+    'get_safe_drive_key': [ 'int', [ IntArray, clientHandlePtrPtr ] ],
+    'drop_client': [ 'void', [ clientHandlePtrPtr ] ]
   };
 };
 
