@@ -26,4 +26,4 @@ send({
     pin: '1234',
     password: 'pass'
   }
-})
+});

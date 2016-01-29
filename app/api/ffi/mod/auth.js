@@ -1,5 +1,3 @@
-'use strict';
-
 var ref = require('ref');
 var int = ref.types.int;
 var ArrayType = require('ref-array');
@@ -17,7 +15,9 @@ var unregisteredClientHandle;
 
 var unregisteredClient = function(lib, request) {
   var unregisteredClient = ref.alloc(clientHandlePtrPtr);
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   var result = lib.create_unregistered_client(unregisteredClient);
+  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   if (result !== 0) {
     return util.sendError(request.id, result);
   }
@@ -33,7 +33,9 @@ var setSafeDriveKey = function(lib) {
     return e;
   }
   var content = new IntArray(size);
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   var result = lib.get_safe_drive_key(content, registeredClientHandle);
+  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   if (result !== 0) {
     return new Error('Failed with error code ' + result);
   }
@@ -43,7 +45,9 @@ var setSafeDriveKey = function(lib) {
 
 var getSafeDriveKeySize = function(lib) {
   var size = ref.alloc('int');
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   var res = lib.get_safe_drive_key_size(size, registeredClientHandle);
+  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   if (res === 0) {
     return size.deref();
   }
@@ -53,13 +57,15 @@ var getSafeDriveKeySize = function(lib) {
 var register = function(lib, request) {
   var params = request.params;
   var regClient = ref.alloc(clientHandlePtrPtr);
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   var res = lib.create_account(params.keyword, params.pin, params.password, regClient);
+  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   if (res !== 0) {
     return util.sendError(request.id, res);
   }
   registeredClientHandle = regClient.deref();
   var safeDriveError = setSafeDriveKey(lib);
-  if(safeDriveError) {
+  if (safeDriveError) {
     return util.sendError(request.id, 999, safeDriveError.toString());
   }
   util.send(request.id);
@@ -68,9 +74,11 @@ var register = function(lib, request) {
 var login = function(lib, request) {
   var params = request.params;
   var regClient = ref.alloc(clientHandlePtrPtr);
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   var res = lib.log_in(params.keyword, params.pin, params.password, regClient);
+  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   if (res !== 0) {
-    return util.sendError(request.id, res)
+    return util.sendError(request.id, res);
   }
   registeredClientHandle = regClient.deref();
   util.send(request.id);
@@ -90,21 +98,25 @@ exports.getUnregisteredClient = function() {
 
 exports.drop = function(lib) {
   if (unregisteredClientHandle) {
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     lib.drop_client(unregisteredClientHandle);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   }
   if (registeredClientHandle) {
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     lib.drop_client(registeredClientHandle);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   }
 };
 
 exports.getMethods = function() {
   return {
-    'create_unregistered_client': ['int', [clientHandlePtrPtr]],
-    'create_account': ['int', ['string', 'string', 'string', clientHandlePtrPtr]],
-    'log_in': ['int', ['string', 'string', 'string', clientHandlePtrPtr]],
-    'get_safe_drive_key_size': ['int', [intPtr, clientHandlePtrPtr]],
-    'get_safe_drive_key': ['int', [IntArray, clientHandlePtrPtr]],
-    'drop_client': ['void', [clientHandlePtrPtr]]
+    'create_unregistered_client': [ 'int', [ clientHandlePtrPtr ] ],
+    'create_account': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
+    'log_in': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
+    'get_safe_drive_key_size': [ 'int', [ intPtr, clientHandlePtrPtr ] ],
+    'get_safe_drive_key': [ 'int', [ IntArray, clientHandlePtrPtr ] ],
+    'drop_client': [ 'void', [ clientHandlePtrPtr ] ]
   };
 };
 
