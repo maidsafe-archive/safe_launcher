@@ -10,9 +10,12 @@ var hanlder = new Hanlder(libPath);
 
 var onMessage = hanlder.dispatcher;
 
-var onUnhadledException = function() {
-
+var onBeforeExit = function() {
+  if (!handler) {
+    return;
+  }
+  handler.cleanUp();
 };
 
 process.on('message', onMessage);
-process.on('uncaughtException', onUnhadledException);
+process.on('beforeExit', onBeforeExit);

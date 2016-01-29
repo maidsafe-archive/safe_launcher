@@ -18,6 +18,7 @@ console.log('The author of this app is:', appDir.read('package.json', 'json').au
 window.sendTo = send;
 
 send({
+  id: '007',
   module: 'auth',
   action: 'register',
   params: {

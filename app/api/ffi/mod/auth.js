@@ -3,6 +3,7 @@
 var ref = require('ref');
 var int = ref.types.int;
 var ArrayType = require('ref-array');
+var util = require('./util.js');
 
 var intPtr = ref.refType(int);
 var IntArray = ArrayType(int);
@@ -14,15 +15,14 @@ var safeDriveKey;
 var registeredClientHandle;
 var unregisteredClientHandle;
 
-var unregisteredClient = function(lib) {
+var unregisteredClient = function(lib, request) {
   var unregisteredClient = ref.alloc(clientHandlePtrPtr);
   var result = lib.create_unregistered_client(unregisteredClient);
-  if (result == 0) {
-    unregisteredClientHandle = unRegClient.deref();
-    process.send('Access granted');
-  } else {
-    process.send('Failed with code ' + result);
+  if (result !== 0) {
+    return util.sendError(request.id, result);
   }
+  unregisteredClientHandle = unregisteredClient.deref();
+  util.send(request.id);
 };
 
 var setSafeDriveKey = function(lib) {
@@ -30,20 +30,21 @@ var setSafeDriveKey = function(lib) {
   try {
     size = getSafeDriveKeySize(lib);
   } catch (e) {
-    return process.send('eee ' + e);
+    return e;
   }
   var content = new IntArray(size);
   var result = lib.get_safe_drive_key(content, registeredClientHandle);
-  if (result != 0) {
-    return process.send('Err ' + result);
+  if (result !== 0) {
+    return new Error('Failed with error code ' + result);
   }
   safeDriveKey = new Buffer(content).toString('base64');
+  return;
 };
 
 var getSafeDriveKeySize = function(lib) {
   var size = ref.alloc('int');
   var res = lib.get_safe_drive_key_size(size, registeredClientHandle);
-  if (res == 0) {
+  if (res === 0) {
     return size.deref();
   }
   throw new Error('Failed with error code' + res);
@@ -53,25 +54,26 @@ var register = function(lib, request) {
   var params = request.params;
   var regClient = ref.alloc(clientHandlePtrPtr);
   var res = lib.create_account(params.keyword, params.pin, params.password, regClient);
-  if (res == 0) {
-    registeredClientHandle = regClient.deref();
-    setSafeDriveKey(lib);
-    process.send('Registerd Successfully');
-  } else {
-    process.send('Failed with code ' + res);
+  if (res !== 0) {
+    return util.sendError(request.id, res);
   }
+  registeredClientHandle = regClient.deref();
+  var safeDriveError = setSafeDriveKey(lib);
+  if(safeDriveError) {
+    return util.sendError(request.id, 999, safeDriveError.toString());
+  }
+  util.send(request.id);
 };
 
 var login = function(lib, request) {
   var params = request.params;
   var regClient = ref.alloc(clientHandlePtrPtr);
   var res = lib.log_in(params.keyword, params.pin, params.password, regClient);
-  if (res == 0) {
-    registeredClientHandle = regClient.deref();
-    process.send('Logged in Successfully');
-  } else {
-    process.send('Failed with code ' + res);
+  if (res !== 0) {
+    return util.sendError(request.id, res)
   }
+  registeredClientHandle = regClient.deref();
+  util.send(request.id);
 };
 
 exports.getRegisteredClient = function() {
@@ -86,20 +88,30 @@ exports.getUnregisteredClient = function() {
   return unregisteredClientHandle;
 };
 
+exports.drop = function(lib) {
+  if (unregisteredClientHandle) {
+    lib.drop_client(unregisteredClientHandle);
+  }
+  if (registeredClientHandle) {
+    lib.drop_client(registeredClientHandle);
+  }
+};
+
 exports.getMethods = function() {
   return {
     'create_unregistered_client': ['int', [clientHandlePtrPtr]],
     'create_account': ['int', ['string', 'string', 'string', clientHandlePtrPtr]],
     'log_in': ['int', ['string', 'string', 'string', clientHandlePtrPtr]],
     'get_safe_drive_key_size': ['int', [intPtr, clientHandlePtrPtr]],
-    'get_safe_drive_key': ['int', [IntArray, clientHandlePtrPtr]]
+    'get_safe_drive_key': ['int', [IntArray, clientHandlePtrPtr]],
+    'drop_client': ['void', [clientHandlePtrPtr]]
   };
 };
 
 exports.execute = function(lib, request) {
   switch (request.action) {
     case 'unregistered-client':
-      unregisteredClient(lib);
+      unregisteredClient(lib, request);
       break;
     case 'register':
       register(lib, request);
@@ -108,6 +120,6 @@ exports.execute = function(lib, request) {
       login(lib, request);
       break;
     default:
-      process.send('Invalid Action');
+      util.sendError(request.id, 999, 'Invalid Action');
   }
 };
