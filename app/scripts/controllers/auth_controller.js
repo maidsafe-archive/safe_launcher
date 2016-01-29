@@ -2,7 +2,7 @@
  * Auth Controller
  * @param Auth - Auth factory dependency
  */
-window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
+window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFactory',
   function($scope, $state, Auth) {
     var REGISTER_TAB_INIT_POS = 1;
     var REGISTER_TAB_COUNT = 3;
