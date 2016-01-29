@@ -29,5 +29,8 @@
     "release": "gulp release --env=production",
     "start": "node ./tasks/start",
     "test": "gulp test"
+  },
+  "dependencies": {
+    "bower": "^1.7.7"
   }
 }
