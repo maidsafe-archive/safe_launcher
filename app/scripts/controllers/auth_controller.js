@@ -1,7 +1,7 @@
 /*global safeLauncher:false, $:false; alert:false */
 
-safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
-  function($scope, Auth) {
+safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFactory',
+  function($scope, $state, Auth) {
     // Reset registration form
     var resetRegistration = function() {
       $scope.safeNewUser = {};
@@ -57,6 +57,7 @@ safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
           return;
         }
         alert(data);
+        $state.go('user');
       });
     };
 
