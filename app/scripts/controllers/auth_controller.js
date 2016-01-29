@@ -37,9 +37,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
       });
     };
 
-    /**
-     * user login
-     */
+    // User login
     var login = function() {
       if (!$scope.user.hasOwnProperty('pin') || !$scope.user.hasOwnProperty('keyword') ||
         !$scope.user.hasOwnProperty('password')) {
