@@ -14,6 +14,24 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
       currentPos: null,
       init: function() {
         this.currentPos = this.state[0];
+      },
+      changePos: function(state) {
+        if (state === this.state[0]) {
+          this.currentPos = this.state[0];
+          return;
+        }
+        if (state === this.state[1]) {
+          $scope.validatePin();
+          return;
+        }
+        if (state === this.state[2]) {
+          if(!$scope.validatePin()) {
+            return;
+          }
+          if(!$scope.validateKeyword()) {
+            return;
+          }
+        }
       }
     };
 
@@ -44,7 +62,16 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
       if (!$scope.registerPin.$valid) {
         return;
       }
+      if (!$scope.user.hasOwnProperty('pin') || !$scope.user.pin) {
+        $scope.registerPin.pin.$setValidity('customValidation', false);
+        return;
+      }
+      if (!$scope.user.hasOwnProperty('confirmPin') || !$scope.user.confirmPin) {
+        $scope.registerPin.confirmPin.$setValidity('customValidation', false);
+        return;
+      }
       $scope.tabs.currentPos = $scope.tabs.state[1];
+      return true;
     };
 
     // validate keyword
@@ -52,7 +79,16 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
       if (!$scope.registerKeyword.$valid) {
         return;
       }
+      if (!$scope.user.hasOwnProperty('keyword') || !$scope.user.keyword) {
+        $scope.registerKeyword.keyword.$setValidity('customValidation', false);
+        return;
+      }
+      if (!$scope.user.hasOwnProperty('confirmKeyword') || !$scope.user.confirmKeyword) {
+        $scope.registerKeyword.confirmKeyword.$setValidity('customValidation', false);
+        return;
+      }
       $scope.tabs.currentPos = $scope.tabs.state[2];
+      return true;
     };
 
     // validate password
@@ -60,7 +96,16 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
       if (!$scope.registerPassword.$valid) {
         return;
       }
+      if (!$scope.user.hasOwnProperty('password') || !$scope.user.password) {
+        $scope.registerPassword.password.$setValidity('customValidation', false);
+        return;
+      }
+      if (!$scope.user.hasOwnProperty('confirmPassword') || !$scope.user.confirmPassword) {
+        $scope.registerPassword.confirmPassword.$setValidity('customValidation', false);
+        return;
+      }
       register();
+      return true;
     };
 
     // user login
