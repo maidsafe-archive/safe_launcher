@@ -30,8 +30,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
       Auth.register(payload, function(err, data) {
         resetRegistration();
         if (err) {
-          alert(err);
-          return;
+          return alert('Err ' + err);
         }
         alert(data);
       });
@@ -57,7 +56,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
       Auth.login($scope.user, function(err, data) {
         resetLogin();
         if (err) {
-          alert(err);
+          alert('err' + err.toString());
           return;
         }
         alert(data);

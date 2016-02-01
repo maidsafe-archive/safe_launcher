@@ -17,17 +17,16 @@ workerProcess.on('message', function(msg) {
   }
   let isError = msg.errorCode !== 0;
   let id = msg.id;
+  let callbacks = callbackPool[id];
   delete msg.id;
-  let cb;
-  for (let i in callbackPool[id]) {
-    cb = callbackPool[id][i];
+  delete callbackPool[id];
+  for (let i in callbacks) {
     if (isError) {
-      cb(msg);
+      callbacks[i](msg);
     } else {
-      cb(null, msg.data);
+      callbacks[i](null, msg.data);
     }
   }
-  delete callbackPool[id];
 });
 
 export var send = function(msg, callback) {
