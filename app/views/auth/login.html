@@ -1,0 +1,29 @@
+<!-- login -->
+<div class="msl-form msl-layout-1 msl-auth-form" ng-controller="AuthController">
+  <form ng-submit="login()">
+    <!-- pin -->
+    <div class="msl-form-grp">
+      <input type="password" name="pin" placeholder="Pin" ng-model="user.pin" />
+      <button type="button" name="clear-btn" class="clear-btn" ng-click="user.pin = null">x</button>
+    </div>
+    <!-- keyword -->
+    <div class="msl-form-grp">
+      <input type="password" name="keyword" placeholder="Keyword" ng-model="user.keyword" />
+      <button type="button" name="clear-btn" class="clear-btn" ng-click="user.keyword = null">x</button>
+    </div>
+    <!-- password -->
+    <div class="msl-form-grp">
+      <input type="password" name="password" placeholder="Password" ng-model="user.password" />
+      <button type="button" name="clear-btn" class="clear-btn" ng-click="user.password = null">x</button>
+    </div>
+    <!-- login btn -->
+    <div class="msl-form-grp">
+      <button type="submit" name="login" class="act-btn">Login</button>
+    </div>
+  </form>
+</div><!-- /login -->
+<!-- footer -->
+<div class="msl-footer">
+  <span class="msl-footer-split"></span>
+  Don't have an account yet? <a ui-sref="register">Create one</a>
+</div>

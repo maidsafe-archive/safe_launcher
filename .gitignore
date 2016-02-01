@@ -8,3 +8,4 @@ Thumbs.db
 /releases/
 /tmp/
 /app/api/ffi/safe_ffi.dll
+/app/bower_components

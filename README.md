@@ -2,11 +2,16 @@ safe_launcher
 ==============
 
 # Quick start
-The only development dependency of this project is [Node.js](https://nodejs.org). So just make sure you have it installed.
+The development dependency of this project is [Node.js](https://nodejs.org).
+Build the [safe_ffi](https://github.com/maidsafe/safe_ffi) and copy the `.dll` for Windows
+or `.so` for Linux/OSX to the `app/api/ffi` folder.
+
+So just make sure you have it installed.
 Then type few commands known to every Node developer...
 ```
 npm install
 npm start
+node ./tasks/rebuild_native.js
 ```
 
 # Development
@@ -31,11 +36,6 @@ Remember to add your dependency to `app/package.json` file, so do:
 cd app
 npm install name_of_npm_module --save
 ```
-
-#### Native npm modules
-
-See [this file](./tasks/rebuild_native.js) for instructions.
-
 
 #### Unit tests
 

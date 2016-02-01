@@ -1,0 +1,56 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: @msl-width;
+  height: @msl-width;
+  font-family: 'Open Sans';
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 18px;
+  background-color: @msl-body-bg;
+}
+
+.msl-root {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.msl-footer {
+  width: 100%;
+  padding: 0 16px 22px;
+  text-align: center;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  font-size: 14px;
+  line-height: normal;
+  font-weight: normal;
+  color: @msl-txt-clr-d;
+  .msl-footer-split {
+    width: 100%;
+    height: 1px;
+    background-color: @msl-border-clr;
+    display: block;
+    margin-bottom: 6px;
+  }
+  a {
+    color: #000000;
+    font-weight: bold;
+    text-decoration: none;
+  }
+}
+
+.msl-layout-1 {
+  padding-bottom: 48px;
+}
+
+.msl-auth-form {
+  position: absolute;
+  left: 10%;
+  bottom: 0;
+}
