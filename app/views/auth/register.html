@@ -15,7 +15,7 @@
     </div>
     <!-- confirm pin -->
     <div class="msl-form-grp">
-      <input type="password" name="confirm_pin" placeholder="Confirm PIN" ng-model="user.confirmPin" msl-validate-pin/>
+      <input type="password" name="confirm_pin" placeholder="Confirm PIN" ng-model="user.confirmPin" target-name="pin" msl-validate-pin msl-validate-confirmation/>
       <span type="button" name="clear-btn" class="clear-btn" ng-click="user.confirmPin = null; registerPin.confirm_pin.$setValidity('customValidation', false)">x</span>
     </div>
     <!-- register btn -->
@@ -33,7 +33,7 @@
     </div>
     <!-- confirm keyword -->
     <div class="msl-form-grp">
-      <input type="password" name="confirm_keyword" placeholder="Confirm Keyword" ng-model="user.confirmKeyword" msl-validate-keyword />
+      <input type="password" name="confirm_keyword" placeholder="Confirm Keyword" ng-model="user.confirmKeyword" target-name="keyword" msl-validate-keyword msl-validate-confirmation />
       <span type="button" name="clear-btn" class="clear-btn" ng-click="user.confirmKeyword = null;registerKeyword.confirm_keyword.$setValidity('customValidation', false)">x</span>
     </div>
     <!-- register btn -->
@@ -51,7 +51,7 @@
     </div>
     <!-- confirm password -->
     <div class="msl-form-grp">
-      <input type="password" name="confirm_password" placeholder="Confirm Password" ng-model="user.confirmPassword" msl-validate-password/>
+      <input type="password" name="confirm_password" placeholder="Confirm Password" ng-model="user.confirmPassword" target-name="password" msl-validate-password msl-validate-confirmation/>
       <span type="button" name="clear-btn" class="clear-btn"  ng-click="user.confirmPassword = null;registerPassword.confirm_password.$setValidity('customValidation', false)">x</span>
     </div>
     <!-- register btn -->
