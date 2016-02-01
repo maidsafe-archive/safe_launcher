@@ -10,11 +10,11 @@ window.safeLauncher.directive('mslValidateKeyword', function() {
       var form = scope[formName][inpName];
       form.$setValidity('customValidation', false);
       if (!value || !(new RegExp(/^[a-z0-9]+$/i)).test(value)) {
-        scope.showErrorMsg(element, "Should not contain special characters");
+        scope.showErrorMsg(element, 'Should not contain special characters');
         return;
       }
       if (value.length < 6) {
-        scope.showErrorMsg(element, "Should contain minimum of 6 characters");
+        scope.showErrorMsg(element, 'Should contain minimum of 6 characters');
         return;
       }
       scope.hideErrorMsg(element);

@@ -25,10 +25,10 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
           return;
         }
         if (state === this.state[2]) {
-          if(!$scope.validatePin()) {
+          if (!$scope.validatePin()) {
             return;
           }
-          if(!$scope.validateKeyword()) {
+          if (!$scope.validateKeyword()) {
             return;
           }
         }
@@ -46,10 +46,10 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
         keyword: $scope.user.keyword,
         password: $scope.user.password
       };
-      console.log("Register :: ", payload);
+      console.log('Register :: ', payload);
       Auth.register(payload, function(err, res) {
         reset();
-        if(err) {
+        if (err) {
           alert(err);
           return;
         }
@@ -118,7 +118,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
       };
       Auth.login($scope.user, function(err, res) {
         reset();
-        if(err) {
+        if (err) {
           alert(err);
           return;
         }
@@ -130,7 +130,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
     // show error text
     $scope.showErrorMsg = function(ele, msg) {
       var siblingEle = ele[0].nextElementSibling;
-      if (siblingEle.dataset['name'] === 'formError') {
+      if (siblingEle.dataset.name === 'formError') {
         siblingEle.textContent = msg;
         return;
       }
@@ -139,10 +139,10 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
 
     $scope.hideErrorMsg = function(ele) {
       var siblingEle = ele[0].nextElementSibling;
-      if (siblingEle.dataset['name'] !== 'formError') {
+      if (siblingEle.dataset.name !== 'formError') {
         return;
       }
       siblingEle.remove();
-    }
+    };
   }
 ]);
