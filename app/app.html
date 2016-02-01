@@ -3,9 +3,6 @@
 <head>
     <meta charset="utf-8">
     <title>SAFE Launcher</title>
-    <script>
-      window.$ = window.jQuery = require('./bower_components/jquery/jquery');
-    </script>
     <link rel="stylesheet" href="./bower_components/open-sans-fontface/open-sans.css" />
     <link href="./stylesheets/main.css" rel="stylesheet" type="text/css">
 </head>
@@ -26,14 +23,18 @@
     <div class="msl-frame" ui-view></div>
   </div>
   <!-- /root node -->
+  <script>
+    window.$ = window.jQuery = require('./bower_components/jquery/jquery');
+  </script>
   <script src="./bower_components/angular/angular.js"></script>
   <script src="./bower_components/angular-ui-router/release/angular-ui-router.js"></script>
 
-  <script src="scripts/app.js"></script>
-  <script src="scripts/router.js"></script>
+  <script src="./app.js"></script>
+  <script src="./scripts/main.js"></script>
+  <script src="./scripts/router.js"></script>
 
   <!-- directives -->
-  <script src="scripts/directives/tabs.js" charset="utf-8"></script>
+  <script src="./scripts/directives/tabs.js" charset="utf-8"></script>
   <script src="scripts/directives/switch.js" charset="utf-8"></script>
   <script src="scripts/directives/validatePin.js" charset="utf-8"></script>
   <script src="scripts/directives/validateKeyword.js" charset="utf-8"></script>

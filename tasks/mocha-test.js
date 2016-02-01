@@ -25,7 +25,8 @@ var runMochaTests = function() {
 }
 
 var executeTest = function() {
-  gulp.src(['./app/*.js', './app/scripts/**/*js'])
+
+  gulp.src(['./app/*.js', './app/api/**/**/*.js', './app/scripts/**/*js'])
     .pipe(jshint({
       esnext: true
     })) // hint (optional)
@@ -33,7 +34,7 @@ var executeTest = function() {
     .pipe(stylish.combineWithHintResults()) // combine with jshint results
     .pipe(jshint.reporter('jshint-stylish'));
 
-    runMochaTests();
+  runMochaTests();
 };
 
 gulp.task('test', executeTest);
