@@ -13,116 +13,121 @@ var releasesDir;
 var readyAppDir;
 var manifest;
 
-var init = function () {
-    projectDir = jetpack;
-    tmpDir = projectDir.dir('./tmp', { empty: true });
-    releasesDir = projectDir.dir('./releases');
-    manifest = projectDir.read('app/package.json', 'json');
-    readyAppDir = tmpDir.cwd(manifest.name);
+var init = function() {
+  projectDir = jetpack;
+  tmpDir = projectDir.dir('./tmp', {
+    empty: true
+  });
+  releasesDir = projectDir.dir('./releases');
+  manifest = projectDir.read('app/package.json', 'json');
+  readyAppDir = tmpDir.cwd(manifest.name);
 
-    return Q();
+  return Q();
 };
 
-var copyRuntime = function () {
-    return projectDir.copyAsync('node_modules/electron-prebuilt/dist', readyAppDir.path(), { overwrite: true });
+var copyRuntime = function() {
+  return projectDir.copyAsync('node_modules/electron-prebuilt/dist', readyAppDir.path(), {
+    overwrite: true
+  });
 };
 
-var cleanupRuntime = function () {
-    return readyAppDir.removeAsync('resources/default_app');
+var cleanupRuntime = function() {
+  return readyAppDir.removeAsync('resources/default_app');
 };
 
-var packageBuiltApp = function () {
-    var deferred = Q.defer();
+var packageBuiltApp = function() {
+  var deferred = Q.defer();
+  var options = {
+    unpack: '*.dll'
+  };
+  asar.createPackageWithOptions(projectDir.path('build'), readyAppDir.path('resources/app.asar'), options, function() {
+    deferred.resolve();
+  });
 
-    asar.createPackage(projectDir.path('build'), readyAppDir.path('resources/app.asar'), function () {
-        deferred.resolve();
-    });
-
-    return deferred.promise;
+  return deferred.promise;
 };
 
-var finalize = function () {
-    var deferred = Q.defer();
+var finalize = function() {
+  var deferred = Q.defer();
 
-    projectDir.copy('resources/windows/icon.ico', readyAppDir.path('icon.ico'));
+  projectDir.copy('resources/windows/icon.ico', readyAppDir.path('icon.ico'));
 
-    // Replace Electron icon for your own.
-    var rcedit = require('rcedit');
-    rcedit(readyAppDir.path('electron.exe'), {
-        'icon': projectDir.path('resources/windows/icon.ico'),
-        'version-string': {
-            'ProductName': manifest.productName,
-            'FileDescription': manifest.description,
-            'ProductVersion': manifest.version,
-            'CompanyName': manifest.author, // it might be better to add another field to package.json for this
-            'LegalCopyright': manifest.copyright,
-            'OriginalFilename': manifest.productName + '.exe'
-        }
-    }, function (err) {
-        if (!err) {
-            deferred.resolve();
-        }
-    });
+  // Replace Electron icon for your own.
+  var rcedit = require('rcedit');
+  rcedit(readyAppDir.path('electron.exe'), {
+    'icon': projectDir.path('resources/windows/icon.ico'),
+    'version-string': {
+      'ProductName': manifest.productName,
+      'FileDescription': manifest.description,
+      'ProductVersion': manifest.version,
+      'CompanyName': manifest.author, // it might be better to add another field to package.json for this
+      'LegalCopyright': manifest.copyright,
+      'OriginalFilename': manifest.productName + '.exe'
+    }
+  }, function(err) {
+    if (!err) {
+      deferred.resolve();
+    }
+  });
 
-    return deferred.promise;
+  return deferred.promise;
 };
 
-var renameApp = function () {
-    return readyAppDir.renameAsync('electron.exe', manifest.productName + '.exe');
+var renameApp = function() {
+  return readyAppDir.renameAsync('electron.exe', manifest.productName + '.exe');
 };
 
-var createInstaller = function () {
-    var deferred = Q.defer();
+var createInstaller = function() {
+  var deferred = Q.defer();
 
-    var finalPackageName = manifest.name + '_' + manifest.version + '.exe';
-    var installScript = projectDir.read('resources/windows/installer.nsi');
+  var finalPackageName = manifest.name + '_' + manifest.version + '.exe';
+  var installScript = projectDir.read('resources/windows/installer.nsi');
 
-    installScript = utils.replace(installScript, {
-        name: manifest.name,
-        productName: manifest.productName,
-        author: manifest.author,
-        version: manifest.version,
-        src: readyAppDir.path(),
-        dest: releasesDir.path(finalPackageName),
-        icon: readyAppDir.path('icon.ico'),
-        setupIcon: projectDir.path('resources/windows/setup-icon.ico'),
-        banner: projectDir.path('resources/windows/setup-banner.bmp'),
-    });
-    tmpDir.write('installer.nsi', installScript);
+  installScript = utils.replace(installScript, {
+    name: manifest.name,
+    productName: manifest.productName,
+    author: manifest.author,
+    version: manifest.version,
+    src: readyAppDir.path(),
+    dest: releasesDir.path(finalPackageName),
+    icon: readyAppDir.path('icon.ico'),
+    setupIcon: projectDir.path('resources/windows/setup-icon.ico'),
+    banner: projectDir.path('resources/windows/setup-banner.bmp'),
+  });
+  tmpDir.write('installer.nsi', installScript);
 
-    gulpUtil.log('Building installer with NSIS...');
+  gulpUtil.log('Building installer with NSIS...');
 
-    // Remove destination file if already exists.
-    releasesDir.remove(finalPackageName);
+  // Remove destination file if already exists.
+  releasesDir.remove(finalPackageName);
 
-    // Note: NSIS have to be added to PATH (environment variables).
-    var nsis = childProcess.spawn('makensis', [
-        tmpDir.path('installer.nsi')
-    ], {
-        stdio: 'inherit'
-    });
-    nsis.on('error', function (err) {
-        if (err.message === 'spawn makensis ENOENT') {
-            throw "Can't find NSIS. Are you sure you've installed it and"
-                + " added to PATH environment variable?";
-        } else {
-            throw err;
-        }
-    });
-    nsis.on('close', function () {
-        gulpUtil.log('Installer ready!', releasesDir.path(finalPackageName));
-        deferred.resolve();
-    });
+  // Note: NSIS have to be added to PATH (environment variables).
+  var nsis = childProcess.spawn('makensis', [
+    tmpDir.path('installer.nsi')
+  ], {
+    stdio: 'inherit'
+  });
+  nsis.on('error', function(err) {
+    if (err.message === 'spawn makensis ENOENT') {
+      throw "Can't find NSIS. Are you sure you've installed it and" + " added to PATH environment variable?";
+    } else {
+      throw err;
+    }
+  });
+  nsis.on('close', function() {
+    gulpUtil.log('Installer ready!', releasesDir.path(finalPackageName));
+    deferred.resolve();
+  });
 
-    return deferred.promise;
+  return deferred.promise;
 };
 
-var cleanClutter = function () {
-    return tmpDir.removeAsync('.');
+var cleanClutter = function() {
+  return tmpDir.removeAsync('.');
 };
 
-module.exports = function () {
-    return init()
+module.exports = function() {
+  return init()
     .then(copyRuntime)
     .then(cleanupRuntime)
     .then(packageBuiltApp)
