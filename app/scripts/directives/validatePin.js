@@ -10,11 +10,14 @@ window.safeLauncher.directive('mslValidatePin', function() {
       var form = scope[formName][inpName];
       form.$setValidity('customValidation', false);
       if (!value || isNaN(value)) {
+        scope.showErrorMsg(element, "Must contain only Numeric values");
         return;
       }
       if (value.length < 4) {
+        scope.showErrorMsg(element, "Must contain minimum of 4 characters");
         return;
       }
+      scope.hideErrorMsg(element);
       form.$setValidity('customValidation', true);
     });
   };

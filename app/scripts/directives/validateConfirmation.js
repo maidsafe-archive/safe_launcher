@@ -12,8 +12,10 @@ window.safeLauncher.directive('mslValidateConfirmation', function() {
       var targetName = attrs.targetName;
       var targetValue = scope[formName][targetName].$viewValue;
       if (value !== targetValue) {
+        scope.showErrorMsg(element, "Value doesn't match");
         return;
       }
+      scope.hideErrorMsg(element);
       form.$setValidity('customValidation', true);
     });
   };

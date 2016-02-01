@@ -126,5 +126,23 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
         $state.go('user');
       });
     };
+
+    // show error text
+    $scope.showErrorMsg = function(ele, msg) {
+      var siblingEle = ele[0].nextElementSibling;
+      if (siblingEle.dataset['name'] === 'formError') {
+        siblingEle.textContent = msg;
+        return;
+      }
+      ele.after('<span class="form-err" data-name="formError">' + msg + '<span>');
+    };
+
+    $scope.hideErrorMsg = function(ele) {
+      var siblingEle = ele[0].nextElementSibling;
+      if (siblingEle.dataset['name'] !== 'formError') {
+        return;
+      }
+      siblingEle.remove();
+    }
   }
 ]);
