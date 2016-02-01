@@ -17,6 +17,8 @@ var destDir = projectDir.cwd('./build');
 var paths = {
     copyFromAppDir: [
         './node_modules/**',
+        './bower_components/**',
+        './scripts/**',
         './vendor/**',
         './**/*.html',
         './**/*.+(jpg|png|svg)'

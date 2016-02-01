@@ -1,0 +1,51 @@
+.msl-btn {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background-color: grayl
+}
+
+// sign out button
+.msl-signout-btn {
+  font-size: 14px;
+  line-height: 32px;
+  background-color: transparent;
+  color: white;
+}
+
+// switch button
+.msl-switch-btn {
+  height: 18px;
+  display: inline-block;
+  overflow: hidden;
+  cursor: pointer;
+  .msl-switch-btn-lbl {
+    width: 40px;
+    height: 18px;
+    border-radius: 9px;
+    background-color: transparent;
+    display: inline-block;
+    position: relative;
+    border: 2px solid @msl-switch-diable;
+    &:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 22px;
+      margin: 3px;
+      width: 8px;
+      height: 8px;
+      background-color: @msl-switch-diable;
+      border-radius: 50%;
+      transition: right .2s linear;
+    }
+    &.open {
+      background-color: @msl-title-bg;
+      border-color: @msl-title-bg;
+      &:after {
+        background-color: white;
+        right: 0;
+      }
+    }
+  }
+}

@@ -1,25 +1,10 @@
-html, body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
+@import "variables";
+@import "mixins";
 
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: sans-serif;
-}
-
-a {
-    text-decoration: none;
-}
-
-.container {
-    text-align: center;
-}
-
-.subtitle {
-    color: gray;
-}
+@import "basic";
+@import "utils";
+@import "buttons";
+@import "list";
+@import "titlebar";
+@import "frame";
+@import "form";
