@@ -18,6 +18,7 @@ var paths = {
     copyFromAppDir: [
         './node_modules/**',
         './bower_components/**',
+        './bower_components/angular-ui-form-validation/dist/**.js',
         './scripts/**',
         './images/**',
         './vendor/**',
