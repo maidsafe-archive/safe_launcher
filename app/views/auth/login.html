@@ -1,20 +1,20 @@
 <!-- login -->
 <div class="msl-form msl-layout-1 msl-auth-form" ng-controller="AuthController">
-  <form ng-submit="login()">
+  <form name="mslLogin" ng-submit="login()">
     <!-- pin -->
     <div class="msl-form-grp">
-      <input type="password" name="pin" placeholder="Pin" ng-model="user.pin" />
-      <button type="button" name="clear-btn" class="clear-btn" ng-click="user.pin = null">x</button>
+      <input type="password" name="pin" placeholder="Pin" ng-model="user.pin" msl-validate-pin/>
+      <span type="button" name="clear-btn" class="clear-btn" ng-click="user.pin = null;mslLogin.pin.$setValidity('customValidation', false)">x</span>
     </div>
     <!-- keyword -->
     <div class="msl-form-grp">
-      <input type="password" name="keyword" placeholder="Keyword" ng-model="user.keyword" />
-      <button type="button" name="clear-btn" class="clear-btn" ng-click="user.keyword = null">x</button>
+      <input type="password" name="keyword" placeholder="Keyword" ng-model="user.keyword" msl-validate-keyword/>
+      <span type="button" name="clear-btn" class="clear-btn" ng-click="user.keyword = null;mslLogin.keyword.$setValidity('customValidation', false)">x</span>
     </div>
     <!-- password -->
     <div class="msl-form-grp">
-      <input type="password" name="password" placeholder="Password" ng-model="user.password" />
-      <button type="button" name="clear-btn" class="clear-btn" ng-click="user.password = null">x</button>
+      <input type="password" name="password" placeholder="Password" ng-model="user.password" msl-validate-password/>
+      <span type="button" name="clear-btn" class="clear-btn" ng-click="user.password = null;mslLogin.password.$setValidity('customValidation', false)">x</span>
     </div>
     <!-- login btn -->
     <div class="msl-form-grp">
