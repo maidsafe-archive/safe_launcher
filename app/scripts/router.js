@@ -11,5 +11,9 @@ window.safeLauncher.config(function($stateProvider, $urlRouterProvider) {
   .state('register', {
     url: '/register',
     templateUrl: 'views/auth/register.html'
+  })
+  .state('user', {
+    url: '/user',
+    templateUrl: 'views/user/base.html'
   });
 });

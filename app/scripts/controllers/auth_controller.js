@@ -2,8 +2,8 @@
  * Auth Controller
  * @param Auth - Auth factory dependency
  */
-window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
-  function($scope, Auth) {
+window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFactory',
+  function($scope, $state, Auth) {
     var REGISTER_TAB_INIT_POS = 1;
     var REGISTER_TAB_COUNT = 3;
     var USER_PASSWORD_MIN_LENGTH = 6;
@@ -61,6 +61,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', 'AuthFactory',
           return;
         }
         alert(data);
+        $state.go('user');
       });
     };
 
