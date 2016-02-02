@@ -8,13 +8,13 @@ window.safeLauncher.directive('mslLoader', function() {
     replace: true,
     restrict: 'E',
     templateUrl: 'views/components/loader.html',
-    controller: ['$scope', 'LoaderFactory', function($scope, Loader) {
+    controller: [ '$scope', 'LoaderFactory', function($scope, Loader) {
       $scope.show = false;
       $scope.api = Loader;
       $scope.$watch('api.loading', toggledisplay);
-      function toggledisplay() {
+      var toggledisplay = function() {
         $scope.show = !!($scope.api.loading);
       };
-    }]
+    } ]
   };
 });
