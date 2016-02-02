@@ -9,7 +9,7 @@ window.safeLauncher.directive('mslValidatePassword', function() {
       var formName = element[0].form.name;
       var form = scope[formName][inpName];
       form.$setValidity('customValidation', false);
-      if(!value) {
+      if (!value) {
         scope.showErrorMsg(element, 'Password cannot be empty');
         return;
       }

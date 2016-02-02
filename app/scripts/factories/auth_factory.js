@@ -6,13 +6,13 @@ window.safeLauncher.factory('AuthFactory', [
     var self = this;
 
     // Login
-    self.login = function(payload, callback) {
-      return callback(null, 'Login successfull');
+    self.login = function(user, callback) {
+      window.login(user.pin, user.keyword, user.password, callback);
     };
 
     // Register
-    self.register = function(payload, callback) {
-      return callback(null, 'Registered');
+    self.register = function(user, callback) {
+      window.register(user.pin, user.keyword, user.password, callback);
     };
 
     return self;

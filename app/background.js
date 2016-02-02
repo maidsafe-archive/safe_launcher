@@ -5,32 +5,24 @@
 
 import { app, BrowserWindow } from 'electron';
 import devHelper from './vendor/electron_boilerplate/dev_helper';
-import windowStateKeeper from './vendor/electron_boilerplate/window_state';
+// import windowStateKeeper from './vendor/electron_boilerplate/window_state';
 
-// Special module holding environment variables which you declared
-// in config/env_xxx.json file.
 import env from './env';
 
 var mainWindow;
 
 // Preserver of the window size and position between app launches.
-var mainWindowState = windowStateKeeper('main', {
-  width: 1000,
-  height: 600
-});
+// var mainWindowState = windowStateKeeper('main', {
+//   width: 1000,
+//   height: 600
+// });
 
 app.on('ready', function() {
   mainWindow = new BrowserWindow({
-    x: mainWindowState.x,
-    y: mainWindowState.y,
-    width: mainWindowState.width,
-    height: mainWindowState.height
+    'width': 360,
+    'height': 500,
+    'resizable': false
   });
-
-  if (mainWindowState.isMaximized) {
-    mainWindow.maximize();
-  }
-
   mainWindow.loadURL('file://' + __dirname + '/app.html');
 
   if (env.name !== 'production') {
@@ -39,7 +31,7 @@ app.on('ready', function() {
   }
 
   mainWindow.on('close', function() {
-    mainWindowState.saveState(mainWindow);
+    // mainWindowState.saveState(mainWindow);
   });
 });
 
