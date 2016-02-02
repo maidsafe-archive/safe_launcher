@@ -5,7 +5,7 @@ export default class Auth {
     this.MODULE = 'auth';
   }
 
-  register(keyword, pin, password, callback) {
+  register(pin, keyword, password, callback) {
     this.send({
       module: this.MODULE,
       action: 'register',
@@ -17,7 +17,7 @@ export default class Auth {
     }, callback);
   }
 
-  login(keyword, pin, password, callback) {
+  login(pin, keyword, password, callback) {
     this.send({
       module: this.MODULE,
       action: 'login',

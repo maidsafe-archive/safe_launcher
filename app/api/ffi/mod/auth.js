@@ -57,9 +57,14 @@ var getSafeDriveKeySize = function(lib) {
 var register = function(lib, request) {
   var params = request.params;
   var regClient = ref.alloc(clientHandlePtrPtr);
-  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  var res = lib.create_account(params.keyword, params.pin, params.password, regClient);
-  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+  var res;
+  try {
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    res = lib.create_account(params.keyword, params.pin, params.password, regClient);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+  } catch (e) {
+    return util.sendError(request.id, 999, e.message());
+  }
   if (res !== 0) {
     return util.sendError(request.id, res);
   }
@@ -74,9 +79,14 @@ var register = function(lib, request) {
 var login = function(lib, request) {
   var params = request.params;
   var regClient = ref.alloc(clientHandlePtrPtr);
-  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  var res = lib.log_in(params.keyword, params.pin, params.password, regClient);
-  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+  var res;
+  try {
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    res = lib.log_in(params.keyword, params.pin, params.password, regClient);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+  } catch (e) {
+    return util.sendError(request.id, 999, e.message());
+  }
   if (res !== 0) {
     return util.sendError(request.id, res);
   }

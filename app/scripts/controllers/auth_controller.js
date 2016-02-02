@@ -53,8 +53,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
         reset();
         Loader.hide();
         if (err) {
-          alert(err);
-          return;
+          return alert('Err ' + err);
         }
         alert(res);
       });
@@ -124,7 +123,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
         reset();
         Loader.hide();
         if (err) {
-          alert(err);
+          alert('err' + err.toString());
           return;
         }
         alert(res);
