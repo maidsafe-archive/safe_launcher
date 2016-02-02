@@ -2,6 +2,9 @@
   padding-bottom: 48px;
   width: 80%;
   margin: 0 auto;
+  input.ng-invalid {
+    border: 1px solid red !important;
+  }
   .msl-form-nav {
     white-space: nowrap;
     .msl-form-nav-i {
@@ -27,6 +30,12 @@
   }
   .msl-form-grp {
     position: relative;
+    .form-err {
+      font-size: 12px;
+      padding: 2px 0;
+      display: inline-block;
+      color: red;
+    }
     input[type=text], input[type=password]  {
       width: 100%;
       height: 32px;
@@ -41,6 +50,7 @@
       height: 32px;
       border: none;
       outline: none;
+      text-align: center;
       background-color: transparent;
       font-size: 14px;
       font-weight: normal;
