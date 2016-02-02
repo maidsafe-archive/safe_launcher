@@ -62,7 +62,7 @@ var register = function(lib, request) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     res = lib.create_account(params.keyword, params.pin, params.password, regClient);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-  } catch(e) {
+  } catch (e) {
     return util.sendError(request.id, 999, e.message());
   }
   if (res !== 0) {
@@ -84,7 +84,7 @@ var login = function(lib, request) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     res = lib.log_in(params.keyword, params.pin, params.password, regClient);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-  } catch(e) {
+  } catch (e) {
     return util.sendError(request.id, 999, e.message());
   }
   if (res !== 0) {
