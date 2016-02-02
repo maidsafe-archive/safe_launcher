@@ -4,15 +4,7 @@
 window.safeLauncher.directive('mslSwitch', function() {
   'use strict';
   var link = function(scope, element, attrs) {
-    var switchState = {
-      open: true,
-      close: false
-    };
     scope.switchId = attrs.switchId;
-    scope.isChecked = switchState[attrs.state];
-    scope.toggleSwitch = function() {
-      scope.isChecked = !scope.isChecked;
-    };
   };
   return {
     scope: true,

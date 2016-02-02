@@ -21,6 +21,7 @@
       </div>
     </div><!-- /title bar -->
     <div class="msl-frame" ui-view></div>
+    <msl-loader />
   </div>
   <!-- /root node -->
   <script>
@@ -34,6 +35,7 @@
   <script src="./scripts/router.js"></script>
 
   <!-- directives -->
+  <script src="./scripts/directives/loader.js" charset="utf-8"></script>
   <script src="./scripts/directives/tabs.js" charset="utf-8"></script>
   <script src="scripts/directives/switch.js" charset="utf-8"></script>
   <script src="scripts/directives/validatePin.js" charset="utf-8"></script>
@@ -43,8 +45,10 @@
 
   <!-- factories -->
   <script src="./scripts/factories/auth_factory.js" charset="utf-8"></script>
+  <script src="./scripts/factories/loader_factory.js" charset="utf-8"></script>
 
   <!-- controllers -->
   <script src="./scripts/controllers/auth_controller.js" charset="utf-8"></script>
+  <script src="./scripts/controllers/user_controller.js" charset="utf-8"></script>
 </body>
 </html>

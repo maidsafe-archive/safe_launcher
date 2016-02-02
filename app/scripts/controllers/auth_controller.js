@@ -2,8 +2,8 @@
  * Auth Controller
  * @param Auth - Auth factory dependency
  */
-window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFactory',
-  function($scope, $state, Auth) {
+window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFactory', 'LoaderFactory',
+  function($scope, $state, Auth, Loader) {
     $scope.user = {};
     $scope.tabs = {
       state: [
@@ -40,6 +40,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
       var reset = function() {
         $scope.user = {};
         $scope.tabs.init();
+        $scope.apply();
       };
       var payload = {
         pin: $scope.user.pin,
@@ -47,8 +48,10 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
         password: $scope.user.password
       };
       console.log('Register :: ', payload);
+      Loader.show();
       Auth.register(payload, function(err, res) {
         reset();
+        Loader.hide();
         if (err) {
           return alert('Err ' + err);
         }
@@ -115,8 +118,10 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
       var reset = function() {
         $scope.user = {};
       };
+      Loader.show();
       Auth.login($scope.user, function(err, res) {
         reset();
+        Loader.hide();
         if (err) {
           alert('err' + err.toString());
           return;
