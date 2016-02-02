@@ -4,146 +4,144 @@
  */
 window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFactory',
   function($scope, $state, Auth) {
-    var REGISTER_TAB_INIT_POS = 1;
-    var REGISTER_TAB_COUNT = 3;
-    var USER_PASSWORD_MIN_LENGTH = 6;
-    var USER_PIN_MIN_LENGTH = 4;
-
-    // Reset registration form
-    var resetRegistration = function() {
-      $scope.user = {};
-      $scope.registerTab.currentPos = REGISTER_TAB_INIT_POS;
+    $scope.user = {};
+    $scope.tabs = {
+      state: [
+        'PIN',
+        'KEYWORD',
+        'PASSWORD'
+      ],
+      currentPos: null,
+      init: function() {
+        this.currentPos = this.state[0];
+      },
+      changePos: function(state) {
+        if (state === this.state[0]) {
+          this.currentPos = this.state[0];
+          return;
+        }
+        if (state === this.state[1]) {
+          $scope.validatePin();
+          return;
+        }
+        if (state === this.state[2]) {
+          if (!$scope.validatePin()) {
+            return;
+          }
+          if (!$scope.validateKeyword()) {
+            return;
+          }
+        }
+      }
     };
 
-    // Reset login form
-    var resetLogin = function() {
-      $scope.user = {};
-    };
-
-    // check value is alpha numeric
-    var isAlphaNumeric = function(val) {
-      return (new RegExp(/^[a-z0-9]+$/i)).test(val);
-    };
-
-    // User registration
-    var register = function(payload) {
-      Auth.register(payload, function(err, data) {
-        resetRegistration();
+    // register user
+    var register = function() {
+      var reset = function() {
+        $scope.user = {};
+        $scope.tabs.init();
+      };
+      var payload = {
+        pin: $scope.user.pin,
+        keyword: $scope.user.keyword,
+        password: $scope.user.password
+      };
+      console.log('Register :: ', payload);
+      Auth.register(payload, function(err, res) {
+        reset();
         if (err) {
           return alert('Err ' + err);
         }
-        alert(data);
+        alert(res);
       });
     };
 
-    // User login
-    var login = function() {
-      if (!$scope.user.hasOwnProperty('pin') || !$scope.user.hasOwnProperty('keyword') ||
-        !$scope.user.hasOwnProperty('password')) {
-        alert('All fields are required');
+    // validate pin
+    $scope.validatePin = function() {
+      if (!$scope.registerPin.$valid) {
         return;
       }
-      if (isNaN($scope.user.pin) || $scope.user.pin.length < USER_PIN_MIN_LENGTH) {
-        alert('Invalid PIN');
+      if (!$scope.user.hasOwnProperty('pin') || !$scope.user.pin) {
+        $scope.registerPin.pin.$setValidity('customValidation', false);
         return;
       }
-      if (!isAlphaNumeric($scope.user.keyword) || !isAlphaNumeric($scope.user.password) ||
-        $scope.user.keyword.length < USER_PASSWORD_MIN_LENGTH ||
-        $scope.user.password.length < USER_PASSWORD_MIN_LENGTH) {
-        alert('Invalid Keyword or Password');
+      if (!$scope.user.hasOwnProperty('confirmPin') || !$scope.user.confirmPin) {
+        $scope.registerPin.confirmPin.$setValidity('customValidation', false);
         return;
       }
-      Auth.login($scope.user, function(err, data) {
-        resetLogin();
+      $scope.tabs.currentPos = $scope.tabs.state[1];
+      return true;
+    };
+
+    // validate keyword
+    $scope.validateKeyword = function() {
+      if (!$scope.registerKeyword.$valid) {
+        return;
+      }
+      if (!$scope.user.hasOwnProperty('keyword') || !$scope.user.keyword) {
+        $scope.registerKeyword.keyword.$setValidity('customValidation', false);
+        return;
+      }
+      if (!$scope.user.hasOwnProperty('confirmKeyword') || !$scope.user.confirmKeyword) {
+        $scope.registerKeyword.confirmKeyword.$setValidity('customValidation', false);
+        return;
+      }
+      $scope.tabs.currentPos = $scope.tabs.state[2];
+      return true;
+    };
+
+    // validate password
+    $scope.validatePassword = function() {
+      if (!$scope.registerPassword.$valid) {
+        return;
+      }
+      if (!$scope.user.hasOwnProperty('password') || !$scope.user.password) {
+        $scope.registerPassword.password.$setValidity('customValidation', false);
+        return;
+      }
+      if (!$scope.user.hasOwnProperty('confirmPassword') || !$scope.user.confirmPassword) {
+        $scope.registerPassword.confirmPassword.$setValidity('customValidation', false);
+        return;
+      }
+      register();
+      return true;
+    };
+
+    // user login
+    $scope.login = function() {
+      if (!$scope.mslLogin.$valid) {
+        return;
+      }
+      var reset = function() {
+        $scope.user = {};
+      };
+      Auth.login($scope.user, function(err, res) {
+        reset();
         if (err) {
           alert('err' + err.toString());
           return;
         }
-        alert(data);
+        alert(res);
         $state.go('user');
       });
     };
 
-    // Registration tabbing
-    $scope.registerTab = {
-      currentPos: REGISTER_TAB_INIT_POS,
-      count: REGISTER_TAB_COUNT,
-      changePosition: function(pos) {
-        var self = this;
-
-        // validate
-        var validate = function(key) {
-          var check = false;
-          if (!$scope.user.hasOwnProperty(key) || !$scope.user[key].hasOwnProperty('value') ||
-          !$scope.user[key].hasOwnProperty('confirm')) {
-            alert('All field required');
-            return check;
-          }
-
-          if (!$scope.user[key].value || !$scope.user[key].confirm) {
-            alert('Field should not be left empty');
-            return check;
-          }
-
-          if (key === 'pin') {
-            if (isNaN($scope.user[key].value)) {
-              alert('PIN must contain only numeric');
-              return check;
-            }
-
-            if ($scope.user[key].value.length < USER_PIN_MIN_LENGTH) {
-              alert('PIN should contain atleast ' + USER_PIN_MIN_LENGTH + ' characters');
-              return check;
-            }
-          }
-
-          if (key === 'keyword' || key === 'password') {
-            if (!isAlphaNumeric($scope.user[key].value)) {
-              alert('Keyword/Password must not contain special characters');
-              return check;
-            }
-
-            if ($scope.user[key].value.length < USER_PASSWORD_MIN_LENGTH) {
-              alert('Keyword/Password should contain atleast ' + USER_PASSWORD_MIN_LENGTH + ' characters');
-              return check;
-            }
-          }
-
-          if ($scope.user[key].value !== $scope.user[key].confirm) {
-            alert('Values must be same');
-            return check;
-          }
-          return !check;
-        };
-
-        switch (pos) {
-          case 1:
-            self.currentPos = pos;
-            break;
-          case 2:
-            if (!validate('pin')) {
-              return;
-            }
-            self.currentPos = pos;
-            break;
-          case 3:
-            if (!validate('pin') || !validate('keyword')) {
-              return;
-            }
-            self.currentPos = pos;
-            break;
-          case self.count + 1:
-            if (!validate('password')) {
-              self.currentPos = self.count;
-              return;
-            }
-            register($scope.user);
-            break;
-        }
+    // show error text
+    $scope.showErrorMsg = function(ele, msg) {
+      var siblingEle = ele[0].nextElementSibling;
+      if (siblingEle.dataset.name === 'formError') {
+        siblingEle.textContent = msg;
+        return;
       }
+      ele.after('<span class="form-err" data-name="formError">' + msg + '<span>');
     };
 
-    $scope.user = {};
-    $scope.login = login;
+    $scope.hideErrorMsg = function(ele) {
+      var siblingEle = ele[0].nextElementSibling;
+      if (siblingEle.dataset.name !== 'formError') {
+        return;
+      }
+      siblingEle.remove();
+    };
   }
 ]);
