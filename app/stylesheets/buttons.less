@@ -19,6 +19,16 @@
   display: inline-block;
   overflow: hidden;
   cursor: pointer;
+  &.open {
+    .msl-switch-btn-lbl {
+      background-color: @msl-title-bg;
+      border-color: @msl-title-bg;
+      &:after {
+        background-color: white;
+        right: 0;
+      }
+    }    
+  }
   .msl-switch-btn-lbl {
     width: 40px;
     height: 18px;
@@ -38,14 +48,6 @@
       background-color: @msl-switch-diable;
       border-radius: 50%;
       transition: right .2s linear;
-    }
-    &.open {
-      background-color: @msl-title-bg;
-      border-color: @msl-title-bg;
-      &:after {
-        background-color: white;
-        right: 0;
-      }
     }
   }
 }

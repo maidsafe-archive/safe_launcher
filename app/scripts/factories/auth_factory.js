@@ -7,6 +7,7 @@ window.safeLauncher.factory('AuthFactory', [
 
     // Login
     self.login = function(payload, callback) {
+      // return callback('Error', null);
       return callback(null, 'Login successfull');
     };
 
