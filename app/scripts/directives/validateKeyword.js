@@ -9,12 +9,16 @@ window.safeLauncher.directive('mslValidateKeyword', function() {
       var formName = element[0].form.name;
       var form = scope[formName][inpName];
       form.$setValidity('customValidation', false);
-      if (!value || !(new RegExp(/^[a-z0-9]+$/i)).test(value)) {
-        scope.showErrorMsg(element, 'Should not contain special characters');
+      if(!value) {
+        scope.showErrorMsg(element, 'Keyword cannot be empty');
+        return;
+      }
+      if (!(new RegExp(/^[a-z0-9]+$/i)).test(value)) {
+        scope.showErrorMsg(element, 'Keyword should not contain special characters');
         return;
       }
       if (value.length < 6) {
-        scope.showErrorMsg(element, 'Should contain minimum of 6 characters');
+        scope.showErrorMsg(element, 'Minimum keyword length should be six characters');
         return;
       }
       scope.hideErrorMsg(element);
