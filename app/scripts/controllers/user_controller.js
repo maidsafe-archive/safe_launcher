@@ -25,7 +25,7 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
     ];
 
     // start server
-    Server.startServer();
+    Server.start();
 
     // handle server error
     Server.onServerError(function(error) {

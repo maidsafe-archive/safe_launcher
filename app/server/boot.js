@@ -47,7 +47,7 @@ export default class RESTServer {
   start() {
     var app = express();
 
-    app.use(logger('dev'));
+    app.use(logger('tiny'));
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({
       extended: false

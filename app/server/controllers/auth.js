@@ -4,7 +4,7 @@ export default class AuthController {
   }
 
   authorise(req, res) {
-    res.send('Working');
+    res.send(200, 'Working');
   }
 
 }
