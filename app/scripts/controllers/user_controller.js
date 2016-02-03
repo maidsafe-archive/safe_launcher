@@ -1,8 +1,8 @@
 /**
  * User Controller
  */
-window.safeLauncher.controller('UserController', [ '$scope', '$state',
-  function($scope, $state) {
+window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFactory',
+  function($scope, $state, Server) {
     $scope.manageList = [
       {
         name: 'Proxy',
@@ -24,8 +24,38 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state',
       }
     ];
 
+    // start server
+    Server.startServer();
+
+    // handle server error
+    Server.onServerError(function(error) {
+      console.error(error);
+    });
+
+    // handle server start
+    Server.onServerStarted(function() {
+      console.log("Server Started");
+    });
+
+    // handle server shutdown
+    Server.onServerShutdown(function() {
+      console.log("Server Stopped");
+    });
+
+    // handle session creation
+    Server.onSessionCreated(function(session) {
+      console.log('Session created :: ', session);
+    });
+
+    // handle session removed
+    Server.onSessionRemoved(function(id) {
+      console.log('Session removed :: ' + id);
+    });
+
+    // Toggle Setting
     $scope.toggleSetting = function(setting) {
       setting.status = !setting.status;
     };
+
   }
 ]);
