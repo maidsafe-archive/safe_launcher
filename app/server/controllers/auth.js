@@ -14,19 +14,23 @@ export var createSession = function(req, res) {
       return res.send(500, error.message());
     }
     var app = authReq.app;
-    let appPubKey = new Uint8Array(new Buffer(authReq.publicKey, 'base64'));
-    let appNonce = new Uint8Array(new Buffer(authReq.nonce, 'base64'));
-    let sessionId = new Buffer(sodium.randombytes_buf(32)).toString('base64');
-    let sessionInfo = new SessionInfo(app.id, app.name, app.version, app.vendor, authReq.permissions, dirKey);
-    let encryptedKey = sodium.crypto_box_easy(sessionInfo.secretKey, appNonce, appPubKey, assymetricKeyPair.privateKey);
-    let token = jwt.sign(sessionId, new Buffer(sessionInfo.signingKey).toString('base64'));
-    sessionManager.put(sessionId, sessionInfo);
-    res.send(200, {
-      token: token,
-      encryptedKey: new Buffer(encryptedKey).toString('base64'),
-      publicKey: new Buffer(assymetricKeyPair.publicKey).toString('base64'),
-      permissions: permissions
-    });
+    try {
+      let appPubKey = new Uint8Array(new Buffer(authReq.publicKey, 'base64'));
+      let appNonce = new Uint8Array(new Buffer(authReq.nonce, 'base64'));
+      let sessionId = new Buffer(sodium.randombytes_buf(32)).toString('base64');
+      let sessionInfo = new SessionInfo(app.id, app.name, app.version, app.vendor, authReq.permissions, dirKey);
+      let encryptedKey = sodium.crypto_box_easy(sessionInfo.secretKey, appNonce, appPubKey, assymetricKeyPair.privateKey);
+      let token = jwt.sign(sessionId, new Buffer(sessionInfo.signingKey).toString('base64'));
+      sessionManager.put(sessionId, sessionInfo);
+      res.send(200, {
+        token: token,
+        encryptedKey: new Buffer(encryptedKey).toString('base64'),
+        publicKey: new Buffer(assymetricKeyPair.publicKey).toString('base64'),
+        permissions: permissions
+      });
+    } catch (e) {
+      res.send(500, e.message());
+    }
   }
   return onDirKey;
 }
