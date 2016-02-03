@@ -17,7 +17,7 @@ window.register = function(pin, keyword, password, callback) {
 
 var onServerError = function(error) {};
 
-var onServerStarted = function() {console.log('started')};
+var onServerStarted = function() {};
 
 var onServerShutdown = function() {};
 
