@@ -11,27 +11,27 @@ window.safeLauncher.factory('ServerFactory', [
     };
 
     // Handle server error
-    self.onServerError(callback) {
+    self.onServerError = function(callback) {
       window.msl.onServerError(callback);
     };
 
     // handle server start
-    self.onServerStarted(callback) {
+    self.onServerStarted = function(callback) {
       window.msl.onServerStarted(callback);
     };
 
     // handle server shutdown
-    self.onServerShutdown(callback) {
+    self.onServerShutdown = function(callback) {
       window.msl.onServerShutdown(callback);
     };
 
     // handle session creation
-    self.onSessionCreated(callback) {
+    self.onSessionCreated = function(callback) {
       window.msl.onSessionCreated(callback);
     };
 
     // handle session removed
-    self.onSessionRemoved(callback) {
+    self.onSessionRemoved = function(callback) {
       window.msl.onSessionRemoved(callback);
     };
 

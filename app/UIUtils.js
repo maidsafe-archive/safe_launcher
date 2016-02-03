@@ -5,8 +5,7 @@ class AppLifeCycleHandler {
   close() {
     this.api.close();
   }
-};
-
+}
 
 // UI Utils
 export default class UIUtils {

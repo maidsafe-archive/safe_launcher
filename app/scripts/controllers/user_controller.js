@@ -34,12 +34,12 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
 
     // handle server start
     Server.onServerStarted(function() {
-      console.log("Server Started");
+      console.log('Server Started');
     });
 
     // handle server shutdown
     Server.onServerShutdown(function() {
-      console.log("Server Stopped");
+      console.log('Server Stopped');
     });
 
     // handle session creation
@@ -56,6 +56,5 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
     $scope.toggleSetting = function(setting) {
       setting.status = !setting.status;
     };
-
   }
 ]);
