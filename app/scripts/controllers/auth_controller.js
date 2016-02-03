@@ -123,7 +123,8 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
         reset();
         Loader.hide();
         if (err) {
-          alert('err' + err.toString());
+          console.log(err);
+          alert('Error :: ' + err);
           return;
         }
         alert(res);

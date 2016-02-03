@@ -21,7 +21,8 @@ app.on('ready', function() {
   mainWindow = new BrowserWindow({
     'width': 360,
     'height': 500,
-    'resizable': false
+    'resizable': false,
+    'frame': false
   });
   mainWindow.loadURL('file://' + __dirname + '/app.html');
 
@@ -30,9 +31,16 @@ app.on('ready', function() {
     mainWindow.openDevTools();
   }
 
-  mainWindow.on('close', function() {
-    // mainWindowState.saveState(mainWindow);
+  mainWindow.on('blur', function(d) {
+    if (env.name !== 'production') {
+      return;
+    }
+    mainWindow.minimize();
   });
+
+  // mainWindow.on('close', function() {
+  //   // mainWindowState.saveState(mainWindow);
+  // });
 });
 
 app.on('window-all-closed', function() {

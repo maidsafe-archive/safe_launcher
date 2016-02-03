@@ -3,9 +3,14 @@
   height: 32px;
   background-color: @msl-title-bg;
   color: white;
-  padding: 0 16px;
+  padding: 0;
   position: relative;
   z-index: 999;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+  button {
+    -webkit-app-region: no-drag;
+  }
   > .lt, > .rt {
     width: 50%;
     display: block;
@@ -17,15 +22,29 @@
   > .rt {
     text-align: right;
     .rt-i {
+      padding-right: 16px;
       display: inline-block;
     }
   }
   .msl-title {
     margin: 0;
-    padding: 0;
+    padding: 0 0 0 16px;
     font-size: 14px;
     line-height: 32px;
     font-weight: normal;
+  }
+  .title-btn {
+    width: 32px;
+    height: 32px;
+    padding: 10px;
+    margin: 0;
+    border: 0;
+    outline: 0;
+    background-color: transparent;
+    cursor: pointer;
+    img {
+      width: 100%;
+    }
   }
   .clearfix();
 }

@@ -7,12 +7,12 @@ window.safeLauncher.factory('AuthFactory', [
 
     // Login
     self.login = function(user, callback) {
-      window.login(user.pin, user.keyword, user.password, callback);
+      window.msl.login(user.pin, user.keyword, user.password, callback);
     };
 
     // Register
     self.register = function(user, callback) {
-      window.register(user.pin, user.keyword, user.password, callback);
+      window.msl.register(user.pin, user.keyword, user.password, callback);
     };
 
     return self;
