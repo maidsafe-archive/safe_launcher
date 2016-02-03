@@ -3,10 +3,6 @@ export default class AuthController {
     this.api = api;
   }
 
-  register(router) {
-      router.get('/auth', this.authorise);
-  }
-
   authorise(req, res) {
     res.send('Working');
   }

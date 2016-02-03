@@ -8,8 +8,10 @@ export default class VersionOneRouter {
   }
 
   getRouter() {
-    var authController = new AuthController(this.api);
-    authController.register(this.router);
+    var authController = new AuthController(this.api);    
+
+    this.router.get('/auth', authController.authorise);
+
     return this.router;
   }
 };
