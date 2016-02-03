@@ -7,7 +7,7 @@ import sessionManager from '../session_manager';
 import SessionInfo from '../model/session_info';
 
 export var createSession = function(req, res) {
-  let authReq = req.body;    
+  let authReq = req.body;
   let onDirKey = function(err, dirKey) {
     let assymetricKeyPair = sodium.crypto_box_keypair();
     if (err) {
@@ -31,16 +31,17 @@ export var createSession = function(req, res) {
   return onDirKey;
 }
 
-export var authorise = function(req, res) {
+export var authorise = function (req, res) {
   let authReq = req.body;
   if (!(authReq.app && authReq.app.name && authReq.app.id && authReq.app.vendor &&
       authReq.app.version && authReq.publicKey && authReq.nonce)) {
     return res.send(400, 'Bad request');
   }
+
   var payload = {
     payload: authReq,
     request: req,
-    response: res;
+    response: res
   };
   var eventType = req.app.get('EVENT_TYPE').AUTH_REQUEST;
   req.app.get('eventEmitter').emit(eventType, payload);

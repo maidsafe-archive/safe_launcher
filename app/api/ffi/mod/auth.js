@@ -111,7 +111,7 @@ exports.getUnregisteredClient = function() {
 
 var getAppDirectoryKey = function(lib, request) {
   if (!registeredClientHandle) {
-    return new Error('Client Handle not available');
+    return util.sendError(request.id, 999, 'Client Handle not available');
   }
   var params = request.params;
   var size = ref.alloc('int');

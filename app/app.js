@@ -25,6 +25,8 @@ var onSessionCreated = function(session) {};
 
 var onSessionRemoved = function(id) {};
 
+window.api = api;
+
 var restServer = new RESTServer(api);
 restServer.addEventListener(restServer.EVENT_TYPE.ERROR, onServerError);
 restServer.addEventListener(restServer.EVENT_TYPE.STARTED, onServerStarted);
