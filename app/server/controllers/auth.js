@@ -6,9 +6,8 @@ import * as sodium from 'libsodium-wrappers';
 import sessionManager from '../session_manager';
 import SessionInfo from '../model/session_info';
 
-var createSession = function(req, res) {
-  let authReq = req.body;
-
+export var createSession = function(req, res) {
+  let authReq = req.body;    
   let onDirKey = function(err, dirKey) {
     let assymetricKeyPair = sodium.crypto_box_keypair();
     if (err) {
@@ -38,13 +37,11 @@ export var authorise = function(req, res) {
       authReq.app.version && authReq.publicKey && authReq.nonce)) {
     return res.send(400, 'Bad request');
   }
-  var api = req.app.get('api');
-  let msgTemplate = 'Application: %s\nVendor: %s\n\nPermissions Requested:\n\t %s';
-  let permissions = authReq.permissions || [];
-  let approved = confirm(util.format(msgTemplate, authReq.app.name, authReq.app.vendor,
-    permissions ? permissions[0] : 'NONE'));
-  if (!approved) {
-    return res.send(401);
-  }
-  api.auth.getAppDirectoryKey(authReq.app.id, authReq.app.name, authReq.app.vendor, createSession(req, res));
+  var payload = {
+    payload: authReq,
+    request: req,
+    response: res;
+  };
+  var eventType = req.app.get('EVENT_TYPE').AUTH_REQUEST;
+  req.app.get('eventEmitter').emit(eventType, payload);
 }

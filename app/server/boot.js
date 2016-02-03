@@ -6,6 +6,7 @@ import EventEmitter from 'events';
 import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
 import versionOneRouter from './routes/version_one';
+import createSession from './controllers/auth';
 
 class ServerEventEmitter extends EventEmitter {};
 
@@ -18,6 +19,7 @@ export default class RESTServer {
       ERROR: 'error',
       STARTED: 'started',
       STOPPED: 'stopped',
+      AUTH_REQUEST: 'auth-request',
       SESSION_CREATED: 'sesssion_created',
       SESSION_REMOVED: 'session_removed'
     };
@@ -52,7 +54,7 @@ export default class RESTServer {
     app.use(bodyParser.urlencoded({
       extended: false
     }));
-    
+
     app.use('/', versionOneRouter);
     app.use('/v1', versionOneRouter);
 
@@ -73,6 +75,7 @@ export default class RESTServer {
     app.set('port', port);
     app.set('api', this.api);
     app.set('eventEmitter', this.eventEmitter);
+    app.set('EVENT_TYPE', this.EVENT_TYPE);
     this.server = http.createServer(app);
     this.server.listen(port);
     this.server.on('error', this._onError(this.EVENT_TYPE.ERROR, this.eventEmitter));
@@ -94,5 +97,14 @@ export default class RESTServer {
 
   addEventListener(event, listener) {
     this.eventEmitter.addListener(event, listener);
+  }
+
+  authApproved(payload) {
+    var app = payload.app;
+    this.api.auth.getAppDirectoryKey(app.id, app.name, app.vendor, createSession(payload.requset, payload.response));
+  }
+
+  authRejected(payload) {
+    payload.res.send(401);
   }
 }
