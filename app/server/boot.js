@@ -5,7 +5,7 @@ import * as logger from 'morgan';
 import EventEmitter from 'events';
 import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
-import VersionOneRouter from './routes/version_one';
+import versionOneRouter from './routes/version_one';
 
 class ServerEventEmitter extends EventEmitter {};
 
@@ -52,9 +52,9 @@ export default class RESTServer {
     app.use(bodyParser.urlencoded({
       extended: false
     }));
-    // app.use(express.static(path.join(__dirname, 'public')));
-    var versionOneRouter = new VersionOneRouter(this.api);
-    app.use('/v1', versionOneRouter.getRouter());
+    
+    app.use('/', versionOneRouter);
+    app.use('/v1', versionOneRouter);
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {
@@ -71,6 +71,8 @@ export default class RESTServer {
 
     var port = process.env.PORT || '3000';
     app.set('port', port);
+    app.set('api', this.api);
+    app.set('eventEmitter', this.eventEmitter);
     this.server = http.createServer(app);
     this.server.listen(port);
     this.server.on('error', this._onError(this.EVENT_TYPE.ERROR, this.eventEmitter));

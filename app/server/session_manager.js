@@ -3,22 +3,11 @@ export default class SessionManager {
     this.sessionPool = {};
   }
 
-  put(appName, appKey, vendor, permisssions) {
-    var id = 100;
-    var session = {
-      keys: {
-        signingKey: '',
-        encryptionKey: '',
-      },
-      appDirKey: '',
-      permisssions: []
-    };
-    this.sessionPool[id] = session;
-    return {
-      id: id,
-      app: session.app,
-      permisssions: session.permisssions
-    };
+  put(sessionId, sessionInfo) {
+    if (this.sessionPool[sessionId]) {
+      return;
+    }
+    this.sessionPool[sessionId] = sessionInfo;    
   }
 
   get(id) {
