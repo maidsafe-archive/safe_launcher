@@ -5,97 +5,92 @@ import * as logger from 'morgan';
 import EventEmitter from 'events';
 import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
-
-var routesVersion1 = require('./server/routes/version_1');
-var server;
+import VersionOneRouter from './routes/version_one';
 
 class ServerEventEmitter extends EventEmitter {};
 
-var eventEmitter = new ServerEventEmitter();
-
-export var EVENT_TYPE = {
-  ERROR: 'error',
-  STARTED: 'started',
-  STOPPED: 'stopped',
-  SESSION_CREATED: 'sesssion_created',
-  SESSION_REMOVED: 'session_removed'
-};
-
-/**
- * Event listener for HTTP server "error" event.
- */
-function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
+export default class RESTServer {
+  constructor(api) {
+    this.api = api;
+    this.server = null;
+    this.eventEmitter = new ServerEventEmitter();
+    this.EVENT_TYPE = {
+      ERROR: 'error',
+      STARTED: 'started',
+      STOPPED: 'stopped',
+      SESSION_CREATED: 'sesssion_created',
+      SESSION_REMOVED: 'session_removed'
+    };
   }
-  eventEmitter.emit(EVENT_TYPE.ERROR, error);
-};
 
-function onClose() {
-  eventEmitter.emit(EVENT_TYPE.STOPPED);
-};
-
-/**
- * Event listener for HTTP server "listening" event.
- */
-function onListening() {
-  eventEmitter.emit(EVENT_TYPE.STARTED, server.address().port);
-};
-
-var app = express();
-
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: false
-}));
-// app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/v1', routesVersion1);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
-
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.end();
-  });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.end();
-});
-
-export var startServer = function() {
-  var port = process.env.PORT || '3000';
-  app.set('port', port);
-  server = http.createServer(app);
-  server.listen(port);
-  server.on('error', onError);
-  server.on('close', onClose);
-  server.on('listening', onListening);
-};
-
-export var stopServer = function() {
-  if (!server) {
-    return;
+  _onError(type, eventEmitter) {
+      return function(error) {
+          if (error.syscall !== 'listen') {
+            throw error;
+          }
+          eventEmitter.emit(type, error);
+      }
   }
-  server.close();
-};
 
-export var removeSession = function(id) {
-  sessionManager.remove(id);  
-  eventEmitter.emit(EVENT_TYPE.SESSION_REMOVED, id);
-};
+  _onClose(type, eventEmitter) {
+    return function() {
+        eventEmitter.emit(type);
+    }
+  }
 
-export var addEventListener = function(event, listener) {
-  eventEmitter.addListener(event, listener);
+  _onListening(type, eventEmitter) {
+    return function() {
+        eventEmitter.emit(type);
+    }
+  }
+
+  start() {
+    var app = express();
+
+    app.use(logger('dev'));
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({
+      extended: false
+    }));
+    // app.use(express.static(path.join(__dirname, 'public')));
+    var versionOneRouter = new VersionOneRouter(this.api);
+    app.use('/v1', versionOneRouter.getRouter());
+
+    // catch 404 and forward to error handler
+    app.use(function(req, res, next) {
+      var err = new Error('Not Found');
+      err.status = 404;
+      next(err);
+    });
+
+    // no stacktraces leaked to user
+    app.use(function(err, req, res, next) {
+      res.status(err.status || 500);
+      res.send('Server Error');
+    });
+
+    var port = process.env.PORT || '3000';
+    app.set('port', port);
+    this.server = http.createServer(app);
+    this.server.listen(port);
+    this.server.on('error', this._onError(this.EVENT_TYPE.ERROR, this.eventEmitter));
+    this.server.on('close', this._onClose(this.EVENT_TYPE.STOPPED, this.eventEmitter));
+    this.server.on('listening', this._onListening(this.EVENT_TYPE.STARTED, this.eventEmitter));
+  }
+
+  stop() {
+    if (!server) {
+      return;
+    }
+    server.close();
+  }
+
+  removeSession(id) {
+    sessionManager.remove(id);
+    this.eventEmitter.emit(EVENT_TYPE.SESSION_REMOVED, id);
+  }
+
+  addEventListener(event, listener) {
+    this.eventEmitter.addListener(event, listener);
+  }
 }
