@@ -15,25 +15,15 @@ window.register = function(pin, keyword, password, callback) {
   api.auth.register(String(pin), keyword, password, callback);
 };
 
-var onServerError = function(error) {
+var onServerError = function(error) {};
 
-};
+var onServerStarted = function(port) {};
 
-var onServerStarted = function(port) {
+var onServerShutdown = function() {};
 
-};
+var onSessionCreated = function(session) {};
 
-var onServerShutdown = function() {
-
-};
-
-var onSessionCreated = function(session) {
-
-};
-
-var onSessionRemoved = function(id) {
-
-};
+var onSessionRemoved = function(id) {};
 
 restServer.addEventListener(restServer.EVENT_TYPE.ERROR, onServerError);
 restServer.addEventListener(restServer.EVENT_TYPE.STARTED, onServerStarted);
