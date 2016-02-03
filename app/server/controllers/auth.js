@@ -31,6 +31,7 @@ export var createSession = function(req, res) {
   return onDirKey;
 }
 
+
 export var authorise = function (req, res) {
   let authReq = req.body;
   if (!(authReq.app && authReq.app.name && authReq.app.id && authReq.app.vendor &&

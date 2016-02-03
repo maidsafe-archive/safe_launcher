@@ -9,7 +9,6 @@
   "main": "background.js",
   "dependencies": {
     "body-parser": "~1.13.2",
-    "debug": "~2.2.0",
     "express": "^4.13.4",
     "ffi": "^2.0.0",
     "fs-jetpack": "^0.7.0",
