@@ -5,15 +5,19 @@ import jwt from 'jsonwebtoken';
 import * as sodium from 'libsodium-wrappers';
 import sessionManager from '../session_manager';
 import SessionInfo from '../model/session_info';
+import {
+  getSessionIdFromRequest
+}
+from '../utils'
 
 export var createSession = function(req, res) {
   let authReq = req.body;
   let onDirKey = function(err, dirKey) {
-    let assymetricKeyPair = sodium.crypto_box_keypair();
     if (err) {
       return res.send(500, error.message());
     }
-    var app = authReq.app;
+    let app = authReq.app;
+    let assymetricKeyPair = sodium.crypto_box_keypair();
     try {
       let appPubKey = new Uint8Array(new Buffer(authReq.publicKey, 'base64'));
       let appNonce = new Uint8Array(new Buffer(authReq.nonce, 'base64'));
@@ -36,18 +40,31 @@ export var createSession = function(req, res) {
 }
 
 
-export var authorise = function (req, res) {
+export var authorise = function(req, res) {
   let authReq = req.body;
   if (!(authReq.app && authReq.app.name && authReq.app.id && authReq.app.vendor &&
       authReq.app.version && authReq.publicKey && authReq.nonce)) {
     return res.send(400, 'Bad request');
   }
 
-  var payload = {
+  let payload = {
     payload: authReq,
     request: req,
     response: res
   };
-  var eventType = req.app.get('EVENT_TYPE').AUTH_REQUEST;
+  let eventType = req.app.get('EVENT_TYPE').AUTH_REQUEST;
   req.app.get('eventEmitter').emit(eventType, payload);
+}
+
+export var revokeToken = function(req, res) {
+  let sessionId = getSessionIdFromRequest(req);
+  if (!sessionId) {
+    return res.send(400, 'Authorisation Token could not be parsed');
+  }
+  if (!sessionManager.remove(sessionId)) {
+    return res.send(400, 'Session not found');
+  }
+  let eventType = req.app.get('EVENT_TYPE').SESSION_REMOVED;
+  req.app.get('eventEmitter').emit(eventType, sessionId);
+  res.send(200);
 }

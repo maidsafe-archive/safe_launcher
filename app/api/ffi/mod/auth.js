@@ -121,7 +121,7 @@ var getAppDirectoryKey = function(lib, request) {
   if (res !== 0) {
     return util.sendError(new Error('Failed with code' + res));
   }
-  var keySize = size.deref();  
+  var keySize = size.deref();
   var content = new IntArray(keySize);
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   var result = lib.get_app_dir_key(params.appName, params.appId, params.vendor, content, registeredClientHandle);
