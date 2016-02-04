@@ -125,7 +125,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
         Loader.hide();
         if (err) {
           console.log(err);
-          alert('Error :: ' + err);
+          alert('Unable to login');
           return;
         }
         alert('Login Successful');

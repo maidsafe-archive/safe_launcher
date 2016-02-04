@@ -63,6 +63,7 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
     // handle auth request
     Server.onAuthRequest(function(data) {
       console.log(data);
+      Server.restoreWindow();
       showConfirmation(data);
     });
 

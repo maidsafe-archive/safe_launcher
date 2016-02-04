@@ -40,6 +40,11 @@ window.safeLauncher.factory('ServerFactory', [
       window.msl.onAuthRequest(callback);
     };
 
+    // restore window if minimized
+    self.restoreWindow = function() {
+      window.msl.restoreWindow();
+    };
+
     // handle auth request
     self.confirmResponse = function(payload, status) {
       window.msl.authResponse(payload, status);

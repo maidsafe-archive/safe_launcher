@@ -71,4 +71,13 @@ export default class UIUtils {
   authResponse(payload, status) {
     return status ? this.restServer.authApproved(payload) : this.restServer.authRejected(payload);
   }
+
+  // restore window if minimized
+  restoreWindow() {
+    var browserWindow = this.remote.getCurrentWindow();
+    if (!browserWindow.isMinimized()) {
+      return;
+    }
+    this.remote.getCurrentWindow().restore();
+  }
 }
