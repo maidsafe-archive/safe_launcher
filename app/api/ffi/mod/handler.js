@@ -4,8 +4,9 @@ module.exports = function(libPath) {
 
   var lib;
   var auth = require('./auth.js');
+  var nfs = require('./nfs.js');
   var util = require('./util.js');
-  var modules = [ auth ];
+  var modules = [ auth, nfs ];
 
   var methodsToRegister = function() {
     var fncs = {};
@@ -20,6 +21,10 @@ module.exports = function(libPath) {
       }
     }
     return fncs;
+  };
+
+  var getClienthandle = function(message) {
+    return message.isAuthorised ? auth.getRegisteredClient() : auth.getUnregisteredClient();
   };
 
   var loadLibrary = function() {
@@ -38,6 +43,12 @@ module.exports = function(libPath) {
       switch (message.module) {
         case 'auth':
           auth.execute(lib, message);
+          break;
+
+        case 'nfs':
+          message.client = getClientHandle(message);
+          message.safeDriveKey = auth.getSafeDriveKey();
+          nfs.execute(getClientHandle(message), lib, message);
           break;
 
         default:

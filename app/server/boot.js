@@ -5,22 +5,26 @@ import * as logger from 'morgan';
 import EventEmitter from 'events';
 import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
-import VersionOneRouter from './routes/version_one';
+import { versionOneRouter } from './routes/version_one';
+import { createSession } from './controllers/auth';
 
 class ServerEventEmitter extends EventEmitter {};
 
 export default class RESTServer {
   constructor(api) {
-    this.api = api;
+    this.app = express();
     this.server = null;
-    this.eventEmitter = new ServerEventEmitter();
     this.EVENT_TYPE = {
       ERROR: 'error',
       STARTED: 'started',
       STOPPED: 'stopped',
+      AUTH_REQUEST: 'auth-request',
       SESSION_CREATED: 'sesssion_created',
       SESSION_REMOVED: 'session_removed'
     };
+    this.app.set('api', api);
+    this.app.set('eventEmitter', new ServerEventEmitter());
+    this.app.set('EVENT_TYPE', this.EVENT_TYPE);
   }
 
   _onError(type, eventEmitter) {
@@ -45,16 +49,18 @@ export default class RESTServer {
   }
 
   start() {
-    var app = express();
+    let app = this.app;
+    let EVENT_TYPE = this.app.get('EVENT_TYPE');
+    let eventEmitter = this.app.get('eventEmitter');
 
     app.use(logger('tiny'));
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({
       extended: false
     }));
-    // app.use(express.static(path.join(__dirname, 'public')));
-    var versionOneRouter = new VersionOneRouter(this.api);
-    app.use('/v1', versionOneRouter.getRouter());
+
+    app.use('/', versionOneRouter);
+    app.use('/v1', versionOneRouter);
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {
@@ -73,9 +79,9 @@ export default class RESTServer {
     app.set('port', port);
     this.server = http.createServer(app);
     this.server.listen(port);
-    this.server.on('error', this._onError(this.EVENT_TYPE.ERROR, this.eventEmitter));
-    this.server.on('close', this._onClose(this.EVENT_TYPE.STOPPED, this.eventEmitter));
-    this.server.on('listening', this._onListening(this.EVENT_TYPE.STARTED, this.eventEmitter));
+    this.server.on('error', this._onError(EVENT_TYPE.ERROR, eventEmitter));
+    this.server.on('close', this._onClose(EVENT_TYPE.STOPPED, eventEmitter));
+    this.server.on('listening', this._onListening(EVENT_TYPE.STARTED, eventEmitter));
   }
 
   stop() {
@@ -87,10 +93,19 @@ export default class RESTServer {
 
   removeSession(id) {
     sessionManager.remove(id);
-    this.eventEmitter.emit(EVENT_TYPE.SESSION_REMOVED, id);
+    this.app.get('eventEmitter').emit(EVENT_TYPE.SESSION_REMOVED, id);
   }
 
   addEventListener(event, listener) {
-    this.eventEmitter.addListener(event, listener);
+    this.app.get('eventEmitter').addListener(event, listener);
+  }
+
+  authApproved(data) {
+    var app = data.payload.app;
+    this.app.get('api').auth.getAppDirectoryKey(app.id, app.name, app.vendor, createSession(data.request, data.response));
+  }
+
+  authRejected(payload) {
+    payload.res.send(401);
   }
 }

@@ -29,4 +29,16 @@ export default class Auth {
     }, callback);
   }
 
+  getAppDirectoryKey(appId, appName, vendor, callback) {
+    this.send({
+      module: this.MODULE,
+      action: 'app-dir-key',
+      params: {
+        appId: appId,
+        appName: appName,
+        vendor: vendor
+      }
+    }, callback);
+  }
+
 }

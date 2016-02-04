@@ -1,0 +1,46 @@
+// Prompt
+.msl-prompt {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  background-color: rgba(73, 58, 96, 0.5);
+  display: table;
+
+  .msl-prompt-b {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .msl-prompt-body {
+    width: 80%;
+    margin: 0 auto;
+    background-color: white;
+    padding: 16px;
+  }
+
+  .msl-prompt-foot {
+    width: 80%;
+    margin: 0 auto;
+    background-color: white;
+    padding: 8px;
+    text-align: right;
+    button {
+      border: 0;
+      outline: 0;
+      background-color: transparent;
+      padding: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      &.allow {
+        opacity: 1;
+      }
+      &.deny {
+        opacity: 0.5;
+      }
+    }
+  }
+}

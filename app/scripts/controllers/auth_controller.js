@@ -40,7 +40,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
       var reset = function() {
         $scope.user = {};
         $scope.tabs.init();
-        $scope.apply();
+        $scope.$apply();
       };
       var payload = {
         pin: $scope.user.pin,
@@ -55,7 +55,8 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
         if (err) {
           return alert('Err ' + err);
         }
-        alert(res);
+        alert('Registration Successful');
+        $state.go('user');
       });
     };
 
@@ -124,10 +125,10 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
         Loader.hide();
         if (err) {
           console.log(err);
-          alert('Error :: ' + err);
+          alert('Unable to login');
           return;
         }
-        alert(res);
+        alert('Login Successful');
         $state.go('user');
       });
     };

@@ -61,4 +61,23 @@ export default class UIUtils {
   onSessionRemoved(callback) {
     this.restServer.addEventListener(this.restServer.EVENT_TYPE.SESSION_REMOVED, callback);
   }
+
+  // on auth request
+  onAuthRequest(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.AUTH_REQUEST, callback);
+  }
+
+  // handle auth response
+  authResponse(payload, status) {
+    return status ? this.restServer.authApproved(payload) : this.restServer.authRejected(payload);
+  }
+
+  // restore window if minimized
+  restoreWindow() {
+    var browserWindow = this.remote.getCurrentWindow();
+    if (!browserWindow.isMinimized()) {
+      return;
+    }
+    this.remote.getCurrentWindow().restore();
+  }
 }

@@ -1,24 +1,15 @@
-export default class SessionManager {
+var sessionManager = null;
+class SessionManager {
   constructor() {
     this.sessionPool = {};
   }
 
-  put(appName, appKey, vendor, permisssions) {
-    var id = 100;
-    var session = {
-      keys: {
-        signingKey: '',
-        encryptionKey: '',
-      },
-      appDirKey: '',
-      permisssions: []
-    };
-    this.sessionPool[id] = session;
-    return {
-      id: id,
-      app: session.app,
-      permisssions: session.permisssions
-    };
+  put(sessionId, sessionInfo) {
+    if (this.sessionPool[sessionId]) {
+      return false;
+    }
+    this.sessionPool[sessionId] = sessionInfo;
+    return true;
   }
 
   get(id) {
@@ -27,8 +18,9 @@ export default class SessionManager {
 
   remove(id) {
     delete this.sessionPool[id];
+    return !this.sessionPool.containsKey(id);
   }
 
 }
 
-export var sessionManager = new SessionManager();
+export default sessionManager = new SessionManager();

@@ -3,27 +3,26 @@
  */
 window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFactory',
   function($scope, $state, Server) {
-    $scope.manageList = [
-      {
-        name: 'Proxy',
-        settings: [
-          {
-            name: 'SAFE Proxy',
-            status: true
-          }
-        ]
-      },
-      {
-        name: 'Apps',
-        settings: [
-          {
-            name: 'Calender',
-            status: false
-          }
-        ]
-      }
-    ];
+    $scope.confirmation = {
+      status: false,
+      data: {}
+    };
+    $scope.manageListApp = [];
 
+    var showConfirmation  = function(data) {
+      $scope.confirmation.status = true;
+      $scope.confirmation.data.payload = data.payload;
+      $scope.confirmation.data.request = data.request;
+      $scope.confirmation.data.response = data.response;
+      $scope.$apply();
+    };
+
+    var hideConfirmation = function() {
+      $scope.confirmation = {
+        status: false,
+        data: {}
+      };
+    };
     // start server
     Server.start();
 
@@ -44,7 +43,16 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
 
     // handle session creation
     Server.onSessionCreated(function(session) {
-      console.log('Session created :: ', session);
+      console.log('Session created :: ');
+      $scope.manageListApp.push({
+        id: session.id,
+        name: session.info.appName,
+        version: session.info.appVersion,
+        vendor: session.info.vendor,
+        status: true,
+        permissions: session.info.permissions
+      });
+      $scope.$apply();
     });
 
     // handle session removed
@@ -52,9 +60,21 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
       console.log('Session removed :: ' + id);
     });
 
+    // handle auth request
+    Server.onAuthRequest(function(data) {
+      console.log(data);
+      Server.restoreWindow();
+      showConfirmation(data);
+    });
+
     // Toggle Setting
     $scope.toggleSetting = function(setting) {
       setting.status = !setting.status;
+    };
+
+    $scope.confirmResponse = function(payload, status) {
+      hideConfirmation();
+      Server.confirmResponse(payload, status);
     };
   }
 ]);

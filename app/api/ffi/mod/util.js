@@ -1,7 +1,8 @@
-exports.sendError = function(id, errorCode) {
+exports.sendError = function(id, errorCode, msg) {
   process.send({
     id: id,
-    errorCode: errorCode
+    errorCode: errorCode,
+    errorMsg: msg
   });
 };
 
