@@ -44,8 +44,6 @@ window.safeLauncher.factory('ServerFactory', [
     self.confirmResponse = function(payload, status) {
       window.msl.authResponse(payload, status);
     };
-
-
     return self;
   }
 ]);

@@ -67,7 +67,8 @@ export default class UIUtils {
     this.restServer.addEventListener(this.restServer.EVENT_TYPE.AUTH_REQUEST, callback);
   }
 
+  // handle auth response
   authResponse(payload, status) {
-    return status ? this.restServer.authApproved(payload) : this.restServer.authRejected(payload);    
+    return status ? this.restServer.authApproved(payload) : this.restServer.authRejected(payload);
   }
 }

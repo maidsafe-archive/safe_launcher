@@ -15,7 +15,7 @@ export default class NFS {
         isPrivate: isPrivate,
         userMetadata: userMetadata,
         isVersioned: isVersioned,
-        isPathShared: isPathShared,
+        isPathShared: isPathShared
       }
     }, callback);
   }

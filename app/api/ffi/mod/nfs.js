@@ -7,25 +7,25 @@ var util = require('./util.js');
 
 var createDirectory = function(lib, request) {
   try {
-      var params = {
-        'module': 'nfs',
-        'action': 'create-dir',
-        'safe_drive_dir_key': request.safeDriveKey,
-        'app_dir_key': request.appDirKey,
-        'safe_drive_access': request.hasSafeDriveAccess || false,
-        'data': {
-          'dir_path': request.params.dirPath,
-          'is_private': request.params.isPrivate,
-          'is_versioned': request.params.isVersioned,
-          'user_metadata': request.params.userMetadata,
-          'is_path_shared': request.params.isPathShared
-        }
-      };
-      var result = lib.execute(JSON.stringify(params), request.client);
-      if (result === 0) {
-        return util.send(request.id, true);
+    var params = {
+      'module': 'nfs',
+      'action': 'create-dir',
+      'safe_drive_dir_key': request.safeDriveKey,
+      'app_dir_key': request.appDirKey,
+      'safe_drive_access': request.hasSafeDriveAccess || false,
+      'data': {
+        'dir_path': request.params.dirPath,
+        'is_private': request.params.isPrivate,
+        'is_versioned': request.params.isVersioned,
+        'user_metadata': request.params.userMetadata,
+        'is_path_shared': request.params.isPathShared
       }
-      util.sendError(request.id, result);
+    };
+    var result = lib.execute(JSON.stringify(params), request.client);
+    if (result === 0) {
+      return util.send(request.id, true);
+    }
+    util.sendError(request.id, result);
   } catch (e) {
     util.sendError(request.id, 999, e.message());
   }

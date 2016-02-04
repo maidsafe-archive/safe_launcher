@@ -131,7 +131,7 @@ var getAppDirectoryKey = function(lib, request) {
       return new Error('Failed with error code ' + result);
     }
     util.send(request.id, new Buffer(content).toString('base64'));
-  } catch(e) {
+  } catch (e) {
     util.sendError(request.id, 999, e.message());
   }
 };
