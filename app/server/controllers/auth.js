@@ -16,7 +16,7 @@ export var createSession = function(req, res) {
     let app = authReq.app;
     let assymetricKeyPair = sodium.crypto_box_keypair();
     try {
-      let sessionId = new Buffer(sodium.randombytes_buf(32)).toString('base64');      
+      let sessionId = new Buffer(sodium.randombytes_buf(32)).toString('base64');
       let appPubKey = new Uint8Array(new Buffer(authReq.publicKey, 'base64'));
       let appNonce = new Uint8Array(new Buffer(authReq.nonce, 'base64'));
       let sessionInfo = new SessionInfo(app.id, app.name, app.version, app.vendor, authReq.permissions, dirKey);
@@ -27,10 +27,10 @@ export var createSession = function(req, res) {
         token: token,
         encryptedKey: new Buffer(encryptedKey).toString('base64'),
         publicKey: new Buffer(assymetricKeyPair.publicKey).toString('base64'),
-        permissions: permissions
+        permissions: authReq.permissions
       });
     } catch (e) {
-      res.send(500, e.message());
+      res.send(500, e.message);
     }
   }
   return onDirKey;

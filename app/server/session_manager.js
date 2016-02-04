@@ -1,4 +1,5 @@
-export default class SessionManager {
+var sessionManager = null;
+class SessionManager {
   constructor() {
     this.sessionPool = {};
   }
@@ -22,4 +23,4 @@ export default class SessionManager {
 
 }
 
-export var sessionManager = new SessionManager();
+export default sessionManager = new SessionManager();

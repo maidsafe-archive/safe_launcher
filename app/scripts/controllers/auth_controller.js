@@ -55,7 +55,8 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
         if (err) {
           return alert('Err ' + err);
         }
-        alert(res);
+        alert('Registration Successful');
+        $state.go('user');
       });
     };
 
@@ -127,7 +128,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
           alert('Error :: ' + err);
           return;
         }
-        alert(res);
+        alert('Login Successful');
         $state.go('user');
       });
     };

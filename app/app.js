@@ -7,7 +7,5 @@ import * as api from './api/safe';
 import RESTServer from './server/boot';
 import UIUtils from './UIUtils';
 
-window.api = api;
-
 var restServer = new RESTServer(api);
 window.msl = new UIUtils(api, remote, restServer);

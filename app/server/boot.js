@@ -14,16 +14,17 @@ export default class RESTServer {
   constructor(api) {
     this.app = express();
     this.server = null;
-    this.app.set('api', api);
-    this.app.set('eventEmitter', new ServerEventEmitter());
-    this.app.set('EVENT_TYPE', {
+    this.EVENT_TYPE = {
       ERROR: 'error',
       STARTED: 'started',
       STOPPED: 'stopped',
       AUTH_REQUEST: 'auth-request',
       SESSION_CREATED: 'sesssion_created',
       SESSION_REMOVED: 'session_removed'
-    });
+    };
+    this.app.set('api', api);
+    this.app.set('eventEmitter', new ServerEventEmitter());
+    this.app.set('EVENT_TYPE', this.EVENT_TYPE);
   }
 
   _onError(type, eventEmitter) {
@@ -92,16 +93,16 @@ export default class RESTServer {
 
   removeSession(id) {
     sessionManager.remove(id);
-    this.eventEmitter.emit(EVENT_TYPE.SESSION_REMOVED, id);
+    this.app.get('eventEmitter').emit(EVENT_TYPE.SESSION_REMOVED, id);
   }
 
   addEventListener(event, listener) {
-    this.eventEmitter.addListener(event, listener);
+    this.app.get('eventEmitter').addListener(event, listener);
   }
 
   authApproved(data) {
     var app = data.payload.app;
-    this.api.auth.getAppDirectoryKey(app.id, app.name, app.vendor, createSession(data.request, data.response));
+    this.app.get('api').auth.getAppDirectoryKey(app.id, app.name, app.vendor, createSession(data.request, data.response));
   }
 
   authRejected(payload) {

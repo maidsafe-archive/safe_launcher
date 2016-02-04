@@ -110,26 +110,30 @@ exports.getUnregisteredClient = function() {
 };
 
 var getAppDirectoryKey = function(lib, request) {
-  if (!registeredClientHandle) {
-    return util.sendError(request.id, 999, 'Client Handle not available');
+  try {
+    if (!registeredClientHandle) {
+      return util.sendError(request.id, 999, 'Client Handle not available');
+    }
+    var params = request.params;
+    var size = ref.alloc('int');
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    var res = lib.get_app_dir_key_size(params.appName, params.appId, params.vendor, size, registeredClientHandle);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    if (res !== 0) {
+      return util.sendError(new Error('Failed with code' + res));
+    }
+    var keySize = size.deref();
+    var content = new IntArray(keySize);
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    var result = lib.get_app_dir_key(params.appName, params.appId, params.vendor, content, registeredClientHandle);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    if (result !== 0) {
+      return new Error('Failed with error code ' + result);
+    }
+    util.send(request.id, new Buffer(content).toString('base64'));
+  } catch(e) {
+    util.sendError(request.id, 999, e.message());
   }
-  var params = request.params;
-  var size = ref.alloc('int');
-  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  var res = lib.get_app_dir_key_size(params.appName, params.appId, params.vendor, size, registeredClientHandle);
-  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-  if (res !== 0) {
-    return util.sendError(new Error('Failed with code' + res));
-  }
-  var keySize = size.deref();
-  var content = new IntArray(keySize);
-  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  var result = lib.get_app_dir_key(params.appName, params.appId, params.vendor, content, registeredClientHandle);
-  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-  if (result !== 0) {
-    return new Error('Failed with error code ' + result);
-  }
-  util.send(request.id, new Buffer(content).toString('base64'));
 };
 
 exports.drop = function(lib) {
