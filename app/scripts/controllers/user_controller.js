@@ -7,26 +7,7 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
       status: false,
       data: {}
     };
-    $scope.manageList = [
-      {
-        name: 'Proxy',
-        settings: [
-          {
-            name: 'SAFE Proxy',
-            status: true
-          }
-        ]
-      },
-      {
-        name: 'Apps',
-        settings: [
-          {
-            name: 'Calender',
-            status: false
-          }
-        ]
-      }
-    ];
+    $scope.manageListApp = [];
 
     var showConfirmation  = function(data) {
       $scope.confirmation.status = true;
@@ -63,7 +44,15 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
     // handle session creation
     Server.onSessionCreated(function(session) {
       console.log('Session created :: ');
-      console.log(session);
+      $scope.manageListApp.push({
+        id: session.id,
+        name: session.info.appName,
+        version: session.info.appVersion,
+        vendor: session.info.vendor,
+        status: true,
+        permissions: session.info.permissions
+      });
+      $scope.$apply();
     });
 
     // handle session removed

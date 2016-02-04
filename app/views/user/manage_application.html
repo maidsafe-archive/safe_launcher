@@ -1,14 +1,14 @@
 <!-- manage -->
-<div class="msl-li" ng-repeat="list in manageList">
-  <h3 class="msl-li-h">{{list.name}}</h3>
-  <div class="msl-li-i" ng-repeat="setting in list.settings" ng-class="{disabled: !setting.status}" ng-click="toggleSetting(setting)">
+<div class="msl-li">
+  <h3 class="msl-li-h">App</h3>
+  <div class="msl-li-i" ng-repeat="list in manageListApp" ng-class="{disabled: !list.status}" ng-click="toggleSetting(list)">
     <span class="li-icn"></span>
     <div class="li-i-desc">
-      <h3 class="li-i-desc-main">{{setting.name}}</h3>
-      <h4 class="li-i-desc-sub">{{setting.name}} is {{setting.status ? 'enabled' : 'disabled'}}</h3>
+      <h3 class="li-i-desc-main">{{list.name}}</h3>
+      <h4 class="li-i-desc-sub">{{list.name}} is {{list.status ? 'enabled' : 'disabled'}}</h3>
     </div>
     <div class="li-i-action">
-      <msl-switch switch-id="app_calender" ng-class="{open: setting.status}"/>
+      <msl-switch switch-id="app_calender" ng-class="{open: list.status}"/>
     </div>
   </div>
 </div><!-- /manage -->
