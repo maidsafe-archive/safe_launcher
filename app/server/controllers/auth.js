@@ -52,7 +52,7 @@ export var authorise = function(req, res) {
   req.app.get('eventEmitter').emit(eventType, payload);
 }
 
-export var revokeToken = function(req, res) {
+export var revoke = function(req, res) {
   let sessionId = getSessionIdFromRequest(req);
   if (!sessionId) {
     return res.send(400, 'Authorisation Token could not be parsed');
