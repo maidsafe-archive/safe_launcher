@@ -5,7 +5,7 @@ import * as logger from 'morgan';
 import EventEmitter from 'events';
 import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
-import versionOneRouter from './routes/version_one';
+import { versionOneRouter } from './routes/version_one';
 import { createSession } from './controllers/auth';
 
 class ServerEventEmitter extends EventEmitter {};

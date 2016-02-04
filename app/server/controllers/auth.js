@@ -5,10 +5,7 @@ import jwt from 'jsonwebtoken';
 import * as sodium from 'libsodium-wrappers';
 import sessionManager from '../session_manager';
 import SessionInfo from '../model/session_info';
-import {
-  getSessionIdFromRequest
-}
-from '../utils'
+import { getSessionIdFromRequest } from '../utils'
 
 export var createSession = function(req, res) {
   let authReq = req.body;
@@ -38,7 +35,6 @@ export var createSession = function(req, res) {
   }
   return onDirKey;
 }
-
 
 export var authorise = function(req, res) {
   let authReq = req.body;
