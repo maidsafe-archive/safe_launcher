@@ -40,7 +40,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
       var reset = function() {
         $scope.user = {};
         $scope.tabs.init();
-        $scope.apply();
+        $scope.$apply();
       };
       var payload = {
         pin: $scope.user.pin,

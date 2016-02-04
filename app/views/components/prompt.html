@@ -1,0 +1,13 @@
+<div class="msl-prompt" ng-show="confirmation.status">
+  <div class="msl-prompt-b">
+    <div class="msl-prompt-body">
+      <div class="msl-prompt-body-li">Name <span class="val">{{ confirmation.data.payload.app.name }}</span></div>
+      <div class="msl-prompt-body-li">Vendor <span class="val">{{ confirmation.data.payload.app.vendor }}</span></div>
+      <div class="msl-prompt-body-li">Version <span class="val">{{ confirmation.data.payload.app.version }}</span></div>
+    </div>
+    <div class="msl-prompt-foot">
+      <button type="button" class="reject" name="reject" ng-click="confirmResponse(confirmation.data, false)">Reject</button>
+      <button type="button" class="confirm" name="confirm" ng-click="confirmResponse(confirmation.data, true)">Cofirm</button>
+    </div>
+  </div>
+</div>

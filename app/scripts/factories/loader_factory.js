@@ -6,12 +6,12 @@ window.safeLauncher.factory('LoaderFactory', [
     var self = this;
     self.loading = false;
 
-    // Login
+    // show
     self.show = function() {
       self.loading = true;
     };
 
-    // Register
+    // hide
     self.hide = function() {
       self.loading = false;
     };

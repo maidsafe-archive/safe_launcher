@@ -11,7 +11,7 @@ export var createSession = function(req, res) {
   let onDirKey = function(err, dirKey) {
     let assymetricKeyPair = sodium.crypto_box_keypair();
     if (err) {
-      return res.send(500, error.message());
+      return res.send(500, err.errorMsg);
     }
     var app = authReq.app;
     let appPubKey = new Uint8Array(new Buffer(authReq.publicKey, 'base64'));

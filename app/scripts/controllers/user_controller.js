@@ -3,6 +3,10 @@
  */
 window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFactory',
   function($scope, $state, Server) {
+    $scope.confirmation = {
+      status: false,
+      data: {}
+    };
     $scope.manageList = [
       {
         name: 'Proxy',
@@ -24,6 +28,20 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
       }
     ];
 
+    var showConfirmation  = function(data) {
+      $scope.confirmation.status = true;
+      $scope.confirmation.data.payload = data.payload;
+      $scope.confirmation.data.request = data.request;
+      $scope.confirmation.data.response = data.response;
+      $scope.$apply();
+    };
+
+    var hideConfirmation = function() {
+      $scope.confirmation = {
+        status: false,
+        data: {}
+      };
+    };
     // start server
     Server.start();
 
@@ -52,9 +70,20 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
       console.log('Session removed :: ' + id);
     });
 
+    // handle auth request
+    Server.onAuthRequest(function(data) {
+      console.log(data);
+      showConfirmation(data);
+    });
+
     // Toggle Setting
     $scope.toggleSetting = function(setting) {
       setting.status = !setting.status;
+    };
+
+    $scope.confirmResponse = function(payload, status) {
+      hideConfirmation();
+      Server.confirmResponse(payload, status);
     };
   }
 ]);

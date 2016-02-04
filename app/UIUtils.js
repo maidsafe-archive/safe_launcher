@@ -61,4 +61,13 @@ export default class UIUtils {
   onSessionRemoved(callback) {
     this.restServer.addEventListener(this.restServer.EVENT_TYPE.SESSION_REMOVED, callback);
   }
+
+  // on auth request
+  onAuthRequest(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.AUTH_REQUEST, callback);
+  }
+
+  authResponse(payload, status) {
+    return status ? this.restServer.authApproved(payload) : this.restServer.authRejected(payload);    
+  }
 }

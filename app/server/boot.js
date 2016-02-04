@@ -99,9 +99,9 @@ export default class RESTServer {
     this.eventEmitter.addListener(event, listener);
   }
 
-  authApproved(payload) {
-    var app = payload.app;
-    this.api.auth.getAppDirectoryKey(app.id, app.name, app.vendor, createSession(payload.requset, payload.response));
+  authApproved(data) {
+    var app = data.payload.app;
+    this.api.auth.getAppDirectoryKey(app.id, app.name, app.vendor, createSession(data.request, data.response));
   }
 
   authRejected(payload) {

@@ -1,11 +1,14 @@
-<msl-tabs>
-    <msl-tab tab-heading="Status" tab-icon="images/status.svg" tab-active>
-      <ng-include src="'views/user/status.html'" />
-    </msl-tab>
-    <msl-tab tab-heading="Manage Application" tab-icon="images/manage.svg" tab-active>
-      <ng-include src="'views/user/manage_application.html'" />
-    </msl-tab>
-    <msl-tab tab-heading="Settings" tab-icon="images/settings.svg" tab-active>
-      <ng-include src="'views/user/settings.html'" />
-    </msl-tab>
-</msl-tabs>
+<div class=""  ng-controller="UserController">
+  <msl-tabs>
+      <msl-tab tab-heading="Status" tab-icon="images/status.svg" tab-active>
+        <ng-include src="'views/user/status.html'" />
+      </msl-tab>
+      <msl-tab tab-heading="Manage Application" tab-icon="images/manage.svg" tab-active>
+        <ng-include src="'views/user/manage_application.html'" />
+      </msl-tab>
+      <msl-tab tab-heading="Settings" tab-icon="images/settings.svg" tab-active>
+        <ng-include src="'views/user/settings.html'" />
+      </msl-tab>
+  </msl-tabs>
+  <ng-include src="'views/components/prompt.html'" />
+</div>
