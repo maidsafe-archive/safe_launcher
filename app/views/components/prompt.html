@@ -4,10 +4,17 @@
       <div class="msl-prompt-body-li">Name <span class="val">{{ confirmation.data.payload.app.name }}</span></div>
       <div class="msl-prompt-body-li">Vendor <span class="val">{{ confirmation.data.payload.app.vendor }}</span></div>
       <div class="msl-prompt-body-li">Version <span class="val">{{ confirmation.data.payload.app.version }}</span></div>
+      <div class="msl-prompt-body-li">Permissions
+        <span class="val" ng-show="confirmation.data.payload.permissions.length > 0">
+          <div ng-repeat="permission in confirmation.data.payload.permissions" class="">{{ permission }}</div>
+        </span>
+        <span class="val" ng-show="confirmation.data.payload.permissions.length === 0">None</span>
+      </div>
+
     </div>
     <div class="msl-prompt-foot">
-      <button type="button" class="reject" name="reject" ng-click="confirmResponse(confirmation.data, false)">Reject</button>
-      <button type="button" class="confirm" name="confirm" ng-click="confirmResponse(confirmation.data, true)">Cofirm</button>
+      <button type="button" class="deny" name="deny" ng-click="confirmResponse(confirmation.data, false)">Deny</button>
+      <button type="button" class="allow" name="allow" ng-click="confirmResponse(confirmation.data, true)">Allow</button>
     </div>
   </div>
 </div>
