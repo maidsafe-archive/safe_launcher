@@ -11,8 +11,8 @@ window.safeLauncher.directive('mslLoader', function() {
     controller: [ '$scope', 'LoaderFactory', function($scope, Loader) {
       $scope.show = false;
       $scope.api = Loader;
-      $scope.$watch('api.loading', toggledisplay);
-      var toggledisplay = function() {
+      $scope.$watch('api.loading', toggleDisplay);
+      var toggleDisplay = function() {
         $scope.show = !!($scope.api.loading);
       };
     } ]
