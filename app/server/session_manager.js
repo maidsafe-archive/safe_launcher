@@ -5,9 +5,10 @@ export default class SessionManager {
 
   put(sessionId, sessionInfo) {
     if (this.sessionPool[sessionId]) {
-      return;
+      return false;
     }
-    this.sessionPool[sessionId] = sessionInfo;    
+    this.sessionPool[sessionId] = sessionInfo;
+    return true;
   }
 
   get(id) {
@@ -16,6 +17,7 @@ export default class SessionManager {
 
   remove(id) {
     delete this.sessionPool[id];
+    return !this.sessionPool.containsKey(id);
   }
 
 }

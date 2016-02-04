@@ -122,14 +122,14 @@ var getAppDirectoryKey = function(lib, request) {
     return util.sendError(new Error('Failed with code' + res));
   }
   var keySize = size.deref();
-  var content = new IntArray(size);
+  var content = new IntArray(keySize);
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   var result = lib.get_app_dir_key(params.appName, params.appId, params.vendor, content, registeredClientHandle);
   /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   if (result !== 0) {
     return new Error('Failed with error code ' + result);
   }
-  Util.send(request.id, new Buffer(content).toString('base64'));
+  util.send(request.id, new Buffer(content).toString('base64'));
 };
 
 exports.drop = function(lib) {

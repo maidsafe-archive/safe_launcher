@@ -1,8 +1,8 @@
 import express from 'express';
-import { authorise } from '../controllers/auth';
+import * as Auth from '../controllers/auth';
 
-var versionOneRouter;
 var router = express.Router();
-router.post('/auth', authorise);
+router.post('/auth', Auth.authorise);
+router.delete('/auth', Auth.revoke);
 
-export default versionOneRouter = router;
+export { router as versionOneRouter };
