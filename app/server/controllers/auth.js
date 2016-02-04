@@ -23,6 +23,12 @@ export var createSession = function(req, res) {
       let encryptedKey = sodium.crypto_box_easy(sessionInfo.secretKey, appNonce, appPubKey, assymetricKeyPair.privateKey);
       let token = jwt.sign(sessionId, new Buffer(sessionInfo.signingKey).toString('base64'));
       sessionManager.put(sessionId, sessionInfo);
+      let sessionObj = {
+        id: sessionId,
+        info: sessionInfo
+      };
+      let eventType = req.app.get('EVENT_TYPE').SESSION_CREATED;
+      req.app.get('eventEmitter').emit(eventType, sessionObj);
       res.send(200, {
         token: token,
         encryptedKey: new Buffer(encryptedKey).toString('base64'),

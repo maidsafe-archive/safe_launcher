@@ -62,7 +62,8 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
 
     // handle session creation
     Server.onSessionCreated(function(session) {
-      console.log('Session created :: ', session);
+      console.log('Session created :: ');
+      console.log(session);
     });
 
     // handle session removed
