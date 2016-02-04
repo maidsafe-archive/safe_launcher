@@ -16,9 +16,9 @@ export var createSession = function(req, res) {
     let app = authReq.app;
     let assymetricKeyPair = sodium.crypto_box_keypair();
     try {
+      let sessionId = new Buffer(sodium.randombytes_buf(32)).toString('base64');      
       let appPubKey = new Uint8Array(new Buffer(authReq.publicKey, 'base64'));
       let appNonce = new Uint8Array(new Buffer(authReq.nonce, 'base64'));
-      let sessionId = new Buffer(sodium.randombytes_buf(32)).toString('base64');
       let sessionInfo = new SessionInfo(app.id, app.name, app.version, app.vendor, authReq.permissions, dirKey);
       let encryptedKey = sodium.crypto_box_easy(sessionInfo.secretKey, appNonce, appPubKey, assymetricKeyPair.privateKey);
       let token = jwt.sign(sessionId, new Buffer(sessionInfo.signingKey).toString('base64'));
