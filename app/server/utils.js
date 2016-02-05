@@ -8,7 +8,7 @@ export var getSessionIdFromRequest = function(req) {
     return;
   }
   try {
-    return new Buffer(authHeader[1], 'base64').toString();
+    return (new Buffer(authHeader[1], 'base64')).toString();
   } catch(e) {
     return;
   }

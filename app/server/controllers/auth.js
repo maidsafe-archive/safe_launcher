@@ -8,10 +8,10 @@ import SessionInfo from '../model/session_info';
 import { getSessionIdFromRequest } from '../utils'
 
 export var createSession = function(req, res) {
-  let authReq = req.body;
-  let onDirKey = function(err, dirKey) {
+  this.onDirKey = function(err, dirKey) {
+    let authReq = req.body;
     if (err) {
-      return res.send(500, err.errorMsg);
+      return res.status(500).send(err.errorMsg);
     }
     let app = authReq.app;
     let assymetricKeyPair = sodium.crypto_box_keypair();
@@ -29,17 +29,17 @@ export var createSession = function(req, res) {
       };
       let eventType = req.app.get('EVENT_TYPE').SESSION_CREATED;
       req.app.get('eventEmitter').emit(eventType, sessionObj);
-      res.send(200, {
+      res.status(200).send({
         token: token,
         encryptedKey: new Buffer(encryptedKey).toString('base64'),
         publicKey: new Buffer(assymetricKeyPair.publicKey).toString('base64'),
         permissions: authReq.permissions
       });
     } catch (e) {
-      res.send(500, e.message);
+      res.status(500).send(e.message);
     }
   }
-  return onDirKey;
+  return this.onDirKey;
 }
 
 export var authorise = function(req, res) {
@@ -61,12 +61,12 @@ export var authorise = function(req, res) {
 export var revoke = function(req, res) {
   let sessionId = getSessionIdFromRequest(req);
   if (!sessionId) {
-    return res.send(400, 'Authorisation Token could not be parsed');
+    return res.status(401).send('Authorisation Token could not be parsed');
   }
   if (!sessionManager.remove(sessionId)) {
-    return res.send(400, 'Session not found');
+    return res.status(400).send('Session not found');
   }
   let eventType = req.app.get('EVENT_TYPE').SESSION_REMOVED;
   req.app.get('eventEmitter').emit(eventType, sessionId);
-  res.send(200);
+  res.status(200).send("Session removed");
 }

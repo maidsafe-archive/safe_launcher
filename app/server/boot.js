@@ -53,7 +53,7 @@ export default class RESTServer {
     let EVENT_TYPE = this.app.get('EVENT_TYPE');
     let eventEmitter = this.app.get('eventEmitter');
 
-    app.use(logger('tiny'));
+    // app.use(logger('combined'));
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({
       extended: false
@@ -100,12 +100,16 @@ export default class RESTServer {
     this.app.get('eventEmitter').addListener(event, listener);
   }
 
+  removeAllEventListener(event) {
+    this.app.get('eventEmitter').removeAllListeners(event);
+  }
+
   authApproved(data) {
     var app = data.payload.app;
-    this.app.get('api').auth.getAppDirectoryKey(app.id, app.name, app.vendor, createSession(data.request, data.response));
+    this.app.get('api').auth.getAppDirectoryKey(app.id, app.name, app.vendor, new createSession(data.request, data.response));
   }
 
   authRejected(payload) {
-    payload.res.send(401);
+    payload.response.status(401).send('Unauthorised');
   }
 }
