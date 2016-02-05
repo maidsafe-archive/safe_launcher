@@ -26,15 +26,15 @@ app.on('ready', function() {
   });
   mainWindow.loadURL('file://' + __dirname + '/app.html');
 
-  // if (env.name !== 'production') {
-  //   devHelper.setDevMenu();
-  //   mainWindow.openDevTools();
-  // }
+  if (env.name !== 'production') {
+    devHelper.setDevMenu();
+    mainWindow.openDevTools();
+  }
 
   mainWindow.on('blur', function(d) {
-    // if (env.name !== 'production') {
-    //   return;
-    // }
+    if (env.name !== 'production') {
+      return;
+    }
     mainWindow.minimize();
   });
 
