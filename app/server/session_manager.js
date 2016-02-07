@@ -18,7 +18,7 @@ class SessionManager {
 
   remove(id) {
     delete this.sessionPool[id];
-    return !this.sessionPool.containsKey(id);
+    return !this.sessionPool.hasOwnProperty(id);
   }
 
 }
