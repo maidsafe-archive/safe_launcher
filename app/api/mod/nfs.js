@@ -5,11 +5,13 @@ export default class NFS {
     this.MODULE = 'nfs';
   }
 
-  createDirectory(dirPath, isPrivate, isVersioned, userMetadata, isPathShared, appDirKey, callback) {
+  createDirectory(dirPath, isPrivate, isVersioned, userMetadata, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
     this.send({
       module: this.MODULE,
       action: 'create-dir',
+      isAuthorised: true,
       appDirKey: appDirKey,
+      hasSafeDriveAccess: hasSafeDriveAccess,
       params: {
         dirPath: dirPath,
         isPrivate: isPrivate,

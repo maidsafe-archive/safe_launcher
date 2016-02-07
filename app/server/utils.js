@@ -1,6 +1,11 @@
+import sessionManager from './session_manager';
+
 export var getSessionIdFromRequest = function(req) {
   let authHeader = req.get('Authorization');
-  if (!authHeader && authHeader.indexOf(' ') === 6) {
+  if (!authHeader) {
+    return;
+  }
+  if (authHeader.indexOf(' ') !== 6) {
     return;
   }
   authHeader = authHeader.split(' ');
@@ -12,4 +17,13 @@ export var getSessionIdFromRequest = function(req) {
   } catch(e) {
     return;
   }
+}
+
+export var setSessionIdHeader = function(req, res, next) {
+  let sessionId = getSessionIdFromRequest(req);
+  if (!sessionId || !sessionManager.get(sessionId)) {
+    return res.send(401, 'Unauthorised');
+  }
+  req.headers['sessionId'] = sessionId;
+  next();
 }

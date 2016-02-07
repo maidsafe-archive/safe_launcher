@@ -16,6 +16,8 @@ process.env['mocha-unfunk-style'] = 'plain';
 
 var runMochaTests = function() {
   childProcess.spawn(gulpPath, [
+    '--compilers',
+    'js:babel-core/register',
     '-R',
     'mocha-unfunk-reporter',
     './tests/*'

@@ -48,7 +48,7 @@ module.exports = function(libPath) {
         case 'nfs':
           message.client = getClientHandle(message);
           message.safeDriveKey = auth.getSafeDriveKey();
-          nfs.execute(getClientHandle(message), lib, message);
+          nfs.execute(lib, message);
           break;
 
         default:
