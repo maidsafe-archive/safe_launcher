@@ -46,7 +46,17 @@ export var authorise = function(req, res) {
   let authReq = req.body;
   if (!(authReq.app && authReq.app.name && authReq.app.id && authReq.app.vendor &&
       authReq.app.version && authReq.publicKey && authReq.nonce)) {
-    return res.send(400, 'Bad request');
+    return res.status(400).send('Fields are missing');
+  }
+
+  var publicKeyLength = new Buffer(authReq.publicKey, 'base64').length;
+  var nonceLength = new Buffer(authReq.nonce, 'base64').length;
+
+  if (nonceLength !== sodium.crypto_box_NONCEBYTES) {
+    return res.status(400).send('Invalid nonce');
+  }
+  if (publicKeyLength !== sodium.crypto_box_PUBLICKEYBYTES) {
+    return res.status(400).send('Invalid public key');
   }
 
   let payload = {

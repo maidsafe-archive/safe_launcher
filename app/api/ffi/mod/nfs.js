@@ -31,12 +31,6 @@ var createDirectory = function(lib, request) {
   }
 };
 
-exports.getMethods = function() {
-  return {
-    'execute': [ 'int', [ 'string', clientHandlePtrPtr ] ]
-  };
-};
-
 exports.execute = function(clientHandle, lib, request) {
   switch (request.action) {
     case 'create-dir':

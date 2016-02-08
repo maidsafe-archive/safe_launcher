@@ -14,7 +14,6 @@ var addToCallbackPool = function(id, callback) {
 };
 
 workerProcess.on('message', function(msg) {
-  console.log('FFI msg', msg);
   if (!callbackPool[msg.id]) {
     return;
   }

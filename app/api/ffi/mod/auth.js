@@ -65,7 +65,7 @@ var register = function(lib, request) {
   registeredClientHandle = regClient.deref();
   var safeDriveError = setSafeDriveKey(lib);
   if (safeDriveError) {
-    return util.sendError(request.id, 999, safeDriveError.toString());
+    return util.sendError(request.id, 999, safeDriveError.message());
   }
   util.send(request.id);
 };
@@ -149,19 +149,6 @@ exports.drop = function(lib) {
     lib.drop_client(registeredClientHandle);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   }
-};
-
-exports.getMethods = function() {
-  return {
-    'create_unregistered_client': [ 'int', [ clientHandlePtrPtr ] ],
-    'create_account': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
-    'log_in': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
-    'get_safe_drive_key_size': [ 'int', [ intPtr, clientHandlePtrPtr ] ],
-    'get_safe_drive_key': [ 'int', [ IntArray, clientHandlePtrPtr ] ],
-    'get_app_dir_key_size': [ 'int', [ 'string', 'string', 'string', intPtr, clientHandlePtrPtr ] ],
-    'get_app_dir_key': [ 'int', [ 'string', 'string', 'string', IntArray, clientHandlePtrPtr ] ],
-    'drop_client': [ 'void', [ clientHandlePtrPtr ] ]
-  };
 };
 
 exports.execute = function(lib, request) {

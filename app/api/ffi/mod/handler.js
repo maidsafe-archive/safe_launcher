@@ -24,6 +24,8 @@ module.exports = function(libPath) {
       'log_in': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
       'get_safe_drive_key': [ 'pointer', [ intPtr, intPtr, intPtr, clientHandlePtrPtr ] ],
       'get_app_dir_key': [ 'pointer', [ 'string', 'string', 'string', intPtr, intPtr, intPtr, clientHandlePtrPtr ] ],
+      'execute': [ 'int', [ 'string', clientHandlePtrPtr ] ],
+      'execute_for_content': [ 'pointer', [ 'string', intPtr, intPtr, intPtr, clientHandlePtrPtr ] ],
       'drop_client': [ 'void', [ clientHandlePtrPtr ] ],
       'drop_vector': [ 'void', [ 'pointer', int, int ] ],
       'drop_null_ptr': [ 'void', ['pointer'] ]
