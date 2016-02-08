@@ -31,7 +31,7 @@ var createDirectory = function(lib, request) {
   }
 };
 
-exports.execute = function(clientHandle, lib, request) {
+exports.execute = function(lib, request) {
   switch (request.action) {
     case 'create-dir':
       createDirectory(lib, request);

@@ -7,7 +7,8 @@ export default class SessionInfo {
     this.appVersion = appVersion;
     this.vendor = vendor;
     this.permissions = permissions || [];
-    this.secretKey = sodium.randombytes_buf(sodium.crypto_box_SECRETKEYBYTES);
+    this.nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+    this.secretKey = sodium.randombytes_buf(sodium.crypto_secretbox_KEYBYTES);
     this.signingKey = sodium.randombytes_buf(sodium.crypto_box_SECRETKEYBYTES);
     this.appDirKey = appDirKey;
   }

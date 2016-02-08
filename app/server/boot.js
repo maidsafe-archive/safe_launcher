@@ -6,6 +6,7 @@ import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
 import { versionOneRouter } from './routes/version_one';
 import { createSession } from './controllers/auth';
+import { decryptRequest } from './utils';
 
 class ServerEventEmitter extends EventEmitter {};
 
@@ -51,7 +52,8 @@ export default class RESTServer {
     let app = this.app;
     let EVENT_TYPE = this.app.get('EVENT_TYPE');
     let eventEmitter = this.app.get('eventEmitter');
-    
+
+    app.use(decryptRequest);
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({
       extended: false
