@@ -1,17 +1,18 @@
 <div class="msl-prompt" ng-show="confirmation.status">
   <div class="msl-prompt-b">
     <div class="msl-prompt-body">
-      <table>
-        <tr><td>Name</td><td class="val">{{ confirmation.data.payload.app.name }}</td>
-        <tr><td>Vendor</td><td class="val">{{ confirmation.data.payload.app.vendor }}</td>
-        <tr><td>Version</td><td class="val">{{ confirmation.data.payload.app.version }}</td>
-        <tr><td>Permissions</td>
-          <td class="val">
-            <div ng-repeat="permission in confirmation.data.payload.permissions" class="">{{ permission }}</div>
-            <span class="val" ng-show="confirmation.data.payload.permissions.length === 0">None</span>
-          </td>
-        </tr>
-      </table>
+      {{ confirmation.data.payload.app.name + ' ' +
+      confirmation.data.payload.app.version +' by '+
+      confirmation.data.payload.app.vendor + ' is requesting access for:' }}
+
+      <div class="msl-prompt-body-li">
+        <div class="msl-prompt-body-li-i"
+        ng-if="confirmation.data.payload.permissions.length !== 0"
+        ng-repeat="permission in confirmation.data.payload.permissions">
+          {{ permission }}
+        </div>
+        <div class="msl-prompt-body-li-i" ng-if="confirmation.data.payload.permissions.length === 0" class="">None</div>
+      </div>
     </div>
     <div class="msl-prompt-foot">
       <button type="button" class="deny" name="deny" ng-click="confirmResponse(confirmation.data, false)">Deny</button>
