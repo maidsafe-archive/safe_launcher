@@ -25,7 +25,7 @@ export var getSessionIdFromRequest = function(req) {
     if (!sessionInfo) {
       return;
     }
-    jwt.verify(token, sessionInfo.signingKey);
+    jwt.verify(token, new Buffer(sessionInfo.signingKey));
     return payload.id;
   } catch (e) {
     return;
@@ -42,7 +42,8 @@ export var decryptRequest = function(req, res, next) {
   }
   let sessionInfo = sessionManager.get(sessionId);
   try {
-    req.path = new Buffer(sodium.crypto_secretbox_open_easy(req.path, sessionInfo.nonce, sessionInfo.secretKey)).toString();
+    // var path = new Uint8Array(new Buffer(req.path.substr(1), 'base64'));
+    // req.url = new Buffer(sodium.crypto_secretbox_open_easy(path, sessionInfo.nonce, sessionInfo.secretKey)).toString();
     if (req.body) {
       req.body = new Buffer(sodium.crypto_secretbox_open_easy(req.body, sessionInfo.nonce, sessionInfo.secretKey)).toString();
     }

@@ -20,10 +20,12 @@ export var createSession = function(req, res) {
       let appPubKey = new Uint8Array(new Buffer(authReq.publicKey, 'base64'));
       let appNonce = new Uint8Array(new Buffer(authReq.nonce, 'base64'));
       let sessionInfo = new SessionInfo(app.id, app.name, app.version, app.vendor, authReq.permissions, dirKey);
-      let symmetricKey = Buffer.concat(new Buffer(sessionInfo.secretKey), new Buffer(sessionInfo.nonce));
+      let symmetricKey = Buffer.concat([new Buffer(sessionInfo.secretKey), new Buffer(sessionInfo.nonce)]);
+      console.log(symmetricKey.length);
       let encryptedKey = sodium.crypto_box_easy(new Uint8Array(symmetricKey), appNonce, appPubKey, assymetricKeyPair.privateKey);
-      let payload = new Buffer(JSON.stringify({ id: sessionId })).toString('base64');
-      let token = jwt.sign(payload, new Buffer(sessionInfo.signingKey).toString('base64'));
+      console.log(encryptedKey.length);
+      let payload = JSON.stringify({ id: sessionId });
+      let token = jwt.sign(payload, new Buffer(sessionInfo.signingKey));
       sessionManager.put(sessionId, sessionInfo);
       let eventType = req.app.get('EVENT_TYPE').SESSION_CREATED;
       req.app.get('eventEmitter').emit(eventType, {
