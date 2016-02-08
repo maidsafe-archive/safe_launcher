@@ -1,7 +1,7 @@
 import path from 'path'
 import http from 'http';
 import express from 'express';
-import * as logger from 'morgan';
+import logger from 'morgan';
 import EventEmitter from 'events';
 import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
@@ -100,12 +100,16 @@ export default class RESTServer {
     this.app.get('eventEmitter').addListener(event, listener);
   }
 
+  removeAllEventListener(event) {
+    this.app.get('eventEmitter').removeAllListeners(event);
+  }
+
   authApproved(data) {
     var app = data.payload.app;
-    this.app.get('api').auth.getAppDirectoryKey(app.id, app.name, app.vendor, createSession(data.request, data.response));
+    this.app.get('api').auth.getAppDirectoryKey(app.id, app.name, app.vendor, new createSession(data.request, data.response));
   }
 
   authRejected(payload) {
-    payload.res.send(401);
+    payload.response.status(401).send('Unauthorised');
   }
 }

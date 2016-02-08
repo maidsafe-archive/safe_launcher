@@ -128,7 +128,6 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
           alert('Unable to login');
           return;
         }
-        alert('Login Successful');
         $state.go('user');
       });
     };
