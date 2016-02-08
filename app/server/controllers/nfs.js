@@ -18,6 +18,17 @@ export var createDirectory = function(req, res) {
   //validate
   let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS');
   let appDirKey = sessionInfo.appDirKey;
-  req.get('api').nfs.createDirectory(params.dirPath, params.isPrivate, params.isVersioned, params.userMetadata, params.isPathShared, hasSafeDriveAccess, onResponse);
+  req.get('api').nfs.createDirectory(params.dirPath, params.isPrivate, params.isVersioned, params.userMetadata, params.isPathShared, appDirKey, hasSafeDriveAccess, onResponse);
   res.send(200, 'Created');
+}
+
+export var deleteDirectory = function(req, res) {
+  let sessionInfo = sessionManager.get(req['sessionId']);
+  let params = req.params;
+
+  //validate
+  let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS');
+  let appDirKey = sessionInfo.appDirKey;
+  req.get('api').nfs.deleteDirectory(params.dirPath, params.isPathShared, appDirKey, hasSafeDriveAccess, onResponse);
+  res.send(202, 'Accepted');
 }
