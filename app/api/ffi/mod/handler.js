@@ -15,7 +15,6 @@ module.exports = function(libPath) {
   var lib;
   var auth = require('./auth.js');
   var nfs = require('./nfs.js');
-  var util = require('./util.js');
 
   var methodsToRegister = function() {
     return {
@@ -28,7 +27,7 @@ module.exports = function(libPath) {
       'execute_for_content': [ 'pointer', [ 'string', intPtr, intPtr, intPtr, clientHandlePtrPtr ] ],
       'drop_client': [ 'void', [ clientHandlePtrPtr ] ],
       'drop_vector': [ 'void', [ 'pointer', int, int ] ],
-      'drop_null_ptr': [ 'void', ['pointer'] ]
+      'drop_null_ptr': [ 'void', [ 'pointer' ] ]
     };
   };
 

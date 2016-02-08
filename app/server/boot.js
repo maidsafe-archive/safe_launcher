@@ -1,7 +1,6 @@
 import path from 'path'
 import http from 'http';
 import express from 'express';
-import logger from 'morgan';
 import EventEmitter from 'events';
 import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
@@ -52,8 +51,7 @@ export default class RESTServer {
     let app = this.app;
     let EVENT_TYPE = this.app.get('EVENT_TYPE');
     let eventEmitter = this.app.get('eventEmitter');
-
-    app.use(logger('tiny'));
+    
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({
       extended: false
