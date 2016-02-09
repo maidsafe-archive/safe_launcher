@@ -26,32 +26,26 @@ var unregisteredClient = function(lib, request) {
 };
 
 var setSafeDriveKey = function(lib) {
-  var size;
-  try {
-    size = getSafeDriveKeySize(lib);
-  } catch (e) {
-    return e;
-  }
-  var content = new IntArray(size);
+  var sizePtr = ref.alloc(int);
+  var capacityPtr = ref.alloc(int);
+  var resultPtr = ref.alloc(int);
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  var result = lib.get_safe_drive_key(content, registeredClientHandle);
+  var pointer = lib.get_safe_drive_key(sizePtr, capacityPtr, resultPtr, registeredClientHandle);
   /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+  var result = resultPtr.deref();
   if (result !== 0) {
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    lib.drop_null_ptr(pointer);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     return new Error('Failed with error code ' + result);
   }
-  safeDriveKey = new Buffer(content).toString('base64');
-  return;
-};
-
-var getSafeDriveKeySize = function(lib) {
-  var size = ref.alloc('int');
+  var size = sizePtr.deref();
+  var capacity = capacityPtr.deref();
+  safeDriveKey = ref.reinterpret(pointer, size).toString('base64');
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  var res = lib.get_safe_drive_key_size(size, registeredClientHandle);
+  lib.drop_vector(pointer, size, capacity);
   /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-  if (res === 0) {
-    return size.deref();
-  }
-  throw new Error('Failed with error code' + res);
+  return;
 };
 
 var register = function(lib, request) {
@@ -71,7 +65,7 @@ var register = function(lib, request) {
   registeredClientHandle = regClient.deref();
   var safeDriveError = setSafeDriveKey(lib);
   if (safeDriveError) {
-    return util.sendError(request.id, 999, safeDriveError.toString());
+    return util.sendError(request.id, 999, safeDriveError.message());
   }
   util.send(request.id);
 };
@@ -91,6 +85,7 @@ var login = function(lib, request) {
     return util.sendError(request.id, res);
   }
   registeredClientHandle = regClient.deref();
+  setSafeDriveKey(lib);
   util.send(request.id);
 };
 
@@ -114,23 +109,30 @@ var getAppDirectoryKey = function(lib, request) {
     if (!registeredClientHandle) {
       return util.sendError(request.id, 999, 'Client Handle not available');
     }
-    var params = request.params;
-    var size = ref.alloc('int');
+    var appName = request.params.appName;
+    var appId = request.params.appId;
+    var vendor = request.params.vendor;
+
+    var sizePtr = ref.alloc(int);
+    var capacityPtr = ref.alloc(int);
+    var resultPtr = ref.alloc(int);
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    var res = lib.get_app_dir_key_size(params.appName, params.appId, params.vendor, size, registeredClientHandle);
+    var pointer = lib.get_app_dir_key(appName, appId, vendor, sizePtr, capacityPtr, resultPtr, registeredClientHandle);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    if (res !== 0) {
-      return util.sendError(new Error('Failed with code' + res));
-    }
-    var keySize = size.deref();
-    var content = new IntArray(keySize);
-    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    var result = lib.get_app_dir_key(params.appName, params.appId, params.vendor, content, registeredClientHandle);
-    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    var result = resultPtr.deref();
     if (result !== 0) {
-      return new Error('Failed with error code ' + result);
+      /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+      lib.drop_null_ptr(pointer);
+      /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+      return util.sendError(request.id, 999, 'Failed with error code ' + result);
     }
-    util.send(request.id, new Buffer(content).toString('base64'));
+    var size = sizePtr.deref();
+    var capacity = capacityPtr.deref();
+    var appDirKey = ref.reinterpret(pointer, size).toString('base64');
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    lib.drop_vector(pointer, size, capacity);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    util.send(request.id, appDirKey);
   } catch (e) {
     util.sendError(request.id, 999, e.message());
   }
@@ -147,19 +149,6 @@ exports.drop = function(lib) {
     lib.drop_client(registeredClientHandle);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   }
-};
-
-exports.getMethods = function() {
-  return {
-    'create_unregistered_client': [ 'int', [ clientHandlePtrPtr ] ],
-    'create_account': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
-    'log_in': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
-    'get_safe_drive_key_size': [ 'int', [ intPtr, clientHandlePtrPtr ] ],
-    'get_safe_drive_key': [ 'int', [ IntArray, clientHandlePtrPtr ] ],
-    'get_app_dir_key_size': [ 'int', [ 'string', 'string', 'string', intPtr, clientHandlePtrPtr ] ],
-    'get_app_dir_key': [ 'int', [ 'string', 'string', 'string', IntArray, clientHandlePtrPtr ] ],
-    'drop_client': [ 'void', [ clientHandlePtrPtr ] ]
-  };
 };
 
 exports.execute = function(lib, request) {

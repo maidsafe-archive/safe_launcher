@@ -20,15 +20,18 @@ export var createSession = function(req, res) {
       let appPubKey = new Uint8Array(new Buffer(authReq.publicKey, 'base64'));
       let appNonce = new Uint8Array(new Buffer(authReq.nonce, 'base64'));
       let sessionInfo = new SessionInfo(app.id, app.name, app.version, app.vendor, authReq.permissions, dirKey);
-      let encryptedKey = sodium.crypto_box_easy(sessionInfo.secretKey, appNonce, appPubKey, assymetricKeyPair.privateKey);
-      let token = jwt.sign(sessionId, new Buffer(sessionInfo.signingKey).toString('base64'));
+      let symmetricKey = Buffer.concat([new Buffer(sessionInfo.secretKey), new Buffer(sessionInfo.nonce)]);
+      console.log(symmetricKey.length);
+      let encryptedKey = sodium.crypto_box_easy(new Uint8Array(symmetricKey), appNonce, appPubKey, assymetricKeyPair.privateKey);
+      console.log(encryptedKey.length);
+      let payload = JSON.stringify({ id: sessionId });
+      let token = jwt.sign(payload, new Buffer(sessionInfo.signingKey));
       sessionManager.put(sessionId, sessionInfo);
-      let sessionObj = {
+      let eventType = req.app.get('EVENT_TYPE').SESSION_CREATED;
+      req.app.get('eventEmitter').emit(eventType, {
         id: sessionId,
         info: sessionInfo
-      };
-      let eventType = req.app.get('EVENT_TYPE').SESSION_CREATED;
-      req.app.get('eventEmitter').emit(eventType, sessionObj);
+      });
       res.status(200).send({
         token: token,
         encryptedKey: new Buffer(encryptedKey).toString('base64'),
@@ -46,7 +49,17 @@ export var authorise = function(req, res) {
   let authReq = req.body;
   if (!(authReq.app && authReq.app.name && authReq.app.id && authReq.app.vendor &&
       authReq.app.version && authReq.publicKey && authReq.nonce)) {
-    return res.send(400, 'Bad request');
+    return res.status(400).send('Fields are missing');
+  }
+
+  var publicKeyLength = new Buffer(authReq.publicKey, 'base64').length;
+  var nonceLength = new Buffer(authReq.nonce, 'base64').length;
+
+  if (nonceLength !== sodium.crypto_box_NONCEBYTES) {
+    return res.status(400).send('Invalid nonce');
+  }
+  if (publicKeyLength !== sodium.crypto_box_PUBLICKEYBYTES) {
+    return res.status(400).send('Invalid public key');
   }
 
   let payload = {

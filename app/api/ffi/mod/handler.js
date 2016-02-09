@@ -1,26 +1,34 @@
 module.exports = function(libPath) {
   var ffi = require('ffi');
   var path = require('path');
+  var ref = require('ref');
+  var int = ref.types.int;
+  var ArrayType = require('ref-array');
+  var util = require('./util.js');
+
+  var intPtr = ref.refType(int);
+  var IntArray = ArrayType(int);
+  var clientHandle = ref.types.void;
+  var clientHandlePtr = ref.refType(clientHandle);
+  var clientHandlePtrPtr = ref.refType(clientHandlePtr);
 
   var lib;
   var auth = require('./auth.js');
   var nfs = require('./nfs.js');
-  var util = require('./util.js');
-  var modules = [ auth, nfs ];
 
   var methodsToRegister = function() {
-    var fncs = {};
-    var methods;
-    for (var i in modules) {
-      methods = modules[i].getMethods();
-      for (var key in methods) {
-        if (fncs[key]) {
-          continue;
-        }
-        fncs[key] = methods[key];
-      }
-    }
-    return fncs;
+    return {
+      'create_unregistered_client': [ 'int', [ clientHandlePtrPtr ] ],
+      'create_account': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
+      'log_in': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
+      'get_safe_drive_key': [ 'pointer', [ intPtr, intPtr, intPtr, clientHandlePtrPtr ] ],
+      'get_app_dir_key': [ 'pointer', [ 'string', 'string', 'string', intPtr, intPtr, intPtr, clientHandlePtrPtr ] ],
+      'execute': [ 'int', [ 'string', clientHandlePtrPtr ] ],
+      'execute_for_content': [ 'pointer', [ 'string', intPtr, intPtr, intPtr, clientHandlePtrPtr ] ],
+      'drop_client': [ 'void', [ clientHandlePtrPtr ] ],
+      'drop_vector': [ 'void', [ 'pointer', int, int ] ],
+      'drop_null_ptr': [ 'void', [ 'pointer' ] ]
+    };
   };
 
   var getClienthandle = function(message) {
@@ -48,7 +56,7 @@ module.exports = function(libPath) {
         case 'nfs':
           message.client = getClientHandle(message);
           message.safeDriveKey = auth.getSafeDriveKey();
-          nfs.execute(getClientHandle(message), lib, message);
+          nfs.execute(lib, message);
           break;
 
         default:
