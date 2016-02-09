@@ -13,7 +13,7 @@ let ResponseHanlder = function(res) {
 }
 
 export var createDirectory = function(req, res) {
-  let sessionInfo = sessionManager.get(req['sessionId']);
+  let sessionInfo = sessionManager.get(req.headers.sessionId);
   let params = req.body;
   if (!(params.dirPath)) {
     return res.status(400).('Invalid request. dirPath missing');
