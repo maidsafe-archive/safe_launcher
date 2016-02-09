@@ -85,7 +85,7 @@ var deleteDirectory = function(lib, request) {
   }
 };
 
-var modifyDirectory function(lib, request) {
+var modifyDirectory = function(lib, request) {
   try {
     var params = createPayload('modify-dir', request);
     var result = lib.execute(JSON.stringify(params), request.client);
