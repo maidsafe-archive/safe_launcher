@@ -31,7 +31,7 @@ module.exports = function(libPath) {
     };
   };
 
-  var getClienthandle = function(message) {
+  var getClientHandle = function(message) {
     return message.isAuthorised ? auth.getRegisteredClient() : auth.getUnregisteredClient();
   };
 
@@ -63,7 +63,7 @@ module.exports = function(libPath) {
           util.sendError(message.id, 999, 'Module not found');
       }
     } catch (e) {
-      process.send('Err ' + e);
+      util.sendError(message.id, 999, e.toString());
     }
   };
 

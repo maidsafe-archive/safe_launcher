@@ -13,7 +13,7 @@ var addToCallbackPool = function(id, callback) {
   callbackPool[id].push(callback);
 };
 
-workerProcess.on('message', function(msg) {
+workerProcess.on('message', function(msg) {  
   if (!callbackPool[msg.id]) {
     return;
   }
