@@ -15,19 +15,21 @@ var createPayload = function(action, request) {
       'dir_path': request.params.dirPath
     }
   };
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   if (request.params.isPrivate) {
-    payload.data['is_private'] = request.params.isPrivate;
+    payload.data.is_private = request.params.isPrivate;
   }
   if (request.params.isVersioned) {
-    payload.data['is_versioned'] = request.params.isVersioned;
+    payload.data.is_versioned = request.params.isVersioned;
   }
   if (request.params.userMetadata) {
-    payload.data['user_metadata'] = request.params.userMetadata;
+    payload.data.user_metadata = request.params.userMetadata;
   }
   if (request.params.isPathShared) {
-    payload.data['is_path_shared'] = request.params.isPathShared;
+    payload.data.is_path_shared = request.params.isPathShared;
   }
-}
+  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+};
 
 var createDirectory = function(lib, request) {
   try {

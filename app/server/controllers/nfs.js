@@ -1,6 +1,6 @@
 import sessionManager from '../session_manager';
 
-let deleteOrGetDirectory = function(req, res, delete00) {
+let deleteOrGetDirectory = function(req, res, isDelete) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   let params = req.params;
 
@@ -26,7 +26,7 @@ let deleteOrGetDirectory = function(req, res, delete00) {
     return res.status(500).send(err);
   };
   let nfsApi = req.app.get('api').nfs;
-  var execFunc = (delete ? nfsApi.deleteDirectory : nfsApi.getDirectory);
+  var execFunc = (isDelete ? nfsApi.deleteDirectory : nfsApi.getDirectory);
   execFunc(params.dirPath, params.isPathShared, appDirKey, hasSafeDriveAccess, onResponse);
 }
 
@@ -44,7 +44,7 @@ export var createDirectory = function(req, res) {
   if (typeof params.isVersioned !== 'boolean') {
     return res.status(400).send('Invalid request. isVersioned should be a boolean value');
   }
-  let onResponse = function(err, ) {
+  let onResponse = function(err) {
     if (!err) {
       return res.status(202).send('Accepted');
     }
