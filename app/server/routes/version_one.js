@@ -5,6 +5,6 @@ import * as Auth from '../controllers/auth';
 var router = express.Router();
 router.post('/auth', Auth.authorise);
 router.delete('/auth', Auth.revoke);
-router.get('/nfs/directory', NFS.createDirectory);
+router.post('/nfs/directory', NFS.createDirectory);
 
 export { router as versionOneRouter };
