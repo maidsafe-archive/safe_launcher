@@ -13,7 +13,7 @@ let ResponseHanlder = function(res) {
 }
 
 export var createDirectory = function(req, res) {
-  let sessionInfo = sessionManager.get(req['sessionId']);
+  let sessionInfo = sessionManager.get(req.headers.sessionId);
   let params = req.body;
   //validate
   let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS');
