@@ -44,10 +44,10 @@ export var decryptRequest = function(req, res, next) {
   try {
     // var path = new Uint8Array(new Buffer(req.path.substr(1), 'base64'));
     // req.url = new Buffer(sodium.crypto_secretbox_open_easy(path, sessionInfo.nonce, sessionInfo.secretKey)).toString();
-    if (req.body) {
-      req.body = new Uint8Array(new Buffer(req.body, 'base64'));
-      req.body = new Buffer(sodium.crypto_secretbox_open_easy(req.body, sessionInfo.nonce, sessionInfo.secretKey)).toString();
-      // req.headers['content-type'] = 'application/json';
+    if (req.body && Object.keys(req.body).length > 0) {
+      let reqBodyUIntArray = new Uint8Array(new Buffer(req.body, 'base64'));
+      let reqBody = sodium.crypto_secretbox_open_easy(reqBodyUIntArray, sessionInfo.nonce, sessionInfo.secretKey);
+      req.body = JSON.parse(new Buffer(reqBody).toString());
     }
     req.headers['sessionId'] = sessionId;
     next();

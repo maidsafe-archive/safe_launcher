@@ -70,6 +70,19 @@ var getDirectory = function(lib, request) {
   }
 };
 
+var deleteDirectory = function(lib, request) {
+  try {
+    var params = createPayload('delete-dir', request);
+    var result = lib.execute(JSON.stringify(params), request.client);
+    if (result === 0) {
+      return util.send(request.id, true);
+    }
+    util.sendError(request.id, result);
+  } catch (e) {
+    util.sendError(request.id, 999, e.message());
+  }
+};
+
 exports.execute = function(lib, request) {
   switch (request.action) {
     case 'create-dir':
@@ -77,6 +90,9 @@ exports.execute = function(lib, request) {
       break;
     case 'get-dir':
       getDirectory(lib, request);
+      break;
+    case 'delete-dir':
+      deleteDirectory(lib, request);
       break;
     default:
       util.sendError(request.id, 999, 'Invalid Action');
