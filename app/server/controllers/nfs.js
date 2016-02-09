@@ -16,7 +16,7 @@ export var createDirectory = function(req, res) {
   let sessionInfo = sessionManager.get(req['sessionId']);
   let params = req.body;
   if (!(params.dirPath)) {
-    return res.status(400).('Invalid request. dirPath missing');
+    return res.status(400).send('Invalid request. dirPath missing');
   }
   params.isPathShared = params.isPathShared || false;
   params.isPrivate = params.isPrivate || true;
@@ -24,7 +24,7 @@ export var createDirectory = function(req, res) {
   params.metadata = params.metadata || '';
 
   if (typeOf(params.isVersioned) !== 'boolean') {
-    return res.status(400).('Invalid request. isVersioned should be a boolean value');
+    return res.status(400).send('Invalid request. isVersioned should be a boolean value');
   }
 
   let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS');
