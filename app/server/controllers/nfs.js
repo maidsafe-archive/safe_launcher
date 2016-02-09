@@ -13,13 +13,26 @@ let ResponseHanlder = function(res) {
 }
 
 export var createDirectory = function(req, res) {
-  let sessionInfo = sessionManager.get(req['sessionId']);
+  let sessionInfo = sessionManager.get(req.headers.sessionId);
   let params = req.body;
-  //validate
+  if (!(params.dirPath)) {
+    return res.status(400).send('Invalid request. dirPath missing');
+  }
+  params.isPathShared = params.isPathShared || false;
+  params.isPrivate = params.isPrivate || true;
+  params.isVersioned = params.isVersioned || false;
+  params.metadata = params.metadata || '';
+
+  if (typeOf(params.isVersioned) !== 'boolean') {
+    return res.status(400).send('Invalid request. isVersioned should be a boolean value');
+  }
+
   let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS');
   let appDirKey = sessionInfo.appDirKey;
-  req.get('api').nfs.createDirectory(params.dirPath, params.isPrivate, params.isVersioned, params.userMetadata, params.isPathShared, appDirKey, hasSafeDriveAccess, onResponse);
-  res.send(200, 'Created');
+  req.get('api').nfs.createDirectory(params.dirPath, params.isPrivate, params.isVersioned,
+                                     params.userMetadata, params.isPathShared, appDirKey,
+                                     hasSafeDriveAccess, onResponse);
+  res.status(202).send('Accepted');
 }
 
 export var deleteDirectory = function(req, res) {
