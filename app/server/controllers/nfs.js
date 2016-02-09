@@ -1,6 +1,6 @@
 import sessionManager from '../session_manager';
 
-let deleteOrGetDirectory = function(req, res, delete) {
+let deleteOrGetDirectory = function(req, res, isDelete) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   let params = req.params;
 
@@ -26,7 +26,7 @@ let deleteOrGetDirectory = function(req, res, delete) {
     return res.status(500).send(err);
   };
   let nfsApi = req.app.get('api').nfs;
-  var execFunc = (delete ? nfsApi.deleteDirectory : nfsApi.getDirectory);
+  var execFunc = (isDelete ? nfsApi.deleteDirectory : nfsApi.getDirectory);
   execFunc(params.dirPath, params.isPathShared, appDirKey, hasSafeDriveAccess, onResponse);
 }
 
