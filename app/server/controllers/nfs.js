@@ -30,7 +30,20 @@ export var createDirectory = function(req, res) {
   let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS');
   let appDirKey = sessionInfo.appDirKey;
   req.get('api').nfs.createDirectory(params.dirPath, params.isPrivate, params.isVersioned,
-                                     params.userMetadata, params.isPathShared, appDirKey,
-                                     hasSafeDriveAccess, onResponse);
+    params.userMetadata, params.isPathShared, appDirKey,
+    hasSafeDriveAccess, onResponse);
   res.status(202).send('Accepted');
 }
+
+export var getDirectory = function(req, res) {
+  let sessionInfo = sessionManager.get(req.headers.sessionId);
+  let appDirKey = sessionInfo.appDirKey;
+  let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS');
+  var onResponse = function(err, data) {
+    if (err) {
+      return res.status(500).send(err);
+    }
+    res.send(data);
+  };
+  req.app.get('api').nfs.createDirectory(dirPath, isPathShared, hasSafeDriveAccess, appDirKey, onResponse);
+};

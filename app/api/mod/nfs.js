@@ -23,4 +23,18 @@ export default class NFS {
     }, callback);
   }
 
+  getDirectory(dirPath, isPathShared, hasSafeDriveAccess, appDirKey, callback) {
+    this.send({
+      module: this.MODULE,
+      action: 'get-dir',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: hasSafeDriveAccess,
+      params: {
+        dirPath: dirPath,        
+        isPathShared: isPathShared
+      }
+    }, callback);
+  }
+
 }
