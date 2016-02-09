@@ -23,6 +23,22 @@ export default class NFS {
     }, callback);
   }
 
+<<<<<<< HEAD
+  getDirectory(dirPath, isPathShared, hasSafeDriveAccess, appDirKey, callback) {
+    this.send({
+      module: this.MODULE,
+      action: 'get-dir',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: hasSafeDriveAccess,
+      params: {
+        dirPath: dirPath,        
+        isPathShared: isPathShared
+      }
+    }, callback);
+  }
+
+=======
   deleteDirectory(dirPath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
       this.send({
         module: this.MODULE,
@@ -36,4 +52,5 @@ export default class NFS {
         }
       }, callback);
     }
+>>>>>>> afc415b818774e16a29dc84bdec21c2452d41bb8
 }
