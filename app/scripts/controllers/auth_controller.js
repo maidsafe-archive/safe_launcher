@@ -40,7 +40,6 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
       var reset = function() {
         $scope.user = {};
         $scope.tabs.init();
-        $scope.$apply();
       };
       var payload = {
         pin: $scope.user.pin,
@@ -53,7 +52,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
         reset();
         Loader.hide();
         if (err) {
-          return alert('Err ' + err);
+          return alert('Unable to register');
         }
         alert('Registration Successful');
         $state.go('user');

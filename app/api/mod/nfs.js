@@ -23,4 +23,17 @@ export default class NFS {
     }, callback);
   }
 
+  deleteDirectory(dirPath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+      this.send({
+        module: this.MODULE,
+        action: 'delete-dir',
+        isAuthorised: true,
+        appDirKey: appDirKey,
+        hasSafeDriveAccess: hasSafeDriveAccess,
+        params: {
+          dirPath: dirPath,
+          isPathShared: isPathShared
+        }
+      }, callback);
+    }
 }
