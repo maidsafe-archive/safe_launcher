@@ -11,11 +11,15 @@ var createPayload = function(action, request) {
     'safe_drive_dir_key': request.safeDriveKey,
     'app_dir_key': request.appDirKey,
     'safe_drive_access': request.hasSafeDriveAccess || false,
-    'data': {
-      'dir_path': request.params.dirPath
-    }
+    'data': {}
   };
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+  if (request.params.hasOwnProperty('dirPath')) {
+    payload.data.dir_path = request.params.dirPath;
+  }
+  if (request.params.hasOwnProperty('filePath')) {
+    payload.data.file_path = request.params.filePath;
+  }
   if (request.params.hasOwnProperty('isPrivate')) {
     payload.data.is_private = request.params.isPrivate;
   }
@@ -75,8 +79,8 @@ var getDirectory = function(lib, request) {
 
 var deleteDirectory = function(lib, request) {
   try {
-    var params = createPayload('delete-dir', request);
-    var result = lib.execute(JSON.stringify(params), request.client);
+    var payload = createPayload('delete-dir', request);
+    var result = lib.execute(JSON.stringify(payload), request.client);
     if (result === 0) {
       return util.send(request.id, true);
     }
@@ -88,8 +92,21 @@ var deleteDirectory = function(lib, request) {
 
 var modifyDirectory = function(lib, request) {
   try {
-    var params = createPayload('modify-dir', request);
-    var result = lib.execute(JSON.stringify(params), request.client);
+    var payload = createPayload('modify-dir', request);
+    var result = lib.execute(JSON.stringify(payload), request.client);
+    if (result === 0) {
+      return util.send(request.id, true);
+    }
+    util.sendError(request.id, result);
+  } catch (e) {
+    util.sendError(request.id, 999, e.message());
+  }
+};
+
+var createFile = function(lib, request) {
+  try {
+    var payload = createPayload('create-file', request);
+    var result = lib.execute(JSON.stringify(payload), request.client);
     if (result === 0) {
       return util.send(request.id, true);
     }
@@ -112,6 +129,9 @@ exports.execute = function(lib, request) {
       break;
     case 'modify-dir':
       modifyDirectory(lib, request);
+      break;
+    case 'create-file':
+      createFile(lib, request);
       break;
     default:
       util.sendError(request.id, 999, 'Invalid Action');

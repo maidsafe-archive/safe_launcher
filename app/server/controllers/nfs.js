@@ -102,3 +102,23 @@ export var modifyDirectory = function(req, res) {
   req.app.get('api').nfs.modifyDirectory(reqBody.name, params.dirPath, reqBody.metadata, params.isPathShared, appDirKey,
     hasSafeDriveAccess, onResponse);
 };
+
+export var createFile = function(req, res) {
+  let sessionInfo = sessionManager.get(req.headers.sessionId);
+  let reqBody = req.body;
+  if (!reqBody.hasOwnProperty('filePath') || !reqBody.filePath) {
+    return res.status(400).send('Invalid request. filePath missing');
+  }
+  reqBody.isPathShared = reqBody.isPathShared || false;
+  reqBody.metadata = reqBody.metadata || '';
+  let onResponse = function(err) {
+    if (!err) {
+      return res.status(202).send('Accepted');
+    }
+    return res.status(500).send(err);
+  };
+  let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1;
+  let appDirKey = sessionInfo.appDirKey;
+  req.app.get('api').nfs.createFile(reqBody.filePath, reqBody.metadata, reqBody.isPathShared, appDirKey,
+    hasSafeDriveAccess, onResponse);
+};
