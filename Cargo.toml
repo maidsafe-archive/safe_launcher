@@ -12,6 +12,7 @@ version = "0.2.0"
 [dependencies]
 bufstream = "~0.1.1"
 byteorder = "~0.4.2"
+clippy = {version = "~0.0.37", optional = true}
 libc = "~0.2.4"
 log = "~0.3.4"
 maidsafe_utilities = "~0.1.5"
