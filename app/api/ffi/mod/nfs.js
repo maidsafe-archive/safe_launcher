@@ -93,6 +93,14 @@ var deleteDirectory = function(lib, request) {
 var modifyDirectory = function(lib, request) {
   try {
     var payload = createPayload('modify-dir', request);
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    if (request.params.newValues.hasOwnProperty('name')) {
+      payload.data.new_values.name = request.params.newValues.name;
+    }
+    if (request.params.newValues.hasOwnProperty('userMetadata')) {
+      payload.data.new_values.user_metadata = request.params.newValues.userMetadata;
+    }
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     var result = lib.execute(JSON.stringify(payload), request.client);
     if (result === 0) {
       return util.send(request.id, true);
@@ -129,6 +137,29 @@ var deleteFile = function(lib, request) {
   }
 };
 
+var modifyFileMeta = function(lib, request) {
+  try {
+    var payload = createPayload('modify-file', request);
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    if (request.params.newValues.hasOwnProperty('name')) {
+      payload.data.new_values.name = request.params.newValues.name;
+    }
+    if (request.params.newValues.hasOwnProperty('userMetadata')) {
+      payload.data.new_values.user_metadata = request.params.newValues.userMetadata;
+    }
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    util.send(999, payload);
+    return;
+    var result = lib.execute(JSON.stringify(payload), request.client);
+    if (result === 0) {
+      return util.send(request.id, true);
+    }
+    util.sendError(request.id, result);
+  } catch (e) {
+    util.sendError(request.id, 999, e.message());
+  }
+};
+
 exports.execute = function(lib, request) {
   switch (request.action) {
     case 'create-dir':
@@ -148,6 +179,9 @@ exports.execute = function(lib, request) {
       break;
     case 'delete-file':
       deleteFile(lib, request);
+      break;
+    case 'modify-file-meta':
+      modifyFileMeta(lib, request);
       break;
     default:
       util.sendError(request.id, 999, 'Invalid Action');
