@@ -51,7 +51,7 @@ export default class NFS {
       }, callback);
     }
 
-    modifyDirectory(name, dirPath, userMetadata, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+    modifyDirectory(name, userMetadata, dirPath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
       this.send({
         module: this.MODULE,
         action: 'modify-dir',
@@ -93,6 +93,24 @@ export default class NFS {
         hasSafeDriveAccess: hasSafeDriveAccess,
         params: {
           filePath: filePath,
+          isPathShared: isPathShared
+        }
+      }, callback);
+    }
+
+    modifyFileMeta(name, userMetadata, filePath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+      this.send({
+        module: this.MODULE,
+        action: 'modify-file-meta',
+        isAuthorised: true,
+        appDirKey: appDirKey,
+        hasSafeDriveAccess: hasSafeDriveAccess,
+        params: {
+          filePath: filePath,
+          newValues: {
+            name: name,
+            userMetadata: userMetadata
+          },
           isPathShared: isPathShared
         }
       }, callback);

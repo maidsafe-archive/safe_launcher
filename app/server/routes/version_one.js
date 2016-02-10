@@ -11,4 +11,5 @@ router.delete('/nfs/directory/:dirPath/:isPathShared', NFS.deleteDirectory);
 router.put('/nfs/directory/:dirPath/:isPathShared', NFS.modifyDirectory);
 router.post('/nfs/file', NFS.createFile);
 router.delete('/nfs/file/:filePath/:isPathShared', NFS.deleteFile);
+router.put('/nfs/file/metadata/:filePath/:isPathShared', NFS.modifyFileMeta);
 export { router as versionOneRouter };
