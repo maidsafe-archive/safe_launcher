@@ -65,4 +65,40 @@ export var deleteDirectory = function(req, res) {
 
 export var getDirectory = function(req, res) {
   deleteOrGetDirectory(req, res, false);
-}
+};
+
+export var modifyDirectory = function(req, res) {
+  let sessionInfo = sessionManager.get(req.headers.sessionId);
+  let reqBody = req.body;
+  let params = req.params;
+
+  if (!params.hasOwnProperty('dirPath') || !params.dirPath) {
+    return res.status(400).send('Invalid request. dirPath missing');
+  }
+
+  try {
+    params.isPathShared = JSON.parse(params.isPathShared);
+  } catch (e) {
+    res.status(500).send(e.message)
+  }
+
+  if (!params.hasOwnProperty('isPathShared') || !(typeof params.isPathShared === 'boolean')) {
+    return res.status(400).send('Invalid request. isPathShared missing');
+  }
+
+  if (!reqBody.hasOwnProperty('name') || !reqBody.name) {
+    return res.status(400).send('Invalid request. Directory name to be changed missing');
+  }
+
+  reqBody.metadata = reqBody.metadata || '';
+  let onResponse = function(err) {
+    if (!err) {
+      return res.status(202).send('Accepted');
+    }
+    return res.status(500).send(err);
+  };
+  let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1;
+  let appDirKey = sessionInfo.appDirKey;
+  req.app.get('api').nfs.modifyDirectory(reqBody.name, params.dirPath, reqBody.metadata, params.isPathShared, appDirKey,
+    hasSafeDriveAccess, onResponse);
+};
