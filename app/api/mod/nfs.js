@@ -68,4 +68,33 @@ export default class NFS {
         }
       }, callback);
     }
+
+    createFile(filePath, userMetadata, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+      this.send({
+        module: this.MODULE,
+        action: 'create-file',
+        isAuthorised: true,
+        appDirKey: appDirKey,
+        hasSafeDriveAccess: hasSafeDriveAccess,
+        params: {
+          filePath: filePath,
+          userMetadata: userMetadata,
+          isPathShared: isPathShared
+        }
+      }, callback);
+    }
+
+    deleteFile(filePath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+      this.send({
+        module: this.MODULE,
+        action: 'delete-file',
+        isAuthorised: true,
+        appDirKey: appDirKey,
+        hasSafeDriveAccess: hasSafeDriveAccess,
+        params: {
+          filePath: filePath,
+          isPathShared: isPathShared
+        }
+      }, callback);
+    }
 }
