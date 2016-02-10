@@ -1,4 +1,5 @@
 import sessionManager from '../session_manager';
+import { formatResponse } from '../utils';
 
 let deleteOrGetDirectory = function(req, res, isDelete) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -10,7 +11,7 @@ let deleteOrGetDirectory = function(req, res, isDelete) {
   try {
     params.isPathShared = JSON.parse(params.isPathShared);
   } catch (e) {
-    res.status(500).send(e.message);
+    res.status(500).send(e.toString());
   }
   if (!params.hasOwnProperty('isPathShared') || !(typeof params.isPathShared === 'boolean')) {
     return res.status(400).send('Invalid request. isPathShared missing');
@@ -21,14 +22,14 @@ let deleteOrGetDirectory = function(req, res, isDelete) {
   let onResponse = function(err, data) {
     if (!err) {
       let status = data ? 200 : 202;
-      return res.status(status).send(data || 'Accepted');
+      return res.status(status).send(formatResponse(data) || 'Accepted');
     }
     return res.status(500).send(err);
   };
   if (isDelete) {
-    req.app.get('api').nfs.deleteDirectory(params.dirPath, params.isPathShared, appDirKey, hasSafeDriveAccess, onResponse);
+    req.app.get('api').nfs.deleteDirectory(params.dirPath, params.isPathShared, hasSafeDriveAccess, appDirKey, onResponse);
   } else {
-    req.app.get('api').nfs.getDirectory(params.dirPath, params.isPathShared, appDirKey, hasSafeDriveAccess, onResponse);
+    req.app.get('api').nfs.getDirectory(params.dirPath, params.isPathShared, hasSafeDriveAccess, appDirKey, onResponse);
   }
 }
 
@@ -79,7 +80,7 @@ export var modifyDirectory = function(req, res) {
   try {
     params.isPathShared = JSON.parse(params.isPathShared);
   } catch (e) {
-    res.status(500).send(e.message)
+    res.status(500).send(e.toString())
   }
 
   if (!params.hasOwnProperty('isPathShared') || !(typeof params.isPathShared === 'boolean')) {

@@ -37,7 +37,7 @@ export var createSession = function(req, res) {
         permissions: authReq.permissions
       });
     } catch (e) {
-      res.status(500).send(e.message);
+      res.status(500).send(e.toString());
     }
   }
   return this.onDirKey;
