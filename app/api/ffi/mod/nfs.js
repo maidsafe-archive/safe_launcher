@@ -116,6 +116,19 @@ var createFile = function(lib, request) {
   }
 };
 
+var deleteFile = function(lib, request) {
+  try {
+    var payload = createPayload('delete-file', request);
+    var result = lib.execute(JSON.stringify(payload), request.client);
+    if (result === 0) {
+      return util.send(request.id, true);
+    }
+    util.sendError(request.id, result);
+  } catch (e) {
+    util.sendError(request.id, 999, e.message());
+  }
+};
+
 exports.execute = function(lib, request) {
   switch (request.action) {
     case 'create-dir':
@@ -132,6 +145,9 @@ exports.execute = function(lib, request) {
       break;
     case 'create-file':
       createFile(lib, request);
+      break;
+    case 'delete-file':
+      deleteFile(lib, request);
       break;
     default:
       util.sendError(request.id, 999, 'Invalid Action');

@@ -83,4 +83,18 @@ export default class NFS {
         }
       }, callback);
     }
+
+    deleteFile(filePath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+      this.send({
+        module: this.MODULE,
+        action: 'delete-file',
+        isAuthorised: true,
+        appDirKey: appDirKey,
+        hasSafeDriveAccess: hasSafeDriveAccess,
+        params: {
+          filePath: filePath,
+          isPathShared: isPathShared
+        }
+      }, callback);
+    }
 }
