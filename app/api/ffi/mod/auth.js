@@ -65,7 +65,7 @@ var register = function(lib, request) {
   registeredClientHandle = regClient.deref();
   var safeDriveError = setSafeDriveKey(lib);
   if (safeDriveError) {
-    return util.sendError(request.id, 999, safeDriveError.message());
+    return util.sendError(request.id, 999, safeDriveError.toString());
   }
   util.send(request.id);
 };
@@ -79,7 +79,7 @@ var login = function(lib, request) {
     res = lib.log_in(params.keyword, params.pin, params.password, regClient);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   } catch (e) {
-    return util.sendError(request.id, 999, e.message());
+    return util.sendError(request.id, 999, e.toString());
   }
   if (res !== 0) {
     return util.sendError(request.id, res);
@@ -134,7 +134,7 @@ var getAppDirectoryKey = function(lib, request) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.send(request.id, appDirKey);
   } catch (e) {
-    util.sendError(request.id, 999, e.message());
+    util.sendError(request.id, 999, e.toString());
   }
 };
 

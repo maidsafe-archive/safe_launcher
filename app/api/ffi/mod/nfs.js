@@ -16,19 +16,20 @@ var createPayload = function(action, request) {
     }
   };
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  if (request.params.isPrivate) {
+  if (request.params.hasOwnProperty('isPrivate')) {
     payload.data.is_private = request.params.isPrivate;
   }
-  if (request.params.isVersioned) {
+  if (request.params.hasOwnProperty('isVersioned')) {
     payload.data.is_versioned = request.params.isVersioned;
   }
-  if (request.params.userMetadata) {
+  if (request.params.hasOwnProperty('userMetadata')) {
     payload.data.user_metadata = request.params.userMetadata;
   }
-  if (request.params.isPathShared) {
+  if (request.params.hasOwnProperty('isPathShared')) {
     payload.data.is_path_shared = request.params.isPathShared;
   }
   /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+  return payload;
 };
 
 var createDirectory = function(lib, request) {
@@ -40,7 +41,7 @@ var createDirectory = function(lib, request) {
     }
     util.sendError(request.id, result);
   } catch (e) {
-    util.sendError(request.id, 999, e.message());
+    util.sendError(request.id, 999, e.toString());
   }
 };
 
@@ -68,7 +69,7 @@ var getDirectory = function(lib, request) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.send(request.id, response);
   } catch (e) {
-    util.sendError(request.id, 999, e.message());
+    util.sendError(request.id, 999, e.toString());
   }
 };
 
@@ -81,7 +82,7 @@ var deleteDirectory = function(lib, request) {
     }
     util.sendError(request.id, result);
   } catch (e) {
-    util.sendError(request.id, 999, e.message());
+    util.sendError(request.id, 999, e.toString());
   }
 };
 

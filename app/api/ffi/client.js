@@ -2,7 +2,7 @@ import childProcess from 'child_process';
 import * as libSodium from 'libsodium-wrappers';
 
 var workerPath = __dirname;
-workerPath += workerPath.indexOf('ffi') === -1 ? '/api/ffi/worker.js' : '/worker.js' ;
+workerPath += workerPath.indexOf('ffi') === -1 ? '/api/ffi/worker.js' : '/worker.js';
 var workerProcess = childProcess.fork(workerPath);
 var callbackPool = {};
 
