@@ -124,3 +124,18 @@ export var formatResponse = function(data) {
 
   return format(data);
 }
+
+export var ResponseHandler = function(res) {
+  let self = this;
+  self.res = res;
+
+  self.onResponse = function(err, data) {
+    if (!err) {
+      let status = data ? 200 : 202;
+      return self.res.status(status).send(formatResponse(data) || 'Accepted');
+    }
+    return self.res.status(500).send(err);
+  };
+
+  return self;
+};

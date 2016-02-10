@@ -35,37 +35,6 @@ var createPayload = function(action, request) {
   return payload;
 };
 
-var executeForContent(requestId, payload) {
-  var sizePtr = ref.alloc(int);
-  var capacityPtr = ref.alloc(int);
-  var resultPtr = ref.alloc(int);
-  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  var pointer = lib.execute_for_content(JSON.stringify(payload), sizePtr, capacityPtr, resultPtr, request.client);
-  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-  var result = resultPtr.deref();
-  if (result !== 0) {
-    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    lib.drop_null_ptr(pointer);
-    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    return util.sendError(requestId, result);
-  }
-  var size = sizePtr.deref();
-  var capacity = capacityPtr.deref();
-  var response = ref.reinterpret(pointer, size).toString();
-  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  lib.drop_vector(pointer, size, capacity);
-  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-  util.send(requestId, response);
-};
-
-var execute = function(requestId, payload) {
-  var result = lib.execute(JSON.stringify(payload), request.client);
-  if (result === 0) {
-    return util.send(requestId, true);
-  }
-  util.sendError(requestId, result);
-};
-
 var createNewValuesPayload = function(newValues) {
   var payload = {};
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
@@ -85,7 +54,7 @@ var createNewValuesPayload = function(newValues) {
 var createDirectory = function(lib, request) {
   try {
     var payload = createPayload('create-dir', request);
-    execute(request.id, payload);
+    util.execute(lib, request.client, request.id, payload);
   } catch (e) {
     util.sendError(request.id, 999, e.toString());
   }
@@ -94,7 +63,7 @@ var createDirectory = function(lib, request) {
 var getDirectory = function(lib, request) {
   try {
     var payload = createPayload('get-dir', request);
-    excuteForContent(request.id, payload);
+    util.executeForContent(lib, request.client, request.id, payload);
   } catch (e) {
     util.sendError(request.id, 999, e.toString());
   }
@@ -103,7 +72,7 @@ var getDirectory = function(lib, request) {
 var deleteDirectory = function(lib, request) {
   try {
     var payload = createPayload('delete-dir', request);
-    execute(request.id, payload);
+    util.execute(lib, request.client, request.id, payload);
   } catch (e) {
     util.sendError(request.id, 999, e.toString());
   }
@@ -115,7 +84,7 @@ var modifyDirectory = function(lib, request) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     payload.data.new_values = createNewValuesPayload(request.params.newValues);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    execute(request.id, payload);
+    util.execute(lib, request.client, request.id, payload);
   } catch (e) {
     util.sendError(request.id, 999, e.toString());
   }
@@ -124,7 +93,7 @@ var modifyDirectory = function(lib, request) {
 var createFile = function(lib, request) {
   try {
     var payload = createPayload('create-file', request);
-    execute(request.id, payload);
+    util.execute(lib, request.client, request.id, payload);
   } catch (e) {
     util.sendError(request.id, 999, e.toString());
   }
@@ -133,7 +102,7 @@ var createFile = function(lib, request) {
 var deleteFile = function(lib, request) {
   try {
     var payload = createPayload('delete-file', request);
-    execute(request.id, payload);
+    util.execute(lib, request.client, request.id, payload);
   } catch (e) {
     util.sendError(request.id, 999, e.toString());
   }
@@ -145,7 +114,7 @@ var modifyFileMeta = function(lib, request) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     payload.data.new_values = createNewValuesPayload(request.params.newValues);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    execute(request.id, payload);
+    util.execute(lib, request.client, request.id, payload);
   } catch (e) {
     util.sendError(request.id, 999, e.toString());
   }
@@ -157,7 +126,7 @@ var modifyFileContent = function(lib, request) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     payload.data.new_values = createNewValuesPayload(request.params.newValues);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    execute(request.id, payload);
+    util.execute(lib, request.client, request.id, payload);
   } catch (e) {
     util.sendError(request.id, 999, e.toString());
   }
@@ -168,8 +137,10 @@ var getFile = function(lib, request) {
     var payload = createPayload(request);
     payload.data.offset = request.params.offset;
     payload.data.length = request.params.length;
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     payload.data.include_metadata = request.params.include_metadata;
-    executeForContent(request.id, payload);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    util.executeForContent(lib, request.client, request.id, payload);
   } catch (e) {
     util.sendError(request.id, 999, e.toString());
   }
