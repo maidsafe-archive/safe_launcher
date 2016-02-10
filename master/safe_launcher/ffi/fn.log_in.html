@@ -9,6 +9,7 @@
 
     <title>safe_launcher::ffi::log_in - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
@@ -46,7 +47,7 @@
                 [<span class='inner'>&#x2212;</span>]
             </a>
         </span><a id='src-122' class='srclink' href='../../src/safe_launcher/ffi/mod.rs.html#58-73' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub extern fn log_in(c_keyword: <a href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const <a class='type' href='../../libc/unix/notbsd/linux/other/b64/x86_64/type.c_char.html' title='libc::unix::notbsd::linux::other::b64::x86_64::c_char'>c_char</a></a>, c_pin: <a href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const <a class='type' href='../../libc/unix/notbsd/linux/other/b64/x86_64/type.c_char.html' title='libc::unix::notbsd::linux::other::b64::x86_64::c_char'>c_char</a></a>, c_password: <a href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const <a class='type' href='../../libc/unix/notbsd/linux/other/b64/x86_64/type.c_char.html' title='libc::unix::notbsd::linux::other::b64::x86_64::c_char'>c_char</a></a>, launcher_handle: <a href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut <a href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const <a class='enum' href='../../libc/enum.c_void.html' title='libc::c_void'>c_void</a></a></a>) -&gt; <a class='type' href='../../libc/type.int32_t.html' title='libc::int32_t'>int32_t</a></pre><div class='docblock'><p>Log into Safenetwork with an already registered account. This or any one of the other companion
+<pre class='rust fn'>pub extern fn log_in(c_keyword: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const <a class='type' href='../../libc/unix/notbsd/linux/other/b64/x86_64/type.c_char.html' title='libc::unix::notbsd::linux::other::b64::x86_64::c_char'>c_char</a></a>, c_pin: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const <a class='type' href='../../libc/unix/notbsd/linux/other/b64/x86_64/type.c_char.html' title='libc::unix::notbsd::linux::other::b64::x86_64::c_char'>c_char</a></a>, c_password: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const <a class='type' href='../../libc/unix/notbsd/linux/other/b64/x86_64/type.c_char.html' title='libc::unix::notbsd::linux::other::b64::x86_64::c_char'>c_char</a></a>, launcher_handle: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const <a class='enum' href='../../libc/enum.c_void.html' title='libc::c_void'>c_void</a></a></a>) -&gt; <a class='type' href='../../libc/type.int32_t.html' title='libc::int32_t'>int32_t</a></pre><div class='docblock'><p>Log into Safenetwork with an already registered account. This or any one of the other companion
 functions to get a launcher must be called before initiating any operation allowed by this
 crate. <code>launcher_handle</code> is a pointer to a pointer and must point to a valid pointer not junk,
 else the consequences are undefined.</p>
@@ -109,6 +110,6 @@ else the consequences are undefined.</p>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

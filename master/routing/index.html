@@ -9,6 +9,7 @@
 
     <title>routing - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
 
     <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
@@ -82,11 +83,11 @@ bootstrap node for the client, and messages to and from the client will be route
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>mpsc</span>;
 <span class='kw'>use</span> <span class='ident'>routing</span>::{<span class='ident'>Client</span>, <span class='ident'>Event</span>, <span class='ident'>FullId</span>};
 
-<span class='kw'>let</span> (<span class='ident'>sender</span>, <span class='ident'>receiver</span>) <span class='op'>=</span> <span class='ident'>mpsc</span>::<span class='ident'>channel</span>::<span class='op'>&lt;</span><span class='ident'>Event</span><span class='op'>&gt;</span>();
+<span class='kw'>let</span> (<span class='ident'>sender</span>, <span class='ident'>_receiver</span>) <span class='op'>=</span> <span class='ident'>mpsc</span>::<span class='ident'>channel</span>::<span class='op'>&lt;</span><span class='ident'>Event</span><span class='op'>&gt;</span>();
 <span class='kw'>let</span> <span class='ident'>full_id</span> <span class='op'>=</span> <span class='ident'>FullId</span>::<span class='ident'>new</span>(); <span class='comment'>// Generate new keys.</span>
-<span class='kw'>let</span> <span class='ident'>client</span> <span class='op'>=</span> <span class='ident'>Client</span>::<span class='ident'>new</span>(<span class='ident'>sender</span>, <span class='prelude-val'>Some</span>(<span class='ident'>full_id</span>.<span class='ident'>clone</span>())).<span class='ident'>unwrap</span>();
+<span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>Client</span>::<span class='ident'>new</span>(<span class='ident'>sender</span>, <span class='prelude-val'>Some</span>(<span class='ident'>full_id</span>.<span class='ident'>clone</span>())).<span class='ident'>unwrap</span>();
 
-<span class='kw'>let</span> <span class='ident'>client_name</span> <span class='op'>=</span> <span class='ident'>full_id</span>.<span class='ident'>public_id</span>().<span class='ident'>name</span>();</pre>
+<span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>full_id</span>.<span class='ident'>public_id</span>().<span class='ident'>name</span>();</pre>
 
 <p>Messages can be sent using the methods of <code>client</code>, and received as <code>Event</code>s from the
 <code>receiver</code>.</p>
@@ -97,8 +98,8 @@ bootstrap node for the client, and messages to and from the client will be route
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>mpsc</span>;
 <span class='kw'>use</span> <span class='ident'>routing</span>::{<span class='ident'>Node</span>, <span class='ident'>Event</span>};
 
-<span class='kw'>let</span> (<span class='ident'>sender</span>, <span class='ident'>receiver</span>) <span class='op'>=</span> <span class='ident'>mpsc</span>::<span class='ident'>channel</span>::<span class='op'>&lt;</span><span class='ident'>Event</span><span class='op'>&gt;</span>();
-<span class='kw'>let</span> <span class='ident'>node</span> <span class='op'>=</span> <span class='ident'>Node</span>::<span class='ident'>new</span>(<span class='ident'>sender</span>).<span class='ident'>unwrap</span>();</pre>
+<span class='kw'>let</span> (<span class='ident'>sender</span>, <span class='ident'>_receiver</span>) <span class='op'>=</span> <span class='ident'>mpsc</span>::<span class='ident'>channel</span>::<span class='op'>&lt;</span><span class='ident'>Event</span><span class='op'>&gt;</span>();
+<span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>Node</span>::<span class='ident'>new</span>(<span class='ident'>sender</span>).<span class='ident'>unwrap</span>();</pre>
 
 <p>Upon creation, the node will first connect to the network as a client. Once it has client
 status, it requests a new name from the network, and then integrates itself in the network with
@@ -416,6 +417,6 @@ routing node.</p>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     
-    <script async src="../search-index.js"></script>
+    <script defer src="../search-index.js"></script>
 </body>
 </html>

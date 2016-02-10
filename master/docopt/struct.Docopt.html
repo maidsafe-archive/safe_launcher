@@ -9,6 +9,7 @@
 
     <title>docopt::Docopt - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
 
     
@@ -45,13 +46,13 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-85' class='srclink' href='../src/docopt/dopt.rs.html#159-165' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-92' class='srclink' href='../src/docopt/dopt.rs.html#159-165' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Docopt {
     // some fields omitted
 }</pre><div class='docblock'><p>The main Docopt type, which is constructed with a Docopt usage string.</p>
 
 <p>This can be used to match command line arguments to produce a <code>ArgvMap</code>.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../docopt/struct.Docopt.html' title='docopt::Docopt'>Docopt</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>&lt;S&gt;(usage: S) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../docopt/struct.Docopt.html' title='docopt::Docopt'>Docopt</a>, <a class='enum' href='../docopt/enum.Error.html' title='docopt::Error'>Error</a>&gt; <span class='where'>where S: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html' title='core::ops::Deref'>Deref</a>&lt;Target=<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;</span></code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../docopt/struct.Docopt.html' title='docopt::Docopt'>Docopt</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>&lt;S&gt;(usage: S) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../docopt/struct.Docopt.html' title='docopt::Docopt'>Docopt</a>, <a class='enum' href='../docopt/enum.Error.html' title='docopt::Error'>Error</a>&gt; <span class='where'>where S: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html' title='core::ops::Deref'>Deref</a>&lt;Target=<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;</span></code></h4>
 <div class='docblock'><p>Parse the Docopt usage string given.</p>
 
 <p>The <code>Docopt</code> value returned may be used immediately to parse command
@@ -82,7 +83,7 @@ error is returned. Both of these errors are always returned inside a
 <p>If special handling of <code>help</code> or <code>version</code> is enabled (the former is
 enabled by default), then <code>Help</code> or <code>Version</code> errors are returned
 if <code>--help</code> or <code>--version</code> is present.</p>
-</div><h4 id='method.argv' class='method'><code>fn <a href='#method.argv' class='fnname'>argv</a>&lt;I, S&gt;(self, argv: I) -&gt; <a class='struct' href='../docopt/struct.Docopt.html' title='docopt::Docopt'>Docopt</a> <span class='where'>where I: <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html' title='core::iter::IntoIterator'>IntoIterator</a>&lt;Item=S&gt;, S: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;</span></code></h4>
+</div><h4 id='method.argv' class='method'><code>fn <a href='#method.argv' class='fnname'>argv</a>&lt;I, S&gt;(self, argv: I) -&gt; <a class='struct' href='../docopt/struct.Docopt.html' title='docopt::Docopt'>Docopt</a> <span class='where'>where I: <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html' title='core::iter::IntoIterator'>IntoIterator</a>&lt;Item=S&gt;, S: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;</span></code></h4>
 <div class='docblock'><p>Set the argv to be used for Docopt parsing.</p>
 
 <p>By default, when no argv is set, and it is automatically taken from
@@ -91,14 +92,14 @@ if <code>--help</code> or <code>--version</code> is present.</p>
 <p>The <code>argv</code> given <em>must</em> be the full set of <code>argv</code> passed to the
 program. e.g., <code>[&quot;cp&quot;, &quot;src&quot;, &quot;dest&quot;]</code> is right while <code>[&quot;src&quot;, &quot;dest&quot;]</code>
 is wrong.</p>
-</div><h4 id='method.options_first' class='method'><code>fn <a href='#method.options_first' class='fnname'>options_first</a>(self, yes: <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='struct' href='../docopt/struct.Docopt.html' title='docopt::Docopt'>Docopt</a></code></h4>
+</div><h4 id='method.options_first' class='method'><code>fn <a href='#method.options_first' class='fnname'>options_first</a>(self, yes: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='struct' href='../docopt/struct.Docopt.html' title='docopt::Docopt'>Docopt</a></code></h4>
 <div class='docblock'><p>Enables the &quot;options first&quot; Docopt behavior.</p>
 
 <p>The options first behavior means that all flags <em>must</em> appear before
 position arguments. That is, after the first position argument is
 seen, all proceeding arguments are interpreted as positional
 arguments unconditionally.</p>
-</div><h4 id='method.help' class='method'><code>fn <a href='#method.help' class='fnname'>help</a>(self, yes: <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='struct' href='../docopt/struct.Docopt.html' title='docopt::Docopt'>Docopt</a></code></h4>
+</div><h4 id='method.help' class='method'><code>fn <a href='#method.help' class='fnname'>help</a>(self, yes: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='struct' href='../docopt/struct.Docopt.html' title='docopt::Docopt'>Docopt</a></code></h4>
 <div class='docblock'><p>Enables automatic handling of <code>--help</code>.</p>
 
 <p>When this is enabled and <code>--help</code> appears anywhere in the arguments,
@@ -181,6 +182,6 @@ convenient quit the program (which will print the version to stdout).</p>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     
-    <script async src="../search-index.js"></script>
+    <script defer src="../search-index.js"></script>
 </body>
 </html>

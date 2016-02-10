@@ -9,6 +9,7 @@
 
     <title>safe_core::client::response_getter::ResponseGetter - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
@@ -45,12 +46,12 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-489' class='srclink' href='../../../src/safe_core/client/response_getter.rs.html#26-32' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-492' class='srclink' href='../../../src/safe_core/client/response_getter.rs.html#26-32' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct ResponseGetter {
     // some fields omitted
 }</pre><div class='docblock'><p>ResponseGetter is a lazy evaluated response getter. It will fetch either from local cache or
 wait for the MessageQueue to notify it of the incoming response from the network.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../safe_core/client/response_getter/struct.ResponseGetter.html' title='safe_core::client::response_getter::ResponseGetter'>ResponseGetter</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(data_channel: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mpsc/struct.Sender.html' title='std::sync::mpsc::Sender'>Sender</a>&lt;<a class='enum' href='../../../safe_core/translated_events/enum.DataReceivedEvent.html' title='safe_core::translated_events::DataReceivedEvent'>DataReceivedEvent</a>&gt;, <a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mpsc/struct.Receiver.html' title='std::sync::mpsc::Receiver'>Receiver</a>&lt;<a class='enum' href='../../../safe_core/translated_events/enum.DataReceivedEvent.html' title='safe_core::translated_events::DataReceivedEvent'>DataReceivedEvent</a>&gt;)</a>&gt;, message_queue: <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/arc/struct.Arc.html' title='alloc::arc::Arc'>Arc</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mutex/struct.Mutex.html' title='std::sync::mutex::Mutex'>Mutex</a>&lt;MessageQueue&gt;&gt;, requested_type: <a class='enum' href='../../../routing/data/enum.DataRequest.html' title='routing::data::DataRequest'>DataRequest</a>) -&gt; <a class='struct' href='../../../safe_core/client/response_getter/struct.ResponseGetter.html' title='safe_core::client::response_getter::ResponseGetter'>ResponseGetter</a></code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../safe_core/client/response_getter/struct.ResponseGetter.html' title='safe_core::client::response_getter::ResponseGetter'>ResponseGetter</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(data_channel: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mpsc/struct.Sender.html' title='std::sync::mpsc::Sender'>Sender</a>&lt;<a class='enum' href='../../../safe_core/translated_events/enum.DataReceivedEvent.html' title='safe_core::translated_events::DataReceivedEvent'>DataReceivedEvent</a>&gt;, <a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mpsc/struct.Receiver.html' title='std::sync::mpsc::Receiver'>Receiver</a>&lt;<a class='enum' href='../../../safe_core/translated_events/enum.DataReceivedEvent.html' title='safe_core::translated_events::DataReceivedEvent'>DataReceivedEvent</a>&gt;)</a>&gt;, message_queue: <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/arc/struct.Arc.html' title='alloc::arc::Arc'>Arc</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mutex/struct.Mutex.html' title='std::sync::mutex::Mutex'>Mutex</a>&lt;MessageQueue&gt;&gt;, requested_type: <a class='enum' href='../../../routing/data/enum.DataRequest.html' title='routing::data::DataRequest'>DataRequest</a>) -&gt; <a class='struct' href='../../../safe_core/client/response_getter/struct.ResponseGetter.html' title='safe_core::client::response_getter::ResponseGetter'>ResponseGetter</a></code></h4>
 <div class='docblock'><p>Create a new instance of ResponseGetter</p>
 </div><h4 id='method.get' class='method'><code>fn <a href='#method.get' class='fnname'>get</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='enum' href='../../../routing/data/enum.Data.html' title='routing::data::Data'>Data</a>, <a class='enum' href='../../../safe_core/errors/enum.CoreError.html' title='safe_core::errors::CoreError'>CoreError</a>&gt;</code></h4>
 <div class='docblock'><p>Get either from local cache or (if not available there) get it when it comes from the
@@ -119,6 +120,6 @@ gracefully exit the receiver.</p>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>

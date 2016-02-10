@@ -9,6 +9,7 @@
 
     <title>safe_launcher::ffi::drop_launcher - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
@@ -46,7 +47,7 @@
                 [<span class='inner'>&#x2212;</span>]
             </a>
         </span><a id='src-164' class='srclink' href='../../src/safe_launcher/ffi/mod.rs.html#80-82' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub extern fn drop_launcher(launcher_handle: <a href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const <a class='enum' href='../../libc/enum.c_void.html' title='libc::c_void'>c_void</a></a>)</pre><div class='docblock'><p>Discard and clean up the previously allocated launcher. Use this only if the launcher is
+<pre class='rust fn'>pub extern fn drop_launcher(launcher_handle: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const <a class='enum' href='../../libc/enum.c_void.html' title='libc::c_void'>c_void</a></a>)</pre><div class='docblock'><p>Discard and clean up the previously allocated launcher. Use this only if the launcher is
 obtained from one of the client obtainment functions in this crate (<code>create_account</code>,
  <code>log_in</code>). Using <code>launcher_handle</code> after a call to this functions is undefined behaviour.</p>
 </div></section>
@@ -108,6 +109,6 @@ obtained from one of the client obtainment functions in this crate (<code>create
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

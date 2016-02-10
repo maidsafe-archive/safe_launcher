@@ -9,6 +9,7 @@
 
     <title>safe_nfs::helper::file_helper::FileHelper - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
@@ -51,7 +52,7 @@
 }</pre><div class='docblock'><p>File provides helper functions to perform Operations on Files</p>
 </div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../safe_nfs/helper/file_helper/struct.FileHelper.html' title='safe_nfs::helper::file_helper::FileHelper'>FileHelper</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(client: <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/arc/struct.Arc.html' title='alloc::arc::Arc'>Arc</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mutex/struct.Mutex.html' title='std::sync::mutex::Mutex'>Mutex</a>&lt;<a class='struct' href='../../../safe_core/client/struct.Client.html' title='safe_core::client::Client'>Client</a>&gt;&gt;) -&gt; <a class='struct' href='../../../safe_nfs/helper/file_helper/struct.FileHelper.html' title='safe_nfs::helper::file_helper::FileHelper'>FileHelper</a></code></h4>
 <div class='docblock'><p>Create a new FileHelper instance</p>
-</div><h4 id='method.create' class='method'><code>fn <a href='#method.create' class='fnname'>create</a>(&amp;self, name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, user_metatdata: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;, parent_directory: <a class='struct' href='../../../safe_nfs/directory_listing/struct.DirectoryListing.html' title='safe_nfs::directory_listing::DirectoryListing'>DirectoryListing</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../../safe_nfs/helper/writer/struct.Writer.html' title='safe_nfs::helper::writer::Writer'>Writer</a>, <a class='enum' href='../../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
+</div><h4 id='method.create' class='method'><code>fn <a href='#method.create' class='fnname'>create</a>(&amp;self, name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, user_metatdata: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;, parent_directory: <a class='struct' href='../../../safe_nfs/directory_listing/struct.DirectoryListing.html' title='safe_nfs::directory_listing::DirectoryListing'>DirectoryListing</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../../safe_nfs/helper/writer/struct.Writer.html' title='safe_nfs::helper::writer::Writer'>Writer</a>, <a class='enum' href='../../../safe_nfs/errors/enum.NfsError.html' title='safe_nfs::errors::NfsError'>NfsError</a>&gt;</code></h4>
 <div class='docblock'><p>Helper function to create a file in a directory listing
 A writer object is returned, through which the data for the file can be written to the network
 The file is actually saved in the directory listing only after <code>writer.close()</code> is invoked</p>
@@ -128,6 +129,6 @@ The file is actually saved in the directory listing only after <code>writer.clos
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>

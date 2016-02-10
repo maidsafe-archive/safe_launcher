@@ -4,11 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-0a35038f75765ae4/accumulator-0.1.3/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-88ac128001ac3a9a/accumulator-0.1.4/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
@@ -373,6 +374,16 @@
 <span id="331">331</span>
 <span id="332">332</span>
 <span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright 2015 MaidSafe.net limited.</span>
 <span class='comment'>//</span>
@@ -409,24 +420,36 @@
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>forbid</span>(<span class='ident'>bad_style</span>, <span class='ident'>exceeding_bitshifts</span>, <span class='ident'>mutable_transmutes</span>, <span class='ident'>no_mangle_const_items</span>,
           <span class='ident'>unknown_crate_types</span>, <span class='ident'>warnings</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>deprecated</span>, <span class='ident'>drop_with_repr_extern</span>, <span class='ident'>improper_ctypes</span>, <span class='ident'>missing_docs</span>,
-        <span class='ident'>non_shorthand_field_patterns</span>, <span class='ident'>overflowing_literals</span>, <span class='ident'>plugin_as_library</span>,
-        <span class='ident'>private_no_mangle_fns</span>, <span class='ident'>private_no_mangle_statics</span>, <span class='ident'>raw_pointer_derive</span>, <span class='ident'>stable_features</span>,
-        <span class='ident'>unconditional_recursion</span>, <span class='ident'>unknown_lints</span>, <span class='ident'>unsafe_code</span>, <span class='ident'>unused</span>, <span class='ident'>unused_allocation</span>,
-        <span class='ident'>unused_attributes</span>, <span class='ident'>unused_comparisons</span>, <span class='ident'>unused_features</span>, <span class='ident'>unused_parens</span>, <span class='ident'>while_true</span>)]</span>
+      <span class='ident'>non_shorthand_field_patterns</span>, <span class='ident'>overflowing_literals</span>, <span class='ident'>plugin_as_library</span>,
+      <span class='ident'>private_no_mangle_fns</span>, <span class='ident'>private_no_mangle_statics</span>, <span class='ident'>stable_features</span>, <span class='ident'>unconditional_recursion</span>,
+      <span class='ident'>unknown_lints</span>, <span class='ident'>unsafe_code</span>, <span class='ident'>unused</span>, <span class='ident'>unused_allocation</span>, <span class='ident'>unused_attributes</span>,
+      <span class='ident'>unused_comparisons</span>, <span class='ident'>unused_features</span>, <span class='ident'>unused_parens</span>, <span class='ident'>while_true</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>warn</span>(<span class='ident'>trivial_casts</span>, <span class='ident'>trivial_numeric_casts</span>, <span class='ident'>unused_extern_crates</span>, <span class='ident'>unused_import_braces</span>,
         <span class='ident'>unused_qualifications</span>, <span class='ident'>unused_results</span>, <span class='ident'>variant_size_differences</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>box_pointers</span>, <span class='ident'>fat_ptr_transmutes</span>, <span class='ident'>missing_copy_implementations</span>,
          <span class='ident'>missing_debug_implementations</span>)]</span>
 
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;clippy&quot;</span>, <span class='ident'>feature</span>(<span class='ident'>plugin</span>))]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;clippy&quot;</span>, <span class='ident'>plugin</span>(<span class='ident'>clippy</span>))]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;clippy&quot;</span>, <span class='ident'>deny</span>(<span class='ident'>clippy</span>))]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;clippy&quot;</span>, <span class='ident'>deny</span>(<span class='ident'>clippy_pedantic</span>))]</span>
+
 <span class='comment'>// Non-MaidSafe crates</span>
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>log</span>;
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
+<span class='attribute'>#[<span class='ident'>macro_use</span>]</span>
+<span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>unused_extern_crates</span>)]</span>  <span class='comment'>// Only using macros from maidsafe_utilites</span>
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>maidsafe_utilities</span>;
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rand</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>time</span>;
 
 <span class='comment'>// MaidSafe crates</span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>lru_time_cache</span>;
+
+<span class='kw'>use</span> <span class='ident'>lru_time_cache</span>::<span class='ident'>LruCache</span>;
+<span class='kw'>use</span> <span class='ident'>time</span>::<span class='ident'>Duration</span>;
 
 <span class='doccomment'>/// Implementation of [Accumulator](index.html#accumulator).</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Accumulator</span><span class='op'>&lt;</span><span class='ident'>Key</span>, <span class='ident'>Value</span><span class='op'>&gt;</span>
@@ -435,9 +458,10 @@
 {
     <span class='comment'>// Expected threshold for resolve</span>
     <span class='ident'>quorum</span>: <span class='ident'>usize</span>,
-    <span class='ident'>lru_cache</span>: ::<span class='ident'>lru_time_cache</span>::<span class='ident'>LruCache</span><span class='op'>&lt;</span><span class='ident'>Key</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;&gt;</span>,
+    <span class='ident'>lru_cache</span>: <span class='ident'>LruCache</span><span class='op'>&lt;</span><span class='ident'>Key</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;&gt;</span>,
 }
 
+<span class='attribute'>#[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;clippy&quot;</span>, <span class='ident'>allow</span>(<span class='ident'>wrong_self_convention</span>))]</span>
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>Key</span>: <span class='ident'>PartialOrd</span> <span class='op'>+</span> <span class='ident'>Ord</span> <span class='op'>+</span> <span class='ident'>Clone</span>, <span class='ident'>Value</span>: <span class='ident'>Clone</span><span class='op'>&gt;</span> <span class='ident'>Accumulator</span><span class='op'>&lt;</span><span class='ident'>Key</span>, <span class='ident'>Value</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Constructor for capacity based `Accumulator`.</span>
     <span class='doccomment'>///</span>
@@ -445,18 +469,17 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_capacity</span>(<span class='ident'>quorum</span>: <span class='ident'>usize</span>, <span class='ident'>capacity</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Accumulator</span><span class='op'>&lt;</span><span class='ident'>Key</span>, <span class='ident'>Value</span><span class='op'>&gt;</span> {
         <span class='ident'>Accumulator</span> {
             <span class='ident'>quorum</span>: <span class='ident'>quorum</span>,
-            <span class='ident'>lru_cache</span>: ::<span class='ident'>lru_time_cache</span>::<span class='ident'>LruCache</span>::<span class='op'>&lt;</span><span class='ident'>Key</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;&gt;</span>::<span class='ident'>with_capacity</span>(<span class='ident'>capacity</span>),
+            <span class='ident'>lru_cache</span>: <span class='ident'>LruCache</span>::<span class='op'>&lt;</span><span class='ident'>Key</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;&gt;</span>::<span class='ident'>with_capacity</span>(<span class='ident'>capacity</span>),
         }
     }
 
     <span class='doccomment'>/// Constructor for time based `Accumulator`.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// `quorum` defines the count at and above which [`add()`](#method.add) will return `Some()`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_duration</span>(<span class='ident'>quorum</span>: <span class='ident'>usize</span>, <span class='ident'>duration</span>: ::<span class='ident'>time</span>::<span class='ident'>Duration</span>) <span class='op'>-&gt;</span> <span class='ident'>Accumulator</span><span class='op'>&lt;</span><span class='ident'>Key</span>, <span class='ident'>Value</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_duration</span>(<span class='ident'>quorum</span>: <span class='ident'>usize</span>, <span class='ident'>duration</span>: <span class='ident'>Duration</span>) <span class='op'>-&gt;</span> <span class='ident'>Accumulator</span><span class='op'>&lt;</span><span class='ident'>Key</span>, <span class='ident'>Value</span><span class='op'>&gt;</span> {
         <span class='ident'>Accumulator</span> {
             <span class='ident'>quorum</span>: <span class='ident'>quorum</span>,
-            <span class='ident'>lru_cache</span>:
-                ::<span class='ident'>lru_time_cache</span>::<span class='ident'>LruCache</span>::<span class='op'>&lt;</span><span class='ident'>Key</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;&gt;</span>::<span class='ident'>with_expiry_duration</span>(<span class='ident'>duration</span>),
+            <span class='ident'>lru_cache</span>: <span class='ident'>LruCache</span>::<span class='op'>&lt;</span><span class='ident'>Key</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;&gt;</span>::<span class='ident'>with_expiry_duration</span>(<span class='ident'>duration</span>),
         }
     }
 
@@ -527,9 +550,12 @@
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>test</span> {
+    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='op'>*</span>;
+    <span class='kw'>use</span> <span class='ident'>rand</span>::<span class='ident'>random</span>;
+
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>add</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>accumulator</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>Accumulator</span>::<span class='ident'>with_capacity</span>(<span class='number'>1</span>, <span class='number'>100</span>);
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>accumulator</span> <span class='op'>=</span> <span class='ident'>Accumulator</span>::<span class='ident'>with_capacity</span>(<span class='number'>1</span>, <span class='number'>100</span>);
 
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='number'>2</span>, <span class='number'>3</span>).<span class='ident'>is_some</span>());
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>contains_key</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>), <span class='boolval'>false</span>);
@@ -543,12 +569,12 @@
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>contains_key</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>), <span class='boolval'>true</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>is_quorum_reached</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>), <span class='boolval'>true</span>);
 
-        <span class='kw'>let</span> <span class='ident'>responses</span> <span class='op'>=</span> <span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>responses</span> <span class='op'>=</span> <span class='macro'>unwrap_option</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>), <span class='string'>&quot;&quot;</span>);
 
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>responses</span>.<span class='ident'>len</span>(), <span class='number'>2</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>responses</span>[<span class='number'>0</span>], <span class='number'>3</span>);
 
-        <span class='kw'>let</span> <span class='ident'>responses</span> <span class='op'>=</span> <span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='number'>2</span>).<span class='ident'>unwrap</span>();
+        <span class='ident'>responses</span> <span class='op'>=</span> <span class='macro'>unwrap_option</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='number'>2</span>), <span class='string'>&quot;&quot;</span>);
 
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>responses</span>.<span class='ident'>len</span>(), <span class='number'>1</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>responses</span>[<span class='number'>0</span>], <span class='number'>3</span>);
@@ -557,77 +583,75 @@
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>add_single_value_quorum</span>() {
         <span class='kw'>let</span> <span class='ident'>quorum_size</span> <span class='op'>=</span> <span class='number'>19</span>;
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>accumulator</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>Accumulator</span>::<span class='ident'>with_capacity</span>(<span class='ident'>quorum_size</span>, <span class='number'>100</span>);
-        <span class='kw'>let</span> <span class='ident'>key</span> <span class='op'>=</span> ::<span class='ident'>rand</span>::<span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>();
-        <span class='kw'>let</span> <span class='ident'>value</span> <span class='op'>=</span> ::<span class='ident'>rand</span>::<span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>u32</span><span class='op'>&gt;</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>accumulator</span> <span class='op'>=</span> <span class='ident'>Accumulator</span>::<span class='ident'>with_capacity</span>(<span class='ident'>quorum_size</span>, <span class='number'>100</span>);
+        <span class='kw'>let</span> <span class='ident'>key</span> <span class='op'>=</span> <span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>();
+        <span class='kw'>let</span> <span class='ident'>value</span> <span class='op'>=</span> <span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>u32</span><span class='op'>&gt;</span>();
         <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>quorum_size</span> <span class='op'>-</span> <span class='number'>1</span> {
             <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='ident'>key</span>, <span class='ident'>value</span>).<span class='ident'>is_none</span>());
-            <span class='kw'>let</span> <span class='ident'>value</span> <span class='op'>=</span> <span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>key</span>).<span class='ident'>unwrap</span>();
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>value</span>.<span class='ident'>len</span>(), <span class='ident'>i</span> <span class='op'>+</span> <span class='number'>1</span>);
+            <span class='kw'>let</span> <span class='ident'>retrieved_value</span> <span class='op'>=</span> <span class='macro'>unwrap_option</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>key</span>), <span class='string'>&quot;&quot;</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>retrieved_value</span>.<span class='ident'>len</span>(), <span class='ident'>i</span> <span class='op'>+</span> <span class='number'>1</span>);
             <span class='comment'>// for response in value { assert_eq!(response, value); };</span>
             <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>is_quorum_reached</span>(<span class='kw-2'>&amp;</span><span class='ident'>key</span>), <span class='boolval'>false</span>);
         }
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='ident'>key</span>, <span class='ident'>value</span>).<span class='ident'>is_some</span>());
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>is_quorum_reached</span>(<span class='kw-2'>&amp;</span><span class='ident'>key</span>), <span class='boolval'>true</span>);
-        <span class='kw'>let</span> <span class='ident'>value</span> <span class='op'>=</span> <span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>key</span>).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>value</span>.<span class='ident'>len</span>(), <span class='ident'>quorum_size</span>);
+        <span class='kw'>let</span> <span class='ident'>retrieved_value</span> <span class='op'>=</span> <span class='macro'>unwrap_option</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>key</span>), <span class='string'>&quot;&quot;</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>retrieved_value</span>.<span class='ident'>len</span>(), <span class='ident'>quorum_size</span>);
         <span class='comment'>// for response in value { assert_eq!(response, value); };</span>
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>add_multiple_values_quorum</span>() {
         <span class='kw'>let</span> <span class='ident'>quorum_size</span> <span class='op'>=</span> <span class='number'>19</span>;
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>accumulator</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>Accumulator</span>::<span class='ident'>with_capacity</span>(<span class='ident'>quorum_size</span>, <span class='number'>100</span>);
-        <span class='kw'>let</span> <span class='ident'>key</span> <span class='op'>=</span> ::<span class='ident'>rand</span>::<span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>accumulator</span> <span class='op'>=</span> <span class='ident'>Accumulator</span>::<span class='ident'>with_capacity</span>(<span class='ident'>quorum_size</span>, <span class='number'>100</span>);
+        <span class='kw'>let</span> <span class='ident'>key</span> <span class='op'>=</span> <span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>();
         <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>quorum_size</span> <span class='op'>-</span> <span class='number'>1</span> {
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='ident'>key</span>, ::<span class='ident'>rand</span>::<span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>u32</span><span class='op'>&gt;</span>()).<span class='ident'>is_none</span>());
+            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='ident'>key</span>, <span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>u32</span><span class='op'>&gt;</span>()).<span class='ident'>is_none</span>());
             <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>is_quorum_reached</span>(<span class='kw-2'>&amp;</span><span class='ident'>key</span>), <span class='boolval'>false</span>);
         }
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='ident'>key</span>, ::<span class='ident'>rand</span>::<span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>u32</span><span class='op'>&gt;</span>()).<span class='ident'>is_some</span>());
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='ident'>key</span>, <span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>u32</span><span class='op'>&gt;</span>()).<span class='ident'>is_some</span>());
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>is_quorum_reached</span>(<span class='kw-2'>&amp;</span><span class='ident'>key</span>), <span class='boolval'>true</span>);
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>add_multiple_keys_quorum</span>() {
         <span class='kw'>let</span> <span class='ident'>quorum_size</span> <span class='op'>=</span> <span class='number'>19</span>;
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>accumulator</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>Accumulator</span>::<span class='ident'>with_capacity</span>(<span class='ident'>quorum_size</span>, <span class='number'>100</span>);
-        <span class='kw'>let</span> <span class='ident'>key</span> <span class='op'>=</span> ::<span class='ident'>rand</span>::<span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>accumulator</span> <span class='op'>=</span> <span class='ident'>Accumulator</span>::<span class='ident'>with_capacity</span>(<span class='ident'>quorum_size</span>, <span class='number'>100</span>);
+        <span class='kw'>let</span> <span class='ident'>key</span> <span class='op'>=</span> <span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>noise_keys</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='number'>5</span>);
         <span class='kw'>while</span> <span class='ident'>noise_keys</span>.<span class='ident'>len</span>() <span class='op'>&lt;</span> <span class='number'>5</span> {
-            <span class='kw'>let</span> <span class='ident'>noise_key</span> <span class='op'>=</span> ::<span class='ident'>rand</span>::<span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>();
+            <span class='kw'>let</span> <span class='ident'>noise_key</span> <span class='op'>=</span> <span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>();
             <span class='kw'>if</span> <span class='ident'>noise_key</span> <span class='op'>!=</span> <span class='ident'>key</span> {
                 <span class='ident'>noise_keys</span>.<span class='ident'>push</span>(<span class='ident'>noise_key</span>);
             };
-        };
+        }
         <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>quorum_size</span> <span class='op'>-</span> <span class='number'>1</span> {
-            <span class='kw'>for</span> <span class='ident'>noise_key</span> <span class='kw'>in</span> <span class='ident'>noise_keys</span>.<span class='ident'>iter</span>() {
-                <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='ident'>noise_key</span>.<span class='ident'>clone</span>(), ::<span class='ident'>rand</span>::<span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>u32</span><span class='op'>&gt;</span>());
+            <span class='kw'>for</span> <span class='ident'>noise_key</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='ident'>noise_keys</span> {
+                <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='ident'>noise_key</span>.<span class='ident'>clone</span>(), <span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>u32</span><span class='op'>&gt;</span>());
             }
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='ident'>key</span>.<span class='ident'>clone</span>(), ::<span class='ident'>rand</span>::<span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>u32</span><span class='op'>&gt;</span>()).<span class='ident'>is_none</span>());
+            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='ident'>key</span>.<span class='ident'>clone</span>(), <span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>u32</span><span class='op'>&gt;</span>()).<span class='ident'>is_none</span>());
             <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>is_quorum_reached</span>(<span class='kw-2'>&amp;</span><span class='ident'>key</span>), <span class='boolval'>false</span>);
         }
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='ident'>key</span>.<span class='ident'>clone</span>(), ::<span class='ident'>rand</span>::<span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>u32</span><span class='op'>&gt;</span>()).<span class='ident'>is_some</span>());
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='ident'>key</span>.<span class='ident'>clone</span>(), <span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>u32</span><span class='op'>&gt;</span>()).<span class='ident'>is_some</span>());
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>is_quorum_reached</span>(<span class='kw-2'>&amp;</span><span class='ident'>key</span>), <span class='boolval'>true</span>);
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>delete</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>accumulator</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>Accumulator</span>::<span class='ident'>with_capacity</span>(<span class='number'>2</span>, <span class='number'>100</span>);
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>accumulator</span> <span class='op'>=</span> <span class='ident'>Accumulator</span>::<span class='ident'>with_capacity</span>(<span class='number'>2</span>, <span class='number'>100</span>);
 
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='number'>1</span>, <span class='number'>1</span>).<span class='ident'>is_none</span>());
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>contains_key</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>), <span class='boolval'>true</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>is_quorum_reached</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>), <span class='boolval'>false</span>);
 
-        <span class='kw'>let</span> <span class='ident'>responses</span> <span class='op'>=</span> <span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>responses</span> <span class='op'>=</span> <span class='macro'>unwrap_option</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>), <span class='string'>&quot;&quot;</span>);
 
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>responses</span>.<span class='ident'>len</span>(), <span class='number'>1</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>responses</span>[<span class='number'>0</span>], <span class='number'>1</span>);
 
         <span class='ident'>accumulator</span>.<span class='ident'>delete</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>);
 
-        <span class='kw'>let</span> <span class='ident'>option</span> <span class='op'>=</span> <span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>);
-
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>option</span>.<span class='ident'>is_none</span>());
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>).<span class='ident'>is_none</span>());
 
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='number'>1</span>, <span class='number'>1</span>).<span class='ident'>is_none</span>());
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>contains_key</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>), <span class='boolval'>true</span>);
@@ -636,7 +660,7 @@
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>contains_key</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>), <span class='boolval'>true</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>is_quorum_reached</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>), <span class='boolval'>true</span>);
 
-        <span class='kw'>let</span> <span class='ident'>responses</span> <span class='op'>=</span> <span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>).<span class='ident'>unwrap</span>();
+        <span class='ident'>responses</span> <span class='op'>=</span> <span class='macro'>unwrap_option</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>), <span class='string'>&quot;&quot;</span>);
 
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>responses</span>.<span class='ident'>len</span>(), <span class='number'>2</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>responses</span>[<span class='number'>0</span>], <span class='number'>1</span>);
@@ -644,14 +668,12 @@
 
         <span class='ident'>accumulator</span>.<span class='ident'>delete</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>);
 
-        <span class='kw'>let</span> <span class='ident'>option</span> <span class='op'>=</span> <span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>);
-
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>option</span>.<span class='ident'>is_none</span>());
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>).<span class='ident'>is_none</span>());
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>fill</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>accumulator</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>Accumulator</span>::<span class='ident'>with_capacity</span>(<span class='number'>1</span>, <span class='number'>1000</span>);
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>accumulator</span> <span class='op'>=</span> <span class='ident'>Accumulator</span>::<span class='ident'>with_capacity</span>(<span class='number'>1</span>, <span class='number'>1000</span>);
 
         <span class='kw'>for</span> <span class='ident'>count</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='number'>1000</span> {
             <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='ident'>count</span>, <span class='number'>1</span>).<span class='ident'>is_some</span>());
@@ -660,7 +682,7 @@
         }
 
         <span class='kw'>for</span> <span class='ident'>count</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='number'>1000</span> {
-            <span class='kw'>let</span> <span class='ident'>responses</span> <span class='op'>=</span> <span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>count</span>).<span class='ident'>unwrap</span>();
+            <span class='kw'>let</span> <span class='ident'>responses</span> <span class='op'>=</span> <span class='macro'>unwrap_option</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>count</span>), <span class='string'>&quot;&quot;</span>);
             <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>responses</span>.<span class='ident'>len</span>(), <span class='number'>1</span>);
             <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>responses</span>[<span class='number'>0</span>], <span class='number'>1</span>);
         }
@@ -668,14 +690,14 @@
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>cache_removals</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>accumulator</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>Accumulator</span>::<span class='ident'>with_capacity</span>(<span class='number'>2</span>, <span class='number'>1000</span>);
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>accumulator</span> <span class='op'>=</span> <span class='ident'>Accumulator</span>::<span class='ident'>with_capacity</span>(<span class='number'>2</span>, <span class='number'>1000</span>);
 
         <span class='kw'>for</span> <span class='ident'>count</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='number'>1000</span> {
             <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>add</span>(<span class='ident'>count</span>, <span class='number'>1</span>).<span class='ident'>is_none</span>());
             <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>contains_key</span>(<span class='kw-2'>&amp;</span><span class='ident'>count</span>), <span class='boolval'>true</span>);
             <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>is_quorum_reached</span>(<span class='kw-2'>&amp;</span><span class='ident'>count</span>), <span class='boolval'>false</span>);
 
-            <span class='kw'>let</span> <span class='ident'>responses</span> <span class='op'>=</span> <span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>count</span>).<span class='ident'>unwrap</span>();
+            <span class='kw'>let</span> <span class='ident'>responses</span> <span class='op'>=</span> <span class='macro'>unwrap_option</span><span class='macro'>!</span>(<span class='ident'>accumulator</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>count</span>), <span class='string'>&quot;&quot;</span>);
 
             <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>responses</span>.<span class='ident'>len</span>(), <span class='number'>1</span>);
             <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>responses</span>[<span class='number'>0</span>], <span class='number'>1</span>);
@@ -700,9 +722,8 @@
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>set_quorum_size</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>accumulator</span>: <span class='ident'>super</span>::<span class='ident'>Accumulator</span><span class='op'>&lt;</span><span class='ident'>i32</span>, <span class='ident'>u32</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>Accumulator</span>::<span class='ident'>with_capacity</span>(<span class='number'>2</span>,
-                                                                                              <span class='number'>100</span>);
-        <span class='kw'>let</span> <span class='ident'>random</span> <span class='op'>=</span> ::<span class='ident'>rand</span>::<span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>accumulator</span>: <span class='ident'>Accumulator</span><span class='op'>&lt;</span><span class='ident'>i32</span>, <span class='ident'>u32</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Accumulator</span>::<span class='ident'>with_capacity</span>(<span class='number'>2</span>, <span class='number'>100</span>);
+        <span class='kw'>let</span> <span class='ident'>random</span> <span class='op'>=</span> <span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>();
         <span class='ident'>accumulator</span>.<span class='ident'>set_quorum_size</span>(<span class='ident'>random</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>random</span>, <span class='ident'>accumulator</span>.<span class='ident'>quorum</span>);
     }
@@ -767,6 +788,6 @@
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

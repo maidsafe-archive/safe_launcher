@@ -9,6 +9,7 @@
 
     <title>crust::service::Service - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
@@ -59,7 +60,7 @@ the sender half to this method. Receiver will receive all <code>Event</code>s fr
 <div class='docblock'><p>Construct a service. As with the <code>Service::new</code> function, but will not
 implicitly start any network activity. This constructor is intended
 only for testing purposes.</p>
-</div><h4 id='method.start_beacon' class='method'><code>fn <a href='#method.start_beacon' class='fnname'>start_beacon</a>(&amp;mut self, udp_port: <a href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a>&gt;</code></h4>
+</div><h4 id='method.start_beacon' class='method'><code>fn <a href='#method.start_beacon' class='fnname'>start_beacon</a>(&amp;mut self, udp_port: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a>&gt;</code></h4>
 <div class='docblock'><p>Start the beaconing on port <code>udp_port</code>. If port number is 0, the OS will
 pick one randomly. The actual port used will be returned.</p>
 
@@ -68,7 +69,7 @@ limit of listenning at most once per process.</p>
 </div><h4 id='method.start_accepting' class='method'><code>fn <a href='#method.start_accepting' class='fnname'>start_accepting</a>(&amp;mut self, port: <a class='enum' href='../../crust/enum.Port.html' title='crust::Port'>Port</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='enum' href='../../crust/enum.Endpoint.html' title='crust::Endpoint'>Endpoint</a>&gt;</code></h4>
 <div class='docblock'><p>Starts accepting on a given port. If port number is 0, the OS
 will pick one randomly. The actual port used will be returned.</p>
-</div><h4 id='method.bootstrap' class='method'><code>fn <a href='#method.bootstrap' class='fnname'>bootstrap</a>(&amp;mut self, token: <a href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>, beacon_port: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a>&gt;)</code></h4>
+</div><h4 id='method.bootstrap' class='method'><code>fn <a href='#method.bootstrap' class='fnname'>bootstrap</a>(&amp;mut self, token: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>, beacon_port: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a>&gt;)</code></h4>
 <div class='docblock'><p>This method tries to connect (bootstrap to existing network) to the default or provided
 override list of bootstrap nodes (via config file named <current executable>.config).</p>
 
@@ -86,7 +87,7 @@ All connections (if any) will be dropped before bootstrap attempt is made.
 This method returns immediately after dropping any active connections.endpoints
 New bootstrap connections will be notified by <code>NewBootstrapConnection</code> event.
 Its upper layer&#39;s responsibility to maintain or drop these connections.</p>
-</div><h4 id='method.bootstrap_with_blacklist' class='method'><code>fn <a href='#method.bootstrap_with_blacklist' class='fnname'>bootstrap_with_blacklist</a>(&amp;mut self, token: <a href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>, beacon_port: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a>&gt;, blacklist: <a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='enum' href='../../crust/enum.Endpoint.html' title='crust::Endpoint'>Endpoint</a><a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>)</code></h4>
+</div><h4 id='method.bootstrap_with_blacklist' class='method'><code>fn <a href='#method.bootstrap_with_blacklist' class='fnname'>bootstrap_with_blacklist</a>(&amp;mut self, token: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>, beacon_port: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a>&gt;, blacklist: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='enum' href='../../crust/enum.Endpoint.html' title='crust::Endpoint'>Endpoint</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>)</code></h4>
 <div class='docblock'><p>Same as bootstrap, but allows to specify a blacklist of endpoints
 this service should never connect to.</p>
 </div><h4 id='method.stop_bootstrap' class='method'><code>fn <a href='#method.stop_bootstrap' class='fnname'>stop_bootstrap</a>(&amp;mut self)</code></h4>
@@ -96,7 +97,7 @@ this service should never connect to.</p>
 </div><h4 id='method.stop' class='method'><code>fn <a href='#method.stop' class='fnname'>stop</a>(&amp;mut self)</code></h4>
 <div class='docblock'><p>This should be called before destroying an instance of a Service to allow the
 listener threads to join.  Once called, the Service should be destroyed.</p>
-</div><h4 id='method.connect' class='method'><code>fn <a href='#method.connect' class='fnname'>connect</a>(&amp;self, token: <a href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>, endpoints: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='enum' href='../../crust/enum.Endpoint.html' title='crust::Endpoint'>Endpoint</a>&gt;)</code></h4>
+</div><h4 id='method.connect' class='method'><code>fn <a href='#method.connect' class='fnname'>connect</a>(&amp;self, token: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>, endpoints: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='enum' href='../../crust/enum.Endpoint.html' title='crust::Endpoint'>Endpoint</a>&gt;)</code></h4>
 <div class='docblock'><p>Opens a connection to a remote peer. <code>endpoints</code> is a vector of addresses of the remote
 peer. All the endpoints will be tried. As soon as a connection is established, it will drop
 all other ongoing attempts. On success <code>Event::NewConnection</code> with connected <code>Endpoint</code> will
@@ -105,7 +106,7 @@ Failed attempts are not notified back up to the caller. If the caller wants to k
 failed attempt, it must maintain a record of the attempt itself which times out if a
 corresponding <code>Event::NewConnection</code> isn&#39;t received.  See also <a href="https://github.com/maidsafe/crust/blob/master/docs/connect.md">Process for Connecting</a> for details on handling of
 connect in different protocols.</p>
-</div><h4 id='method.rendezvous_connect' class='method'><code>fn <a href='#method.rendezvous_connect' class='fnname'>rendezvous_connect</a>(&amp;self, udp_socket: <a class='struct' href='https://doc.rust-lang.org/nightly/std/net/udp/struct.UdpSocket.html' title='std::net::udp::UdpSocket'>UdpSocket</a>, token: <a href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>, public_endpoint: <a class='enum' href='../../crust/enum.Endpoint.html' title='crust::Endpoint'>Endpoint</a>)</code></h4>
+</div><h4 id='method.rendezvous_connect' class='method'><code>fn <a href='#method.rendezvous_connect' class='fnname'>rendezvous_connect</a>(&amp;self, udp_socket: <a class='struct' href='https://doc.rust-lang.org/nightly/std/net/udp/struct.UdpSocket.html' title='std::net::udp::UdpSocket'>UdpSocket</a>, token: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>, public_endpoint: <a class='enum' href='../../crust/enum.Endpoint.html' title='crust::Endpoint'>Endpoint</a>)</code></h4>
 <div class='docblock'><p>Opens a connection to a remote peer. <code>public_endpoint</code> is the endpoint
 of the remote peer. <code>udp_socket</code> is a socket whose public address will
 be used by the other peer.</p>
@@ -136,9 +137,9 @@ details on handling of connect in different protocols.</p>
 <div class='docblock'><p>Initiates uPnP port mapping of the currently used accepting endpoints.
 On success ExternalEndpoint event is generated containg our external
 endpoints.</p>
-</div><h4 id='method.get_mapped_udp_socket' class='method'><code>fn <a href='#method.get_mapped_udp_socket' class='fnname'>get_mapped_udp_socket</a>(&amp;self, result_token: <a href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>)</code></h4>
+</div><h4 id='method.get_mapped_udp_socket' class='method'><code>fn <a href='#method.get_mapped_udp_socket' class='fnname'>get_mapped_udp_socket</a>(&amp;self, result_token: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>)</code></h4>
 <div class='docblock'><p>Lookup a mapped udp socket based on result_token</p>
-</div><h4 id='method.udp_punch_hole' class='method'><code>fn <a href='#method.udp_punch_hole' class='fnname'>udp_punch_hole</a>(&amp;self, result_token: <a href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>, udp_socket: <a class='struct' href='https://doc.rust-lang.org/nightly/std/net/udp/struct.UdpSocket.html' title='std::net::udp::UdpSocket'>UdpSocket</a>, secret: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[<a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>; 4]</a>&gt;, peer_addr: <a class='enum' href='https://doc.rust-lang.org/nightly/std/net/addr/enum.SocketAddr.html' title='std::net::addr::SocketAddr'>SocketAddr</a>)</code></h4>
+</div><h4 id='method.udp_punch_hole' class='method'><code>fn <a href='#method.udp_punch_hole' class='fnname'>udp_punch_hole</a>(&amp;self, result_token: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>, udp_socket: <a class='struct' href='https://doc.rust-lang.org/nightly/std/net/udp/struct.UdpSocket.html' title='std::net::udp::UdpSocket'>UdpSocket</a>, secret: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>; 4]</a>&gt;, peer_addr: <a class='enum' href='https://doc.rust-lang.org/nightly/std/net/addr/enum.SocketAddr.html' title='std::net::addr::SocketAddr'>SocketAddr</a>)</code></h4>
 <div class='docblock'><p>Udp hole punching process</p>
 </div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../../crust/service/struct.Service.html' title='crust::service::Service'>Service</a></code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
 </div></section>
@@ -200,6 +201,6 @@ endpoints.</p>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

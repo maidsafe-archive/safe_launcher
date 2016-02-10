@@ -9,6 +9,7 @@
 
     <title>safe_launcher::send_one! - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
 
     <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
@@ -45,12 +46,10 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-3976' class='srclink' href='../src/safe_launcher/macros.rs.html#157-161' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-4045' class='srclink' href='../src/safe_launcher/macros.rs.html#157-161' title='goto source code'>[src]</a></span></h1>
 <pre class='rust macro'>
 <span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>send_one</span> {
-    (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>data</span>:<span class='ident'>expr</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>sender</span>:<span class='ident'>expr</span>) <span class='op'>=&gt;</span> {
-        <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>sender</span>.<span class='ident'>send</span>(::<span class='ident'>std</span>::<span class='ident'>convert</span>::<span class='ident'>From</span>::<span class='ident'>from</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>data</span>))
-    }
+    (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>data</span>:<span class='ident'>expr</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>sender</span>:<span class='ident'>expr</span>) <span class='op'>=&gt;</span> { ... };
 }</pre>
 <div class='docblock'><p>This macro is intended to be used in all cases when we want to send a value to a single
 <code>std::sync::mpsc::Sender&lt;T&gt;</code>, for e.g. an observer. It performs necessary trait conversion for
@@ -148,6 +147,6 @@ sending the given data if such a conversion was defined.</p>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     
-    <script async src="../search-index.js"></script>
+    <script defer src="../search-index.js"></script>
 </body>
 </html>

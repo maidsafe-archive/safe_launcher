@@ -9,6 +9,7 @@
 
     <title>safe_core::self_encryption_storage::SelfEncryptionStorage - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
@@ -45,15 +46,15 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1399' class='srclink' href='../../src/safe_core/self_encryption_storage.rs.html#25-27' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-1403' class='srclink' href='../../src/safe_core/self_encryption_storage.rs.html#25-27' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct SelfEncryptionStorage {
     // some fields omitted
 }</pre><div class='docblock'><p>Network storage is the concrete type which self-encryption crate will use to put or get data
 from the network</p>
 </div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../safe_core/self_encryption_storage/struct.SelfEncryptionStorage.html' title='safe_core::self_encryption_storage::SelfEncryptionStorage'>SelfEncryptionStorage</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(client: <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/arc/struct.Arc.html' title='alloc::arc::Arc'>Arc</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/sync/mutex/struct.Mutex.html' title='std::sync::mutex::Mutex'>Mutex</a>&lt;<a class='struct' href='../../safe_core/client/struct.Client.html' title='safe_core::client::Client'>Client</a>&gt;&gt;) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/arc/struct.Arc.html' title='alloc::arc::Arc'>Arc</a>&lt;<a class='struct' href='../../safe_core/self_encryption_storage/struct.SelfEncryptionStorage.html' title='safe_core::self_encryption_storage::SelfEncryptionStorage'>SelfEncryptionStorage</a>&gt;</code></h4>
 <div class='docblock'><p>Create a new SelfEncryptionStorage instance</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='../../self_encryption/trait.Storage.html' title='self_encryption::Storage'>Storage</a> for <a class='struct' href='../../safe_core/self_encryption_storage/struct.SelfEncryptionStorage.html' title='safe_core::self_encryption_storage::SelfEncryptionStorage'>SelfEncryptionStorage</a></code></h3><div class='impl-items'><h4 id='method.get' class='method'><code>fn <a href='../../self_encryption/trait.Storage.html#method.get' class='fnname'>get</a>(&amp;self, name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;</code></h4>
-<h4 id='method.put' class='method'><code>fn <a href='../../self_encryption/trait.Storage.html#method.put' class='fnname'>put</a>(&amp;self, _: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;, data: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;)</code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='../../self_encryption/trait.Storage.html' title='self_encryption::Storage'>Storage</a> for <a class='struct' href='../../safe_core/self_encryption_storage/struct.SelfEncryptionStorage.html' title='safe_core::self_encryption_storage::SelfEncryptionStorage'>SelfEncryptionStorage</a></code></h3><div class='impl-items'><h4 id='method.get' class='method'><code>fn <a href='../../self_encryption/trait.Storage.html#method.get' class='fnname'>get</a>(&amp;self, name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;</code></h4>
+<h4 id='method.put' class='method'><code>fn <a href='../../self_encryption/trait.Storage.html#method.put' class='fnname'>put</a>(&amp;self, _: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;, data: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -113,6 +114,6 @@ from the network</p>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

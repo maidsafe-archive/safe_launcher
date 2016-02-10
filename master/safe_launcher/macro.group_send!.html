@@ -9,6 +9,7 @@
 
     <title>safe_launcher::group_send! - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
 
     <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
@@ -45,19 +46,10 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-3975' class='srclink' href='../src/safe_launcher/macros.rs.html#101-112' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-4044' class='srclink' href='../src/safe_launcher/macros.rs.html#101-112' title='goto source code'>[src]</a></span></h1>
 <pre class='rust macro'>
 <span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>group_send</span> {
-    (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>data</span>:<span class='ident'>expr</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>senders</span>:<span class='ident'>expr</span>) <span class='op'>=&gt;</span> {{
-        <span class='comment'>// Wrapping in an Option is a trick to avoid error:</span>
-        <span class='comment'>// - cannot move out of captured outer variable in an `FnMut` closure</span>
-        <span class='comment'>// while doing a move in the closure provided to `retain()` below</span>
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>option_dance</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>data</span>);
-        <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>senders</span>.<span class='ident'>retain</span>(<span class='op'>|</span><span class='ident'>tx</span><span class='op'>|</span> <span class='ident'>tx</span>.<span class='ident'>send</span>(::<span class='ident'>std</span>::<span class='ident'>convert</span>::<span class='ident'>From</span>::<span class='ident'>from</span>(
-                                         <span class='macro'>unwrap_option</span><span class='macro'>!</span>(<span class='ident'>option_dance</span>.<span class='ident'>take</span>(),
-                                                        <span class='string'>&quot;Logic Error - Report a bug.&quot;</span>)))
-                               .<span class='ident'>is_ok</span>());
-    }}
+    (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>data</span>:<span class='ident'>expr</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>senders</span>:<span class='ident'>expr</span>) <span class='op'>=&gt;</span> { ... };
 }</pre>
 <div class='docblock'><p>This macro is intended to be used in all cases when we want to send a value to a group
 (Vector) of <code>std::sync::mpsc::Sender&lt;T&gt;</code>, for e.g. an observer pattern with senders. It
@@ -158,6 +150,6 @@ interested in observing).</p>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     
-    <script async src="../search-index.js"></script>
+    <script defer src="../search-index.js"></script>
 </body>
 </html>

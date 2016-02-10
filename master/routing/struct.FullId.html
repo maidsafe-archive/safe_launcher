@@ -9,6 +9,7 @@
 
     <title>routing::FullId - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
 
     <link rel="shortcut icon" href="http://maidsafe.net/img/favicon.ico">
@@ -45,13 +46,13 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1940' class='srclink' href='../src/routing/id.rs.html#22-26' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-1985' class='srclink' href='../src/routing/id.rs.html#22-26' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct FullId {
     // some fields omitted
 }</pre><div class='docblock'><p>Network identity component containing name, and public and private keys.</p>
 </div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../routing/struct.FullId.html' title='routing::FullId'>FullId</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../routing/struct.FullId.html' title='routing::FullId'>FullId</a></code></h4>
 <div class='docblock'><p>Construct a FullId with newly generated keys.</p>
-</div><h4 id='method.with_keys' class='method'><code>fn <a href='#method.with_keys' class='fnname'>with_keys</a>(encrypt_keys: <a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='struct' href='../sodiumoxide/crypto/box_/curve25519xsalsa20poly1305/struct.PublicKey.html' title='sodiumoxide::crypto::box_::curve25519xsalsa20poly1305::PublicKey'>PublicKey</a>, <a class='struct' href='../sodiumoxide/crypto/box_/curve25519xsalsa20poly1305/struct.SecretKey.html' title='sodiumoxide::crypto::box_::curve25519xsalsa20poly1305::SecretKey'>SecretKey</a>)</a>, sign_keys: <a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='struct' href='../sodiumoxide/crypto/sign/ed25519/struct.PublicKey.html' title='sodiumoxide::crypto::sign::ed25519::PublicKey'>PublicKey</a>, <a class='struct' href='../sodiumoxide/crypto/sign/ed25519/struct.SecretKey.html' title='sodiumoxide::crypto::sign::ed25519::SecretKey'>SecretKey</a>)</a>) -&gt; <a class='struct' href='../routing/struct.FullId.html' title='routing::FullId'>FullId</a></code></h4>
+</div><h4 id='method.with_keys' class='method'><code>fn <a href='#method.with_keys' class='fnname'>with_keys</a>(encrypt_keys: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='struct' href='../sodiumoxide/crypto/box_/curve25519xsalsa20poly1305/struct.PublicKey.html' title='sodiumoxide::crypto::box_::curve25519xsalsa20poly1305::PublicKey'>PublicKey</a>, <a class='struct' href='../sodiumoxide/crypto/box_/curve25519xsalsa20poly1305/struct.SecretKey.html' title='sodiumoxide::crypto::box_::curve25519xsalsa20poly1305::SecretKey'>SecretKey</a>)</a>, sign_keys: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='struct' href='../sodiumoxide/crypto/sign/ed25519/struct.PublicKey.html' title='sodiumoxide::crypto::sign::ed25519::PublicKey'>PublicKey</a>, <a class='struct' href='../sodiumoxide/crypto/sign/ed25519/struct.SecretKey.html' title='sodiumoxide::crypto::sign::ed25519::SecretKey'>SecretKey</a>)</a>) -&gt; <a class='struct' href='../routing/struct.FullId.html' title='routing::FullId'>FullId</a></code></h4>
 <div class='docblock'><p>Construct with given keys, (Client requirement).</p>
 </div><h4 id='method.public_id' class='method'><code>fn <a href='#method.public_id' class='fnname'>public_id</a>(&amp;self) -&gt; &amp;<a class='struct' href='../routing/struct.PublicId.html' title='routing::PublicId'>PublicId</a></code></h4>
 <div class='docblock'><p>Returns public ID reference.</p>
@@ -122,6 +123,6 @@
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     
-    <script async src="../search-index.js"></script>
+    <script defer src="../search-index.js"></script>
 </body>
 </html>
