@@ -52,7 +52,7 @@ export default class NFS {
     }
 
     modifyDirectory(name, userMetadata, dirPath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
-      this.send({
+      var payload = {
         module: this.MODULE,
         action: 'modify-dir',
         isAuthorised: true,
@@ -60,13 +60,17 @@ export default class NFS {
         hasSafeDriveAccess: hasSafeDriveAccess,
         params: {
           dirPath: dirPath,
-          newValues: {
-            name: name,
-            userMetadata: userMetadata
-          },
+          newValues: {},
           isPathShared: isPathShared
         }
-      }, callback);
+      };
+      if (typeof name === 'string' && name) {
+        payload.params.newValues.name = name;
+      }
+      if (typeof userMetadata === 'string') {
+        payload.params.newValues.userMetadata = userMetadata;
+      }
+      this.send(payload, callback);
     }
 
     createFile(filePath, userMetadata, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
@@ -99,7 +103,7 @@ export default class NFS {
     }
 
     modifyFileMeta(name, userMetadata, filePath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
-      this.send({
+      var payload = {
         module: this.MODULE,
         action: 'modify-file-meta',
         isAuthorised: true,
@@ -107,12 +111,39 @@ export default class NFS {
         hasSafeDriveAccess: hasSafeDriveAccess,
         params: {
           filePath: filePath,
+          newValues: {},
+          isPathShared: isPathShared
+        }
+      };
+      if (typeof name === 'string' && name) {
+        payload.params.newValues.name = name;
+      }
+      if (typeof userMetadata === 'string') {
+        payload.params.newValues.userMetadata = userMetadata;
+      }
+      this.send(payload, callback);
+    }
+
+    modifyFileContent(contentBytes, offset, filePath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+      var payload = {
+        module: this.MODULE,
+        action: 'modify-file-content',
+        isAuthorised: true,
+        appDirKey: appDirKey,
+        hasSafeDriveAccess: hasSafeDriveAccess,
+        params: {
+          filePath: filePath,
           newValues: {
-            name: name,
-            userMetadata: userMetadata
+            content: {
+              bytes: contentBytes
+            }
           },
           isPathShared: isPathShared
         }
-      }, callback);
+      };
+      if (offset) {
+        payload.params.newValues.content.offset = offset;
+      }
+      this.send(payload, callback);
     }
 }
