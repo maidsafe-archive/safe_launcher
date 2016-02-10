@@ -53,19 +53,21 @@ export default class RESTServer {
     let EVENT_TYPE = this.app.get('EVENT_TYPE');
     let eventEmitter = this.app.get('eventEmitter');
 
-    // app.use(function(req, res, next){
-    //   if (req.is('text/*')) {
-    //     req.body = '';
-    //     req.setEncoding('utf8');
-    //     req.on('data', function(chunk){ req.body += chunk });
-    //     req.on('end', next);
-    //   } else {
-    //     next();
-    //   }
-    // });
+    app.use(function(req, res, next){
+      if (req.is('text/*')) {
+        req.body = '';
+        req.setEncoding('utf8');
+        req.on('data', function(chunk){ req.body += chunk });
+        req.on('end', function() {
+          decryptRequest(req, res, next);
+        });
+      } else {
+        bodyParser.json({strict: false})(req, res, next);
+      }
+    });
 
-    app.use(bodyParser.json({strict: false}));
-    app.use(decryptRequest);
+    // app.use(bodyParser.json({strict: false}));
+    // app.use(decryptRequest);
     app.use(bodyParser.urlencoded({
       extended: false
     }));

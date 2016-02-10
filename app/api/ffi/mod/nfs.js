@@ -66,6 +66,22 @@ var execute = function(requestId, payload) {
   util.sendError(requestId, result);
 };
 
+var createNewValuesPayload = function(newValues) {
+  var payload = {};
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+  if (newValues.hasOwnProperty('name')) {
+    payload.name = newValues.name;
+  }
+  if (newValues.hasOwnProperty('userMetadata')) {
+    payload.user_metadata = newValues.userMetadata;
+  }
+  if (newValues.hasOwnProperty('content')) {
+    payload.content = newValues.content;
+  }
+  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+  return payload;
+};
+
 var createDirectory = function(lib, request) {
   try {
     var payload = createPayload('create-dir', request);
@@ -97,15 +113,7 @@ var modifyDirectory = function(lib, request) {
   try {
     var payload = createPayload('modify-dir', request);
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    if (!request.params.hasOwnProperty('newValues')) {
-      payload.data.new_values = {};
-    }
-    if (request.params.newValues.hasOwnProperty('name')) {
-      payload.data.new_values.name = request.params.newValues.name;
-    }
-    if (request.params.newValues.hasOwnProperty('userMetadata')) {
-      payload.data.new_values.user_metadata = request.params.newValues.userMetadata;
-    }
+    payload.data.new_values = createNewValuesPayload(request.params.newValues);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     execute(request.id, payload);
   } catch (e) {
@@ -135,15 +143,19 @@ var modifyFileMeta = function(lib, request) {
   try {
     var payload = createPayload('modify-file', request);
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    if (request.params.hasOwnProperty('newValues')) {
-      payload.data.new_values = {};
-    }
-    if (request.params.newValues.hasOwnProperty('name')) {
-      payload.data.new_values.name = request.params.newValues.name;
-    }
-    if (request.params.newValues.hasOwnProperty('userMetadata')) {
-      payload.data.new_values.user_metadata = request.params.newValues.userMetadata;
-    }
+    payload.data.new_values = createNewValuesPayload(request.params.newValues);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    execute(request.id, payload);
+  } catch (e) {
+    util.sendError(request.id, 999, e.toString());
+  }
+};
+
+var modifyFileContent = function(lib, request) {
+  try {
+    var payload = createPayload('modify-file', request);
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    payload.data.new_values = createNewValuesPayload(request.params.newValues);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     execute(request.id, payload);
   } catch (e) {
@@ -188,6 +200,9 @@ exports.execute = function(lib, request) {
       break;
     case 'get-file':
       getFile(lib, request);
+      break;
+    case 'modify-file-content':
+      modifyFileContent(lib, request);
       break;
     default:
       util.sendError(request.id, 999, 'Invalid Action');
