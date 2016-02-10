@@ -124,7 +124,7 @@ export default class NFS {
       this.send(payload, callback);
     }
 
-    modifyFileContent(content, filePath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+    modifyFileContent(contentBytes, offset, filePath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
       var payload = {
         module: this.MODULE,
         action: 'modify-file-content',
@@ -133,12 +133,16 @@ export default class NFS {
         hasSafeDriveAccess: hasSafeDriveAccess,
         params: {
           filePath: filePath,
-          newValues: {},
+          newValues: {
+            content: {
+              bytes: contentBytes
+            }
+          },
           isPathShared: isPathShared
         }
       };
-      if (typeof content === 'string' && content) {
-        payload.params.newValues.content = content;
+      if (offset) {
+        payload.params.newValues.content.offset = offset;
       }
       this.send(payload, callback);
     }

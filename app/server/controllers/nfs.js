@@ -35,7 +35,7 @@ let deleteOrGetDirectory = function(req, res, isDelete) {
 
 export var createDirectory = function(req, res) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
-  let params = req.body;
+  let params = JSON.parse(req.body.toString());
   if (!params.hasOwnProperty('dirPath') || !params.dirPath) {
     return res.status(400).send('Invalid request. dirPath missing');
   }
@@ -70,7 +70,7 @@ export var getDirectory = function(req, res) {
 
 export var modifyDirectory = function(req, res) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
-  let reqBody = req.body;
+  let reqBody = JSON.parse(req.body.toString());
   let params = req.params;
 
   if (!params.hasOwnProperty('dirPath') || !params.dirPath) {
@@ -103,7 +103,7 @@ export var modifyDirectory = function(req, res) {
 
 export var createFile = function(req, res) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
-  let reqBody = req.body;
+  let reqBody = JSON.parse(req.body.toString());
   if (!reqBody.hasOwnProperty('filePath') || !reqBody.filePath) {
     return res.status(400).send('Invalid request. filePath missing');
   }
@@ -150,7 +150,7 @@ export var deleteFile = function(req, res) {
 export var modifyFileMeta = function(req, res) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   let params = req.params;
-  let reqBody = req.body;
+  let reqBody = JSON.parse(req.body.toString());
   if (!params.hasOwnProperty('filePath') || !params.filePath) {
     return res.status(400).send('Invalid request. filePath missing');
   }
@@ -179,21 +179,22 @@ export var modifyFileMeta = function(req, res) {
 export var modifyFileContent = function(req, res) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   let params = req.params;
-  let reqBody = req.body;
+  let reqBody = req.body.toString('base64');
   if (!params.hasOwnProperty('filePath') || !params.filePath) {
     return res.status(400).send('Invalid request. filePath missing');
   }
   try {
     params.isPathShared = JSON.parse(params.isPathShared);
   } catch (e) {
-    res.status(500).send(e.message);
+    res.status(500).send(e.toString());
   }
   if (!params.hasOwnProperty('isPathShared') || !(typeof params.isPathShared === 'boolean')) {
     return res.status(400).send('Invalid request. isPathShared missing');
   }
-  if (!reqBody.hasOwnProperty('content') || !reqBody.content) {
+  if (!reqBody) {
     return res.status(400).send('Invalid request. content missing or should be valid');
   }
+  params.offset = params.offset || null;
   let onResponse = function(err) {
     if (!err) {
       return res.status(202).send('Accepted');
@@ -202,6 +203,6 @@ export var modifyFileContent = function(req, res) {
   };
   let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1;
   let appDirKey = sessionInfo.appDirKey;
-  req.app.get('api').nfs.modifyFileMeta(reqBody.content, params.filePath, params.isPathShared,
+  req.app.get('api').nfs.modifyFileContent(reqBody, params.offset, params.filePath, params.isPathShared,
     appDirKey, hasSafeDriveAccess, onResponse);
 };

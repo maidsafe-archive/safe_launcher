@@ -47,7 +47,7 @@ export var decryptRequest = function(req, res, next) {
     if (req.body && Object.keys(req.body).length > 0) {
       let reqBodyUIntArray = new Uint8Array(new Buffer(req.body, 'base64'));
       let reqBody = sodium.crypto_secretbox_open_easy(reqBodyUIntArray, sessionInfo.nonce, sessionInfo.secretKey);
-      req.body = JSON.parse(new Buffer(reqBody).toString());
+      req.body = new Buffer(reqBody);
     }
     req.headers['sessionId'] = sessionId;
     next();
