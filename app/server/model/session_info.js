@@ -12,4 +12,8 @@ export default class SessionInfo {
     this.signingKey = sodium.randombytes_buf(sodium.crypto_box_SECRETKEYBYTES);
     this.appDirKey = appDirKey;
   }
+
+  hasSafeDriveAccess() {
+    return this.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1;
+  }
 }

@@ -27,9 +27,11 @@ let deleteOrGetDirectory = function(req, res, isDelete) {
     return res.status(500).send(err);
   };
   if (isDelete) {
-    req.app.get('api').nfs.deleteDirectory(params.dirPath, params.isPathShared, hasSafeDriveAccess, appDirKey, onResponse);
+    req.app.get('api').nfs.deleteDirectory(params.dirPath, params.isPathShared,
+      sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, onResponse);
   } else {
-    req.app.get('api').nfs.getDirectory(params.dirPath, params.isPathShared, hasSafeDriveAccess, appDirKey, onResponse);
+    req.app.get('api').nfs.getDirectory(params.dirPath, params.isPathShared,
+      sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, onResponse);
   }
 }
 
@@ -56,8 +58,8 @@ export var createDirectory = function(req, res) {
   let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1;
   let appDirKey = sessionInfo.appDirKey;
   req.app.get('api').nfs.createDirectory(params.dirPath, params.isPrivate, params.isVersioned,
-    params.metadata, params.isPathShared, appDirKey,
-    hasSafeDriveAccess, onResponse);
+    params.metadata, params.isPathShared,
+    sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, onResponse);
 }
 
 export var deleteDirectory = function(req, res) {
@@ -70,13 +72,14 @@ export var getDirectory = function(req, res) {
 
 export var modifyDirectory = function(req, res) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
+  if (!sessionInfo) {
+    return res.status(401).send('Unauthorised');
+  }
   let reqBody = req.body;
   let params = req.params;
-
-  if (!params.hasOwnProperty('dirPath') || !params.dirPath) {
+  if (!params.dirPath) {
     return res.status(400).send('Invalid request. dirPath missing');
   }
-
   try {
     params.isPathShared = JSON.parse(params.isPathShared);
   } catch (e) {
@@ -87,7 +90,7 @@ export var modifyDirectory = function(req, res) {
     return res.status(400).send('Invalid request. isPathShared missing');
   }
 
-  if (!reqBody.hasOwnProperty('name') || !reqBody.name) {
+  if (!reqBody.name) {
     return res.status(400).send('Invalid request. Directory name to be changed missing');
   }
 
@@ -98,16 +101,20 @@ export var modifyDirectory = function(req, res) {
     }
     return res.status(500).send(err);
   };
-  let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1;
-  let appDirKey = sessionInfo.appDirKey;
-  req.app.get('api').nfs.modifyDirectory(reqBody.name, reqBody.metadata, params.dirPath,  params.isPathShared, appDirKey,
-    hasSafeDriveAccess, onResponse);
+  req.app.get('api').nfs.modifyDirectory(reqBody.name, reqBody.metadata, params.dirPath, params.isPathShared,
+    sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), onResponse);
 };
 
 export var createFile = function(req, res) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
+  if (!sessionInfo) {
+    return res.status(401).send('Unauthorised');
+  }
   let reqBody = req.body;
-  if (!reqBody.hasOwnProperty('filePath') || !reqBody.filePath) {
+  if (!params.dirPath) {
+    return res.status(400).send('Invalid request. dirPath missing');
+  }
+  if (!reqBody.filePath) {
     return res.status(400).send('Invalid request. filePath missing');
   }
   reqBody.isPathShared = reqBody.isPathShared || false;
@@ -118,16 +125,17 @@ export var createFile = function(req, res) {
     }
     return res.status(500).send(err);
   };
-  let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1;
-  let appDirKey = sessionInfo.appDirKey;
-  req.app.get('api').nfs.createFile(reqBody.filePath, reqBody.metadata, reqBody.isPathShared, appDirKey,
-    hasSafeDriveAccess, onResponse);
+  req.app.get('api').nfs.createFile(reqBody.filePath, reqBody.metadata, reqBody.isPathShared,
+    sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), onResponse);
 };
 
 export var deleteFile = function(req, res) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
+  if (!sessionInfo) {
+    return res.status(401).send('Unauthorised');
+  }
   let params = req.params;
-  if (!params.hasOwnProperty('filePath') || !params.filePath) {
+  if (!params.filePath) {
     return res.status(400).send('Invalid request. filePath missing');
   }
   try {
@@ -144,23 +152,24 @@ export var deleteFile = function(req, res) {
     }
     return res.status(500).send(err);
   };
-  let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1;
-  let appDirKey = sessionInfo.appDirKey;
-  req.app.get('api').nfs.deleteFile(params.filePath, params.isPathShared, appDirKey,
-    hasSafeDriveAccess, onResponse);
+  req.app.get('api').nfs.deleteFile(params.filePath, params.isPathShared, sessionInfo.appDirKey,
+    sessionInfo.hasSafeDriveAccess(), onResponse);
 };
 
 export var modifyFileMeta = function(req, res) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
+  if (!sessionInfo) {
+    return res.status(401).send('Unauthorised');
+  }
   let params = req.params;
   let reqBody = req.body;
-  if (!params.hasOwnProperty('filePath') || !params.filePath) {
+  if (!params.filePath) {
     return res.status(400).send('Invalid request. filePath missing');
   }
   try {
     params.isPathShared = JSON.parse(params.isPathShared);
   } catch (e) {
-    res.status(500).send(e.message);
+    res.status(400).send('isPathShared field should be present and should be a boolean value');
   }
   if (!params.hasOwnProperty('isPathShared') || !(typeof params.isPathShared === 'boolean')) {
     return res.status(400).send('Invalid request. isPathShared missing');
@@ -175,8 +184,26 @@ export var modifyFileMeta = function(req, res) {
     }
     return res.status(500).send(err);
   };
+  req.app.get('api').nfs.modifyFileMeta(reqBody.name, reqBody.metadata, params.filePath, params.isPathShared,
+    sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), onResponse);
+};
+
+export var getFile = function(req, res, next) {
+  let sessionInfo = sessionManager.get(req.headers.sessionId);
+  if (!sessionInfo) {
+    return res.status(401).send('Unauthorised');
+  }
+  let offset = req.query.offset || 0;
+  let length = req.query.length || 0;
+  let onResponse = function(err, data) {
+    if (!err) {
+      let status = data ? 200 : 202;
+      return res.status(status).send(formatResponse(data) || 'Accepted');
+    }
+    return res.status(500).send(err);
+  };
   let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1;
   let appDirKey = sessionInfo.appDirKey;
-  req.app.get('api').nfs.modifyFileMeta(reqBody.name, reqBody.metadata, params.filePath, params.isPathShared,
+  req.app.get('api').nfs.getFile(req.params.filePath, req.params.isPathShared, offset, length,
     appDirKey, hasSafeDriveAccess, onResponse);
 };

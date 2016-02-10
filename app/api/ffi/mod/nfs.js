@@ -35,14 +35,41 @@ var createPayload = function(action, request) {
   return payload;
 };
 
+var executeForContent(requestId, payload) {
+  var sizePtr = ref.alloc(int);
+  var capacityPtr = ref.alloc(int);
+  var resultPtr = ref.alloc(int);
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+  var pointer = lib.execute_for_content(JSON.stringify(payload), sizePtr, capacityPtr, resultPtr, request.client);
+  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+  var result = resultPtr.deref();
+  if (result !== 0) {
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    lib.drop_null_ptr(pointer);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    return util.sendError(requestId, result);
+  }
+  var size = sizePtr.deref();
+  var capacity = capacityPtr.deref();
+  var response = ref.reinterpret(pointer, size).toString();
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+  lib.drop_vector(pointer, size, capacity);
+  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+  util.send(requestId, response);
+};
+
+var execute = function(requestId, payload) {
+  var result = lib.execute(JSON.stringify(payload), request.client);
+  if (result === 0) {
+    return util.send(requestId, true);
+  }
+  util.sendError(requestId, result);
+};
+
 var createDirectory = function(lib, request) {
   try {
     var payload = createPayload('create-dir', request);
-    var result = lib.execute(JSON.stringify(payload), request.client);
-    if (result === 0) {
-      return util.send(request.id, true);
-    }
-    util.sendError(request.id, result);
+    execute(request.id, payload);
   } catch (e) {
     util.sendError(request.id, 999, e.toString());
   }
@@ -51,26 +78,7 @@ var createDirectory = function(lib, request) {
 var getDirectory = function(lib, request) {
   try {
     var payload = createPayload('get-dir', request);
-    var sizePtr = ref.alloc(int);
-    var capacityPtr = ref.alloc(int);
-    var resultPtr = ref.alloc(int);
-    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    var pointer = lib.execute_for_content(JSON.stringify(payload), sizePtr, capacityPtr, resultPtr, request.client);
-    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    var result = resultPtr.deref();
-    if (result !== 0) {
-      /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-      lib.drop_null_ptr(pointer);
-      /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-      return util.sendError(request.id, result);
-    }
-    var size = sizePtr.deref();
-    var capacity = capacityPtr.deref();
-    var response = ref.reinterpret(pointer, size).toString();
-    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    lib.drop_vector(pointer, size, capacity);
-    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    util.send(request.id, response);
+    excuteForContent(request.id, payload);
   } catch (e) {
     util.sendError(request.id, 999, e.toString());
   }
@@ -79,11 +87,7 @@ var getDirectory = function(lib, request) {
 var deleteDirectory = function(lib, request) {
   try {
     var payload = createPayload('delete-dir', request);
-    var result = lib.execute(JSON.stringify(payload), request.client);
-    if (result === 0) {
-      return util.send(request.id, true);
-    }
-    util.sendError(request.id, result);
+    execute(request.id, payload);
   } catch (e) {
     util.sendError(request.id, 999, e.toString());
   }
@@ -103,39 +107,27 @@ var modifyDirectory = function(lib, request) {
       payload.data.new_values.user_metadata = request.params.newValues.userMetadata;
     }
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    var result = lib.execute(JSON.stringify(payload), request.client);
-    if (result === 0) {
-      return util.send(request.id, true);
-    }
-    util.sendError(request.id, result);
+    execute(request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.message());
+    util.sendError(request.id, 999, e.toString());
   }
 };
 
 var createFile = function(lib, request) {
   try {
     var payload = createPayload('create-file', request);
-    var result = lib.execute(JSON.stringify(payload), request.client);
-    if (result === 0) {
-      return util.send(request.id, true);
-    }
-    util.sendError(request.id, result);
+    execute(request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.message());
+    util.sendError(request.id, 999, e.toString());
   }
 };
 
 var deleteFile = function(lib, request) {
   try {
     var payload = createPayload('delete-file', request);
-    var result = lib.execute(JSON.stringify(payload), request.client);
-    if (result === 0) {
-      return util.send(request.id, true);
-    }
-    util.sendError(request.id, result);
+    execute(request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.message());
+    util.sendError(request.id, 999, e.toString());
   }
 };
 
@@ -153,13 +145,21 @@ var modifyFileMeta = function(lib, request) {
       payload.data.new_values.user_metadata = request.params.newValues.userMetadata;
     }
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    var result = lib.execute(JSON.stringify(payload), request.client);
-    if (result === 0) {
-      return util.send(request.id, true);
-    }
-    util.sendError(request.id, result);
+    execute(request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.message());
+    util.sendError(request.id, 999, e.toString());
+  }
+};
+
+var getFile = function(lib, request) {
+  try {
+    var payload = createPayload(request);
+    payload.data.offset = request.params.offset;
+    payload.data.length = request.params.length;
+    payload.data.include_metadata = request.params.include_metadata;
+    executeForContent(request.id, payload);
+  } catch (e) {
+    util.sendError(request.id, 999, e.toString());
   }
 };
 
@@ -185,6 +185,9 @@ exports.execute = function(lib, request) {
       break;
     case 'modify-file-meta':
       modifyFileMeta(lib, request);
+      break;
+    case 'get-file':
+      getFile(lib, request);
       break;
     default:
       util.sendError(request.id, 999, 'Invalid Action');
