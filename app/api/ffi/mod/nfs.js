@@ -1,6 +1,5 @@
 var ref = require('ref');
 var int = ref.types.int;
-var intPtr = ref.refType(int);
 
 var util = require('./util.js');
 
@@ -52,9 +51,9 @@ var createDirectory = function(lib, request) {
 var getDirectory = function(lib, request) {
   try {
     var payload = createPayload('get-dir', request);
-    var sizePtr = ref.alloc(intPtr);
-    var capacityPtr = ref.alloc(intPtr);
-    var resultPtr = ref.alloc(intPtr);
+    var sizePtr = ref.alloc(int);
+    var capacityPtr = ref.alloc(int);
+    var resultPtr = ref.alloc(int);
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     var pointer = lib.execute_for_content(JSON.stringify(payload), sizePtr, capacityPtr, resultPtr, request.client);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
