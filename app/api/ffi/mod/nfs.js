@@ -93,6 +93,9 @@ var modifyDirectory = function(lib, request) {
   try {
     var payload = createPayload('modify-dir', request);
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    if(!request.params.hasOwnProperty('newValues')) {
+      payload.data.new_values = {};
+    }
     if (request.params.newValues.hasOwnProperty('name')) {
       payload.data.new_values.name = request.params.newValues.name;
     }
@@ -139,7 +142,11 @@ var deleteFile = function(lib, request) {
 var modifyFileMeta = function(lib, request) {
   try {
     var payload = createPayload('modify-file', request);
+      util.send(999, payload);
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    if(request.params.hasOwnProperty('newValues')) {
+      payload.data.new_values = {};
+    }
     if (request.params.newValues.hasOwnProperty('name')) {
       payload.data.new_values.name = request.params.newValues.name;
     }
