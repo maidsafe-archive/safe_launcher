@@ -1,4 +1,5 @@
 import sessionManager from '../session_manager';
+import { formatResponse } from '../utils';
 
 let deleteOrGetDirectory = function(req, res, isDelete) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -21,7 +22,7 @@ let deleteOrGetDirectory = function(req, res, isDelete) {
   let onResponse = function(err, data) {
     if (!err) {
       let status = data ? 200 : 202;
-      return res.status(status).send(JSON.parse(data) || 'Accepted');
+      return res.status(status).send(formatResponse(data) || 'Accepted');
     }
     return res.status(500).send(err);
   };

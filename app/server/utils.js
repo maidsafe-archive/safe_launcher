@@ -38,7 +38,7 @@ export var decryptRequest = function(req, res, next) {
   }
   let sessionId = getSessionIdFromRequest(req);
   if (!sessionId) {
-    return res.send(401, 'Unauthorised');
+    return res.status(401).send('Unauthorised');
   }
   let sessionInfo = sessionManager.get(sessionId);
   try {
@@ -51,8 +51,76 @@ export var decryptRequest = function(req, res, next) {
     }
     req.headers['sessionId'] = sessionId;
     next();
-  } catch(e) {
+  } catch (e) {
     return res.status(400).send('Failed to decrypt the request. ' + e.message());
   }
+}
 
+export var formatResponse = function(data) {
+  if (typeof data === 'string') {
+    data = JSON.parse(data);
+  }
+
+  let format = function(data) {
+    var type = typeof data;
+    switch (type) {
+      case 'object':
+        return (data.constructor === Array) ? formatList(data) : formatObject(data);
+      default:
+        return data;
+    }
+  };
+
+  let convertToCamelCase = function(key) {
+    if (!key || key.indexOf('_') === -1) {
+      return key;
+    }
+    let temp;
+    let keys = key.split('_');
+    let newKey = '';
+    for (let i in keys) {
+      if (i === '0') {
+        newKey = keys[i];
+        continue;
+      }
+      temp = keys[i];
+      newKey += (temp.substr(0, 1).toUpperCase() + temp.substr(1));
+    }
+    return newKey;
+  };
+
+  let formatObject = function(obj) {
+    let computeTime = function(seconds, nanoSeconds) {
+      return (seconds * 1000) + Math.floor(nanoSeconds / 1000000);
+    };
+    if (obj.hasOwnProperty('creation_time_sec')) {
+      obj.createdOn = computeTime(obj.creation_time_sec, obj.creation_time_nsec);
+      delete obj.creation_time_sec;
+      delete obj.creation_time_nsec;
+    }
+    if (obj.hasOwnProperty('modification_time_sec')) {
+      obj.modifiedOn = computeTime(obj.modification_time_sec, obj.modification_time_nsec);
+      delete obj.modification_time_sec;
+      delete obj.modification_time_nsec;
+    }
+    if (obj.hasOwnProperty('user_metadata')) {
+      obj.metadata = obj.user_metadata;
+      delete obj.user_metadata;
+    }
+    var formattedObj = {};
+    for (let key in obj) {
+      formattedObj[convertToCamelCase(key)] = format(obj[key]);
+    }
+    return formattedObj;
+  };
+
+  let formatList = function(list) {
+    var formattedList = [];
+    for (let i in list) {
+      formattedList.push(format(list[i]));
+    }
+    return formattedList;
+  };
+
+  return format(data);
 }

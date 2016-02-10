@@ -6,6 +6,9 @@ import { remote } from 'electron'; // native electron module
 import * as api from './api/safe';
 import RESTServer from './server/boot';
 import UIUtils from './UIUtils';
+import {formatResponse} from './server/utils';
 
 var restServer = new RESTServer(api);
 window.msl = new UIUtils(api, remote, restServer);
+
+window.fr = formatResponse;
