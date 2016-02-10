@@ -10,7 +10,7 @@ let deleteOrGetDirectory = function(req, res, isDelete) {
   try {
     params.isPathShared = JSON.parse(params.isPathShared);
   } catch (e) {
-    res.status(500).send(e.message)
+    res.status(500).send(e.message);
   }
   if (!params.hasOwnProperty('isPathShared') || !(typeof params.isPathShared === 'boolean')) {
     return res.status(400).send('Invalid request. isPathShared missing');
@@ -25,9 +25,11 @@ let deleteOrGetDirectory = function(req, res, isDelete) {
     }
     return res.status(500).send(err);
   };
-  let nfsApi = req.app.get('api').nfs;
-  var execFunc = (isDelete ? nfsApi.deleteDirectory : nfsApi.getDirectory);
-  execFunc(params.dirPath, params.isPathShared, appDirKey, hasSafeDriveAccess, onResponse);
+  if (isDelete) {
+    req.app.get('api').nfs.deleteDirectory(params.dirPath, params.isPathShared, appDirKey, hasSafeDriveAccess, onResponse);
+  } else {
+    req.app.get('api').nfs.getDirectory(params.dirPath, params.isPathShared, appDirKey, hasSafeDriveAccess, onResponse);
+  }
 }
 
 export var createDirectory = function(req, res) {
