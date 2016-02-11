@@ -42,7 +42,7 @@ export var decryptRequest = function(req, res, next) {
     return res.status(401).send('Unauthorised');
   }
   let sessionInfo = sessionManager.get(sessionId);
-  let stringToJson = function(string) {
+  let parseQueryString = function(string) {
     string = string.split('&');
     var json = {};
     string.forEach(function(val) {
@@ -64,7 +64,7 @@ export var decryptRequest = function(req, res, next) {
       let queryUIntArray = new Uint8Array(new Buffer(query, 'base64'));
       let reqQuery = sodium.crypto_secretbox_open_easy(queryUIntArray, sessionInfo.nonce, sessionInfo.secretKey);
       reqQuery = new Buffer(reqQuery).toString();
-      reqQuery = stringToJson(reqQuery);
+      reqQuery = parseQueryString(reqQuery);
       req.query = reqQuery;
     }
     req.headers['sessionId'] = sessionId;
