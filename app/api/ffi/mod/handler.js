@@ -15,6 +15,7 @@ module.exports = function(libPath) {
   var lib;
   var auth = require('./auth.js');
   var nfs = require('./nfs.js');
+  var dns = require('./dns.js');
 
   var methodsToRegister = function() {
     return {
@@ -57,6 +58,12 @@ module.exports = function(libPath) {
           message.client = getClientHandle(message);
           message.safeDriveKey = auth.getSafeDriveKey();
           nfs.execute(lib, message);
+          break;
+
+        case 'dns':
+          message.client = getClientHandle(message);
+          message.safeDriveKey = auth.getSafeDriveKey();
+          dns.execute(lib, message);
           break;
 
         default:
