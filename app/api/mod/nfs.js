@@ -6,7 +6,7 @@ export default class NFS {
   }
 
   createDirectory(dirPath, isPrivate, isVersioned, userMetadata, isPathShared,
-    appDirKey, hasSafeDriveAccess, callback) {
+    hasSafeDriveAccess, appDirKey, callback) {
     this.send({
       module: this.MODULE,
       action: 'create-dir',
@@ -135,15 +135,29 @@ export default class NFS {
           filePath: filePath,
           newValues: {
             content: {
-              bytes: contentBytes
+              bytes: contentBytes,
+              offet: offset
             }
           },
           isPathShared: isPathShared
         }
       };
-      if (offset) {
-        payload.params.newValues.content.offset = offset;
-      }
       this.send(payload, callback);
+    }
+
+    getFile(filePath, isPathShared, offset, length, hasSafeDriveAccess, appDirKey, callback) {
+      this.send({
+        module: this.MODULE,
+        action: 'get-file',
+        isAuthorised: true,
+        appDirKey: appDirKey,
+        hasSafeDriveAccess: hasSafeDriveAccess,
+        params: {
+          filePath: filePath,
+          isPathShared: isPathShared,
+          offset: offset || 0,
+          length: length || 0
+        }
+      }, callback);
     }
 }

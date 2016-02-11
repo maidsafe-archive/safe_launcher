@@ -66,8 +66,6 @@ export default class RESTServer {
       }
     });
 
-    // app.use(bodyParser.json({strict: false}));
-    // app.use(decryptRequest);
     app.use(bodyParser.urlencoded({
       extended: false
     }));

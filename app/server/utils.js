@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import * as sodium from 'libsodium-wrappers';
 import sessionManager from './session_manager';
+import { errorCodeLookup } from './error_code_lookup';
 
 export var getSessionIdFromRequest = function(req) {
   let authHeader = req.get('Authorization');
@@ -41,6 +42,15 @@ export var decryptRequest = function(req, res, next) {
     return res.status(401).send('Unauthorised');
   }
   let sessionInfo = sessionManager.get(sessionId);
+  let parseQueryString = function(string) {
+    string = string.split('&');
+    var json = {};
+    string.forEach(function(val) {
+      val = val.split('=');
+      json[val[0]] = val[1];
+    });
+    return json;
+  };
   try {
     // var path = new Uint8Array(new Buffer(req.path.substr(1), 'base64'));
     // req.url = new Buffer(sodium.crypto_secretbox_open_easy(path, sessionInfo.nonce, sessionInfo.secretKey)).toString();
@@ -48,6 +58,14 @@ export var decryptRequest = function(req, res, next) {
       let reqBodyUIntArray = new Uint8Array(new Buffer(req.body, 'base64'));
       let reqBody = sodium.crypto_secretbox_open_easy(reqBodyUIntArray, sessionInfo.nonce, sessionInfo.secretKey);
       req.body = new Buffer(reqBody);
+    }
+    if (Object.keys(req.query).length > 0) {
+      var query = Object.keys(req.query)[0];
+      let queryUIntArray = new Uint8Array(new Buffer(query, 'base64'));
+      let reqQuery = sodium.crypto_secretbox_open_easy(queryUIntArray, sessionInfo.nonce, sessionInfo.secretKey);
+      reqQuery = new Buffer(reqQuery).toString();
+      reqQuery = parseQueryString(reqQuery);
+      req.query = reqQuery;
     }
     req.headers['sessionId'] = sessionId;
     next();
@@ -124,3 +142,34 @@ export var formatResponse = function(data) {
 
   return format(data);
 }
+
+export var ResponseHandler = function(res, sessionInfo) {
+  let self = this;
+  self.res = res;
+  self.sessionInfo = sessionInfo;
+  var encrypt = function(msg) {
+    if (!(self.sessionInfo && msg)) {
+      return msg;
+    }
+    self.res.set('Content-Type', 'text/plain');
+    return self.sessionInfo.encryptResponse(msg);
+  };
+
+  self.onResponse = function(err, data) {
+    if (err) {
+      if (err.hasOwnProperty('errorCode')) {
+        err.description = errorCodeLookup(err.errorCode);
+      }
+      err = encrypt(err);
+      return self.res.status(500).send(err);
+    }
+    let status = data ? 200 : 202;
+    if (data) {
+      self.res.status(status).send(encrypt(data));
+    } else {
+      self.res.sendStatus(status);
+    }
+  };
+
+  return self;
+};

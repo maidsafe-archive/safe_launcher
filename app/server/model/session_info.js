@@ -12,4 +12,14 @@ export default class SessionInfo {
     this.signingKey = sodium.randombytes_buf(sodium.crypto_box_SECRETKEYBYTES);
     this.appDirKey = appDirKey;
   }
+
+  hasSafeDriveAccess() {
+    return this.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1;
+  }
+
+  encryptResponse(jsonObj) {
+    var responseBody = JSON.stringify(jsonObj);
+    return new Buffer(sodium.crypto_secretbox_easy(responseBody, this.nonce, this.secretKey)).toString('base64');
+  }
+
 }
