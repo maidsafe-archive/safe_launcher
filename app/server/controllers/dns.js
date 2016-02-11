@@ -46,11 +46,11 @@ export var deleteDns = function(req, res) {
 export var deleteService = function(req, res) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   let params = req.params;
-  if (!(typeof params.longName === 'string')) {
-    return res.status(400).send('Invalid request. longName is not valid');
-  }
   if (!(typeof params.serviceName === 'string')) {
     return res.status(400).send('Invalid request. serviceName is not valid');
+  }
+  if (!(typeof params.longName === 'string')) {
+    return res.status(400).send('Invalid request. longName is not valid');
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);
   req.app.get('api').dns.deleteService(params.longName, params.serviceName,
