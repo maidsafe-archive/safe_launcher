@@ -1,7 +1,7 @@
 import sessionManager from '../session_manager';
 import { formatResponse, ResponseHandler } from '../utils';
 
-export var register = function(req, res) {
+var registerOrAddService = function(req, res, isRegister) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   let reqBody = JSON.parse(req.body.toString());
   if (!reqBody.longName) {
@@ -22,6 +22,19 @@ export var register = function(req, res) {
     return res.status(400).send('Invalid request. isPathShared missing');
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  req.app.get('api').dns.register(reqBody.longName, reqBody.serviceName, reqBody.serviceHomeDirPath,
-    reqBody.isPathShared, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
+  if (isRegister) {
+    req.app.get('api').dns.register(reqBody.longName, reqBody.serviceName, reqBody.serviceHomeDirPath,
+      reqBody.isPathShared, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
+  } else {
+    req.app.get('api').dns.addService(reqBody.longName, reqBody.serviceName, reqBody.serviceHomeDirPath,
+      reqBody.isPathShared, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
+  }
+};
+
+export var register = function(req, res) {
+  registerOrAddService(req, res, true);
+};
+
+export var addService = function(req, res) {
+  registerOrAddService(req, res, false);
 };

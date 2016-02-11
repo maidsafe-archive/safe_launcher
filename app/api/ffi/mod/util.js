@@ -46,7 +46,7 @@ exports.executeForContent = function(lib, client, requestId, payload) {
 exports.execute = function(lib, client, requestId, payload) {
   var result = lib.execute(JSON.stringify(payload), client);
   if (result === 0) {
-    return send(requestId, true);
+    return send(requestId);
   }
   sendError(requestId, result);
 };

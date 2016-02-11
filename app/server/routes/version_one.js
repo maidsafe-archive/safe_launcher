@@ -19,4 +19,5 @@ router.put('/nfs/file/:filePath/:isPathShared', NFS.modifyFileContent);
 router.get('/nfs/file/:filePath/:isPathShared', NFS.getFile);
 // DNS API
 router.post('/dns/register', DNS.register);
+router.post('/dns/service', DNS.addService);
 export { router as versionOneRouter };
