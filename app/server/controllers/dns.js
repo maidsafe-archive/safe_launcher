@@ -13,14 +13,7 @@ var registerOrAddService = function(req, res, isRegister) {
   if (!reqBody.serviceHomeDirPath) {
     return res.status(400).send('Invalid request. serviceHomeDirPath missing');
   }
-  try {
-    reqBody.isPathShared = JSON.parse(reqBody.isPathShared);
-  } catch (e) {
-    res.status(500).send(e.toString())
-  }
-  if (!reqBody.hasOwnProperty('isPathShared') || !(typeof reqBody.isPathShared === 'boolean')) {
-    return res.status(400).send('Invalid request. isPathShared missing');
-  }
+  reqBody.isPathShared = reqBody.isPathShared || false;
   let responseHandler = new ResponseHandler(res, sessionInfo);
   if (isRegister) {
     req.app.get('api').dns.register(reqBody.longName, reqBody.serviceName, reqBody.serviceHomeDirPath,
