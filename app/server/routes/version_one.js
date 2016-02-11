@@ -21,4 +21,5 @@ router.get('/nfs/file/:filePath/:isPathShared?', NFS.getFile);
 router.post('/dns/register', DNS.register);
 router.post('/dns/service', DNS.addService);
 router.delete('/dns/longName/:longName', DNS.deleteDns);
+router.delete('/dns/service/:serviceName/:longName', DNS.deleteService);
 export { router as versionOneRouter };
