@@ -169,6 +169,8 @@ export var modifyFileContent = function(req, res) {
   }
   let params = req.params;
   let reqBody = req.body.toString('base64');
+  let query = req.query;
+
   if (!params.filePath) {
     return res.status(400).send('Invalid request. filePath missing');
   }
@@ -183,8 +185,8 @@ export var modifyFileContent = function(req, res) {
   if (!reqBody) {
     return res.status(400).send('Invalid request. content missing or should be valid');
   }
-  params.offset = params.offset || 0;
+  query.offset = query.offset || 0;
   let responseHandler = new ResponseHandler(res, sessionInfo);;
-  req.app.get('api').nfs.modifyFileContent(reqBody, params.offset, params.filePath, params.isPathShared,
+  req.app.get('api').nfs.modifyFileContent(reqBody, query.offset, params.filePath, params.isPathShared,
     sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
 };

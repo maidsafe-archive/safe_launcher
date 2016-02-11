@@ -7,7 +7,7 @@ var request = require('request');
 import { remote } from 'electron';
 import * as api from '../app/api/safe';
 import RESTServer from '../app/server/boot';
-import UIUtils from '../app/UIUtils';
+import UIUtils from '../app/ui_utils';
 
 describe('Authentication', function() {
   var restServer = null;
