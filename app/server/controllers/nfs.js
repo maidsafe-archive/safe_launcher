@@ -82,7 +82,7 @@ export var modifyDirectory = function(req, res) {
   if (!reqBody.name && !reqBody.metadata) {
     return res.status(400).send('Invalid request. Name or metadata should be present in the request');
   }
-  let responseHandler = new ResponseHandler(res, sessionInfo);;
+  let responseHandler = new ResponseHandler(res, sessionInfo);
   req.app.get('api').nfs.modifyDirectory(reqBody.name, reqBody.metadata, params.dirPath, params.isPathShared,
     sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
 };
