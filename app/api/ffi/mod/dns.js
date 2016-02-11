@@ -40,7 +40,6 @@ var register = function(lib, request) {
 var addService = function(lib, request) {
   try {
     var payload = createPayload('add-service', request);
-    util.send(999, 'payload');
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
     util.sendError(request.id, 999, e.toString());
