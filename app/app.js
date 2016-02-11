@@ -5,7 +5,7 @@ import { remote } from 'electron'; // native electron module
 // import env from './env';
 import * as api from './api/safe';
 import RESTServer from './server/boot';
-import UIUtils from './UIUtils';
+import UIUtils from './ui_utils';
 import {formatResponse} from './server/utils';
 
 var restServer = new RESTServer(api);
