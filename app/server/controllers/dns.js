@@ -27,7 +27,3 @@ var registerOrAddService = function(req, res, isRegister) {
 export var register = function(req, res) {
   registerOrAddService(req, res, true);
 };
-
-export var addService = function(req, res) {
-  registerOrAddService(req, res, false);
-};
