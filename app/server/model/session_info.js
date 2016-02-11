@@ -16,4 +16,10 @@ export default class SessionInfo {
   hasSafeDriveAccess() {
     return this.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1;
   }
+
+  encryptResponse(jsonObj) {
+    var responseBody = JSON.stringify(jsonObj);
+    return new Buffer(sodium.crypto_secretbox_easy(responseBody, this.nonce, this.secretKey)).toString('base64');
+  }
+
 }

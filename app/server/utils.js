@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import * as sodium from 'libsodium-wrappers';
 import sessionManager from './session_manager';
+import { errorCodeLookup } from './error_code_lookup';
 
 export var getSessionIdFromRequest = function(req) {
   let authHeader = req.get('Authorization');
@@ -125,16 +126,32 @@ export var formatResponse = function(data) {
   return format(data);
 }
 
-export var ResponseHandler = function(res) {
+export var ResponseHandler = function(res, sessionInfo) {
   let self = this;
   self.res = res;
+  self.sessionInfo = sessionInfo;
+  var encrypt = function(msg) {
+    if (!(self.sessionInfo && msg)) {
+      return msg;
+    }
+    self.res.set('Content-Type', 'text/plain');
+    return self.sessionInfo.encryptResponse(msg);
+  };
 
   self.onResponse = function(err, data) {
-    if (!err) {
-      let status = data ? 200 : 202;
-      return self.res.status(status).send(formatResponse(data) || 'Accepted');
+    if (err) {
+      if (err.hasOwnProperty('errorCode')) {
+        err.description = errorCodeLookup(err.errorCode);
+      }
+      err = encrypt(err);
+      return self.res.status(500).send(err);
     }
-    return self.res.status(500).send(err);
+    let status = data ? 200 : 202;
+    if (data) {
+      self.res.status(status).send(encrypt(data));
+    } else {
+      self.res.sendStatus(status);
+    }
   };
 
   return self;
