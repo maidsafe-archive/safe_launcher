@@ -22,6 +22,6 @@ router.post('/dns/register', DNS.register);
 router.post('/dns/service', DNS.addService);
 router.delete('/dns/longName/:longName', DNS.deleteDns);
 router.delete('/dns/service/:serviceName/:longName', DNS.deleteService);
-router.get('/dns/directory/:serviceName/:longName', DNS.getHomeDirectory);
-router.get('/dns/directory/:serviceName/:longName/:filePath', DNS.getFile);
+router.get('/dns/:serviceName/:longName', DNS.getHomeDirectory);
+router.get('/dns/:serviceName/:longName/:filePath', DNS.getFile);
 export { router as versionOneRouter };
