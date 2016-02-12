@@ -185,9 +185,9 @@ export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
     var content = encrypt(data.content);
     self.res.set('file-name', data.metadata.name);
     self.res.set('file-size', data.metadata.size);
-    self.res.set('file-created-time', , data.metadata.createdOn);
+    self.res.set('file-created-time', data.metadata.createdOn);
     self.res.set('file-modified-time', data.metadata.modifiedOn);
-    self.res.set('file-metadata', , data.metadata.userMetadata);
+    self.res.set('file-metadata', data.metadata.userMetadata);
     res.status(200).send(data);
   };
 

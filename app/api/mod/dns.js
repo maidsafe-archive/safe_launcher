@@ -14,11 +14,11 @@ export default class DNS {
       appDirKey: appDirKey,
       params: {
         longName: longName,
-        serviceName: serviceName,
+        serviceName: serviceName
       }
     };
     this.send(msg, callback);
-  };
+  }
 
   register(longName, serviceName, serviceHomeDirPath, isPathShared,
     hasSafeDriveAccess, appDirKey, callback) {

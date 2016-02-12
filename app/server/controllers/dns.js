@@ -33,7 +33,7 @@ export var getHomeDirectory = function(req, res) {
   let responseHandler = new ResponseHandler(res, sessionInfo);
   req.app.get('api').dns.getHomeDirectory(longName, serviceName, hasSafeDriveAccess, appDirKey,
     responseHandler.onResponse);
-}
+};
 
 export var register = function(req, res) {
   registerOrAddService(req, res, true);

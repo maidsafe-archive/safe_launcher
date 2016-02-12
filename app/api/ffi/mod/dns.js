@@ -73,6 +73,7 @@ exports.execute = function(lib, request) {
   switch (request.action) {
     case 'get-home-dir':
       getHomeDirectory(lib, request);
+      break;
     case 'register-dns':
       register(lib, request);
       break;
