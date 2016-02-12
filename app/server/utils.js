@@ -143,10 +143,12 @@ export var formatResponse = function(data) {
   return format(data);
 }
 
-export var ResponseHandler = function(res, sessionInfo) {
+export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
   let self = this;
   self.res = res;
   self.sessionInfo = sessionInfo;
+  self.isFileResponse = isFileResponse || false;
+
   var encrypt = function(msg) {
     if (!(self.sessionInfo && msg)) {
       return msg;
@@ -155,7 +157,7 @@ export var ResponseHandler = function(res, sessionInfo) {
     return self.sessionInfo.encryptResponse(msg);
   };
 
-  self.onResponse = function(err, data) {
+  var generalResponse = function(err, data) {
     if (err) {
       if (err.hasOwnProperty('errorCode')) {
         err.description = errorCodeLookup(err.errorCode);
@@ -170,6 +172,26 @@ export var ResponseHandler = function(res, sessionInfo) {
       self.res.sendStatus(status);
     }
   };
+
+  var fileReponse = function(err, data) {
+    if (err) {
+      if (err.hasOwnProperty('errorCode')) {
+        err.description = errorCodeLookup(err.errorCode);
+      }
+      err = encrypt(err);
+      return self.res.status(500).send(err);
+    }
+    data = formatResponse(data);
+    var content = encrypt(data.content);
+    self.res.set('file-name', data.metadata.name);
+    self.res.set('file-size', data.metadata.size);
+    self.res.set('file-created-time', , data.metadata.createdOn);
+    self.res.set('file-modified-time', data.metadata.modifiedOn);
+    self.res.set('file-metadata', , data.metadata.userMetadata);
+    res.status(200).send(data);
+  };
+
+  self.onResponse = self.isFileResponse ? fileReponse : generalResponse;
 
   return self;
 };
