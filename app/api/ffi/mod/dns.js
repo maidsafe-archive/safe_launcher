@@ -28,6 +28,11 @@ var createPayload = function(action, request) {
   return payload;
 };
 
+var getHomeDirectory = function(lib, request) {
+  var payload = createPayload(request);
+  util.executeForContent(lib, request.client, request.id, payload);
+};
+
 var register = function(lib, request) {
   try {
     var payload = createPayload('register-dns', request);
@@ -66,6 +71,9 @@ var deleteService = function(lib, request) {
 
 exports.execute = function(lib, request) {
   switch (request.action) {
+    case 'get-home-dir':
+      getHomeDirectory(lib, request);
+      break;
     case 'register-dns':
       register(lib, request);
       break;

@@ -1,5 +1,5 @@
 import sessionManager from '../session_manager';
-import { formatResponse, ResponseHandler } from '../utils';
+import { ResponseHandler } from '../utils';
 
 var registerOrAddService = function(req, res, isRegister) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -22,6 +22,17 @@ var registerOrAddService = function(req, res, isRegister) {
     req.app.get('api').dns.addService(reqBody.longName, reqBody.serviceName, reqBody.serviceHomeDirPath,
       reqBody.isPathShared, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
   }
+};
+
+export var getHomeDirectory = function(req, res) {
+  let sessionInfo = req.headers['sessionId'] ? sessionManager.get(res.headers['sessionId']) : null;
+  let appDirKey = sessionInfo ? sessionInfo.appDirKey : null;
+  let hasSafeDriveAccess = sessionInfo ? sessionInfo.hasSafeDriveAccess() : false;
+  let longName = req.params.longName;
+  let serviceName = req.params.serviceName;
+  let responseHandler = new ResponseHandler(res, sessionInfo);
+  req.app.get('api').dns.getHomeDirectory(longName, serviceName, hasSafeDriveAccess, appDirKey,
+    responseHandler.onResponse);
 };
 
 export var register = function(req, res) {

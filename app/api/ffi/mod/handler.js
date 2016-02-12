@@ -33,7 +33,10 @@ module.exports = function(libPath) {
   };
 
   var getClientHandle = function(message) {
-    return message.isAuthorised ? auth.getRegisteredClient() : auth.getUnregisteredClient();
+    if (!lib) {
+      throw 'FFI library not yet initialised';
+    }
+    return message.isAuthorised ? auth.getRegisteredClient() : auth.getUnregisteredClient(lib);
   };
 
   var loadLibrary = function() {
@@ -56,13 +59,17 @@ module.exports = function(libPath) {
 
         case 'nfs':
           message.client = getClientHandle(message);
-          message.safeDriveKey = auth.getSafeDriveKey();
+          if (message.isAuthorised) {
+            message.safeDriveKey = auth.getSafeDriveKey();
+          }
           nfs.execute(lib, message);
           break;
 
         case 'dns':
           message.client = getClientHandle(message);
-          message.safeDriveKey = auth.getSafeDriveKey();
+          if (message.isAuthorised) {
+            message.safeDriveKey = auth.getSafeDriveKey();
+          }
           dns.execute(lib, message);
           break;
 

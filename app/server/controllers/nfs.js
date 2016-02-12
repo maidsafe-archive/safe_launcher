@@ -1,5 +1,5 @@
 import sessionManager from '../session_manager';
-import { formatResponse, ResponseHandler } from '../utils';
+import { ResponseHandler } from '../utils';
 
 let deleteOrGetDirectory = function(req, res, isDelete) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -9,7 +9,7 @@ let deleteOrGetDirectory = function(req, res, isDelete) {
     return res.status(400).send('Invalid request. dirPath missing');
   }
   params.isPathShared = params.isPathShared || false;
-  let responseHandler = new ResponseHandler(res, sessionInfo);
+  let responseHandler = new ResponseHandler(res, sessionInfo, !isDelete);  
   if (isDelete) {
     req.app.get('api').nfs.deleteDirectory(params.dirPath, params.isPathShared,
       sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);

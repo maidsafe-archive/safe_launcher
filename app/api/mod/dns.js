@@ -5,6 +5,21 @@ export default class DNS {
     this.MODULE = 'dns';
   }
 
+  getHomeDirectory(longName, serviceName, hasSafeDriveAccess, appDirKey, callback) {
+    var msg = {
+      module: this.MODULE,
+      action: 'get-home-dir',
+      isAuthorised: (appDirKey ? true : false),
+      hasSafeDriveAccess: hasSafeDriveAccess || false,
+      appDirKey: appDirKey,
+      params: {
+        longName: longName,
+        serviceName: serviceName
+      }
+    };
+    this.send(msg, callback);
+  }
+
   register(longName, serviceName, serviceHomeDirPath, isPathShared,
     hasSafeDriveAccess, appDirKey, callback) {
     this.send({
