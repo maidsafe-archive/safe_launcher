@@ -1,4 +1,4 @@
 {
-  "name": "test",
-  "description": "Add here any environment specific stuff you like."
+  "serverPort": 50000,
+  "proxyPort": 60000
 }

@@ -11,7 +11,8 @@ import { decryptRequest } from './utils';
 class ServerEventEmitter extends EventEmitter {};
 
 export default class RESTServer {
-  constructor(api) {
+  constructor(api, port) {
+    this.port = port;
     this.app = express();
     this.server = null;
     this.EVENT_TYPE = {
@@ -85,11 +86,9 @@ export default class RESTServer {
       res.status(err.status || 500);
       res.send('Server Error');
     });
-
-    var port = process.env.PORT || '3000';
-    app.set('port', port);
+    app.set('port', this.port);
     this.server = http.createServer(app);
-    this.server.listen(port);
+    this.server.listen(this.port);
     this.server.on('error', this._onError(EVENT_TYPE.ERROR, eventEmitter));
     this.server.on('close', this._onClose(EVENT_TYPE.STOPPED, eventEmitter));
     this.server.on('listening', this._onListening(EVENT_TYPE.STARTED, eventEmitter));
