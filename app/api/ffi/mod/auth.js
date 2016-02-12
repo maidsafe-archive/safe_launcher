@@ -13,7 +13,7 @@ var safeDriveKey;
 var registeredClientHandle;
 var unregisteredClientHandle;
 
-var unregisteredClient = function(lib, request) {
+var unregisteredClient = function(lib) {
   var unregisteredClient = ref.alloc(clientHandlePtrPtr);
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   var result = lib.create_unregistered_client(unregisteredClient);
@@ -97,8 +97,8 @@ exports.getSafeDriveKey = function() {
   return safeDriveKey;
 };
 
-exports.getUnregisteredClient = function() {
-  if (!unregisteredClientHandle && !unregisteredClient()) {
+exports.getUnregisteredClient = function(lib) {
+  if (!unregisteredClientHandle && !unregisteredClient(lib)) {
     return;
   }
   return unregisteredClientHandle;

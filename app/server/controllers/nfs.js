@@ -1,5 +1,5 @@
 import sessionManager from '../session_manager';
-import { formatResponse, ResponseHandler } from '../utils';
+import { ResponseHandler } from '../utils';
 
 let deleteOrGetDirectory = function(req, res, isDelete) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
