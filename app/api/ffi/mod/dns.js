@@ -37,10 +37,22 @@ var register = function(lib, request) {
   }
 };
 
+var addService = function(lib, request) {
+  try {
+    var payload = createPayload('add-service', request);
+    util.execute(lib, request.client, request.id, payload);
+  } catch (e) {
+    util.sendError(request.id, 999, e.toString());
+  }
+};
+
 exports.execute = function(lib, request) {
   switch (request.action) {
     case 'register-dns':
       register(lib, request);
+      break;
+    case 'add-service':
+      addService(lib, request);
       break;
     default:
       util.sendError(request.id, 999, 'Invalid Action');
