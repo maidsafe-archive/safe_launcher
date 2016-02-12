@@ -46,6 +46,24 @@ var addService = function(lib, request) {
   }
 };
 
+var deleteDns = function(lib, request) {
+  try {
+    var payload = createPayload('delete-dns', request);
+    util.execute(lib, request.client, request.id, payload);
+  } catch (e) {
+    util.sendError(request.id, 999, e.toString());
+  }
+};
+
+var deleteService = function(lib, request) {
+  try {
+    var payload = createPayload('delete-service', request);
+    util.execute(lib, request.client, request.id, payload);
+  } catch (e) {
+    util.sendError(request.id, 999, e.toString());
+  }
+};
+
 exports.execute = function(lib, request) {
   switch (request.action) {
     case 'register-dns':
@@ -53,6 +71,12 @@ exports.execute = function(lib, request) {
       break;
     case 'add-service':
       addService(lib, request);
+      break;
+    case 'delete-dns':
+      deleteDns(lib, request);
+      break;
+    case 'delete-service':
+      deleteService(lib, request);
       break;
     default:
       util.sendError(request.id, 999, 'Invalid Action');

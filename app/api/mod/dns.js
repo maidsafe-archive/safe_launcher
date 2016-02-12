@@ -38,4 +38,31 @@ export default class DNS {
       }
     }, callback);
   }
+
+  deleteDns(longName, hasSafeDriveAccess, appDirKey, callback) {
+    this.send({
+      module: this.MODULE,
+      action: 'delete-dns',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: hasSafeDriveAccess,
+      params: {
+        longName: longName
+      }
+    }, callback);
+  }
+
+  deleteService(longName, serviceName, hasSafeDriveAccess, appDirKey, callback) {
+    this.send({
+      module: this.MODULE,
+      action: 'delete-dns',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: hasSafeDriveAccess,
+      params: {
+        longName: longName,
+        serviceName: serviceName
+      }
+    }, callback);
+  }
 }
