@@ -35,6 +35,23 @@ export var getHomeDirectory = function(req, res) {
     responseHandler.onResponse);
 };
 
+export var getFile = function(req, res) {
+  let sessionInfo = req.headers['sessionId'] ? sessionManager.get(res.headers['sessionId']) : null;
+  let appDirKey = sessionInfo ? sessionInfo.appDirKey : null;
+  let hasSafeDriveAccess = sessionInfo ? sessionInfo.hasSafeDriveAccess() : false;
+  let longName = req.query.longName;
+  let serviceName = req.query.serviceName;
+  let filePath = req.query.filePath;
+  if (!(longName && serviceName && filePath)) {
+    return res.status(400).send('Required parameter(s) missing');
+  }
+  let offset = req.query.offset || 0;
+  let length = req.query.length || 0;
+  let responseHandler = new ResponseHandler(res, sessionInfo, true);
+  req.app.get('api').dns.getFile(longName, serviceName, filePath, offset, length, asSafeDriveAccess, appDirKey,
+    responseHandler.onResponse);
+};
+
 export var register = function(req, res) {
   registerOrAddService(req, res, true);
 };
