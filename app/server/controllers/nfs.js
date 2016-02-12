@@ -8,14 +8,7 @@ let deleteOrGetDirectory = function(req, res, isDelete) {
   if (!params.hasOwnProperty('dirPath') || !params.dirPath || !(typeof params.dirPath === 'string')) {
     return res.status(400).send('Invalid request. dirPath missing');
   }
-  try {
-    params.isPathShared = JSON.parse(params.isPathShared);
-  } catch (e) {
-    res.status(500).send(e.toString());
-  }
-  if (!params.hasOwnProperty('isPathShared') || !(typeof params.isPathShared === 'boolean')) {
-    return res.status(400).send('Invalid request. isPathShared missing');
-  }
+  params.isPathShared = params.isPathShared || false;
   let responseHandler = new ResponseHandler(res, sessionInfo);
   if (isDelete) {
     req.app.get('api').nfs.deleteDirectory(params.dirPath, params.isPathShared,
@@ -66,23 +59,14 @@ export var modifyDirectory = function(req, res) {
   if (!params.dirPath) {
     return res.status(400).send('Invalid request. dirPath missing');
   }
-  try {
-    params.isPathShared = JSON.parse(params.isPathShared);
-  } catch (e) {
-    res.status(500).send(e.toString())
-  }
-
-  if (!params.hasOwnProperty('isPathShared') || !(typeof params.isPathShared === 'boolean')) {
-    return res.status(400).send('Invalid request. isPathShared missing');
-  }
-
+  params.isPathShared = params.isPathShared || false;
   reqBody.name = reqBody.name || null;
   reqBody.metadata = reqBody.metadata || null;
 
   if (!reqBody.name && !reqBody.metadata) {
     return res.status(400).send('Invalid request. Name or metadata should be present in the request');
   }
-  let responseHandler = new ResponseHandler(res, sessionInfo);;
+  let responseHandler = new ResponseHandler(res, sessionInfo);
   req.app.get('api').nfs.modifyDirectory(reqBody.name, reqBody.metadata, params.dirPath, params.isPathShared,
     sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
 };
@@ -109,17 +93,10 @@ export var deleteFile = function(req, res) {
     return res.status(401).send('Unauthorised');
   }
   let params = req.params;
-  if (!params.filePath) {
-    return res.status(400).send('Invalid request. filePath missing');
+  if (!(typeof params.filePath === 'string')) {
+    return res.status(400).send('Invalid request. filePath is not valid');
   }
-  try {
-    params.isPathShared = JSON.parse(params.isPathShared);
-  } catch (e) {
-    res.status(500).send(e.message);
-  }
-  if (!params.hasOwnProperty('isPathShared') || !(typeof params.isPathShared === 'boolean')) {
-    return res.status(400).send('Invalid request. isPathShared missing');
-  }
+  params.isPathShared = params.isPathShared || false;
   let responseHandler = new ResponseHandler(res, sessionInfo);;
   req.app.get('api').nfs.deleteFile(params.filePath, params.isPathShared, sessionInfo.appDirKey,
     sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
@@ -132,17 +109,10 @@ export var modifyFileMeta = function(req, res) {
   }
   let params = req.params;
   let reqBody = JSON.parse(req.body.toString());
-  if (!params.filePath) {
-    return res.status(400).send('Invalid request. filePath missing');
+  if (!(typeof params.filePath === 'string')) {
+    return res.status(400).send('Invalid request. filePath is not valid');
   }
-  try {
-    params.isPathShared = JSON.parse(params.isPathShared);
-  } catch (e) {
-    res.status(400).send('isPathShared field should be present and should be a boolean value');
-  }
-  if (!params.hasOwnProperty('isPathShared') || !(typeof params.isPathShared === 'boolean')) {
-    return res.status(400).send('Invalid request. isPathShared missing');
-  }
+  params.isPathShared = params.isPathShared || false;
   reqBody.metadata = reqBody.metadata || null;
   reqBody.name = reqBody.name || null;
   let responseHandler = new ResponseHandler(res, sessionInfo);;
@@ -155,10 +125,15 @@ export var getFile = function(req, res, next) {
   if (!sessionInfo) {
     return res.status(401).send('Unauthorised');
   }
+  let params = req.params;
+  if (!(typeof params.filePath === 'string')) {
+    return res.status(400).send('Invalid request. filePath is not valid');
+  }
+  params.isPathShared = params.isPathShared || false;
   let offset = req.query.offset || 0;
   let length = req.query.length || 0;
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  req.app.get('api').nfs.getFile(req.params.filePath, req.params.isPathShared, offset, length,
+  req.app.get('api').nfs.getFile(params.filePath, params.isPathShared, offset, length,
     sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
 };
 
@@ -169,22 +144,17 @@ export var modifyFileContent = function(req, res) {
   }
   let params = req.params;
   let reqBody = req.body.toString('base64');
-  if (!params.filePath) {
-    return res.status(400).send('Invalid request. filePath missing');
+  let query = req.query;
+
+  if (!(typeof params.filePath === 'string')) {
+    return res.status(400).send('Invalid request. filePath is not valid');
   }
-  try {
-    params.isPathShared = JSON.parse(params.isPathShared);
-  } catch (e) {
-    res.status(500).send(e.toString());
-  }
-  if (!params.hasOwnProperty('isPathShared') || !(typeof params.isPathShared === 'boolean')) {
-    return res.status(400).send('Invalid request. isPathShared missing');
-  }
+  params.isPathShared = params.isPathShared || false;
   if (!reqBody) {
     return res.status(400).send('Invalid request. content missing or should be valid');
   }
-  params.offset = params.offset || 0;
+  query.offset = query.offset || 0;
   let responseHandler = new ResponseHandler(res, sessionInfo);;
-  req.app.get('api').nfs.modifyFileContent(reqBody, params.offset, params.filePath, params.isPathShared,
+  req.app.get('api').nfs.modifyFileContent(reqBody, query.offset, params.filePath, params.isPathShared,
     sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
 };

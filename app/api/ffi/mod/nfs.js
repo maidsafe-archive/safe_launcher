@@ -1,6 +1,3 @@
-var ref = require('ref');
-var int = ref.types.int;
-
 var util = require('./util.js');
 
 var createPayload = function(action, request) {
