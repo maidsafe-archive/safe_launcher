@@ -8,6 +8,7 @@ import RESTServer from './server/boot';
 import UIUtils from './ui_utils';
 import {formatResponse} from './server/utils';
 import childProcess from 'child_process';
+import path from 'path';
 
 let restServer = new RESTServer(api, env.serverPort);
 let proxyServer = {
@@ -16,7 +17,7 @@ let proxyServer = {
     if (this.process) {
       return;
     }
-    this.process = childProcess.fork('./app/server/web_proxy.js', [
+    this.process = childProcess.fork(path.resolve(__dirname, 'server/web_proxy.js'), [
       '--proxyPort',
       env.proxyPort,
       '--serverPort',
@@ -31,5 +32,5 @@ let proxyServer = {
     this.process = null;
   }
 };
-window.proxyServer = proxyServer;
+
 window.msl = new UIUtils(api, remote, restServer);

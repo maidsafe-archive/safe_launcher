@@ -72,7 +72,7 @@ export default class RESTServer {
     }));
 
     app.get('/pac-file', function(req, res) {
-      res.download('./app/server/web_proxy.pac');
+      res.download(path.resolve(__dirname, 'server/web_proxy.pac'));
     });
     app.use('/', versionOneRouter);
     app.use('/v1', versionOneRouter);

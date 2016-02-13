@@ -1,4 +1,5 @@
 {
+  "name": "development",
   "serverPort": 50000,
   "proxyPort": 60000,
   "proxyRule": "*.safenet/*"
