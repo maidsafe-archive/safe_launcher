@@ -2,7 +2,7 @@ export function errorCodeLookup(errCode) {
   let CLIENT_ERROR_START_RANGE = -1;
   let NFS_ERROR_START_RANGE = CLIENT_ERROR_START_RANGE - 500;
   let DNS_ERROR_START_RANGE = NFS_ERROR_START_RANGE - 500;
-
+  let FFI_ERROR_START_RANGE = DNS_ERROR_START_RANGE - 500;
   switch (errCode) {
     case CLIENT_ERROR_START_RANGE:
       return 'CoreError::StructuredDataHeaderSizeProhibitive';
@@ -72,7 +72,27 @@ export function errorCodeLookup(errCode) {
       return 'DnsError::UnexpectedError';
     case DNS_ERROR_START_RANGE - 6:
       return 'DnsError::UnsuccessfulEncodeDecode';
+    case FFI_ERROR_START_RANGE - 1:
+      return 'FfiError::PathNotFound';
+    case FFI_ERROR_START_RANGE - 2:
+      return 'InvalidPath';
+    case FFI_ERROR_START_RANGE - 3:
+      return 'PermissionDenied';
+    case FFI_ERROR_START_RANGE - 4:
+      return 'JsonParseError';
+    case FFI_ERROR_START_RANGE - 5:
+      return 'JsonDecodeError';
+    case FFI_ERROR_START_RANGE - 6:
+      return 'SpecificParseError';
+    case FFI_ERROR_START_RANGE - 7:
+      return 'JsonEncodeError';
+    case FFI_ERROR_START_RANGE - 8:
+      return 'LocalConfigAccessFailed';
+    case FFI_ERROR_START_RANGE - 9:
+      return 'Unexpected';
+    case FFI_ERROR_START_RANGE - 10:
+      return 'UnsuccessfulEncodeDecode';
     default:
-      return 'Unclassified error';
+      return 'Unexpected error';
   }
 };
