@@ -156,7 +156,8 @@ export default class NFS {
           filePath: filePath,
           isPathShared: isPathShared,
           offset: offset || 0,
-          length: length || 0
+          length: length || 0,
+          includeMetadata: true
         }
       }, callback);
     }

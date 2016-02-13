@@ -150,11 +150,11 @@ export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
   self.isFileResponse = isFileResponse || false;
 
   var encrypt = function(msg) {
-    if (!(self.sessionInfo && msg)) {
+    if (!self.sessionInfo) {
       return msg;
     }
     self.res.set('Content-Type', 'text/plain');
-    return self.sessionInfo.encryptResponse(msg);
+    return self.sessionInfo.encryptResponse(formatResponse(msg));
   };
 
   var generalResponse = function(err, data) {
