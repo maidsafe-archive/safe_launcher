@@ -154,7 +154,7 @@ export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
       return msg;
     }
     self.res.set('Content-Type', 'text/plain');
-    return self.sessionInfo.encryptResponse(formatResponse(msg));
+    return self.sessionInfo.encryptResponse(msg);
   };
 
   var generalResponse = function(err, data) {
@@ -167,7 +167,7 @@ export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
     }
     let status = data ? 200 : 202;
     if (data) {
-      self.res.status(status).send(encrypt(data));
+      self.res.status(status).send(encrypt(formatResponse(data)));
     } else {
       self.res.sendStatus(status);
     }
@@ -182,13 +182,20 @@ export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
       return self.res.status(500).send(err);
     }
     data = formatResponse(data);
-    var content = encrypt(data.content);
+    var content = new Buffer(data.content, 'base64');
+    if (sessionInfo) {
+      content = sessionInfo.encryptBuffer(content);
+      self.res.set('Content-Type', 'text/plain');
+    } else {
+      // TODO set mime type
+      self.res.set('Content-Type', 'text/html');
+    }
     self.res.set('file-name', data.metadata.name);
     self.res.set('file-size', data.metadata.size);
     self.res.set('file-created-time', data.metadata.createdOn);
     self.res.set('file-modified-time', data.metadata.modifiedOn);
     self.res.set('file-metadata', data.metadata.userMetadata);
-    res.status(200).send(data);
+    res.status(200).send(content);
   };
 
   self.onResponse = self.isFileResponse ? fileReponse : generalResponse;

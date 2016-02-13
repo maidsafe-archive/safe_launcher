@@ -65,7 +65,8 @@ export default class DNS {
         serviceName: serviceName,
         offset: offset || 0,
         length: length || 0,
-        filePath: filePath
+        filePath: filePath,
+        includeMetadata: true
       }
     }, callback);
   }

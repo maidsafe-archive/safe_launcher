@@ -18,10 +18,10 @@ router.put('/nfs/file/metadata/:filePath/:isPathShared?', NFS.modifyFileMeta);
 router.put('/nfs/file/:filePath/:isPathShared?', NFS.modifyFileContent);
 router.get('/nfs/file/:filePath/:isPathShared?', NFS.getFile);
 // DNS API
-router.post('/dns/register', DNS.register);
-router.post('/dns/service', DNS.addService);
+router.post('/dns', DNS.register);
+router.put('/dns', DNS.addService);
 router.delete('/dns/longName/:longName', DNS.deleteDns);
 router.delete('/dns/service/:serviceName/:longName', DNS.deleteService);
-router.get('/dns/directory/:serviceName/:longName', DNS.getHomeDirectory);
-router.get('/dns/directory/:serviceName/:longName/:filePath', DNS.getFile);
+router.get('/dns/:serviceName/:longName', DNS.getHomeDirectory);
+router.get('/dns/:serviceName/:longName/:filePath', DNS.getFile);
 export { router as versionOneRouter };

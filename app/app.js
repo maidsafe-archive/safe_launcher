@@ -3,14 +3,33 @@
 import { remote } from 'electron'; // native electron module
 // import jetpack from 'fs-jetpack'; // module loaded from npm
 import env from './env';
-import ProxyServer from './web_proxy';
 import * as api from './api/safe';
 import RESTServer from './server/boot';
 import UIUtils from './ui_utils';
 import {formatResponse} from './server/utils';
+import childProcess from 'child_process';
 
 let restServer = new RESTServer(api, env.serverPort);
-let proxyServer = new ProxyServer(env.proxyPort, env.serverPort);
+let proxyServer = {
+  process: null,
+  start: function() {
+    if (this.process) {
+      return;
+    }
+    this.process = childProcess.fork('./app/server/web_proxy.js', [
+      '--proxyPort',
+      env.proxyPort,
+      '--serverPort',
+      env.serverPort
+    ]);
+  },
+  stop: function() {
+    if (!this.process) {
+      return;
+    }
+    this.process.kill();
+    this.process = null;
+  }
+};
+window.proxyServer = proxyServer;
 window.msl = new UIUtils(api, remote, restServer);
-
-window.proxy = proxyServer;
