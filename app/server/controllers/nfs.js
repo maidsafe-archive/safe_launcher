@@ -25,8 +25,10 @@ export var createDirectory = function(req, res) {
   if (!params.hasOwnProperty('dirPath') || !params.dirPath) {
     return res.status(400).send('Invalid request. dirPath missing');
   }
+  if (!params.hasOwnProperty('isPrivate')) {
+    params.isPrivate = false;
+  }
   params.isPathShared = params.isPathShared || false;
-  params.isPrivate = params.isPrivate || true;
   params.isVersioned = params.isVersioned || false;
   params.metadata = params.metadata || '';
 
