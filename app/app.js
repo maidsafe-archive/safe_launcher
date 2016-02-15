@@ -3,12 +3,13 @@
 import { remote } from 'electron'; // native electron module
 // import jetpack from 'fs-jetpack'; // module loaded from npm
 import env from './env';
+import path from 'path';
+import UIUtils from './ui_utils';
 import * as api from './api/safe';
 import RESTServer from './server/boot';
-import UIUtils from './ui_utils';
-import {formatResponse} from './server/utils';
 import childProcess from 'child_process';
-import path from 'path';
+import {formatResponse} from './server/utils';
+import { ipcRenderer as ipc } from 'electron';
 
 let restServer = new RESTServer(api, env.serverPort);
 let proxyServer = {
@@ -33,4 +34,12 @@ let proxyServer = {
   }
 };
 
+window.onbeforeunload = function(e) {
+  proxyServer.stop();
+  api.close();
+  e.returnValue = true;
+};
+
 window.msl = new UIUtils(api, remote, restServer);
+
+ipc.on('ffi-closed', window.msl.closeWindow);

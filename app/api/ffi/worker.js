@@ -10,7 +10,7 @@ var hanlder = new Hanlder(libPath);
 
 var onMessage = hanlder.dispatcher;
 
-var onBeforeExit = function(hanlder) {
+var BeforeExit = function(hanlder) {
   this.cleanUp = function() {
     if (!handler) {
       return;
@@ -21,4 +21,4 @@ var onBeforeExit = function(hanlder) {
 };
 
 process.on('message', onMessage);
-process.on('beforeExit', onBeforeExit(hanlder));
+process.on('beforeExit', new BeforeExit(hanlder));
