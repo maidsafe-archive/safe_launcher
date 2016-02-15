@@ -16,7 +16,7 @@
       </div>
       <div class="rt">
         <div class="rt-i">
-          <button ng-show="$state.current.name === 'user'" type="button" name="button" class="msl-btn msl-signout-btn" onclick="window.msl.closeWindow()">Sign out</button>
+          <button ng-if="$state.current.name === 'user'" type="button" name="button" class="msl-btn msl-signout-btn" onclick="window.msl.closeWindow()">Sign out</button>
         </div>
       </div>
     </div><!-- /title bar -->

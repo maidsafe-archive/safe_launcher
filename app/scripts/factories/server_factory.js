@@ -49,6 +49,16 @@ window.safeLauncher.factory('ServerFactory', [
     self.confirmResponse = function(payload, status) {
       window.msl.authResponse(payload, status);
     };
+
+    // start proxy server
+    self.startProxyServer = function(callback) {
+      window.msl.startProxyServer(callback);
+    }
+
+    // stop proxy server
+    self.stopProxyServer = function() {
+      window.msl.stopProxyServer();
+    }
     return self;
   }
 ]);

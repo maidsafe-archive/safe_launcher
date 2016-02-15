@@ -2,7 +2,8 @@
  * User Controller
  */
 window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFactory',
-  function($scope, $state, Server) {
+  function($scope, $state, Server, Loader) {
+    $scope.proxyState = false;
     $scope.confirmation = {
       status: false,
       data: {}
@@ -75,6 +76,18 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
     $scope.confirmResponse = function(payload, status) {
       hideConfirmation();
       Server.confirmResponse(payload, status);
+    };
+
+    // toggle proxy server
+    $scope.toggleProxyServer = function() {
+      $scope.proxyState = !$scope.proxyState;
+      if (!$scope.proxyState) {
+        Server.stopProxyServer();
+        return;
+      }
+      Server.startProxyServer(function(msg) {
+        console.log(msg);
+      });
     };
   }
 ]);

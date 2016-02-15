@@ -14,7 +14,7 @@ import { ipcRenderer as ipc } from 'electron';
 let restServer = new RESTServer(api, env.serverPort);
 let proxyServer = {
   process: null,
-  start: function() {
+  start: function(callback) {
     if (this.process) {
       return;
     }
@@ -24,6 +24,9 @@ let proxyServer = {
       '--serverPort',
       env.serverPort
     ]);
+    this.process.on('message', function(msg) {
+      callback(msg);
+    });
   },
   stop: function() {
     if (!this.process) {
@@ -40,6 +43,6 @@ window.onbeforeunload = function(e) {
   e.returnValue = true;
 };
 
-window.msl = new UIUtils(api, remote, restServer);
+window.msl = new UIUtils(api, remote, restServer, proxyServer);
 
 ipc.on('ffi-closed', window.msl.closeWindow);

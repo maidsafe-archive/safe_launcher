@@ -1,9 +1,10 @@
 // UI Utils
 export default class UIUtils {
-  constructor(api, remote, restServer) {
+  constructor(api, remote, restServer, proxy) {
     this.api = api;
     this.remote = remote;
     this.restServer = restServer;
+    this.proxy = proxy;
   }
 
   // login
@@ -68,5 +69,15 @@ export default class UIUtils {
       return;
     }
     this.remote.getCurrentWindow().restore();
+  }
+
+  // start proxy server
+  startProxyServer(callback) {
+    this.proxy.start(callback);
+  }
+
+  // stop proxy server
+  stopProxyServer() {
+    this.proxy.stop();
   }
 }

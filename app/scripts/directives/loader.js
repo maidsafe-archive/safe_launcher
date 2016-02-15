@@ -14,7 +14,7 @@ window.safeLauncher.directive('mslLoader', function() {
       var toggleDisplay = function() {
         $scope.show = !!($scope.api.loading);
       };
-      $scope.$watch('api.loading', toggleDisplay);
+      $scope.$watch('api.loading', toggleDisplay, true);
     } ]
   };
 });
