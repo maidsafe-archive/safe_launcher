@@ -5,7 +5,7 @@ import EventEmitter from 'events';
 import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
 import { versionOneRouter } from './routes/version_one';
-import { createSession } from './controllers/auth';
+import { CreateSession } from './controllers/auth';
 import { decryptRequest } from './utils';
 
 class ServerEventEmitter extends EventEmitter {};
@@ -119,7 +119,7 @@ export default class RESTServer {
 
   authApproved(data) {
     var app = data.payload.app;
-    this.app.get('api').auth.getAppDirectoryKey(app.id, app.name, app.vendor, new createSession(data.request, data.response));
+    this.app.get('api').auth.getAppDirectoryKey(app.id, app.name, app.vendor, new CreateSession(data));
   }
 
   authRejected(payload) {

@@ -26,6 +26,7 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootSco
       $scope.confirmation.data.payload = data.payload;
       $scope.confirmation.data.request = data.request;
       $scope.confirmation.data.response = data.response;
+      $scope.confirmation.data.permissions = data.permissions;
       $scope.$apply();
     };
 
@@ -104,6 +105,13 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootSco
         console.log(msg);
         Loader.hide();
       });
+    };
+
+    $scope.parsePermission = function(str) {
+      str = str.toLowerCase();
+      str = str.replace(/_/g, " ");
+      str = str[0].toUpperCase() + str.slice(1);
+      return str;
     };
   }
 ]);

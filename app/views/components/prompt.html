@@ -8,11 +8,11 @@
 
       <div class="msl-prompt-body-li">
         <div class="msl-prompt-body-li-i"
-        ng-if="confirmation.data.payload.permissions.length !== 0"
-        ng-repeat="permission in confirmation.data.payload.permissions">
-          {{ permission }}
+        ng-if="confirmation.data.permissions.list.length !== 0"
+        ng-repeat="permission in confirmation.data.permissions.list">
+          {{ parsePermission(permission) }}
         </div>
-        <div class="msl-prompt-body-li-i" ng-if="confirmation.data.payload.permissions.length === 0" class="">None</div>
+        <div class="msl-prompt-body-li-i" ng-if="confirmation.data.permissions.length === 0" class="">None</div>
       </div>
     </div>
     <div class="msl-prompt-foot">
