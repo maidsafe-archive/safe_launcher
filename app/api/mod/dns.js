@@ -6,7 +6,7 @@ export default class DNS {
   }
 
   getHomeDirectory(longName, serviceName, hasSafeDriveAccess, appDirKey, callback) {
-    var msg = {
+    this.send({
       module: this.MODULE,
       action: 'get-home-dir',
       isAuthorised: (appDirKey ? true : false),
@@ -16,8 +16,7 @@ export default class DNS {
         longName: longName,
         serviceName: serviceName
       }
-    };
-    this.send(msg, callback);
+    }, callback);
   }
 
   register(longName, serviceName, serviceHomeDirPath, isPathShared,
@@ -50,6 +49,23 @@ export default class DNS {
         serviceName: serviceName,
         isPathShared: isPathShared,
         serviceHomeDirPath: serviceHomeDirPath
+      }
+    }, callback);
+  }
+
+  getFile(longName, serviceName, filePath, offset, length, hasSafeDriveAccess, appDirKey, callback) {
+    this.send({
+      module: this.MODULE,
+      action: 'get-file',
+      isAuthorised: (appDirKey ? true : false),
+      hasSafeDriveAccess: hasSafeDriveAccess || false,
+      appDirKey: appDirKey,
+      params: {
+        longName: longName,
+        serviceName: serviceName,
+        offset: offset || 0,
+        length: length || 0,
+        filePath: filePath
       }
     }, callback);
   }

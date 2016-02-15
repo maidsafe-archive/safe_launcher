@@ -51,6 +51,15 @@ var addService = function(lib, request) {
   }
 };
 
+var getFile = function(lib, request) {
+  try {
+    var payload = createPayload('get-file', request);
+    util.executeForContent(lib, request.client, request.id, payload);
+  } catch (e) {
+    util.sendError(request.id, 999, e.toString());
+  }
+};
+
 var deleteDns = function(lib, request) {
   try {
     var payload = createPayload('delete-dns', request);
@@ -79,6 +88,9 @@ exports.execute = function(lib, request) {
       break;
     case 'add-service':
       addService(lib, request);
+      break;
+    case 'get-file':
+      getFile(lib, request);
       break;
     case 'delete-dns':
       deleteDns(lib, request);
