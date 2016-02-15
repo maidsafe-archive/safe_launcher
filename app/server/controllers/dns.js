@@ -49,7 +49,7 @@ export var getFile = function(req, res) {
   let offset = req.query.offset || 0;
   let length = req.query.length || 0;
   let responseHandler = new ResponseHandler(res, sessionInfo, true);
-  req.app.get('api').dns.getFile(longName, serviceName, filePath, offset, length, asSafeDriveAccess, appDirKey,
+  req.app.get('api').dns.getFile(longName, serviceName, filePath, offset, length, hasSafeDriveAccess, appDirKey,
     responseHandler.onResponse);
 };
 

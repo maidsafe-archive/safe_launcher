@@ -131,11 +131,11 @@ var modifyFileContent = function(lib, request) {
 
 var getFile = function(lib, request) {
   try {
-    var payload = createPayload(request);
+    var payload = createPayload('get-file', request);
     payload.data.offset = request.params.offset;
     payload.data.length = request.params.length;
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    payload.data.include_metadata = request.params.include_metadata;
+    payload.data.include_metadata = request.params.includeMetadata;
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.executeForContent(lib, request.client, request.id, payload);
   } catch (e) {
