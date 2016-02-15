@@ -1,20 +1,9 @@
-class AppLifeCycleHandler {
-  constructor(api) {
-    this.api = api;
-  }
-  close() {
-    this.api.close();
-  }
-}
-
 // UI Utils
 export default class UIUtils {
   constructor(api, remote, restServer) {
     this.api = api;
     this.remote = remote;
     this.restServer = restServer;
-    this.lifeCycleHandler = new AppLifeCycleHandler(api);
-    this.remote.getCurrentWindow().on('close', this.lifeCycleHandler.close);
   }
 
   // login
