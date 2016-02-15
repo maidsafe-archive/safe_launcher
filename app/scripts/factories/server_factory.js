@@ -53,12 +53,12 @@ window.safeLauncher.factory('ServerFactory', [
     // start proxy server
     self.startProxyServer = function(callback) {
       window.msl.startProxyServer(callback);
-    }
+    };
 
     // stop proxy server
     self.stopProxyServer = function() {
       window.msl.stopProxyServer();
-    }
+    };
     return self;
   }
 ]);

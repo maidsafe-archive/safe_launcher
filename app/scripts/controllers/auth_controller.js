@@ -37,11 +37,11 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', '$rootSco
 
     var Loader = {
       show: function() {
-        $rootScope._loader = true;
+        $rootScope.$loader = true;
       },
       hide: function() {
-        $rootScope._loader = false;
-        if(!$rootScope.$$phase) {
+        $rootScope.$loader = false;
+        if (!$rootScope.$$phase) {
           $rootScope.$apply();
         }
       }
