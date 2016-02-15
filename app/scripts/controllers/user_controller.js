@@ -1,14 +1,25 @@
 /**
  * User Controller
  */
-window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFactory',
-  function($scope, $state, Server, Loader) {
+window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootScope', 'ServerFactory',
+  function($scope, $state, $rootScope, Server) {
     $scope.proxyState = false;
     $scope.confirmation = {
       status: false,
       data: {}
     };
     $scope.manageListApp = [];
+    var Loader = {
+      show: function() {
+        $rootScope._loader = true;
+      },
+      hide: function() {
+        $rootScope._loader = false;
+        if(!$rootScope.$$phase) {
+          $rootScope.$apply();
+        }
+      }
+    };
 
     var showConfirmation  = function(data) {
       $scope.confirmation.status = true;
@@ -53,6 +64,7 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
         status: true,
         permissions: session.info.permissions
       });
+      Loader.hide();
       $scope.$apply();
     });
 
@@ -75,18 +87,22 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
 
     $scope.confirmResponse = function(payload, status) {
       hideConfirmation();
+      Loader.show();
       Server.confirmResponse(payload, status);
     };
 
     // toggle proxy server
     $scope.toggleProxyServer = function() {
       $scope.proxyState = !$scope.proxyState;
+      Loader.show();
       if (!$scope.proxyState) {
         Server.stopProxyServer();
+        Loader.hide();
         return;
       }
       Server.startProxyServer(function(msg) {
         console.log(msg);
+        Loader.hide();
       });
     };
   }

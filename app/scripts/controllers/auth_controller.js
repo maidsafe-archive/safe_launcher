@@ -2,8 +2,8 @@
  * Auth Controller
  * @param Auth - Auth factory dependency
  */
-window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFactory', 'LoaderFactory',
-  function($scope, $state, Auth, Loader) {
+window.safeLauncher.controller('AuthController', [ '$scope', '$state', '$rootScope', 'AuthFactory',
+  function($scope, $state, $rootScope, Auth) {
     $scope.user = {};
     $scope.tabs = {
       state: [
@@ -31,6 +31,18 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
           if (!$scope.validateKeyword()) {
             return;
           }
+        }
+      }
+    };
+
+    var Loader = {
+      show: function() {
+        $rootScope._loader = true;
+      },
+      hide: function() {
+        $rootScope._loader = false;
+        if(!$rootScope.$$phase) {
+          $rootScope.$apply();
         }
       }
     };
