@@ -38,10 +38,11 @@ export var getHomeDirectory = function(req, res) {
 export var getFile = function(req, res) {
   let sessionInfo = req.headers['sessionId'] ? sessionManager.get(res.headers['sessionId']) : null;
   let appDirKey = sessionInfo ? sessionInfo.appDirKey : null;
+  var reqParams = req.params;
   let hasSafeDriveAccess = sessionInfo ? sessionInfo.hasSafeDriveAccess() : false;
-  let longName = req.params.longName;
-  let serviceName = req.params.serviceName;
-  let filePath = req.params.filePath;
+  let longName = reqParams.longName;
+  let serviceName = reqParams.serviceName;
+  let filePath = reqParams.filePath;
   if (!(longName && serviceName && filePath)) {
     return res.status(400).send('Required parameter(s) missing');
   }
