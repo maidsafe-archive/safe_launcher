@@ -3,7 +3,7 @@
   <form name="mslLogin" ng-submit="login()">
     <!-- pin -->
     <div class="msl-form-grp">
-      <input type="password" name="pin" placeholder="Pin" ng-model="user.pin" msl-validate-pin/>
+      <input type="password" name="pin" placeholder="Pin" ng-model="user.pin" msl-validate-pin autofocus/>
       <span type="button" name="clear-btn" class="clear-btn" ng-click="user.pin = null;mslLogin.pin.$setValidity('customValidation', false)">x</span>
     </div>
     <!-- keyword -->
