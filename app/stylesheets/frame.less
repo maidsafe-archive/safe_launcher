@@ -1,11 +1,17 @@
 .msl-frame {
   width: 100%;
-  height: 328px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding-top: 32px;
   .msl-frame-h {
     width: 100%;
     height: 32px;
     display: table;
     background-color: white;
+    position: relative;
+    z-index: 999;
     .msl-frame-h-i {
       font-size: 14px;
       font-weight: normal;
@@ -31,9 +37,11 @@
   }
   .msl-frame-cntr {
     width: 100%;
-    height: 296px;
-    overflow: auto;
-    padding: 16px 16px 0;
+    height: 100%;
+    padding: 80px 16px 0;
+    position: absolute;
+    top: 0;
+    left: 0;
     overflow: auto;
     .msl-frame-cntr-b {
       width: 100%;

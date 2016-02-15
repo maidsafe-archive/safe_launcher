@@ -14,7 +14,7 @@
 <div class="msl-li" ng-if="manageListApp.length > 0">
   <h3 class="msl-li-h">App</h3>
   <div class="msl-li-i" ng-repeat="list in manageListApp" ng-class="{disabled: !list.status}" ng-click="toggleSetting(list)">
-    <span class="li-icn"></span>
+    <span class="li-icn">{{list.name[0]}}</span>
     <div class="li-i-desc">
       <h3 class="li-i-desc-main">{{list.name}}</h3>
       <h4 class="li-i-desc-sub">{{list.name}} is {{list.status ? 'enabled' : 'disabled'}}</h3>
