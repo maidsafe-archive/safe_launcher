@@ -124,7 +124,7 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootSco
     // Parse authorise permissions
     $scope.parsePermission = function(str) {
       str = str.toLowerCase();
-      str = str.replace(/_/g, " ");
+      str = str.replace(/_/g, ' ');
       str = str[0].toUpperCase() + str.slice(1);
       return str;
     };
@@ -132,6 +132,6 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootSco
     // remove session
     $scope.removeSession = function(id) {
       Server.removeSession(id);
-    }
+    };
   }
 ]);
