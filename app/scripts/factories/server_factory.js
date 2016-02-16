@@ -40,6 +40,16 @@ window.safeLauncher.factory('ServerFactory', [
       window.msl.onAuthRequest(callback);
     };
 
+    // handle revoke request
+    self.onRevokeRequest = function(callback) {
+      window.msl.onRevokeRequest(callback);
+    };
+
+    // remove session
+    self.removeSession = function(id) {
+      window.msl.removeSession(id);
+    };
+
     // restore window if minimized
     self.restoreWindow = function() {
       window.msl.restoreWindow();

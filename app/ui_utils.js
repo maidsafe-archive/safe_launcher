@@ -62,6 +62,11 @@ export default class UIUtils {
     return status ? this.restServer.authApproved(payload) : this.restServer.authRejected(payload);
   }
 
+  // remove session
+  removeSession(id) {
+    this.restServer.removeSession(id);
+  }
+
   // restore window if minimized
   restoreWindow() {
     var browserWindow = this.remote.getCurrentWindow();

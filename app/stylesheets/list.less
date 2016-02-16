@@ -11,7 +11,6 @@
   .msl-li-i {
     padding-bottom: 16px;
     position: relative;
-    cursor: pointer;
     &.disabled {
       > .li-i-desc {
         opacity: 0.5;
@@ -52,11 +51,19 @@
     }
     > .li-i-action {
       width: 20%;
-      padding: 11px 0;
+      padding: 6px 0;
       position: absolute;
       top: 0;
       right: 0;
       text-align: right;
+      button {
+        background-color: transparent;
+        font-size: 14px;
+        font-weight: 600;
+        color: @msl-txt-clr-d;
+        cursor: pointer;
+        padding: 8px 0;
+      }
     }
     .clearfix();
   }

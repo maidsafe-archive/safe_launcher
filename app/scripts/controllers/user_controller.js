@@ -9,6 +9,7 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootSco
       data: {}
     };
     $scope.manageListApp = [];
+
     var Loader = {
       show: function() {
         $rootScope.$loader = true;
@@ -36,6 +37,18 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootSco
         data: {}
       };
     };
+
+    var removeApplication = function(id) {
+      $scope.manageListApp.forEach(function(list, index) {
+        if (list.id === id) {
+          $scope.manageListApp.splice(index, 1);
+          if (!$scope.$$phase) {
+            $scope.$apply();
+          }
+        }
+      });
+    };
+
     // start server
     Server.start();
 
@@ -72,6 +85,7 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootSco
     // handle session removed
     Server.onSessionRemoved(function(id) {
       console.log('Session removed :: ' + id);
+      removeApplication(id);
     });
 
     // handle auth request
@@ -102,16 +116,22 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootSco
         return;
       }
       Server.startProxyServer(function(msg) {
-        console.log(msg);
         Loader.hide();
+        console.log(msg);
       });
     };
 
+    // Parse authorise permissions
     $scope.parsePermission = function(str) {
       str = str.toLowerCase();
       str = str.replace(/_/g, " ");
       str = str[0].toUpperCase() + str.slice(1);
       return str;
     };
+
+    // remove session
+    $scope.removeSession = function(id) {
+      Server.removeSession(id);
+    }
   }
 ]);
