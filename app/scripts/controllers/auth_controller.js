@@ -58,15 +58,13 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', '$rootSco
         keyword: $scope.user.keyword,
         password: $scope.user.password
       };
-      console.log('Register :: ', payload);
       Loader.show();
       Auth.register(payload, function(err, res) {
         reset();
         Loader.hide();
         if (err) {
-          return alert('Unable to register');
+          return alert('Registration failed. Please try again');
         }
-        alert('Registration Successful');
         $state.go('user');
       });
     };
@@ -135,8 +133,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', '$rootSco
         reset();
         Loader.hide();
         if (err) {
-          console.log(err);
-          alert('Unable to login');
+          alert('Login failed. Please try again');
           return;
         }
         $state.go('user');
