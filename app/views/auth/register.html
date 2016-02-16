@@ -10,7 +10,9 @@
   <form name="registerPin" ng-show="tabs.currentPos === tabs.state[0]" ng-submit="validatePin()">
     <!-- pin -->
     <div class="msl-form-grp">
-      <input type="password" name="pin" placeholder="PIN" ng-model="user.pin" msl-validate-pin/>
+      <input type="password" name="pin" placeholder="PIN"
+      ng-model="user.pin"
+      msl-validate-pin/>
       <span type="button" name="clear-btn" class="clear-btn" ng-click="user.pin = null; registerPin.pin.$setValidity('customValidation', false);">x</span>
     </div>
     <!-- confirm pin -->
@@ -28,7 +30,9 @@
   <form name="registerKeyword" ng-show="tabs.currentPos === tabs.state[1]" ng-submit="validateKeyword()">
     <!-- keyword -->
     <div class="msl-form-grp">
-      <input type="password" name="keyword" placeholder="Keyword" ng-model="user.keyword" msl-validate-keyword/>
+      <input type="password" name="keyword" placeholder="Keyword"
+      ng-model="user.keyword"
+      msl-validate-keyword/>
       <span type="button" name="clear-btn" class="clear-btn" ng-click="user.keyword = null;registerKeyword.keyword.$setValidity('customValidation', false)">x</span>
     </div>
     <!-- confirm keyword -->
@@ -46,13 +50,13 @@
   <form name="registerPassword" ng-show="tabs.currentPos === tabs.state[2]" ng-submit="validatePassword()">
     <!-- password -->
     <div class="msl-form-grp">
-      <input type="password" name="password" placeholder="Password" ng-model="user.password" msl-validate-password/>
+      <input type="password" name="password" placeholder="Password"
+      ng-model="user.password"
+      msl-validate-password/>
       <span type="button" name="clear-btn" class="clear-btn" ng-click="user.password = null;registerPassword.password.$setValidity('customValidation', false)">x</span>
     </div>
     <!-- confirm password -->
-    <div class="msl-form-grp">
-      <input type="password" name="confirmPassword" placeholder="Confirm Password" ng-model="user.confirmPassword" target-name="password" msl-validate-password msl-validate-confirmation/>
-      <span type="button" name="clear-btn" class="clear-btn"  ng-click="user.confirmPassword = null;registerPassword.confirmPassword.$setValidity('customValidation', false)">x</span>
+    <div class="msl-form-grp">=ssword.confirmPassword.$setValidity('customValidation', false)">x</span>
     </div>
     <!-- register btn -->
     <div class="msl-form-grp">

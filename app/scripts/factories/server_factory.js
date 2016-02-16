@@ -40,6 +40,16 @@ window.safeLauncher.factory('ServerFactory', [
       window.msl.onAuthRequest(callback);
     };
 
+    // handle revoke request
+    self.onRevokeRequest = function(callback) {
+      window.msl.onRevokeRequest(callback);
+    };
+
+    // remove session
+    self.removeSession = function(id) {
+      window.msl.removeSession(id);
+    };
+
     // restore window if minimized
     self.restoreWindow = function() {
       window.msl.restoreWindow();
@@ -48,6 +58,16 @@ window.safeLauncher.factory('ServerFactory', [
     // handle auth request
     self.confirmResponse = function(payload, status) {
       window.msl.authResponse(payload, status);
+    };
+
+    // start proxy server
+    self.startProxyServer = function(callback) {
+      window.msl.startProxyServer(callback);
+    };
+
+    // stop proxy server
+    self.stopProxyServer = function() {
+      window.msl.stopProxyServer();
     };
     return self;
   }

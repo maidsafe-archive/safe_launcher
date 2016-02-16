@@ -36,7 +36,6 @@ export var createDirectory = function(req, res) {
     return res.status(400).send('Invalid request. isVersioned should be a boolean value');
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);;
-  let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1;
   let appDirKey = sessionInfo.appDirKey;
   req.app.get('api').nfs.createDirectory(params.dirPath, params.isPrivate, params.isVersioned,
     params.metadata, params.isPathShared, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey,

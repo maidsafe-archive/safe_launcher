@@ -39,7 +39,7 @@ var executeTest = function() {
     .pipe(stylish.combineWithHintResults()) // combine with jshint results
     .pipe(jshint.reporter('jshint-stylish'));
 
-  runMochaTests();
+  // runMochaTests();
 };
 
 gulp.task('test', executeTest);

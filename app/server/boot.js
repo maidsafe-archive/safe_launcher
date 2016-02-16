@@ -5,7 +5,7 @@ import EventEmitter from 'events';
 import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
 import { versionOneRouter } from './routes/version_one';
-import { createSession } from './controllers/auth';
+import { CreateSession } from './controllers/auth';
 import { decryptRequest } from './utils';
 
 class ServerEventEmitter extends EventEmitter {};
@@ -92,9 +92,9 @@ export default class RESTServer {
     app.set('port', this.port);
     this.server = http.createServer(app);
     this.server.listen(this.port);
-    this.server.on('error', this._onError(EVENT_TYPE.ERROR, eventEmitter));
-    this.server.on('close', this._onClose(EVENT_TYPE.STOPPED, eventEmitter));
-    this.server.on('listening', this._onListening(EVENT_TYPE.STARTED, eventEmitter));
+    this.server.on('error', this._onError(this.EVENT_TYPE.ERROR, eventEmitter));
+    this.server.on('close', this._onClose(this.EVENT_TYPE.STOPPED, eventEmitter));
+    this.server.on('listening', this._onListening(this.EVENT_TYPE.STARTED, eventEmitter));
   }
 
   stop() {
@@ -106,7 +106,7 @@ export default class RESTServer {
 
   removeSession(id) {
     sessionManager.remove(id);
-    this.app.get('eventEmitter').emit(EVENT_TYPE.SESSION_REMOVED, id);
+    this.app.get('eventEmitter').emit(this.EVENT_TYPE.SESSION_REMOVED, id);
   }
 
   addEventListener(event, listener) {
@@ -119,7 +119,7 @@ export default class RESTServer {
 
   authApproved(data) {
     var app = data.payload.app;
-    this.app.get('api').auth.getAppDirectoryKey(app.id, app.name, app.vendor, new createSession(data.request, data.response));
+    this.app.get('api').auth.getAppDirectoryKey(app.id, app.name, app.vendor, new CreateSession(data));
   }
 
   authRejected(payload) {

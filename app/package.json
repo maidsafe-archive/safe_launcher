@@ -1,8 +1,8 @@
 {
-  "name": "safe_launcher",
+  "name": "safe-launcher",
   "productName": "SAFELauncher",
   "identifier": "com.maidsafe.safe_launcher",
-  "description": "SAFE launcher - gateway to the SAFE Network",
+  "description": "SAFE Launcher - Gateway to the SAFE Network",
   "version": "0.1.0",
   "author": "Maidsafe",
   "copyright": "",
@@ -18,5 +18,8 @@
     "morgan": "~1.6.1",
     "ref": "^1.3.2",
     "ref-array": "^1.1.2"
+  },
+  "scripts": {
+    "postinstall": "node ../tasks/rebuild_native"
   }
 }

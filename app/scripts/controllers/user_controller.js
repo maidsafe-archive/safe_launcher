@@ -1,19 +1,33 @@
 /**
  * User Controller
  */
-window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFactory',
-  function($scope, $state, Server) {
+window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootScope', 'ServerFactory',
+  function($scope, $state, $rootScope, Server) {
+    $scope.proxyState = false;
     $scope.confirmation = {
       status: false,
       data: {}
     };
     $scope.manageListApp = [];
 
+    var Loader = {
+      show: function() {
+        $rootScope.$loader = true;
+      },
+      hide: function() {
+        $rootScope.$loader = false;
+        if (!$rootScope.$$phase) {
+          $rootScope.$apply();
+        }
+      }
+    };
+
     var showConfirmation  = function(data) {
       $scope.confirmation.status = true;
       $scope.confirmation.data.payload = data.payload;
       $scope.confirmation.data.request = data.request;
       $scope.confirmation.data.response = data.response;
+      $scope.confirmation.data.permissions = data.permissions;
       $scope.$apply();
     };
 
@@ -23,6 +37,18 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
         data: {}
       };
     };
+
+    var removeApplication = function(id) {
+      $scope.manageListApp.forEach(function(list, index) {
+        if (list.id === id) {
+          $scope.manageListApp.splice(index, 1);
+          if (!$scope.$$phase) {
+            $scope.$apply();
+          }
+        }
+      });
+    };
+
     // start server
     Server.start();
 
@@ -52,12 +78,14 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
         status: true,
         permissions: session.info.permissions
       });
+      Loader.hide();
       $scope.$apply();
     });
 
     // handle session removed
     Server.onSessionRemoved(function(id) {
       console.log('Session removed :: ' + id);
+      removeApplication(id);
     });
 
     // handle auth request
@@ -74,7 +102,36 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', 'ServerFa
 
     $scope.confirmResponse = function(payload, status) {
       hideConfirmation();
+      Loader.show();
       Server.confirmResponse(payload, status);
+    };
+
+    // toggle proxy server
+    $scope.toggleProxyServer = function() {
+      $scope.proxyState = !$scope.proxyState;
+      Loader.show();
+      if (!$scope.proxyState) {
+        Server.stopProxyServer();
+        Loader.hide();
+        return;
+      }
+      Server.startProxyServer(function(msg) {
+        Loader.hide();
+        console.log(msg);
+      });
+    };
+
+    // Parse authorise permissions
+    $scope.parsePermission = function(str) {
+      str = str.toLowerCase();
+      str = str.replace(/_/g, ' ');
+      str = str[0].toUpperCase() + str.slice(1);
+      return str;
+    };
+
+    // remove session
+    $scope.removeSession = function(id) {
+      Server.removeSession(id);
     };
   }
 ]);

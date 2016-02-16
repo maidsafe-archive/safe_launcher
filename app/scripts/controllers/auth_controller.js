@@ -2,8 +2,8 @@
  * Auth Controller
  * @param Auth - Auth factory dependency
  */
-window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFactory', 'LoaderFactory',
-  function($scope, $state, Auth, Loader) {
+window.safeLauncher.controller('AuthController', [ '$scope', '$state', '$rootScope', 'AuthFactory',
+  function($scope, $state, $rootScope, Auth) {
     $scope.user = {};
     $scope.tabs = {
       state: [
@@ -35,6 +35,18 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
       }
     };
 
+    var Loader = {
+      show: function() {
+        $rootScope.$loader = true;
+      },
+      hide: function() {
+        $rootScope.$loader = false;
+        if (!$rootScope.$$phase) {
+          $rootScope.$apply();
+        }
+      }
+    };
+
     // register user
     var register = function() {
       var reset = function() {
@@ -46,15 +58,13 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
         keyword: $scope.user.keyword,
         password: $scope.user.password
       };
-      console.log('Register :: ', payload);
       Loader.show();
       Auth.register(payload, function(err, res) {
         reset();
         Loader.hide();
         if (err) {
-          return alert('Unable to register');
+          return alert('Registration failed. Please try again');
         }
-        alert('Registration Successful');
         $state.go('user');
       });
     };
@@ -123,8 +133,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', 'AuthFact
         reset();
         Loader.hide();
         if (err) {
-          console.log(err);
-          alert('Unable to login');
+          alert('Login failed. Please try again');
           return;
         }
         $state.go('user');

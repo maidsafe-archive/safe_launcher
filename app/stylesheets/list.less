@@ -11,7 +11,6 @@
   .msl-li-i {
     padding-bottom: 16px;
     position: relative;
-    cursor: pointer;
     &.disabled {
       > .li-i-desc {
         opacity: 0.5;
@@ -25,6 +24,11 @@
       display: inline-block;
       border-radius: 50%;
       background-color: @msl-icn-bg-orange;
+      text-align: center;
+      line-height: 40px;
+      color: white;
+      font-size: 20px;
+      font-weight: 600;
     }
     > .li-i-desc {
       float: left;
@@ -37,7 +41,8 @@
       }
       .li-i-desc-sub {
         margin: 0;
-        padding: 0;
+        padding: 0 8px 0 0;
+        display: inline;
         font-size: 12px;
         font-weight: normal;
         line-height: 24px;
@@ -46,11 +51,19 @@
     }
     > .li-i-action {
       width: 20%;
-      padding: 11px 0;
+      padding: 6px 0;
       position: absolute;
       top: 0;
       right: 0;
       text-align: right;
+      button {
+        background-color: transparent;
+        font-size: 14px;
+        font-weight: 600;
+        color: @msl-txt-clr-d;
+        cursor: pointer;
+        padding: 8px 0;
+      }
     }
     .clearfix();
   }

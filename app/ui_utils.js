@@ -1,9 +1,10 @@
 // UI Utils
 export default class UIUtils {
-  constructor(api, remote, restServer) {
+  constructor(api, remote, restServer, proxy) {
     this.api = api;
     this.remote = remote;
     this.restServer = restServer;
+    this.proxy = proxy;
   }
 
   // login
@@ -61,6 +62,11 @@ export default class UIUtils {
     return status ? this.restServer.authApproved(payload) : this.restServer.authRejected(payload);
   }
 
+  // remove session
+  removeSession(id) {
+    this.restServer.removeSession(id);
+  }
+
   // restore window if minimized
   restoreWindow() {
     var browserWindow = this.remote.getCurrentWindow();
@@ -68,5 +74,15 @@ export default class UIUtils {
       return;
     }
     this.remote.getCurrentWindow().restore();
+  }
+
+  // start proxy server
+  startProxyServer(callback) {
+    this.proxy.start(callback);
+  }
+
+  // stop proxy server
+  stopProxyServer() {
+    this.proxy.stop();
   }
 }

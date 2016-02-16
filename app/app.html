@@ -16,12 +16,12 @@
       </div>
       <div class="rt">
         <div class="rt-i">
-          <button ng-show="$state.current.name === 'user'" type="button" name="button" class="msl-btn msl-signout-btn" onclick="window.msl.closeWindow()">Sign out</button>
+          <button ng-if="$state.current.name === 'user'" type="button" name="button" class="msl-btn msl-signout-btn" onclick="window.msl.closeWindow()">Sign out</button>
         </div>
       </div>
     </div><!-- /title bar -->
     <div class="msl-frame" ui-view></div>
-    <msl-loader />
+    <msl-loader ng-show="$loader" />
   </div>
   <!-- /root node -->
 
@@ -45,7 +45,6 @@
   <script src="scripts/directives/validateConfirmation.js" charset="utf-8"></script>
 
   <!-- factories -->
-  <script src="./scripts/factories/loader_factory.js" charset="utf-8"></script>
   <script src="./scripts/factories/auth_factory.js" charset="utf-8"></script>
   <script src="./scripts/factories/server_factory.js" charset="utf-8"></script>
 

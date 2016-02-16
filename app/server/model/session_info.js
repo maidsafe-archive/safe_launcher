@@ -14,7 +14,7 @@ export default class SessionInfo {
   }
 
   hasSafeDriveAccess() {
-    return this.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1;
+    return this.permissions.hasSafeDriveAccess();
   }
 
   encryptResponse(jsonObj) {

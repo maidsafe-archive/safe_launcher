@@ -5,9 +5,12 @@ import jwt from 'jsonwebtoken';
 import * as sodium from 'libsodium-wrappers';
 import sessionManager from '../session_manager';
 import SessionInfo from '../model/session_info';
+import Permission from '../model/permission';
 import { getSessionIdFromRequest } from '../utils'
 
-export var createSession = function(req, res) {
+export let CreateSession = function(data) {
+  let req = data.request;
+  let res = data.response;
   this.onDirKey = function(err, dirKey) {
     let authReq = req.body;
     if (err) {
@@ -19,7 +22,7 @@ export var createSession = function(req, res) {
       let sessionId = new Buffer(sodium.randombytes_buf(32)).toString('base64');
       let appPubKey = new Uint8Array(new Buffer(authReq.publicKey, 'base64'));
       let appNonce = new Uint8Array(new Buffer(authReq.nonce, 'base64'));
-      let sessionInfo = new SessionInfo(app.id, app.name, app.version, app.vendor, authReq.permissions, dirKey);
+      let sessionInfo = new SessionInfo(app.id, app.name, app.version, app.vendor, data.permissions, dirKey);
       let symmetricKey = Buffer.concat([new Buffer(sessionInfo.secretKey), new Buffer(sessionInfo.nonce)]);
       let encryptedKey = sodium.crypto_box_easy(new Uint8Array(symmetricKey), appNonce, appPubKey, assymetricKeyPair.privateKey);
       let payload = JSON.stringify({ id: sessionId });
@@ -49,7 +52,13 @@ export var authorise = function(req, res) {
       authReq.app.version && authReq.publicKey && authReq.nonce)) {
     return res.status(400).send('Fields are missing');
   }
-
+  if (!authReq.hasOwnProperty('permissions')) {
+    return res.status(400).send('permissions are missing');
+  }
+  let permissions = new Permission(authReq.permissions);
+  if (!permissions.isValid()) {
+    return res.status(400).send('Invalid permissions');
+  }
   var publicKeyLength = new Buffer(authReq.publicKey, 'base64').length;
   var nonceLength = new Buffer(authReq.nonce, 'base64').length;
 
@@ -63,7 +72,8 @@ export var authorise = function(req, res) {
   let payload = {
     payload: authReq,
     request: req,
-    response: res
+    response: res,
+    permissions: permissions
   };
   let eventType = req.app.get('EVENT_TYPE').AUTH_REQUEST;
   req.app.get('eventEmitter').emit(eventType, payload);
