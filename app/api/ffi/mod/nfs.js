@@ -153,7 +153,7 @@ var move = function(lib, request, action) {
     payload.data.is_dest_path_shared = request.params.isDestPathShared;
     payload.data.retain_source = request.params.retainSource;
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    util.executeForContent(lib, request.client, request.id, payload);
+    util.execute(lib, request.client, request.id, payload);
   } catch (e) {
     util.sendError(request.id, 999, e.toString());
   }

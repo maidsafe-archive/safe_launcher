@@ -32,10 +32,10 @@ let move = function(req, res, isFile) {
   let responseHandler = new ResponseHandler(res, sessionInfo);
   if (isFile) {
     req.app.get('api').nfs.moveFile(payload.srcPath, payload.isSrcPathShared, payload.destPath, payload.isDestPathShared,
-      payload.retainSource, sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
+      payload.retainSource, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
   } else {
-    req.app.get('api').nfs.moveDirectory(payload.srcPath, payload.isSrcPathShared, payload.destPath, payload.isDestPathShared,
-      payload.retainSource, sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
+    req.app.get('api').nfs.moveDir(payload.srcPath, payload.isSrcPathShared, payload.destPath, payload.isDestPathShared,
+      payload.retainSource, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
   }
 }
 

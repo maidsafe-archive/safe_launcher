@@ -171,7 +171,7 @@ export default class NFS {
         hasSafeDriveAccess: hasSafeDriveAccess,
         params: {
           srcPath: srcPath,
-          isPathShared: isPathShared,
+          isSrcPathShared: isSrcPathShared,
           destPath: destPath,
           isDestPathShared: isDestPathShared,
           retainSource: retainSource
@@ -188,7 +188,7 @@ export default class NFS {
         hasSafeDriveAccess: hasSafeDriveAccess,
         params: {
           srcPath: srcPath,
-          isPathShared: isPathShared,
+          isSrcPathShared: isSrcPathShared,
           destPath: destPath,
           isDestPathShared: isDestPathShared,
           retainSource: retainSource

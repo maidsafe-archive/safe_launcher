@@ -13,8 +13,8 @@ router.delete('/nfs/directory/:dirPath/:isPathShared?', NFS.deleteDirectory);
 router.put('/nfs/directory/:dirPath/:isPathShared?', NFS.modifyDirectory);
 // NFS - FILE API
 router.post('/nfs/file', NFS.createFile);
-router.post('/nfs/movedir', NFS.moveDir);
-router.post('/nfs/movefile', NFS.moveDir);
+router.post('/nfs/movedir', NFS.moveDirectory);
+router.post('/nfs/movefile', NFS.moveFile);
 router.delete('/nfs/file/:filePath/:isPathShared?', NFS.deleteFile);
 router.put('/nfs/file/metadata/:filePath/:isPathShared?', NFS.modifyFileMeta);
 router.put('/nfs/file/:filePath/:isPathShared?', NFS.modifyFileContent);
