@@ -92,7 +92,7 @@ export var listLongNames = function(req, res) {
     return res.status(401).send('Unauthorised');
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  req.app.get('api').dns.listLongNames(responseHandler.onResponse);
+  req.app.get('api').dns.listLongNames(sessionInfo.appDirKey, responseHandler.onResponse);
 };
 
 export var listServices = function(req, res) {
@@ -101,7 +101,7 @@ export var listServices = function(req, res) {
     return res.status(401).send('Unauthorised');
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  req.app.get('api').dns.listServices(req.params.longName, responseHandler.onResponse);
+  req.app.get('api').dns.listServices(req.params.longName, sessionInfo.appDirKey, responseHandler.onResponse);
 };
 
 export var createPublicId = function(req, res) {
@@ -110,5 +110,5 @@ export var createPublicId = function(req, res) {
     return res.status(401).send('Unauthorised');
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  req.app.get('api').dns.listServices(req.params.longName, responseHandler.onResponse);
+  req.app.get('api').dns.createPublicId(req.params.longName, sessionInfo.appDirKey, responseHandler.onResponse);
 };

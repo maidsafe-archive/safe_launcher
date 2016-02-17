@@ -87,7 +87,7 @@ var deleteService = function(lib, request) {
 var listLongNames = function(lib, request) {
   try {
     var payload = createPayload('get-long-names', request);
-    util.execute(lib, request.client, request.id, payload);
+    util.executeForContent(lib, request.client, request.id, payload);
   } catch (e) {
     util.sendError(request.id, 999, e.toString());
   }
@@ -96,7 +96,7 @@ var listLongNames = function(lib, request) {
 var listServices = function(lib, request) {
   try {
     var payload = createPayload('get-services', request);
-    util.execute(lib, request.client, request.id, payload);
+    util.executeForContent(lib, request.client, request.id, payload);
   } catch (e) {
     util.sendError(request.id, 999, e.toString());
   }

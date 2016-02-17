@@ -98,12 +98,12 @@ export default class DNS {
     }, callback);
   }
 
-  createPublicId(longName, callback) {
+  createPublicId(longName, appDirKey, callback) {
     this.send({
       module: this.MODULE,
-      action: 'create-public-id',
+      action: 'register-public-id',
       isAuthorised: true,
-      appDirKey: null,
+      appDirKey: appDirKey,
       hasSafeDriveAccess: false,
       params: {
         longName: longName
@@ -111,24 +111,24 @@ export default class DNS {
     }, callback);
   }
 
-  listLongNames(callback) {
+  listLongNames(appDirKey, callback) {
     this.send({
       module: this.MODULE,
       action: 'get-long-names',
       isAuthorised: true,
-      appDirKey: null,
+      appDirKey: appDirKey,
       hasSafeDriveAccess: false,
       params: {
       }
     }, callback);
   }
 
-  listServices(longName, callback) {
+  listServices(longName, appDirKey, callback) {
     this.send({
       module: this.MODULE,
       action: 'get-services',
       isAuthorised: true,
-      appDirKey: null,
+      appDirKey: appDirKey,
       hasSafeDriveAccess: false,
       params: {
         longName: longName
