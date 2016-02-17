@@ -84,6 +84,33 @@ var deleteService = function(lib, request) {
   }
 };
 
+var listLongNames = function(lib, request) {
+  try {
+    var payload = createPayload('get-long-names', request);
+    util.execute(lib, request.client, request.id, payload);
+  } catch (e) {
+    util.sendError(request.id, 999, e.toString());
+  }
+};
+
+var listServices = function(lib, request) {
+  try {
+    var payload = createPayload('get-services', request);
+    util.execute(lib, request.client, request.id, payload);
+  } catch (e) {
+    util.sendError(request.id, 999, e.toString());
+  }
+};
+
+var createPublicId = function(lib, request) {
+  try {
+    var payload = createPayload('register-public-id', request);
+    util.execute(lib, request.client, request.id, payload);
+  } catch (e) {
+    util.sendError(request.id, 999, e.toString());
+  }
+};
+
 exports.execute = function(lib, request) {
   switch (request.action) {
     case 'get-home-dir':
@@ -103,6 +130,15 @@ exports.execute = function(lib, request) {
       break;
     case 'delete-service':
       deleteService(lib, request);
+      break;
+    case 'register-public-id':
+      createPublicId(lib, request);
+      break;
+    case 'get-long-names':
+      listLongNames(lib, request);
+      break;
+    case 'get-services':
+      listServices(lib, request);
       break;
     default:
       util.sendError(request.id, 999, 'Invalid Action');

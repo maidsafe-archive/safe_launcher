@@ -19,6 +19,26 @@ let deleteOrGetDirectory = function(req, res, isDelete) {
   }
 }
 
+let move = function(req, res, isFile) {
+  let sessionInfo = sessionManager.get(req.headers.sessionId);
+  if (!sessionInfo) {
+    return res.status(401).send('Unauthorised');
+  }
+  let payload = JSON.parse(req.body.toString());
+  if (!(payload.srcPath && payload.hasOwnProperty('isSrcPathShared') && payload.destPath && payload.hasOwnProperty('isDestPathShared'))) {
+    return res.status(400).send('Invalid request. Manadatory parameters are missing');
+  }
+  payload.retainSource = payload.retainSource ? true : false;
+  let responseHandler = new ResponseHandler(res, sessionInfo);
+  if (isFile) {
+    req.app.get('api').nfs.moveFile(payload.srcPath, payload.isSrcPathShared, payload.destPath, payload.isDestPathShared,
+      payload.retainSource, sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
+  } else {
+    req.app.get('api').nfs.moveDirectory(payload.srcPath, payload.isSrcPathShared, payload.destPath, payload.isDestPathShared,
+      payload.retainSource, sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
+  }
+}
+
 export var createDirectory = function(req, res) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   let params = JSON.parse(req.body.toString());
@@ -60,7 +80,7 @@ export var modifyDirectory = function(req, res) {
   if (!params.dirPath) {
     return res.status(400).send('Invalid request. dirPath missing');
   }
-  params.isPathShared =JSON.parse(params.isPathShared) || false;
+  params.isPathShared = JSON.parse(params.isPathShared) || false;
   reqBody.name = reqBody.name || null;
   reqBody.metadata = reqBody.metadata || null;
 
@@ -135,7 +155,7 @@ export var getFile = function(req, res, next) {
   let length = req.query.length || 0;
   let responseHandler = new ResponseHandler(res, sessionInfo);
   req.app.get('api').nfs.getFile(params.filePath, params.isPathShared, offset, length,
-    sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey,responseHandler.onResponse);
+    sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
 };
 
 export var modifyFileContent = function(req, res) {
@@ -152,10 +172,18 @@ export var modifyFileContent = function(req, res) {
   }
   params.isPathShared = JSON.parse(params.isPathShared) || false;
   if (!reqBody) {
-    return res.status(400).send('Invalid request. content missing or should be valid');
+    return res.status(400).send('Invalid request.');
   }
   query.offset = query.offset || 0;
-  let responseHandler = new ResponseHandler(res, sessionInfo);;
+  let responseHandler = new ResponseHandler(res, sessionInfo);
   req.app.get('api').nfs.modifyFileContent(reqBody, query.offset, params.filePath, params.isPathShared,
     sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
 };
+
+export var moveDirectory = function(req, res) {
+  move(req, res, false);
+}
+
+export var moveFile = function(req, res) {
+  move(req, res, true);
+}

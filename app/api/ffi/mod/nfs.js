@@ -143,6 +143,22 @@ var getFile = function(lib, request) {
   }
 };
 
+var move = function(lib, request, action) {
+  try {
+    var payload = createPayload(action, request);
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    payload.data.src_path = request.params.srcPath;
+    payload.data.is_src_path_shared = request.params.isSrcPathShared;
+    payload.data.dest_path = request.params.destPath;
+    payload.data.is_dest_path_shared = request.params.isDestPathShared;
+    payload.data.retain_source = request.params.retainSource;
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    util.executeForContent(lib, request.client, request.id, payload);
+  } catch (e) {
+    util.sendError(request.id, 999, e.toString());
+  }
+};
+
 exports.execute = function(lib, request) {
   switch (request.action) {
     case 'create-dir':
@@ -171,6 +187,12 @@ exports.execute = function(lib, request) {
       break;
     case 'modify-file-content':
       modifyFileContent(lib, request);
+      break;
+    case 'move-dir':
+      move(lib, request, 'move-dir');
+      break;
+    case 'move-file':
+      move(lib, request, 'move-file');
       break;
     default:
       util.sendError(request.id, 999, 'Invalid Action');
