@@ -102,7 +102,9 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootSco
 
     $scope.confirmResponse = function(payload, status) {
       hideConfirmation();
-      Loader.show();
+      if (status) {
+        Loader.show();
+      }
       Server.confirmResponse(payload, status);
     };
 
