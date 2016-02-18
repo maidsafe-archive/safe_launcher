@@ -97,4 +97,42 @@ export default class DNS {
       }
     }, callback);
   }
+
+  createPublicId(longName, appDirKey, callback) {
+    this.send({
+      module: this.MODULE,
+      action: 'register-public-id',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: false,
+      params: {
+        longName: longName
+      }
+    }, callback);
+  }
+
+  listLongNames(appDirKey, callback) {
+    this.send({
+      module: this.MODULE,
+      action: 'get-long-names',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: false,
+      params: {
+      }
+    }, callback);
+  }
+
+  listServices(longName, appDirKey, callback) {
+    this.send({
+      module: this.MODULE,
+      action: 'get-services',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: false,
+      params: {
+        longName: longName
+      }
+    }, callback);
+  }
 }

@@ -85,3 +85,30 @@ export var deleteService = function(req, res) {
   req.app.get('api').dns.deleteService(params.longName, params.serviceName,
     sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
 };
+
+export var listLongNames = function(req, res) {
+  let sessionInfo = sessionManager.get(req.headers.sessionId);
+  if (!sessionInfo) {
+    return res.status(401).send('Unauthorised');
+  }
+  let responseHandler = new ResponseHandler(res, sessionInfo);
+  req.app.get('api').dns.listLongNames(sessionInfo.appDirKey, responseHandler.onResponse);
+};
+
+export var listServices = function(req, res) {
+  let sessionInfo = sessionManager.get(req.headers.sessionId);
+  if (!sessionInfo) {
+    return res.status(401).send('Unauthorised');
+  }
+  let responseHandler = new ResponseHandler(res, sessionInfo);
+  req.app.get('api').dns.listServices(req.params.longName, sessionInfo.appDirKey, responseHandler.onResponse);
+};
+
+export var createPublicId = function(req, res) {
+  let sessionInfo = sessionManager.get(req.headers.sessionId);
+  if (!sessionInfo) {
+    return res.status(401).send('Unauthorised');
+  }
+  let responseHandler = new ResponseHandler(res, sessionInfo);
+  req.app.get('api').dns.createPublicId(req.params.longName, sessionInfo.appDirKey, responseHandler.onResponse);
+};
