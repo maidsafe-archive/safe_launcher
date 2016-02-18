@@ -39,7 +39,7 @@ export var decryptRequest = function(req, res, next) {
   }
   let sessionId = getSessionIdFromRequest(req);
   if (!sessionId) {
-    return res.status(401).send('Unauthorised');
+    return res.sendStatus(401);
   }
   let sessionInfo = sessionManager.get(sessionId);
   let parseQueryString = function(string) {
@@ -70,7 +70,7 @@ export var decryptRequest = function(req, res, next) {
     req.headers['sessionId'] = sessionId;
     next();
   } catch (e) {
-    return res.status(400).send('Failed to decrypt the request. ' + e.message());
+    return res.sendStatus(401);
   }
 }
 
