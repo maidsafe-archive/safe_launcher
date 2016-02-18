@@ -162,7 +162,8 @@ export default class NFS {
       }, callback);
     }
 
-    moveDir(srcPath, isSrcPathShared, destPath, isDestPathShared, retainSource, hasSafeDriveAccess, appDirKey, callback) {
+    moveDir(srcPath, isSrcPathShared, destPath, isDestPathShared, retainSource,
+      hasSafeDriveAccess, appDirKey, callback) {
       this.send({
         module: this.MODULE,
         action: 'move-dir',
@@ -179,7 +180,8 @@ export default class NFS {
       }, callback);
     }
 
-    moveFile(srcPath, isSrcPathShared, destPath, isDestPathShared, retainSource, hasSafeDriveAccess, appDirKey, callback) {
+    moveFile(srcPath, isSrcPathShared, destPath, isDestPathShared, retainSource,
+      hasSafeDriveAccess, appDirKey, callback) {
       this.send({
         module: this.MODULE,
         action: 'move-file',

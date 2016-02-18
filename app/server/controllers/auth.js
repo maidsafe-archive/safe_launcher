@@ -82,12 +82,10 @@ export var authorise = function(req, res) {
 export var revoke = function(req, res) {
   let sessionId = getSessionIdFromRequest(req);
   if (!sessionId) {
-    return res.status(401).send('Authorisation Token could not be parsed');
+    return res.sendStatus(401);
   }
-  if (!sessionManager.remove(sessionId)) {
-    return res.status(400).send('Session not found');
-  }
+  sessionManager.remove(sessionId);
   let eventType = req.app.get('EVENT_TYPE').SESSION_REMOVED;
   req.app.get('eventEmitter').emit(eventType, sessionId);
-  res.status(200).send("Session removed");
+  res.sendStatus(200);
 }
