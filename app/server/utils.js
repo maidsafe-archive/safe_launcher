@@ -70,7 +70,7 @@ export var decryptRequest = function(req, res, next) {
     req.headers['sessionId'] = sessionId;
     next();
   } catch (e) {
-    return res.status(400).send('Failed to decrypt the request. ' + e.message());
+    return res.status(400).send('Failed to decrypt the request. ' + e.toString());
   }
 }
 
