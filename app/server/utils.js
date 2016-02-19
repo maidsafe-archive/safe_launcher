@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import mime from 'mime';
 import * as sodium from 'libsodium-wrappers';
 import sessionManager from './session_manager';
 import { errorCodeLookup } from './error_code_lookup';
@@ -190,8 +191,7 @@ export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
       content = sessionInfo.encryptBuffer(content);
       self.res.set('Content-Type', 'text/plain');
     } else {
-      // TODO set mime type
-      self.res.set('Content-Type', 'text/html');
+      self.res.set('Content-Type', mime.lookup(data.metadata.name));
     }
     self.res.set('file-name', data.metadata.name);
     self.res.set('file-size', data.metadata.size);
