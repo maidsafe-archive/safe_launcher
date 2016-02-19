@@ -125,6 +125,9 @@ export var formatResponse = function(data) {
       obj.metadata = obj.user_metadata;
       delete obj.user_metadata;
     }
+    if (obj.hasOwnProperty('metadata') && typeof obj.metadata === 'string' && obj.metadata) {
+      obj.metadata = JSON.parse(obj.metadata);
+    }
     var formattedObj = {};
     for (let key in obj) {
       formattedObj[convertToCamelCase(key)] = format(obj[key]);

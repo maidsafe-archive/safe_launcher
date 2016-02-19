@@ -1,7 +1,5 @@
 import sessionManager from '../session_manager';
-import {
-  ResponseHandler
-} from '../utils';
+import { ResponseHandler } from '../utils';
 
 var registerOrAddService = function(req, res, isRegister) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
