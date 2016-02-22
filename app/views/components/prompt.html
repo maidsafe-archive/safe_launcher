@@ -1,23 +1,25 @@
 <div class="msl-prompt" ng-show="confirmation.status">
   <div class="msl-prompt-b">
-    <h3 class="msl-prompt-h">Authorise application</h3>
-    <div class="msl-prompt-body">
-      {{ confirmation.data.payload.app.name + ' ' +
-      confirmation.data.payload.app.version +' by '+
-      confirmation.data.payload.app.vendor + ' is requesting access for:' }}
+    <div class="msl-prompt-cont">
+      <h3 class="msl-prompt-h">Authorise application</h3>
+      <div class="msl-prompt-body">
+        {{ confirmation.data.payload.app.name + ' ' +
+        confirmation.data.payload.app.version +' by '+
+        confirmation.data.payload.app.vendor + ' is requesting access for:' }}
 
-      <div class="msl-prompt-body-li">
-        <div class="msl-prompt-body-li-i"
-        ng-if="confirmation.data.permissions.list.length !== 0"
-        ng-repeat="permission in confirmation.data.permissions.list">
-          {{ parsePermission(permission) }}
+        <div class="msl-prompt-body-li">
+          <div class="msl-prompt-body-li-i"
+          ng-if="confirmation.data.permissions.list.length !== 0"
+          ng-repeat="permission in confirmation.data.permissions.list">
+            {{ parsePermission(permission) }}
+          </div>
+          <div class="msl-prompt-body-li-i" ng-if="confirmation.data.permissions.list.length === 0" class="">None</div>
         </div>
-        <div class="msl-prompt-body-li-i" ng-if="confirmation.data.permissions.list.length === 0" class="">None</div>
       </div>
-    </div>
-    <div class="msl-prompt-foot">
-      <button type="button" class="deny" name="deny" ng-click="confirmResponse(confirmation.data, false)">Deny</button>
-      <button type="button" class="allow" name="allow" ng-click="confirmResponse(confirmation.data, true)">Allow</button>
+      <div class="msl-prompt-foot">
+        <button type="button" class="deny" name="deny" ng-click="confirmResponse(confirmation.data, false)">Deny</button>
+        <button type="button" class="allow" name="allow" ng-click="confirmResponse(confirmation.data, true)">Allow</button>
+      </div>
     </div>
   </div>
 </div>
