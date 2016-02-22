@@ -23,7 +23,7 @@ export default class SessionInfo {
   }
 
   encryptBuffer(buffer) {
-    return new Buffer(sodium.crypto_secretbox_easy(buffer, this.nonce, this.secretKey))
+    return new Buffer(sodium.crypto_secretbox_easy(buffer, this.nonce, this.secretKey)).toString('base64');
   }
 
 }

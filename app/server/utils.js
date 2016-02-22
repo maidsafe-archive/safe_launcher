@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import mime from 'mime';
 import * as sodium from 'libsodium-wrappers';
 import sessionManager from './session_manager';
 import { errorCodeLookup } from './error_code_lookup';
@@ -125,6 +126,9 @@ export var formatResponse = function(data) {
       obj.metadata = obj.user_metadata;
       delete obj.user_metadata;
     }
+    if (obj.hasOwnProperty('metadata') && typeof obj.metadata === 'string' && obj.metadata) {
+      obj.metadata = JSON.parse(obj.metadata);
+    }
     var formattedObj = {};
     for (let key in obj) {
       formattedObj[convertToCamelCase(key)] = format(obj[key]);
@@ -187,8 +191,7 @@ export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
       content = sessionInfo.encryptBuffer(content);
       self.res.set('Content-Type', 'text/plain');
     } else {
-      // TODO set mime type
-      self.res.set('Content-Type', 'text/html');
+      self.res.set('Content-Type', mime.lookup(data.metadata.name));
     }
     self.res.set('file-name', data.metadata.name);
     self.res.set('file-size', data.metadata.size);

@@ -157,7 +157,7 @@ export var getFile = function(req, res, next) {
     return res.sendStatus(401);
   }
   let params = req.params;
-  let responseHandler = new ResponseHandler(res, sessionInfo);
+  let responseHandler = new ResponseHandler(res, sessionInfo, true);
   if (!(typeof params.filePath === 'string')) {
     return responseHandler.onResponse('Invalid request. filePath is not valid');
   }
