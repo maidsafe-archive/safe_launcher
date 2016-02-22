@@ -13,8 +13,8 @@ window.safeLauncher.directive('mslValidateKeyword', function() {
         scope.showErrorMsg(element, 'Keyword cannot be empty');
         return;
       }
-      if (!(new RegExp(/^[a-z0-9]+$/i)).test(value)) {
-        scope.showErrorMsg(element, 'Keyword should not contain special characters');
+      if (!(new RegExp(/^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/i)).test(value)) {
+        scope.showErrorMsg(element, 'Keyword should contain alphabets and atleast one number');
         return;
       }
       if (value.length < 6) {

@@ -2,8 +2,9 @@
  * Auth Controller
  * @param Auth - Auth factory dependency
  */
-window.safeLauncher.controller('AuthController', [ '$scope', '$state', '$rootScope', 'AuthFactory',
-  function($scope, $state, $rootScope, Auth) {
+window.safeLauncher.controller('AuthController', [ '$scope', '$state', '$rootScope', '$timeout', 'AuthFactory',
+  function($scope, $state, $rootScope, $timeout, Auth) {
+    var LOGIN_TIMEOUT = 90000;
     $scope.user = {};
     $scope.tabs = {
       state: [
@@ -122,16 +123,31 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', '$rootSco
 
     // user login
     $scope.login = function() {
+      var timer = null;
+
       if (!$scope.mslLogin.$valid) {
         return;
       }
+      if (!$scope.user.hasOwnProperty('pin') || !$scope.user.pin) {
+        return $scope.mslLogin.pin.$setValidity('customValidation', false);
+      }
+      if (!$scope.user.hasOwnProperty('keyword') || !$scope.user.keyword) {
+        return $scope.mslLogin.keyword.$setValidity('customValidation', false);
+      }
+      if (!$scope.user.hasOwnProperty('password') || !$scope.user.password) {
+        return $scope.mslLogin.password.$setValidity('customValidation', false);
+      }
       var reset = function() {
         $scope.user = {};
+        Loader.hide();
+        $timeout.cancel(timer);
       };
       Loader.show();
+      timer = $timeout(function () {
+        reset();
+      }, LOGIN_TIMEOUT);
       Auth.login($scope.user, function(err, res) {
         reset();
-        Loader.hide();
         if (err) {
           alert('Login failed. Please try again');
           return;
