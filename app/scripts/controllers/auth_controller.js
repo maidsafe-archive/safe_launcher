@@ -158,20 +158,47 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', '$rootSco
 
     // show error text
     $scope.showErrorMsg = function(ele, msg) {
-      var siblingEle = ele[0].nextElementSibling;
-      if (siblingEle.dataset.name === 'formError') {
-        siblingEle.textContent = msg;
+      var parent = ele[0].parentNode;
+      var children = parent.children;
+      var target = children[ children.length - 1 ];
+
+      // var siblingEle = ele[0].nextElementSibling;
+      if (target.dataset.name === 'formError') {
+        target.textContent = msg;
         return;
       }
-      ele.after('<span class="form-err" data-name="formError">' + msg + '<span>');
+      var errFild = document.createElement('span');
+      errFild.setAttribute('class', 'form-err');
+      errFild.setAttribute('data-name', 'formError');
+      errFild.innerHTML = msg;
+      parent.appendChild(errFild);
     };
 
     $scope.hideErrorMsg = function(ele) {
-      var siblingEle = ele[0].nextElementSibling;
-      if (siblingEle.dataset.name !== 'formError') {
+      var parent = ele[0].parentNode;
+      var children = parent.children;
+      var target = children[ children.length - 1 ];
+      // var siblingEle = ele[0].nextElementSibling;
+      ele.removeClass('ng-invalid');
+      if (target.dataset.name !== 'formError') {
         return;
       }
-      siblingEle.remove();
+      target.remove();
+    };
+
+    // reset input field
+    $scope.resetInputField = function(model, $event) {
+      var input = angular.element($event.target.previousElementSibling);
+      if (input[0].nodeName !== 'INPUT') {
+        return;
+      }
+      var form = input[0].form.name;
+      $scope.user[model] = null;
+      $scope[form][input[0].name].$setValidity('customValidation', true);
+      input.removeClass('ng-invalid ng-invalid-custom-validation');
+      input.focus();
+      // $scope[form][ele].$setValidity('customValidation', false);
+      // user.pin = null;mslLogin.pin.$setValidity('customValidation', false);
     };
   }
 ]);

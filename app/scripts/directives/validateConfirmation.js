@@ -11,8 +11,9 @@ window.safeLauncher.directive('mslValidateConfirmation', function() {
       form.$setValidity('customValidation', false);
       var targetName = attrs.targetName;
       var targetValue = scope[formName][targetName].$viewValue;
+      element.addClass('ng-invalid');
       if (value !== targetValue) {
-        scope.showErrorMsg(element, 'Values must match');
+        scope.showErrorMsg(element, 'Entries doesn\'t match');
         return;
       }
       scope.hideErrorMsg(element);

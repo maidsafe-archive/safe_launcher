@@ -9,20 +9,20 @@ window.safeLauncher.directive('mslValidatePassword', function() {
       var formName = element[0].form.name;
       var form = scope[formName][inpName];
       form.$setValidity('customValidation', false);
+      element.addClass('ng-invalid');
       if (!value) {
-        scope.showErrorMsg(element, 'Password cannot be empty');
-        return;
+        return scope.showErrorMsg(element, 'Cannot be left blank');
       }
       if (!(new RegExp(/^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/i)).test(value)) {
-        scope.showErrorMsg(element, 'Password should contain alphabets and atleast one number');
-        return;
+        return scope.showErrorMsg(element, 'Must be alphanumeric');
       }
       if (value.length < 6) {
-        scope.showErrorMsg(element, 'Minimum password length should be six characters');
-        return;
+        return scope.showErrorMsg(element, 'Must be 6 characters long');
       }
       scope.hideErrorMsg(element);
       form.$setValidity('customValidation', true);
+      form.$valid = true;
+      form.$invalid = false;
     });
   };
   return {

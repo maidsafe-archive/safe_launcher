@@ -9,20 +9,23 @@ window.safeLauncher.directive('mslValidateKeyword', function() {
       var formName = element[0].form.name;
       var form = scope[formName][inpName];
       form.$setValidity('customValidation', false);
+      element.addClass('invalid');
       if (!value) {
-        scope.showErrorMsg(element, 'Keyword cannot be empty');
+        scope.showErrorMsg(element, 'Cannot be left blank');
         return;
       }
       if (!(new RegExp(/^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/i)).test(value)) {
-        scope.showErrorMsg(element, 'Keyword should contain alphabets and atleast one number');
+        scope.showErrorMsg(element, 'Must be alphanumeric');
         return;
       }
       if (value.length < 6) {
-        scope.showErrorMsg(element, 'Minimum keyword length should be six characters');
+        scope.showErrorMsg(element, 'Must be 6 characters long');
         return;
       }
       scope.hideErrorMsg(element);
       form.$setValidity('customValidation', true);
+      form.$valid = true;
+      form.$invalid = false;
     });
   };
   return {
