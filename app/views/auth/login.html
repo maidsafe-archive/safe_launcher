@@ -1,5 +1,5 @@
 <!-- login -->
-<div class="msl-form msl-layout-1 msl-auth-form" ng-controller="AuthController">
+<div class="msl-form msl-layout-1 msl-auth-form" ng-controller="authController">
   <form name="mslLogin" ng-submit="login()">
     <!-- pin -->
     <div class="msl-form-grp">
@@ -13,14 +13,14 @@
       <input type="password" name="keyword" placeholder="Keyword" ng-model="user.keyword" msl-validate-keyword/>
       <span type="button" name="clear-btn" class="clear-btn"
       ng-show="user.keyword"
-      ng-click="user.keyword = null;mslLogin.keyword.$setValidity('customValidation', false);">x</span>
+      ng-click="resetInputField('keyword', $event)">x</span>
     </div>
     <!-- password -->
     <div class="msl-form-grp">
       <input type="password" name="password" placeholder="Password" ng-model="user.password" msl-validate-password/>
       <span type="button" name="clear-btn" class="clear-btn"
       ng-show="user.password"
-      ng-click="user.password = null;mslLogin.password.$setValidity('customValidation', false);">x</span>
+      ng-click="resetInputField('password', $event)">x</span>
     </div>
     <!-- login btn -->
     <div class="msl-form-grp">

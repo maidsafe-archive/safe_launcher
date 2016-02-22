@@ -1,9 +1,8 @@
 /**
- * Auth Controller
- * @param Auth - Auth factory dependency
+ * Authentication Controller
  */
-window.safeLauncher.controller('AuthController', [ '$scope', '$state', '$rootScope', '$timeout', 'AuthFactory',
-  function($scope, $state, $rootScope, $timeout, Auth) {
+window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootScope', '$timeout', 'authFactory',
+  function($scope, $state, $rootScope, $timeout, auth) {
     var LOGIN_TIMEOUT = 90000;
     $scope.user = {};
     $scope.tabs = {
@@ -60,7 +59,7 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', '$rootSco
         password: $scope.user.password
       };
       Loader.show();
-      Auth.register(payload, function(err, res) {
+      auth.register(payload, function(err, res) {
         reset();
         Loader.hide();
         if (err) {
@@ -143,10 +142,10 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', '$rootSco
         $timeout.cancel(timer);
       };
       Loader.show();
-      timer = $timeout(function () {
+      timer = $timeout(function() {
         reset();
       }, LOGIN_TIMEOUT);
-      Auth.login($scope.user, function(err, res) {
+      auth.login($scope.user, function(err, res) {
         reset();
         if (err) {
           alert('Login failed. Please try again');

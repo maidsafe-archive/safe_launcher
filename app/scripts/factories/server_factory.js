@@ -1,7 +1,7 @@
 /**
  * Server Factory
  */
-window.safeLauncher.factory('ServerFactory', [
+window.safeLauncher.factory('serverFactory', [
   function() {
     var self = this;
 

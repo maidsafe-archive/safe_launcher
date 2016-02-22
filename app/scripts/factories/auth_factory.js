@@ -1,7 +1,7 @@
 /**
- * Auth Factory
+ * Authentication Factory
  */
-window.safeLauncher.factory('AuthFactory', [
+window.safeLauncher.factory('authFactory', [
   function() {
     var self = this;
 

@@ -1,8 +1,8 @@
 /**
  * User Controller
  */
-window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootScope', 'ServerFactory',
-  function($scope, $state, $rootScope, Server) {
+window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootScope', 'serverFactory',
+  function($scope, $state, $rootScope, server) {
     var LIST_COLORS = [ 'bg-light-green', 'bg-blue', 'bg-yellow', 'bg-pink', 'bg-purple', 'bg-green', 'bg-orange' ];
 
     $scope.proxyState = false;
@@ -56,39 +56,39 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootSco
       $scope.proxyState = !$scope.proxyState;
       Loader.show();
       if (!$scope.proxyState) {
-        Server.stopProxyServer();
+        server.stopProxyServer();
         Loader.hide();
         return;
       }
-      Server.startProxyServer(function(msg) {
+      server.startProxyServer(function(msg) {
         Loader.hide();
         console.log(msg);
       });
     };
 
     // start server
-    Server.start();
+    server.start();
 
     // start proxy server
     toggleProxyServer();
 
     // handle server error
-    Server.onServerError(function(error) {
+    server.onServerError(function(error) {
       console.error(error);
     });
 
     // handle server start
-    Server.onServerStarted(function() {
+    server.onServerStarted(function() {
       console.log('Server Started');
     });
 
     // handle server shutdown
-    Server.onServerShutdown(function() {
+    server.onServerShutdown(function() {
       console.log('Server Stopped');
     });
 
     // handle session creation
-    Server.onSessionCreated(function(session) {
+    server.onSessionCreated(function(session) {
       console.log('Session created :: ');
       $scope.manageListApp.push({
         id: session.id,
@@ -103,15 +103,15 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootSco
     });
 
     // handle session removed
-    Server.onSessionRemoved(function(id) {
+    server.onSessionRemoved(function(id) {
       console.log('Session removed :: ' + id);
       removeApplication(id);
     });
 
     // handle auth request
-    Server.onAuthRequest(function(data) {
+    server.onAuthRequest(function(data) {
       console.log(data);
-      Server.restoreWindow();
+      server.restoreWindow();
       showConfirmation(data);
     });
 
@@ -131,7 +131,7 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootSco
       if (status) {
         Loader.show();
       }
-      Server.confirmResponse(payload, status);
+      server.confirmResponse(payload, status);
     };
 
     // toggle proxy server as public function
@@ -147,7 +147,7 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootSco
 
     // remove session
     $scope.removeSession = function(id) {
-      Server.removeSession(id);
+      server.removeSession(id);
     };
   }
 ]);
