@@ -13,12 +13,21 @@
 <!-- manage -->
 <div class="msl-li" ng-if="manageListApp.length > 0">
   <h3 class="msl-li-h">App</h3>
-  <div class="msl-li-i" ng-repeat="list in manageListApp" ng-class="{disabled: !list.status}">
+  <div class="msl-li-i" ng-repeat="list in manageListApp" ng-class="{open: !list.status}" ng-click="list.status = !list.status">
     <span class="li-icn">{{list.name[0]}}</span>
     <div class="li-i-desc">
-      <h3 class="li-i-desc-main">{{list.name}}</h3>
-      <h4 class="li-i-desc-sub">{{ list.version }}</h3>
-      <h4 class="li-i-desc-sub">{{ list.vendor }}</h3>
+      <h3 class="li-i-desc-main">
+        <span class="name">{{list.name}}</span>
+        <span class="icn"></span>
+      </h3>
+      <h4 class="li-i-desc-sub">
+        <span class="name">Version</span>
+        <span class="val">{{ list.version }}</span>
+      </h4>
+      <h4 class="li-i-desc-sub">
+        <span class="name">Vendor</span>
+        <span class="val">{{ list.vendor }}</span>
+      </h4>
     </div>
     <div class="li-i-action">
       <!-- <msl-switch switch-id="app_calender" ng-class="{open: list.status}"/> -->
