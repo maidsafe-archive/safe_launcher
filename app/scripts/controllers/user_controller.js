@@ -49,8 +49,26 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootSco
       });
     };
 
+    // toggle proxy server
+    var toggleProxyServer = function() {
+      $scope.proxyState = !$scope.proxyState;
+      Loader.show();
+      if (!$scope.proxyState) {
+        Server.stopProxyServer();
+        Loader.hide();
+        return;
+      }
+      Server.startProxyServer(function(msg) {
+        Loader.hide();
+        console.log(msg);
+      });
+    };
+
     // start server
     Server.start();
+
+    // start proxy server
+    toggleProxyServer();
 
     // handle server error
     Server.onServerError(function(error) {
@@ -108,20 +126,8 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootSco
       Server.confirmResponse(payload, status);
     };
 
-    // toggle proxy server
-    $scope.toggleProxyServer = function() {
-      $scope.proxyState = !$scope.proxyState;
-      Loader.show();
-      if (!$scope.proxyState) {
-        Server.stopProxyServer();
-        Loader.hide();
-        return;
-      }
-      Server.startProxyServer(function(msg) {
-        Loader.hide();
-        console.log(msg);
-      });
-    };
+    // toggle proxy server as public function
+    $scope.toggleProxyServer = toggleProxyServer;
 
     // Parse authorise permissions
     $scope.parsePermission = function(str) {
