@@ -14,7 +14,7 @@
 <div class="msl-li" ng-if="manageListApp.length > 0">
   <h3 class="msl-li-h">App</h3>
   <div class="msl-li-i" ng-repeat="list in manageListApp" ng-class="{open: !list.status}" ng-click="list.status = !list.status">
-    <span class="li-icn">{{list.name[0]}}</span>
+    <span class="li-icn" ng-class="getListColor($index)">{{list.name[0]}}</span>
     <div class="li-i-desc">
       <h3 class="li-i-desc-main">
         <span class="name">{{list.name}}</span>

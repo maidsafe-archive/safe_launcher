@@ -3,6 +3,8 @@
  */
 window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootScope', 'ServerFactory',
   function($scope, $state, $rootScope, Server) {
+    var LIST_COLORS = [ 'bg-light-green', 'bg-blue', 'bg-yellow', 'bg-pink', 'bg-purple', 'bg-green', 'bg-orange' ];
+
     $scope.proxyState = false;
     $scope.confirmation = {
       status: false,
@@ -112,6 +114,12 @@ window.safeLauncher.controller('UserController', [ '$scope', '$state', '$rootSco
       Server.restoreWindow();
       showConfirmation(data);
     });
+
+    // get list colors
+    $scope.getListColor = function(index) {
+      index = index % LIST_COLORS.length;
+      return LIST_COLORS[index];
+    };
 
     // Toggle Setting
     $scope.toggleSetting = function(setting) {
