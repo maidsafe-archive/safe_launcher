@@ -17,7 +17,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       self.cancel = function() {
         console.log('Request canceled');
         self.status = false;
-      }
+      };
     };
     var authRes = new AuthResponse();
 
