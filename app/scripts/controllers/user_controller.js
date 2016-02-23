@@ -4,7 +4,7 @@
 window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootScope', 'serverFactory',
   function($scope, $state, $rootScope, server) {
     var LIST_COLORS = [ 'bg-light-green', 'bg-blue', 'bg-yellow', 'bg-pink', 'bg-purple', 'bg-green', 'bg-orange' ];
-
+    // $rootScope.$applyAsync();
     $scope.proxyState = false;
     $scope.confirmation = {
       status: false,

@@ -4,6 +4,23 @@
 window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootScope', '$timeout', 'authFactory',
   function($scope, $state, $rootScope, $timeout, auth) {
     var LOGIN_TIMEOUT = 90000;
+    var AuthResponse = function() {
+      var self = this;
+      self.status = true;
+      self.onResponse = function(err) {
+        if (!self.status) {
+          return;
+        }
+        self.onComplete(err);
+      };
+      self.onComplete = function(err) {};
+      self.cancel = function() {
+        console.log('Request canceled');
+        self.status = false;
+      };
+    };
+    var authRes = new AuthResponse();
+
     $scope.user = {};
     $scope.tabs = {
       state: [
@@ -35,21 +52,22 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       }
     };
 
-    var Loader = {
+    $scope.authLoader = {
+      isLoading: false,
+      error: false,
       show: function() {
-        $rootScope.$loader = true;
+        this.isLoading = true;
       },
       hide: function() {
-        $rootScope.$loader = false;
-        if (!$rootScope.$$phase) {
-          $rootScope.$apply();
-        }
+        this.isLoading = false;
+        this.error = false;
       }
     };
 
     // register user
     var register = function() {
       var reset = function() {
+        // authLoader.hide();
         $scope.user = {};
         $scope.tabs.init();
       };
@@ -58,15 +76,17 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         keyword: $scope.user.keyword,
         password: $scope.user.password
       };
-      Loader.show();
-      auth.register(payload, function(err, res) {
+      $scope.authLoader.show();
+      authRes.onComplete = function(err) {
         reset();
-        Loader.hide();
         if (err) {
-          return alert('Registration failed. Please try again');
+          $scope.authLoader.error = true;
+          alert('Registration failed. Please try again');
+          return;
         }
         $state.go('user');
-      });
+      };
+      auth.register(payload, authRes.onResponse);
     };
 
     // validate pin
@@ -137,22 +157,34 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         return $scope.mslLogin.password.$setValidity('customValidation', false);
       }
       var reset = function() {
+        // authLoader.hide();
         $scope.user = {};
-        Loader.hide();
         $timeout.cancel(timer);
       };
-      Loader.show();
+
+      $scope.authLoader.show();
+      if (!$rootScope.$$phase) {
+        $rootScope.$apply();
+      }
       timer = $timeout(function() {
+        $scope.authLoader.error = true;
         reset();
       }, LOGIN_TIMEOUT);
-      auth.login($scope.user, function(err, res) {
+      authRes.onComplete = function(err) {
         reset();
         if (err) {
+          $scope.authLoader.error = true;
           alert('Login failed. Please try again');
           return;
         }
         $state.go('user');
-      });
+      };
+      auth.login($scope.user, authRes.onResponse);
+    };
+
+    $scope.cancelRequest = function() {
+      authRes.cancel();
+      $scope.authLoader.hide();
     };
 
     // show error text

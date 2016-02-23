@@ -1,6 +1,9 @@
 .msl-form {
+  width: 295px;
+  position: absolute;
+  bottom: 0;
+  left: 47.5px;
   padding-bottom: 48px;
-  width: 80%;
   margin: 0 auto;
   .msl-form-nav {
     white-space: nowrap;
@@ -31,6 +34,7 @@
     margin: 16px 0 0;
     .form-err {
       padding: 0 8px;
+      font-family: 'Myriad Set Pro';
       font-size: 12px;
       font-weight: normal;
       line-height: 32px;
@@ -43,12 +47,11 @@
       height: 32px;
       margin: 0;
       padding: 0 32px 0 8px;
-      font-size: 17px;
+      font-size: 16px;
+      color: @msl-txt-1;
       outline: none;
       flex: 1;
-      border-width: 2px;
-      border-style: solid;
-      border-color: @input-static;
+      border: 2px solid @input-static;
       &:focus, &:focus + .clear-btn {
         border-color: @msl-title-bg;
       }
@@ -75,18 +78,12 @@
       border-color: @input-static;
       cursor: pointer;
     }
-    .act-btn {
-      min-width: 100px;
-      margin: 32px auto;
-      padding: 8px 16px;
+  }
+  .act-btn {
+    margin: 28px 0 30px;
+    button {
+      margin: 0 auto;
       display: block;
-      font-size: 14px;
-      font-weight: normal;
-      text-align: center;
-      border: none;
-      outline: none;
-      background-color: @msl-title-bg;
-      color: white;
     }
   }
 }
