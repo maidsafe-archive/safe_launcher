@@ -4,6 +4,23 @@
 window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootScope', '$timeout', 'authFactory',
   function($scope, $state, $rootScope, $timeout, auth) {
     var LOGIN_TIMEOUT = 90000;
+    var AuthResponse = function() {
+      var self = this;
+      self.status = true;
+      self.onResponse = function(err) {
+        if (!self.status) {
+          return;
+        }
+        self.onComplete(err);
+      };
+      self.onComplete = function(err) {};
+      self.cancel = function() {
+        console.log('Request canceled');
+        self.status = false;
+      }
+    };
+    var authRes = new AuthResponse();
+
     $scope.user = {};
     $scope.isLoading = false;
     $scope.tabs = {
@@ -36,8 +53,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       }
     };
 
-    // handle loader
-    var Loader = {
+    var authLoader = {
       show: function() {
         $scope.isLoading = true;
       },
@@ -49,6 +65,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     // register user
     var register = function() {
       var reset = function() {
+        // authLoader.hide();
         $scope.user = {};
         $scope.tabs.init();
       };
@@ -57,15 +74,16 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         keyword: $scope.user.keyword,
         password: $scope.user.password
       };
-      Loader.show();
-      auth.register(payload, function(err, res) {
+      authLoader.show();
+      authRes.onComplete = function(err) {
         reset();
-        Loader.hide();
         if (err) {
-          return alert('Registration failed. Please try again');
+          alert('Registration failed. Please try again');
+          return;
         }
         $state.go('user');
-      });
+      };
+      auth.register(payload, authRes.onResponse);
     };
 
     // validate pin
@@ -136,22 +154,32 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         return $scope.mslLogin.password.$setValidity('customValidation', false);
       }
       var reset = function() {
+        // authLoader.hide();
         $scope.user = {};
-        Loader.hide();
         $timeout.cancel(timer);
       };
-      Loader.show();
+
+      authLoader.show();
+      if (!$rootScope.$$phase) {
+        $rootScope.$apply();
+      }
       timer = $timeout(function() {
         reset();
       }, LOGIN_TIMEOUT);
-      auth.login($scope.user, function(err, res) {
+      authRes.onComplete = function(err) {
         reset();
         if (err) {
           alert('Login failed. Please try again');
           return;
         }
         $state.go('user');
-      });
+      };
+      auth.login($scope.user, authRes.onResponse);
+    };
+
+    $scope.cancelRequest = function() {
+      authRes.cancel();
+      Loader.hide();
     };
 
     // show error text

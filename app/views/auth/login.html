@@ -42,15 +42,5 @@
     </div>
   </div>
   <!-- auth loading -->
-  <div class="msl-auth-loading" ng-show="isLoading">
-    <h3 class="msl-auth-loading-h">Logging in...</h3>
-    <div class="msl-auth-loading-slider"></div>
-    <div class="msl-auth-loading-desc">
-      Logging you into the SAFE Network. <br>
-      This won't take long!
-    </div>
-    <div class="msl-auth-loading-act">
-      <button type="button" name="cancelLoading" class="msl-btn msl-btn-primary">Cancel</button>
-    </div>
-  </div>
+  <ng-include src="'views/components/auth_loader.html'" ng-show="isLoading" />
 </div>
