@@ -89,3 +89,10 @@ export var revoke = function(req, res) {
   req.app.get('eventEmitter').emit(eventType, sessionId);
   res.sendStatus(200);
 }
+
+export var isTokenValid = function(req, res) {
+  if (!req.headers['sessionId']) {
+    return res.sendStatus(401);
+  }
+  return res.sendStatus(200);
+}

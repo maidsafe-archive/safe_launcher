@@ -5,6 +5,7 @@ import * as Auth from '../controllers/auth';
 
 var router = express.Router();
 router.post('/auth', Auth.authorise);
+router.get('/auth', Auth.isTokenValid);
 router.delete('/auth', Auth.revoke);
 // NFS - DIRECTORY API
 router.post('/nfs/directory', NFS.createDirectory);
