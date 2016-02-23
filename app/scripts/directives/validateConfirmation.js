@@ -12,6 +12,10 @@ window.safeLauncher.directive('mslValidateConfirmation', function() {
       var targetName = attrs.targetName;
       var targetValue = scope[formName][targetName].$viewValue;
       element.addClass('ng-invalid');
+      if (!value) {
+        scope.showErrorMsg(element, 'Cannot be left blank');
+        return;
+      }
       if (value !== targetValue) {
         scope.showErrorMsg(element, 'Entries doesn\'t match');
         return;
