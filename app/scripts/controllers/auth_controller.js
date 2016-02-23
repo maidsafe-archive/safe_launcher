@@ -5,6 +5,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
   function($scope, $state, $rootScope, $timeout, auth) {
     var LOGIN_TIMEOUT = 90000;
     $scope.user = {};
+    $scope.isLoading = false;
     $scope.tabs = {
       state: [
         'PIN',
@@ -35,15 +36,13 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       }
     };
 
+    // handle loader
     var Loader = {
       show: function() {
-        $rootScope.$loader = true;
+        $scope.isLoading = true;
       },
       hide: function() {
-        $rootScope.$loader = false;
-        if (!$rootScope.$$phase) {
-          $rootScope.$apply();
-        }
+        $scope.isLoading = false;
       }
     };
 
