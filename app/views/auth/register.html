@@ -5,7 +5,7 @@
   </div><!-- /auth banner -->
   <div class="msl-auth-b" ng-show="!authLoader.isLoading">
     <!-- regiter -->
-    <div class="msl-form msl-layout-1 msl-auth-form" ng-init="tabs.init()">
+    <div class="msl-form msl-layout-1" ng-init="tabs.init()">
       <div class="msl-form-nav">
         <div class="msl-form-nav-i" ng-class="{active: tabs.currentPos === tabs.state[0]}" ng-click="tabs.changePos('PIN')">PIN</div>
         <div class="msl-form-nav-i" ng-class="{active: tabs.currentPos === tabs.state[1]}" ng-click="tabs.changePos('KEYWORD')">Keyword</div>
