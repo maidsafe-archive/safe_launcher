@@ -22,7 +22,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     var authRes = new AuthResponse();
 
     $scope.user = {};
-    $scope.isLoading = false;
     $scope.tabs = {
       state: [
         'PIN',
@@ -53,12 +52,15 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       }
     };
 
-    var authLoader = {
+    $scope.authLoader = {
+      isLoading: false,
+      error: false,
       show: function() {
-        $scope.isLoading = true;
+        this.isLoading = true;
       },
       hide: function() {
-        $scope.isLoading = false;
+        this.isLoading = false;
+        this.error = false;
       }
     };
 
@@ -74,10 +76,11 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         keyword: $scope.user.keyword,
         password: $scope.user.password
       };
-      authLoader.show();
+      $scope.authLoader.show();
       authRes.onComplete = function(err) {
         reset();
         if (err) {
+          $scope.authLoader.error = true;
           alert('Registration failed. Please try again');
           return;
         }
@@ -159,16 +162,18 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         $timeout.cancel(timer);
       };
 
-      authLoader.show();
+      $scope.authLoader.show();
       if (!$rootScope.$$phase) {
         $rootScope.$apply();
       }
       timer = $timeout(function() {
+        $scope.authLoader.error = true;
         reset();
       }, LOGIN_TIMEOUT);
       authRes.onComplete = function(err) {
         reset();
         if (err) {
+          $scope.authLoader.error = true;
           alert('Login failed. Please try again');
           return;
         }
@@ -179,7 +184,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
 
     $scope.cancelRequest = function() {
       authRes.cancel();
-      Loader.hide();
+      $scope.authLoader.hide();
     };
 
     // show error text

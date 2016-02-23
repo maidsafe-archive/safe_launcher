@@ -19,6 +19,12 @@
     width: 295px;
     margin: 0 auto;
     text-align: center;
+    &.failed {
+      .msl-auth-loading-slider {
+        background-color: @bg-error;
+        &:after { display: none; }
+      }
+    }
     .msl-auth-loading-h {
       margin: 0;
       padding: 0;
