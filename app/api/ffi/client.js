@@ -23,7 +23,7 @@ workerProcess.on('close', function() {
   ipc.send('ffi-closed');
 });
 
-workerProcess.on('message', function(msg) {
+workerProcess.on('message', function(msg) {  
   if (!callbackPool[msg.id]) {
     return;
   }
