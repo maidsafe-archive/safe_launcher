@@ -6,38 +6,40 @@
   top: 0;
   left: 0;
   z-index: 999;
-  background-color: rgba(73, 58, 96, 0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: table;
 
   .msl-prompt-b {
     display: table-cell;
     text-align: center;
     vertical-align: middle;
-    padding: 0 10%;
+    padding: 0 52px;
+  }
+
+  .msl-prompt-cont {
+    background-color: white;
+    border-radius: 2px;
   }
 
   .msl-prompt-h {
     width: 100%;
     margin: 0;
-    padding: 0 16px;
-    font-size: 16px;
+    padding: 24px;
+    font-size: 23px;
     font-weight: 600;
     line-height: 32px;
     text-align: left;
-    border-bottom: 1px solid #EEE;
-    color: @msl-txt-clr-d;
-    background-color: white;
+    color: @msl-txt-1;
   }
 
   .msl-prompt-body {
     width: 100%;
     margin: 0 auto;
-    background-color: white;
-    padding: 16px;
-    font-size: 14px;
+    padding: 14px 24px 24px;
+    font-size: 15px;
     line-height: 24px;
-    font-weight: 600;
-    color: @msl-txt-clr-d;
+    font-weight: normal;
+    color: @msl-txt-1;
     text-align: left;
     .msl-prompt-body-li {
       margin-top: 8px;
@@ -52,21 +54,22 @@
   .msl-prompt-foot {
     width: 100%;
     margin: 0 auto;
-    background-color: white;
     padding: 8px;
     text-align: right;
     button {
+      height: 36px;
+      margin-left: 8px;
+      padding: 8px;
       border: 0;
       outline: 0;
-      background-color: transparent;
-      padding: 8px;
       font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
       cursor: pointer;
-      &.allow {
-        opacity: 1;
-      }
-      &.deny {
-        opacity: 0.5;
+      color: @msl-title-bg;
+      background-color: transparent;
+      &:hover {
+        background-color: @msl-btn-default;
       }
     }
   }

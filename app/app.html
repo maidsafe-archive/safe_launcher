@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>SAFE Launcher</title>
     <link rel="stylesheet" href="./bower_components/open-sans-fontface/open-sans.css" />
+    <link rel="stylesheet" href="./bower_components/myriad-font/css/myriad.css" />
     <link href="./stylesheets/main.css" rel="stylesheet" type="text/css">
 </head>
 <body ng-app="safeLauncher">
@@ -14,9 +15,9 @@
       <div class="lt">
         <h3 class="msl-title">SAFE Launcher</h3>
       </div>
-      <div class="rt">
+      <div class="rt" ng-hide="$state.current.name !== 'user'">
         <div class="rt-i">
-          <button ng-if="$state.current.name === 'user'" type="button" name="button" class="msl-btn msl-signout-btn" onclick="window.msl.closeWindow()">Sign out</button>
+          <button type="button" name="button" class="msl-btn msl-signout-btn" onclick="window.msl.closeWindow()">Sign out</button>
         </div>
       </div>
     </div><!-- /title bar -->

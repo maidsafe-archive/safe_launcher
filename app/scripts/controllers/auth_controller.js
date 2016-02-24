@@ -1,9 +1,26 @@
 /**
- * Auth Controller
- * @param Auth - Auth factory dependency
+ * Authentication Controller
  */
-window.safeLauncher.controller('AuthController', [ '$scope', '$state', '$rootScope', 'AuthFactory',
-  function($scope, $state, $rootScope, Auth) {
+window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootScope', '$timeout', 'authFactory',
+  function($scope, $state, $rootScope, $timeout, auth) {
+    var LOGIN_TIMEOUT = 90000;
+    var AuthResponse = function() {
+      var self = this;
+      self.status = true;
+      self.onResponse = function(err) {
+        if (!self.status) {
+          return;
+        }
+        self.onComplete(err);
+      };
+      self.onComplete = function(err) {};
+      self.cancel = function() {
+        console.log('Request canceled');
+        self.status = false;
+      };
+    };
+    var authRes = new AuthResponse();
+
     $scope.user = {};
     $scope.tabs = {
       state: [
@@ -35,21 +52,22 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', '$rootSco
       }
     };
 
-    var Loader = {
+    $scope.authLoader = {
+      isLoading: false,
+      error: false,
       show: function() {
-        $rootScope.$loader = true;
+        this.isLoading = true;
       },
       hide: function() {
-        $rootScope.$loader = false;
-        if (!$rootScope.$$phase) {
-          $rootScope.$apply();
-        }
+        this.isLoading = false;
+        this.error = false;
       }
     };
 
     // register user
     var register = function() {
       var reset = function() {
+        // authLoader.hide();
         $scope.user = {};
         $scope.tabs.init();
       };
@@ -58,15 +76,17 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', '$rootSco
         keyword: $scope.user.keyword,
         password: $scope.user.password
       };
-      Loader.show();
-      Auth.register(payload, function(err, res) {
+      $scope.authLoader.show();
+      authRes.onComplete = function(err) {
         reset();
-        Loader.hide();
         if (err) {
-          return alert('Registration failed. Please try again');
+          $scope.authLoader.error = true;
+          alert('Registration failed. Please try again');
+          return;
         }
         $state.go('user');
-      });
+      };
+      auth.register(payload, authRes.onResponse);
     };
 
     // validate pin
@@ -122,40 +142,94 @@ window.safeLauncher.controller('AuthController', [ '$scope', '$state', '$rootSco
 
     // user login
     $scope.login = function() {
+      var timer = null;
+
       if (!$scope.mslLogin.$valid) {
         return;
       }
+      if (!$scope.user.hasOwnProperty('pin') || !$scope.user.pin) {
+        return $scope.mslLogin.pin.$setValidity('customValidation', false);
+      }
+      if (!$scope.user.hasOwnProperty('keyword') || !$scope.user.keyword) {
+        return $scope.mslLogin.keyword.$setValidity('customValidation', false);
+      }
+      if (!$scope.user.hasOwnProperty('password') || !$scope.user.password) {
+        return $scope.mslLogin.password.$setValidity('customValidation', false);
+      }
       var reset = function() {
+        // authLoader.hide();
         $scope.user = {};
+        $timeout.cancel(timer);
       };
-      Loader.show();
-      Auth.login($scope.user, function(err, res) {
+
+      $scope.authLoader.show();
+      if (!$rootScope.$$phase) {
+        $rootScope.$apply();
+      }
+      timer = $timeout(function() {
+        $scope.authLoader.error = true;
         reset();
-        Loader.hide();
+      }, LOGIN_TIMEOUT);
+      authRes.onComplete = function(err) {
+        reset();
         if (err) {
+          $scope.authLoader.error = true;
           alert('Login failed. Please try again');
           return;
         }
         $state.go('user');
-      });
+      };
+      auth.login($scope.user, authRes.onResponse);
+    };
+
+    $scope.cancelRequest = function() {
+      authRes.cancel();
+      $scope.authLoader.hide();
     };
 
     // show error text
     $scope.showErrorMsg = function(ele, msg) {
-      var siblingEle = ele[0].nextElementSibling;
-      if (siblingEle.dataset.name === 'formError') {
-        siblingEle.textContent = msg;
+      var parent = ele[0].parentNode;
+      var children = parent.children;
+      var target = children[ children.length - 1 ];
+
+      // var siblingEle = ele[0].nextElementSibling;
+      if (target.dataset.name === 'formError') {
+        target.textContent = msg;
         return;
       }
-      ele.after('<span class="form-err" data-name="formError">' + msg + '<span>');
+      var errFild = document.createElement('span');
+      errFild.setAttribute('class', 'form-err');
+      errFild.setAttribute('data-name', 'formError');
+      errFild.innerHTML = msg;
+      parent.appendChild(errFild);
     };
 
     $scope.hideErrorMsg = function(ele) {
-      var siblingEle = ele[0].nextElementSibling;
-      if (siblingEle.dataset.name !== 'formError') {
+      var parent = ele[0].parentNode;
+      var children = parent.children;
+      var target = children[ children.length - 1 ];
+      // var siblingEle = ele[0].nextElementSibling;
+      ele.removeClass('ng-invalid');
+      if (target.dataset.name !== 'formError') {
         return;
       }
-      siblingEle.remove();
+      target.remove();
+    };
+
+    // reset input field
+    $scope.resetInputField = function(model, $event) {
+      var input = angular.element($event.target.previousElementSibling);
+      if (input[0].nodeName !== 'INPUT') {
+        return;
+      }
+      var form = input[0].form.name;
+      $scope.user[model] = null;
+      $scope[form][input[0].name].$setValidity('customValidation', true);
+      input.removeClass('ng-invalid ng-invalid-custom-validation');
+      input.focus();
+      // $scope[form][ele].$setValidity('customValidation', false);
+      // user.pin = null;mslLogin.pin.$setValidity('customValidation', false);
     };
   }
 ]);

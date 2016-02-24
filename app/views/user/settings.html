@@ -2,13 +2,13 @@
 <div class="msl-li">
   <h3 class="msl-li-h">Proxy</h3>
   <div class="msl-li-i" ng-class="{disabled: !proxyState}" ng-click="toggleProxyServer()">
-    <span class="li-icn">P</span>
+    <span class="li-icn bg-green">W</span>
     <div class="li-i-desc">
-      <h3 class="li-i-desc-main">Proxy Server</h3>
-      <h4 class="li-i-desc-sub">Proxy server is {{proxyState ? 'enabled' : 'disabled'}}</h3>
+      <h3 class="li-i-desc-main">Web Proxy Server</h3>
+      <h4 class="li-i-desc-sub">Web Proxy server is {{proxyState ? 'enabled' : 'disabled'}}</h3>
     </div>
     <div class="li-i-action">
-      <msl-switch switch-id="app_calender" ng-class="{open: proxyState}"/>
+      <msl-switch switch-id="web_proxy_server" ng-class="{open: proxyState}"/>
     </div>
   </div>
 </div><!-- /settings -->

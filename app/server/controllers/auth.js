@@ -6,7 +6,9 @@ import * as sodium from 'libsodium-wrappers';
 import sessionManager from '../session_manager';
 import SessionInfo from '../model/session_info';
 import Permission from '../model/permission';
-import { getSessionIdFromRequest } from '../utils'
+import {
+  getSessionIdFromRequest
+} from '../utils'
 
 export let CreateSession = function(data) {
   let req = data.request;
@@ -25,7 +27,9 @@ export let CreateSession = function(data) {
       let sessionInfo = new SessionInfo(app.id, app.name, app.version, app.vendor, data.permissions, dirKey);
       let symmetricKey = Buffer.concat([new Buffer(sessionInfo.secretKey), new Buffer(sessionInfo.nonce)]);
       let encryptedKey = sodium.crypto_box_easy(new Uint8Array(symmetricKey), appNonce, appPubKey, assymetricKeyPair.privateKey);
-      let payload = JSON.stringify({ id: sessionId });
+      let payload = JSON.stringify({
+        id: sessionId
+      });
       let token = jwt.sign(payload, new Buffer(sessionInfo.signingKey));
       sessionManager.put(sessionId, sessionInfo);
       let eventType = req.app.get('EVENT_TYPE').SESSION_CREATED;
@@ -82,12 +86,17 @@ export var authorise = function(req, res) {
 export var revoke = function(req, res) {
   let sessionId = getSessionIdFromRequest(req);
   if (!sessionId) {
-    return res.status(401).send('Authorisation Token could not be parsed');
+    return res.sendStatus(401);
   }
-  if (!sessionManager.remove(sessionId)) {
-    return res.status(400).send('Session not found');
-  }
+  sessionManager.remove(sessionId);
   let eventType = req.app.get('EVENT_TYPE').SESSION_REMOVED;
   req.app.get('eventEmitter').emit(eventType, sessionId);
-  res.status(200).send("Session removed");
+  res.sendStatus(200);
+}
+
+export var isTokenValid = function(req, res) {
+  if (!req.headers['sessionId']) {
+    return res.sendStatus(401);
+  }
+  return res.sendStatus(200);
 }

@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import mime from 'mime';
 import * as sodium from 'libsodium-wrappers';
 import sessionManager from './session_manager';
 import { errorCodeLookup } from './error_code_lookup';
@@ -39,7 +40,7 @@ export var decryptRequest = function(req, res, next) {
   }
   let sessionId = getSessionIdFromRequest(req);
   if (!sessionId) {
-    return res.status(401).send('Unauthorised');
+    return res.sendStatus(401);
   }
   let sessionInfo = sessionManager.get(sessionId);
   let parseQueryString = function(string) {
@@ -70,7 +71,7 @@ export var decryptRequest = function(req, res, next) {
     req.headers['sessionId'] = sessionId;
     next();
   } catch (e) {
-    return res.status(400).send('Failed to decrypt the request. ' + e.message());
+    return res.sendStatus(401);
   }
 }
 
@@ -124,6 +125,9 @@ export var formatResponse = function(data) {
     if (obj.hasOwnProperty('user_metadata')) {
       obj.metadata = obj.user_metadata;
       delete obj.user_metadata;
+    }
+    if (obj.hasOwnProperty('metadata') && typeof obj.metadata === 'string' && obj.metadata) {
+      obj.metadata = JSON.parse(obj.metadata);
     }
     var formattedObj = {};
     for (let key in obj) {
@@ -187,8 +191,7 @@ export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
       content = sessionInfo.encryptBuffer(content);
       self.res.set('Content-Type', 'text/plain');
     } else {
-      // TODO set mime type
-      self.res.set('Content-Type', 'text/html');
+      self.res.set('Content-Type', mime.lookup(data.metadata.name));
     }
     self.res.set('file-name', data.metadata.name);
     self.res.set('file-size', data.metadata.size);

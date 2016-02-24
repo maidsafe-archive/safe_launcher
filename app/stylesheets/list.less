@@ -1,6 +1,6 @@
 .msl-li {
   .msl-li-h {
-    margin: 0 0 16px;
+    margin: 0 16px 16px;
     padding: 0;
     font-size: 14px;
     font-weight: normal;
@@ -9,11 +9,28 @@
     border-bottom: 1px solid @msl-border-clr;
   }
   .msl-li-i {
-    padding-bottom: 16px;
+    padding: 16px;
     position: relative;
+    cursor: pointer;
     &.disabled {
       > .li-i-desc {
         opacity: 0.5;
+      }
+    }
+    &.open {
+      background-color: white;
+      > .li-i-desc {
+        .li-i-desc-main {
+           > .icn {
+             transform: rotate(180deg);
+           }
+        }
+        .li-i-desc-sub {
+          display: block;
+          > .name {
+            display: inline-block;
+          }
+        }
       }
     }
     > .li-icn {
@@ -23,7 +40,6 @@
       margin-right: 16px;
       display: inline-block;
       border-radius: 50%;
-      background-color: @msl-icn-bg-orange;
       text-align: center;
       line-height: 40px;
       color: white;
@@ -38,6 +54,16 @@
         font-size: 14px;
         font-weight: 600;
         line-height: 24px;
+        > .name {
+          display: inline-block;
+        }
+        > .icn {
+          width: 10px;
+          height: 10px;
+          display: inline-block;
+          background-image: url('../images/down-chevron.svg');
+          background-size: 10px;
+        }
       }
       .li-i-desc-sub {
         margin: 0;
@@ -47,22 +73,28 @@
         font-weight: normal;
         line-height: 24px;
         color: @msl-txt-clr-d;
+        > .name {
+          display: none;
+        }
+        > .val {
+          display: inline-block;
+        }
       }
     }
     > .li-i-action {
       width: 20%;
-      padding: 6px 0;
       position: absolute;
-      top: 0;
-      right: 0;
+      top: 16px;
+      right: 16px;
       text-align: right;
       button {
         background-color: transparent;
         font-size: 14px;
         font-weight: 600;
-        color: @msl-txt-clr-d;
+        text-transform: uppercase;
+        color: @msl-danger-btn;
         cursor: pointer;
-        padding: 8px 0;
+        padding: 4px 0;
       }
     }
     .clearfix();

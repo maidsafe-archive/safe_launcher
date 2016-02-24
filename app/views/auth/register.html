@@ -1,74 +1,101 @@
-<!-- regiter -->
-<div class="msl-form msl-layout-1 msl-auth-form" ng-controller="AuthController" ng-init="tabs.init()">
-  <div class="msl-form-nav">
-    <div class="msl-form-nav-i" ng-class="{active: tabs.currentPos === tabs.state[0]}" ng-click="tabs.changePos('PIN')">PIN</div>
-    <div class="msl-form-nav-i" ng-class="{active: tabs.currentPos === tabs.state[1]}" ng-click="tabs.changePos('KEYWORD')">Keyword</div>
-    <div class="msl-form-nav-i" ng-class="{active: tabs.currentPos === tabs.state[2]}" ng-click="tabs.changePos('PASSWORD')">Password</div>
+<div class="msl-auth" ng-controller="authController">
+  <!-- auth banner -->
+  <div class="msl-auth-bnr">
+    <img src="./images/launcher_rocket.svg" alt="Auth banner" />
+  </div><!-- /auth banner -->
+  <div class="msl-auth-b" ng-show="!authLoader.isLoading">
+    <!-- regiter -->
+    <div class="msl-form msl-layout-1" ng-init="tabs.init()">
+      <div class="msl-form-nav">
+        <div class="msl-form-nav-i" ng-class="{active: tabs.currentPos === tabs.state[0]}" ng-click="tabs.changePos('PIN')">PIN</div>
+        <div class="msl-form-nav-i" ng-class="{active: tabs.currentPos === tabs.state[1]}" ng-click="tabs.changePos('KEYWORD')">Keyword</div>
+        <div class="msl-form-nav-i" ng-class="{active: tabs.currentPos === tabs.state[2]}" ng-click="tabs.changePos('PASSWORD')">Password</div>
+      </div>
+
+      <!-- pin base -->
+      <form name="registerPin" ng-show="tabs.currentPos === tabs.state[0]" ng-submit="validatePin()">
+        <!-- pin -->
+        <div class="msl-form-grp">
+          <input type="password" name="pin" placeholder="PIN"
+          ng-model="user.pin"
+          msl-validate-pin/>
+          <span name="clear-btn" class="clear-btn"
+          ng-show="user.pin"
+          ng-click="resetInputField('pin', $event)">x</span>
+        </div>
+        <!-- confirm pin -->
+        <div class="msl-form-grp">
+          <input type="password" name="confirmPin" placeholder="Confirm PIN" ng-model="user.confirmPin" target-name="pin" msl-validate-pin msl-validate-confirmation/>
+          <span name="clear-btn" class="clear-btn"
+          ng-show="user.confirmPin"
+          ng-click="resetInputField('confirmPin', $event)">x</span>
+        </div>
+        <!-- register btn -->
+        <div class="msl-form-grp act-btn">
+          <button type="submit" name="validatePinBtn" class="msl-btn msl-btn-primary">Next</button>
+        </div>
+      </form>
+
+      <!-- keyword -->
+      <form name="registerKeyword" ng-show="tabs.currentPos === tabs.state[1]" ng-submit="validateKeyword()">
+        <!-- keyword -->
+        <div class="msl-form-grp">
+          <input type="password" name="keyword" placeholder="Keyword"
+          ng-model="user.keyword"
+          msl-validate-keyword/>
+          <span name="clear-btn" class="clear-btn"
+          ng-show="user.keyword"
+          ng-click="resetInputField('keyword', $event)">x</span>
+        </div>
+        <!-- confirm keyword -->
+        <div class="msl-form-grp">
+          <input type="password" name="confirmKeyword" placeholder="Confirm Keyword" ng-model="user.confirmKeyword" target-name="keyword" msl-validate-keyword msl-validate-confirmation />
+          <span name="clear-btn" class="clear-btn"
+          ng-show="user.confirmKeyword"
+          ng-click="resetInputField('confirmKeyword', $event)">x</span>
+        </div>
+        <!-- register btn -->
+        <div class="msl-form-grp act-btn">
+          <button type="submit" name="validateKeywordBtn" class="msl-btn msl-btn-primary">Next</button>
+        </div>
+      </form>
+
+      <!-- password -->
+      <form name="registerPassword" ng-show="tabs.currentPos === tabs.state[2]" ng-submit="validatePassword()">
+        <!-- password -->
+        <div class="msl-form-grp">
+          <input type="password" name="password" placeholder="Password"
+          ng-model="user.password"
+          msl-validate-password/>
+          <span name="clear-btn" class="clear-btn"
+          ng-show="user.password"
+          ng-click="resetInputField('password', $event)">x</span>
+        </div>
+        <!-- confirm password -->
+        <div class="msl-form-grp">
+          <input type="password" name="confirmPassword"
+          placeholder="Confirm Password"
+          ng-model="user.confirmPassword"
+          target-name="password"
+          msl-validate-password
+          msl-validate-confirmation />
+          <span name="clear-btn" class="clear-btn"
+          ng-show="user.confirmPassword"
+          ng-click="resetInputField('confirmPassword', $event)">x</span>
+        </div>
+
+        <!-- register btn -->
+        <div class="msl-form-grp act-btn">
+          <button type="submit" name="validatePasswordBtn" class="msl-btn msl-btn-primary">Register</button>
+        </div>
+      </form>
+    </div><!-- /regiter -->
+    <!-- footer -->
+    <div class="msl-footer">
+      <span class="msl-footer-split"></span>
+      Already have an account? <a ui-sref="login">Log In</a>
+    </div><!-- /footer -->
   </div>
-
-  <!-- pin base -->
-  <form name="registerPin" ng-show="tabs.currentPos === tabs.state[0]" ng-submit="validatePin()">
-    <!-- pin -->
-    <div class="msl-form-grp">
-      <input type="password" name="pin" placeholder="PIN"
-      ng-model="user.pin"
-      msl-validate-pin/>
-      <span type="button" name="clear-btn" class="clear-btn" ng-click="user.pin = null; registerPin.pin.$setValidity('customValidation', false);">x</span>
-    </div>
-    <!-- confirm pin -->
-    <div class="msl-form-grp">
-      <input type="password" name="confirmPin" placeholder="Confirm PIN" ng-model="user.confirmPin" target-name="pin" msl-validate-pin msl-validate-confirmation/>
-      <span type="button" name="clear-btn" class="clear-btn" ng-click="user.confirmPin = null; registerPin.confirmPin.$setValidity('customValidation', false)">x</span>
-    </div>
-    <!-- register btn -->
-    <div class="msl-form-grp">
-      <button type="submit" name="register" class="act-btn">Next</button>
-    </div>
-  </form>
-
-  <!-- keyword -->
-  <form name="registerKeyword" ng-show="tabs.currentPos === tabs.state[1]" ng-submit="validateKeyword()">
-    <!-- keyword -->
-    <div class="msl-form-grp">
-      <input type="password" name="keyword" placeholder="Keyword"
-      ng-model="user.keyword"
-      msl-validate-keyword/>
-      <span type="button" name="clear-btn" class="clear-btn" ng-click="user.keyword = null;registerKeyword.keyword.$setValidity('customValidation', false)">x</span>
-    </div>
-    <!-- confirm keyword -->
-    <div class="msl-form-grp">
-      <input type="password" name="confirmKeyword" placeholder="Confirm Keyword" ng-model="user.confirmKeyword" target-name="keyword" msl-validate-keyword msl-validate-confirmation />
-      <span type="button" name="clear-btn" class="clear-btn" ng-click="user.confirmKeyword = null;registerKeyword.confirmKeyword.$setValidity('customValidation', false)">x</span>
-    </div>
-    <!-- register btn -->
-    <div class="msl-form-grp">
-      <button type="submit" name="register" class="act-btn">Next</button>
-    </div>
-  </form>
-
-  <!-- password -->
-  <form name="registerPassword" ng-show="tabs.currentPos === tabs.state[2]" ng-submit="validatePassword()">
-    <!-- password -->
-    <div class="msl-form-grp">
-      <input type="password" name="password" placeholder="Password"
-      ng-model="user.password"
-      msl-validate-password/>
-      <span type="button" name="clear-btn" class="clear-btn" ng-click="user.password = null;registerPassword.password.$setValidity('customValidation', false)">x</span>
-    </div>
-    <!-- confirm password -->
-    <div class="msl-form-grp">
-      <input type="password" name="confirmPassword" placeholder="Confirm Password" ng-model="user.confirmPassword" target-name="password" msl-validate-password msl-validate-confirmation/>
-      <span type="button" name="clear-btn" class="clear-btn"  ng-click="user.confirmPassword = null;registerPassword.confirmPassword.$setValidity('customValidation', false)">x</span>
-    </div>
-
-    <!-- register btn -->
-    <div class="msl-form-grp">
-      <button type="submit" name="register" class="act-btn">Register</button>
-    </div>
-  </form>
-</div><!-- /regiter -->
-<!-- footer -->
-<div class="msl-footer">
-  <span class="msl-footer-split"></span>
-  Already have an account? <a ui-sref="login">Log In</a>
-</div><!-- /footer -->
+  <!-- auth loading -->
+  <ng-include src="'views/components/auth_loader.html'" ng-show="authLoader.isLoading" />
+</div>

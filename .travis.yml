@@ -7,7 +7,7 @@ node_js:
 before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-script:  
+script:
   - npm test
 env:
   - CXX=g++-4.8

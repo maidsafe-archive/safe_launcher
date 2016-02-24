@@ -1,29 +1,46 @@
-<!-- login -->
-<div class="msl-form msl-layout-1 msl-auth-form" ng-controller="AuthController">
-  <form name="mslLogin" ng-submit="login()">
-    <!-- pin -->
-    <div class="msl-form-grp">
-      <input type="password" name="pin" placeholder="Pin" ng-model="user.pin" msl-validate-pin autofocus/>
-      <span type="button" name="clear-btn" class="clear-btn" ng-click="user.pin = null;mslLogin.pin.$setValidity('customValidation', false)">x</span>
+<div class="msl-auth" ng-controller="authController">
+  <!-- auth banner -->
+  <div class="msl-auth-bnr">
+    <img src="./images/launcher_rocket.svg" alt="Auth banner" />
+  </div><!-- /auth banner -->
+
+  <div class="msl-auth-b" ng-show="!authLoader.isLoading">
+    <!-- login -->
+    <div class="msl-form msl-layout-1" >
+      <form name="mslLogin" ng-submit="login()">
+        <!-- pin -->
+        <div class="msl-form-grp">
+          <input type="password" name="pin" placeholder="Pin" ng-model="user.pin" msl-validate-pin autofocus/>
+          <span type="button" name="clear-btn" class="clear-btn"
+          ng-show="user.pin"
+          ng-click="resetInputField('pin', $event)">x</span>
+        </div>
+        <!-- keyword -->
+        <div class="msl-form-grp">
+          <input type="password" name="keyword" placeholder="Keyword" ng-model="user.keyword" msl-validate-keyword/>
+          <span type="button" name="clear-btn" class="clear-btn"
+          ng-show="user.keyword"
+          ng-click="resetInputField('keyword', $event)">x</span>
+        </div>
+        <!-- password -->
+        <div class="msl-form-grp">
+          <input type="password" name="password" placeholder="Password" ng-model="user.password" msl-validate-password/>
+          <span type="button" name="clear-btn" class="clear-btn"
+          ng-show="user.password"
+          ng-click="resetInputField('password', $event)">x</span>
+        </div>
+        <!-- login btn -->
+        <div class="msl-form-grp act-btn">
+          <button type="submit" name="login" class="msl-btn msl-btn-primary">Login</button>
+        </div>
+      </form>
+    </div><!-- /login -->
+    <!-- footer -->
+    <div class="msl-footer">
+      <span class="msl-footer-split"></span>
+      Don't have an account yet? <a ui-sref="register">Create one</a>
     </div>
-    <!-- keyword -->
-    <div class="msl-form-grp">
-      <input type="password" name="keyword" placeholder="Keyword" ng-model="user.keyword" msl-validate-keyword/>
-      <span type="button" name="clear-btn" class="clear-btn" ng-click="user.keyword = null;mslLogin.keyword.$setValidity('customValidation', false)">x</span>
-    </div>
-    <!-- password -->
-    <div class="msl-form-grp">
-      <input type="password" name="password" placeholder="Password" ng-model="user.password" msl-validate-password/>
-      <span type="button" name="clear-btn" class="clear-btn" ng-click="user.password = null;mslLogin.password.$setValidity('customValidation', false)">x</span>
-    </div>
-    <!-- login btn -->
-    <div class="msl-form-grp">
-      <button type="submit" name="login" class="act-btn">Login</button>
-    </div>
-  </form>
-</div><!-- /login -->
-<!-- footer -->
-<div class="msl-footer">
-  <span class="msl-footer-split"></span>
-  Don't have an account yet? <a ui-sref="register">Create one</a>
+  </div>
+  <!-- auth loading -->
+  <ng-include src="'views/components/auth_loader.html'" ng-show="authLoader.isLoading" />
 </div>

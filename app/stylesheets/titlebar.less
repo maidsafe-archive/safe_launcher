@@ -28,10 +28,22 @@
   }
   .msl-title {
     margin: 0;
-    padding: 0 0 0 16px;
+    padding: 0 0 0 32px;
     font-size: 14px;
     line-height: 32px;
     font-weight: normal;
+    position: relative;
+    &:before {
+      content: "";
+      width: 24px;
+      height: 24px;
+      margin: 4px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-image: url('../images/app_icon.png');
+      background-size: 24px;
+    }
   }
   .title-btn {
     width: 32px;

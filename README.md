@@ -4,14 +4,13 @@ safe_launcher
 # Quick start
 The development dependency of this project is [Node.js](https://nodejs.org).
 Build the [safe_ffi](https://github.com/maidsafe/safe_ffi) and copy the `.dll` for Windows
-or `.so` for Linux/OSX to the `app/api/ffi` folder.
+, `.so` for Linux or `.dylib` for OSX to the `app/api/ffi` folder.
 
 So just make sure you have it installed.
 Then type few commands known to every Node developer...
 ```
 npm install
 npm start
-node ./tasks/rebuild_native.js
 ```
 
 # Development
@@ -21,7 +20,7 @@ node ./tasks/rebuild_native.js
 ```
 npm install
 ```
-It will also download Electron runtime, and install dependencies for second `package.json` file inside `app` folder.
+It will also download Electron runtime, and install dependencies for second `package.json` & `bower.json` file inside `app` folder.
 
 #### Starting the app
 
@@ -43,6 +42,15 @@ To run it go with standard:
 ```
 npm test
 ```
+
+# Making a distributable package
+
+To make ready for distribution package use command based on the platform:
+```
+npm run package
+```
+this will generate the package files in the `app_dist` folder
+
 
 # Making a release
 
