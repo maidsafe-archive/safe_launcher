@@ -36,10 +36,10 @@ var packageApp = function() {
     'safe_launcher',
     '--icon=' + config.icon,
     '--platform=' + config.platform,
-    '--asar',
-    '--asar-unpack=' + config.icon,
-    '--out=app_dist',
     '--prune',
+    '--asar',
+    '--asar-unpack=' + config.unpack,
+    '--out=app_dist',
     '--arch=x64',
     '--version=' + electronVersion,
     '--overwrite'
