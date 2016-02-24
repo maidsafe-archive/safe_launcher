@@ -4,7 +4,6 @@
 window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootScope', 'serverFactory',
   function($scope, $state, $rootScope, server) {
     var LIST_COLORS = [ 'bg-light-green', 'bg-blue', 'bg-yellow', 'bg-pink', 'bg-purple', 'bg-green', 'bg-orange' ];
-    // $rootScope.$applyAsync();
     $scope.proxyState = false;
     $scope.confirmation = {
       status: false,
@@ -24,7 +23,7 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
       }
     };
 
-    var showConfirmation  = function(data) {
+    var showConfirmation = function(data) {
       $scope.confirmation.status = true;
       $scope.confirmation.data.payload = data.payload;
       $scope.confirmation.data.request = data.request;
@@ -51,19 +50,19 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
       });
     };
 
+    var proxyListener = function(status) {
+      Loader.hide();
+      $scope.proxyState = status;
+    };
+
     // toggle proxy server
     var toggleProxyServer = function() {
       $scope.proxyState = !$scope.proxyState;
       Loader.show();
       if (!$scope.proxyState) {
-        server.stopProxyServer();
-        Loader.hide();
-        return;
+        return server.stopProxyServer();
       }
-      server.startProxyServer(function(msg) {
-        Loader.hide();
-        console.log(msg);
-      });
+      server.startProxyServer(proxyListener);
     };
 
     // start server

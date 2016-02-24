@@ -174,8 +174,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         reset();
         if (err) {
           $scope.authLoader.error = true;
-          alert('Login failed. Please try again');
-          return;
+          return $scope.$applyAsync();
         }
         $state.go('user');
       };
@@ -191,7 +190,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     $scope.showErrorMsg = function(ele, msg) {
       var parent = ele[0].parentNode;
       var children = parent.children;
-      var target = children[ children.length - 1 ];
+      var target = children[children.length - 1];
 
       // var siblingEle = ele[0].nextElementSibling;
       if (target.dataset.name === 'formError') {
@@ -208,7 +207,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     $scope.hideErrorMsg = function(ele) {
       var parent = ele[0].parentNode;
       var children = parent.children;
-      var target = children[ children.length - 1 ];
+      var target = children[children.length - 1];
       // var siblingEle = ele[0].nextElementSibling;
       ele.removeClass('ng-invalid');
       if (target.dataset.name !== 'formError') {
