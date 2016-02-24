@@ -15,9 +15,10 @@
       <div class="lt">
         <h3 class="msl-title">SAFE Launcher</h3>
       </div>
-      <div class="rt" ng-hide="$state.current.name !== 'user'">
+      <div class="rt" >
         <div class="rt-i">
-          <button type="button" name="button" class="msl-btn msl-signout-btn" onclick="window.msl.closeWindow()">Sign out</button>
+          <button ng-hide="$state.current.name !== 'user'" type="button" name="button" class="msl-btn msl-signout-btn" onclick="window.msl.closeWindow()">Sign out</button>
+          <button ng-hide="$state.current.name === 'user'" type="button" name="button" class="msl-btn msl-close-app" onclick="window.msl.closeWindow()"></button>
         </div>
       </div>
     </div><!-- /title bar -->
