@@ -1,26 +1,21 @@
 <!doctype html>
 <html>
+
 <head>
-    <meta charset="utf-8">
-    <title>SAFE Launcher</title>
-    <link rel="stylesheet" href="./bower_components/open-sans-fontface/open-sans.css" />
-    <link rel="stylesheet" href="./bower_components/myriad-font/css/myriad.css" />
-    <link href="./stylesheets/main.css" rel="stylesheet" type="text/css">
+  <meta charset="utf-8">
+  <title>SAFE Launcher</title>
+  <link rel="stylesheet" href="./bower_components/open-sans-fontface/open-sans.css" />
+  <link rel="stylesheet" href="./bower_components/myriad-font/css/myriad.css" />
+  <link href="./stylesheets/main.css" rel="stylesheet" type="text/css">
 </head>
+
 <body ng-app="safeLauncher">
   <!-- root node -->
   <div class="msl-root">
     <!-- title bar -->
-    <div class="msl-titlebar">
-      <div class="lt">
-        <h3 class="msl-title">SAFE Launcher</h3>
-      </div>
-      <div class="rt" ng-hide="$state.current.name !== 'user'">
-        <div class="rt-i">
-          <button type="button" name="button" class="msl-btn msl-signout-btn" onclick="window.msl.closeWindow()">Sign out</button>
-        </div>
-      </div>
-    </div><!-- /title bar -->
+    <div class="msl-titlebar" ng-include="'views/components/titlebar.html'">
+    </div>
+    <!-- /title bar -->
     <div class="msl-frame" ui-view></div>
     <msl-loader ng-show="$loader" />
   </div>
@@ -53,4 +48,5 @@
   <script src="./scripts/controllers/auth_controller.js" charset="utf-8"></script>
   <script src="./scripts/controllers/user_controller.js" charset="utf-8"></script>
 </body>
+
 </html>

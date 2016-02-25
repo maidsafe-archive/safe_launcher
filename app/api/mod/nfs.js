@@ -136,7 +136,7 @@ export default class NFS {
           newValues: {
             content: {
               bytes: contentBytes,
-              offet: offset
+              offset: offset
             }
           },
           isPathShared: isPathShared

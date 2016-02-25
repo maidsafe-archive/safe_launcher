@@ -14,7 +14,7 @@ import { ipcRenderer as ipc } from 'electron';
 let restServer = new RESTServer(api, env.serverPort);
 let proxyServer = {
   process: null,
-  start: function(callback) {
+  start: function(proxyListener) {
     if (this.process) {
       return;
     }
@@ -24,8 +24,11 @@ let proxyServer = {
       '--serverPort',
       env.serverPort
     ]);
+    this.process.on('exit', function() {
+      proxyListener.notify(false);
+    });
     this.process.on('message', function(msg) {
-      callback(msg);
+      proxyListener.notify(true);
     });
   },
   stop: function() {

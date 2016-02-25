@@ -22,13 +22,13 @@ app.on('ready', function() {
     devHelper.setDevMenu();
     mainWindow.openDevTools();
   }
-
-  mainWindow.on('blur', function(d) {
-    if (env.name !== 'production') {
-      return;
-    }
-    mainWindow.minimize();
-  });
+  //
+  // mainWindow.on('blur', function(d) {
+  //   if (env.name !== 'production') {
+  //     return;
+  //   }
+  //   mainWindow.minimize();
+  // });
 });
 
 app.on('window-all-closed', function() {
