@@ -1,3 +1,13 @@
+class ProxyListener {
+  constructor(callback) {
+    this.callback = callback;
+  }
+
+  notify(status) {
+    this.callback(status);
+  }
+}
+
 // UI Utils
 export default class UIUtils {
   constructor(api, remote, restServer, proxy) {
@@ -78,7 +88,7 @@ export default class UIUtils {
 
   // start proxy server
   startProxyServer(callback) {
-    this.proxy.start(callback);
+    this.proxy.start(new ProxyListener(callback));
   }
 
   // stop proxy server

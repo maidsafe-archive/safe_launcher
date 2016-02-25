@@ -25,7 +25,7 @@ var initialiseArguments = function(args) {
 
 var args = initialiseArguments(process.argv);
 
-var server = http.createServer(function(req, res) {
+var server = http.createServer(function(req, res) {	
 	var urlServe = url.parse(req.url);
 	if (safenetPath.test(urlServe.host)) {
 		if (safenetApiPath.test(urlServe.host)) {
