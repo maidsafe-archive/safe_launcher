@@ -79,7 +79,7 @@ var modifyDirectory = function(lib, request) {
   try {
     var payload = createPayload('modify-dir', request);
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    payload.data.new_values = createNewValuesPayload(request.params.newValues);
+    payload.data.new_values = createNewValuesPayload(request.params.newValues);        
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {

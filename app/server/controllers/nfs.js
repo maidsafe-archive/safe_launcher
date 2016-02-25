@@ -184,8 +184,12 @@ export var modifyFileContent = function(req, res) {
   if (!reqBody) {
     return responseHandler.onResponse('Invalid request.');
   }
-  query.offset = query.offset || 0;
-  req.app.get('api').nfs.modifyFileContent(reqBody, query.offset, params.filePath, params.isPathShared,
+
+  if (query.offset && isNaN(query.offset)) {
+    return responseHandler.onResponse('Invalid request. offset should be a number');
+  }
+
+  req.app.get('api').nfs.modifyFileContent(reqBody, parseInt(query.offset), params.filePath, params.isPathShared,
     sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
 };
 
