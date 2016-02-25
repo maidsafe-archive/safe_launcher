@@ -13,8 +13,8 @@ app.on('ready', function() {
   mainWindow = new BrowserWindow({
     'width': 390,
     'height': 440,
-    'resizable': false,
-    'frame': false
+    'resizable': false
+    // 'frame': false
   });
   mainWindow.loadURL('file://' + __dirname + '/app.html');
 
