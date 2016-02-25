@@ -95,7 +95,7 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
         version: session.info.appVersion,
         vendor: session.info.vendor,
         status: true,
-        permissions: session.info.permissions
+        permissions: session.info.permissions.list
       });
       Loader.hide();
       $scope.$apply();

@@ -32,6 +32,12 @@ export default class UIUtils {
     this.remote.getCurrentWindow().close();
   }
 
+
+  // minimize browser window
+  minimizeWindow() {
+    this.remote.getCurrentWindow().minimize();
+  }
+
   // start REST Server
   startServer() {
     this.restServer.start();
