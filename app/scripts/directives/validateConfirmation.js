@@ -13,11 +13,11 @@ window.safeLauncher.directive('mslValidateConfirmation', function() {
       var targetValue = scope[formName][targetName].$viewValue;
       element.addClass('ng-invalid');
       if (!value) {
-        scope.showErrorMsg(element, 'Cannot be left blank');
+        scope.showErrorMsg(element, 'Can\'t be left blank');
         return;
       }
       if (value !== targetValue) {
-        scope.showErrorMsg(element, 'Entries doesn\'t match');
+        scope.showErrorMsg(element, 'Entries don\'t match');
         return;
       }
       scope.hideErrorMsg(element);
