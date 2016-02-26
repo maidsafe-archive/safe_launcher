@@ -11,7 +11,7 @@ window.safeLauncher.directive('mslValidateKeyword', function() {
       form.$setValidity('customValidation', false);
       element.addClass('invalid');
       if (!value) {
-        scope.showErrorMsg(element, 'Cannot be left blank');
+        scope.showErrorMsg(element, 'Can\'t be left blank');
         return;
       }
       if (!(new RegExp(/^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/i)).test(value)) {

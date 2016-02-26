@@ -11,7 +11,7 @@ window.safeLauncher.directive('mslValidatePassword', function() {
       form.$setValidity('customValidation', false);
       element.addClass('ng-invalid');
       if (!value) {
-        return scope.showErrorMsg(element, 'Cannot be left blank');
+        return scope.showErrorMsg(element, 'Can\'t be left blank');
       }
       if (!(new RegExp(/^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/i)).test(value)) {
         return scope.showErrorMsg(element, 'Must be alphanumeric');

@@ -11,7 +11,7 @@ window.safeLauncher.directive('mslValidatePin', function() {
       form.$setValidity('customValidation', false);
       element.addClass('ng-invalid');
       if (!value) {
-        scope.showErrorMsg(element, 'Cannot be left blank');
+        scope.showErrorMsg(element, 'Can\'t be left blank');
         return;
       }
       if (isNaN(value)) {

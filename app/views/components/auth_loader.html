@@ -3,7 +3,7 @@
   <h3 class="msl-auth-loading-h" ng-show="$state.current.name === 'register'">{{ authLoader.error ? "Error in Registration!" : "Registering..." }}</h3>
   <div class="msl-auth-loading-slider"></div>
   <div class="msl-auth-loading-desc" ng-show="!authLoader.error">
-    {{ $state.current.name === 'login' ? "Logging" : "Registering" }} you into the SAFE Network.<br>This won't take long!
+    {{ $state.current.name === 'login' ? "Logging" : "Registering" }} you on the SAFE Network.
   </div>
   <div class="msl-auth-loading-desc" ng-show="authLoader.error">
     {{ $state.current.name === 'login' ? "Login" : "Registration" }} failed!<br>Please enter the correct details
