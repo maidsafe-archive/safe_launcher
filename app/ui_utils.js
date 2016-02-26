@@ -82,13 +82,13 @@ export default class UIUtils {
     this.restServer.removeSession(id);
   }
 
-  // restore window if minimized
-  restoreWindow() {
+  // focus window
+  focusWindow() {
     var browserWindow = this.remote.getCurrentWindow();
-    if (!browserWindow.isMinimized()) {
+    if (browserWindow.isFocused()) {
       return;
     }
-    this.remote.getCurrentWindow().restore();
+    this.remote.getCurrentWindow().focus();
   }
 
   // start proxy server

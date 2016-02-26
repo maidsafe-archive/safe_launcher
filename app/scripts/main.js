@@ -16,4 +16,8 @@ window.safeLauncher = angular
   $rootScope.$state = $state;
   $rootScope.$stateParams = $stateParams;
   $rootScope.$loader = false;
+  $rootScope.openExternal = function(link) {
+    var shell = require('electron').shell;
+    shell.openExternal(link.toString());
+  };
 } ]);

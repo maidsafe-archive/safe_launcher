@@ -50,9 +50,9 @@ window.safeLauncher.factory('serverFactory', [
       window.msl.removeSession(id);
     };
 
-    // restore window if minimized
-    self.restoreWindow = function() {
-      window.msl.restoreWindow();
+    // focus window
+    self.focusWindow = function() {
+      window.msl.focusWindow();
     };
 
     // handle auth request
