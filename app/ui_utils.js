@@ -85,7 +85,7 @@ export default class UIUtils {
   // focus window
   focusWindow() {
     var browserWindow = this.remote.getCurrentWindow();
-    if (!browserWindow.isFocused()) {
+    if (browserWindow.isFocused()) {
       return;
     }
     this.remote.getCurrentWindow().focus();
