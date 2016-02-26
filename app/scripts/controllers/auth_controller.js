@@ -67,7 +67,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     // register user
     var register = function() {
       var reset = function() {
-        // authLoader.hide();
         $scope.user = {};
         $scope.tabs.init();
       };
@@ -81,7 +80,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         reset();
         if (err) {
           $scope.authLoader.error = true;
-          alert('Registration failed. Please try again');
           return;
         }
         $state.go('user');
@@ -94,12 +92,19 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       if (!$scope.registerPin.$valid) {
         return;
       }
+      var form = $('form[name = ' + $scope.registerPin.$name + ']');
+      var pin = null;
+      var confirmPin = null;
       if (!$scope.user.hasOwnProperty('pin') || !$scope.user.pin) {
         $scope.registerPin.pin.$setValidity('customValidation', false);
+        pin = form.find('input[name=' + $scope.registerPin.pin.$name + ']');
+        $scope.showErrorMsg(pin, 'Cannot be left blank');
         return;
       }
       if (!$scope.user.hasOwnProperty('confirmPin') || !$scope.user.confirmPin) {
         $scope.registerPin.confirmPin.$setValidity('customValidation', false);
+        confirmPin = form.find('input[name=' + $scope.registerPin.confirmPin.$name + ']');
+        $scope.showErrorMsg(confirmPin, 'Cannot be left blank');
         return;
       }
       $scope.tabs.currentPos = $scope.tabs.state[1];
@@ -111,12 +116,20 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       if (!$scope.registerKeyword.$valid) {
         return;
       }
+      var form = $('form[name = ' + $scope.registerKeyword.$name + ']');
+      var keyword = null;
+      var confirmKeyword = null;
+
       if (!$scope.user.hasOwnProperty('keyword') || !$scope.user.keyword) {
         $scope.registerKeyword.keyword.$setValidity('customValidation', false);
+        keyword = form.find('input[name=' + $scope.registerKeyword.keyword.$name + ']');
+        $scope.showErrorMsg(keyword, 'Cannot be left blank');
         return;
       }
       if (!$scope.user.hasOwnProperty('confirmKeyword') || !$scope.user.confirmKeyword) {
         $scope.registerKeyword.confirmKeyword.$setValidity('customValidation', false);
+        confirmKeyword = form.find('input[name=' + $scope.registerKeyword.confirmKeyword.$name + ']');
+        $scope.showErrorMsg(confirmKeyword, 'Cannot be left blank');
         return;
       }
       $scope.tabs.currentPos = $scope.tabs.state[2];
@@ -128,12 +141,20 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       if (!$scope.registerPassword.$valid) {
         return;
       }
+      var form = $('form[name = ' + $scope.registerPassword.$name + ']');
+      var password = null;
+      var confirmPassword = null;
+
       if (!$scope.user.hasOwnProperty('password') || !$scope.user.password) {
         $scope.registerPassword.password.$setValidity('customValidation', false);
+        password = form.find('input[name=' + $scope.registerPassword.password.$name + ']');
+        $scope.showErrorMsg(password, 'Cannot be left blank');
         return;
       }
       if (!$scope.user.hasOwnProperty('confirmPassword') || !$scope.user.confirmPassword) {
         $scope.registerPassword.confirmPassword.$setValidity('customValidation', false);
+        confirmPassword = form.find('input[name=' + $scope.registerPassword.confirmPassword.$name + ']');
+        $scope.showErrorMsg(confirmPassword, 'Cannot be left blank');
         return;
       }
       register();
@@ -157,7 +178,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         return $scope.mslLogin.password.$setValidity('customValidation', false);
       }
       var reset = function() {
-        // authLoader.hide();
         $scope.user = {};
         $timeout.cancel(timer);
       };
@@ -192,7 +212,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       var children = parent.children;
       var target = children[children.length - 1];
 
-      // var siblingEle = ele[0].nextElementSibling;
       if (target.dataset.name === 'formError') {
         target.textContent = msg;
         return;
@@ -208,7 +227,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       var parent = ele[0].parentNode;
       var children = parent.children;
       var target = children[children.length - 1];
-      // var siblingEle = ele[0].nextElementSibling;
       ele.removeClass('ng-invalid');
       if (target.dataset.name !== 'formError') {
         return;
@@ -227,8 +245,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       $scope[form][input[0].name].$setValidity('customValidation', true);
       input.removeClass('ng-invalid ng-invalid-custom-validation');
       input.focus();
-      // $scope[form][ele].$setValidity('customValidation', false);
-      // user.pin = null;mslLogin.pin.$setValidity('customValidation', false);
     };
   }
 ]);

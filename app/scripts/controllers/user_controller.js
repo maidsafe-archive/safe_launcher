@@ -110,7 +110,7 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
     // handle auth request
     server.onAuthRequest(function(data) {
       console.log(data);
-      server.restoreWindow();
+      server.focusWindow();
       showConfirmation(data);
     });
 
