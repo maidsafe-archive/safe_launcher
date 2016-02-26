@@ -42,7 +42,8 @@ var server = http.createServer(function(req, res) {
     var service = tokens.length === 3 ? tokens[0] : DEFAULT_SERVICE;
     var domain = tokens.length === 3 ? tokens[1] : tokens[0];
     var path = urlServe.pathname.split('/').slice(1).join('/') || DEFAULT_FILE;
-    req.url = urlServe.protocol + '//' + urlServe.host + '/dns/' + service + '/' + domain + '/' + encodeURIComponent(path);
+    req.url = urlServe.protocol + '//' + urlServe.host + '/dns/' + service + '/' +
+      domain + '/' + encodeURIComponent(decodeURIComponent(path));
     proxy.web(req, res, {
       target: 'http://localhost:' + args.serverPort
     });
