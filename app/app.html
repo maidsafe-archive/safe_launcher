@@ -11,13 +11,13 @@
 
 <body ng-app="safeLauncher">
   <!-- root node -->
-  <div class="msl-root">
+  <div class="msl-root" ng-controller="basicController" ng-init="initApplication()">
     <!-- title bar -->
     <!-- <div class="msl-titlebar" ng-include="'views/components/titlebar.html'">
     </div> -->
     <!-- /title bar -->
     <div class="msl-frame" ui-view></div>
-    <msl-loader ng-show="$loader" />
+    <msl-loader ng-show="$loader.isLoading" />
   </div>
   <!-- /root node -->
 
@@ -45,6 +45,7 @@
   <script src="./scripts/factories/server_factory.js" charset="utf-8"></script>
 
   <!-- controllers -->
+  <script src="./scripts/controllers/basic_controller.js" charset="utf-8"></script>
   <script src="./scripts/controllers/auth_controller.js" charset="utf-8"></script>
   <script src="./scripts/controllers/user_controller.js" charset="utf-8"></script>
 </body>

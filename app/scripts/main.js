@@ -15,7 +15,19 @@ window.safeLauncher = angular
 .run([ '$rootScope', '$state', '$stateParams', function($rootScope, $state, $stateParams) {
   $rootScope.$state = $state;
   $rootScope.$stateParams = $stateParams;
-  $rootScope.$loader = false;
+  $rootScope.$loader = {
+    isLoading: false,
+    show: function() {
+      this.isLoading = true;
+    },
+    hide: function() {
+      this.isLoading = false;
+      if (!$rootScope.$$phase) {
+        $rootScope.$apply();
+      }
+    }
+  };
+  $rootScope.$proxyServer = false;
   $rootScope.openExternal = function(link) {
     var shell = require('electron').shell;
     shell.openExternal(link.toString());

@@ -1,9 +1,11 @@
 /**
  * Authentication Controller
  */
-window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootScope', '$timeout', 'authFactory',
-  function($scope, $state, $rootScope, $timeout, auth) {
+window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootScope', '$timeout', 'authFactory', 'serverFactory',
+  function($scope, $state, $rootScope, $timeout, auth, server) {
     var LOGIN_TIMEOUT = 90000;
+    $scope.user = {};
+
     var AuthResponse = function() {
       var self = this;
       self.status = true;
@@ -21,7 +23,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     };
     var authRes = new AuthResponse();
 
-    $scope.user = {};
     $scope.tabs = {
       state: [
         'PIN',
