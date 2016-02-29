@@ -1,34 +1,16 @@
 /**
  * Authentication Controller
  */
-window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootScope', '$timeout', 'authFactory', 'serverFactory',
-  function($scope, $state, $rootScope, $timeout, auth, server) {
+window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootScope', '$timeout',
+  'authFactory', 'serverFactory', 'validateFieldsFactory',
+  function($scope, $state, $rootScope, $timeout, auth, server, validate) {
     var LOGIN_TIMEOUT = 90000;
     $scope.user = {};
+    $scope.formError = null;
 
-    var AuthResponse = function() {
-      var self = this;
-      self.status = true;
-      self.onResponse = function(err) {
-        if (!self.status) {
-          return;
-        }
-        self.onComplete(err);
-      };
-      self.onComplete = function(err) {};
-      self.cancel = function() {
-        console.log('Request canceled');
-        self.status = false;
-      };
-    };
-    var authRes = new AuthResponse();
-
+    // registration tabbing
     $scope.tabs = {
-      state: [
-        'PIN',
-        'KEYWORD',
-        'PASSWORD'
-      ],
+      state: [ 'PIN', 'KEYWORD', 'PASSWORD' ],
       currentPos: null,
       init: function() {
         this.currentPos = this.state[0];
@@ -65,6 +47,24 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       }
     };
 
+    var AuthResponse = function() {
+      var self = this;
+      self.status = true;
+      self.onResponse = function(err) {
+        if (!self.status) {
+          return;
+        }
+        self.onComplete(err);
+      };
+      self.onComplete = function(err) {};
+      self.cancel = function() {
+        console.log('Request canceled');
+        self.status = false;
+      };
+    };
+
+    var authRes = new AuthResponse();
+
     // register user
     var register = function() {
       var reset = function() {
@@ -86,6 +86,26 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         $state.go('user');
       };
       auth.register(payload, authRes.onResponse);
+    };
+
+    var getFormEle = function(form, field) {
+      var formEle = $('form[name=' + form.$name + ']');
+      return formEle.find('input[name=' + form[field].$name + ']');
+    };
+
+    // show form error
+    var showFormErr = function(err, form, field) {
+      var fieldEle = getFormEle(form, field);
+      fieldEle.addClass('invalid');
+      fieldEle.focus();
+      $scope.formError = err;
+    };
+
+    // hide form error
+    var hideFormErr = function(form, field) {
+      var fieldEle = getFormEle(form, field);
+      fieldEle.removeClass('invalid');
+      $scope.formError = null;
     };
 
     // validate pin
@@ -165,19 +185,38 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     // user login
     $scope.login = function() {
       var timer = null;
+      var errMsg = null;
+      errMsg = validate.validatePin($scope.user.pin);
+      if (errMsg) {
+        return showFormErr(errMsg, $scope.mslLogin, 'pin');
+      }
 
-      if (!$scope.mslLogin.$valid) {
-        return;
+      hideFormErr($scope.mslLogin, 'pin');
+      errMsg = validate.validateKeyword($scope.user.keyword);
+      if (errMsg) {
+        return showFormErr(errMsg, $scope.mslLogin, 'keyword');
       }
-      if (!$scope.user.hasOwnProperty('pin') || !$scope.user.pin) {
-        return $scope.mslLogin.pin.$setValidity('customValidation', false);
-      }
-      if (!$scope.user.hasOwnProperty('keyword') || !$scope.user.keyword) {
-        return $scope.mslLogin.keyword.$setValidity('customValidation', false);
-      }
-      if (!$scope.user.hasOwnProperty('password') || !$scope.user.password) {
-        return $scope.mslLogin.password.$setValidity('customValidation', false);
-      }
+
+      // validate.isPinValid($scope.user.pin, function(err, data) {
+      //   if (err) {
+      //     return showFormErr(err, $scope.mslLogin, 'pin');
+      //   }
+      //   valid = true;
+      //   hideFormErr($scope.mslLogin, 'pin');
+      // });
+
+      // if (!$scope.mslLogin.$valid) {
+      //   return;
+      // }
+      // if (!$scope.user.hasOwnProperty('pin') || !$scope.user.pin) {
+      //   return $scope.mslLogin.pin.$setValidity('customValidation', false);
+      // }
+      // if (!$scope.user.hasOwnProperty('keyword') || !$scope.user.keyword) {
+      //   return $scope.mslLogin.keyword.$setValidity('customValidation', false);
+      // }
+      // if (!$scope.user.hasOwnProperty('password') || !$scope.user.password) {
+      //   return $scope.mslLogin.password.$setValidity('customValidation', false);
+      // }
       var reset = function() {
         $scope.user = {};
         $timeout.cancel(timer);
@@ -199,6 +238,9 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         }
         $state.go('user');
       };
+      if (!valid) {
+        return;
+      }
       auth.login($scope.user, authRes.onResponse);
     };
 
@@ -208,44 +250,44 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     };
 
     // show error text
-    $scope.showErrorMsg = function(ele, msg) {
-      var parent = ele[0].parentNode;
-      var children = parent.children;
-      var target = children[children.length - 1];
+    // $scope.showErrorMsg = function(ele, msg) {
+    //   var parent = ele[0].parentNode;
+    //   var children = parent.children;
+    //   var target = children[children.length - 1];
+    //
+    //   if (target.dataset.name === 'formError') {
+    //     target.textContent = msg;
+    //     return;
+    //   }
+    //   var errFild = document.createElement('span');
+    //   errFild.setAttribute('class', 'form-err');
+    //   errFild.setAttribute('data-name', 'formError');
+    //   errFild.innerHTML = msg;
+    //   parent.appendChild(errFild);
+    // };
 
-      if (target.dataset.name === 'formError') {
-        target.textContent = msg;
-        return;
-      }
-      var errFild = document.createElement('span');
-      errFild.setAttribute('class', 'form-err');
-      errFild.setAttribute('data-name', 'formError');
-      errFild.innerHTML = msg;
-      parent.appendChild(errFild);
-    };
-
-    $scope.hideErrorMsg = function(ele) {
-      var parent = ele[0].parentNode;
-      var children = parent.children;
-      var target = children[children.length - 1];
-      ele.removeClass('ng-invalid');
-      if (target.dataset.name !== 'formError') {
-        return;
-      }
-      target.remove();
-    };
+    // $scope.hideErrorMsg = function(ele) {
+    //   var parent = ele[0].parentNode;
+    //   var children = parent.children;
+    //   var target = children[children.length - 1];
+    //   ele.removeClass('ng-invalid');
+    //   if (target.dataset.name !== 'formError') {
+    //     return;
+    //   }
+    //   target.remove();
+    // };
 
     // reset input field
-    $scope.resetInputField = function(model, $event) {
-      var input = angular.element($event.target.previousElementSibling);
-      if (input[0].nodeName !== 'INPUT') {
-        return;
-      }
-      var form = input[0].form.name;
-      $scope.user[model] = null;
-      $scope[form][input[0].name].$setValidity('customValidation', true);
-      input.removeClass('ng-invalid ng-invalid-custom-validation');
-      input.focus();
-    };
+    // $scope.resetInputField = function(model, $event) {
+    //   var input = angular.element($event.target.previousElementSibling);
+    //   if (input[0].nodeName !== 'INPUT') {
+    //     return;
+    //   }
+    //   var form = input[0].form.name;
+    //   $scope.user[model] = null;
+    //   $scope[form][input[0].name].$setValidity('customValidation', true);
+    //   input.removeClass('ng-invalid ng-invalid-custom-validation');
+    //   input.focus();
+    // };
   }
 ]);

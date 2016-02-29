@@ -2,43 +2,45 @@
   <!-- auth banner -->
   <div class="msl-auth-bnr">
     <img src="./images/launcher_rocket.svg" alt="Auth banner" />
-  </div><!-- /auth banner -->
+  </div>
+  <!-- /auth banner -->
 
   <div class="msl-auth-b" ng-show="!authLoader.isLoading">
     <!-- login -->
-    <div class="msl-form msl-layout-1" >
+    <div class="msl-form msl-layout-1">
       <form name="mslLogin" ng-submit="login()">
         <!-- pin -->
         <div class="msl-form-grp">
-          <input type="password" name="pin" placeholder="Pin" ng-model="user.pin" msl-validate-pin autofocus/>
-          <span type="button" name="clear-btn" class="clear-btn"
-          ng-show="user.pin"
-          ng-click="resetInputField('pin', $event)"></span>
+          <input type="password" name="pin" placeholder="Pin" ng-model="user.pin" autofocus/>
+          <span type="button" name="clear-btn" class="clear-btn" ng-show="user.pin"
+            ng-click="resetInputField('pin', $event)"></span>
         </div>
+
         <!-- keyword -->
         <div class="msl-form-grp">
-          <input type="password" name="keyword" placeholder="Keyword" ng-model="user.keyword" msl-validate-keyword/>
-          <span type="button" name="clear-btn" class="clear-btn"
-          ng-show="user.keyword"
-          ng-click="resetInputField('keyword', $event)"></span>
+          <input type="password" name="keyword" placeholder="Keyword" ng-model="user.keyword" />
+          <span type="button" name="clear-btn" class="clear-btn" ng-show="user.keyword"
+            ng-click="resetInputField('keyword', $event)"></span>
         </div>
+
         <!-- password -->
         <div class="msl-form-grp">
-          <input type="password" name="password" placeholder="Password" ng-model="user.password" msl-validate-password/>
-          <span type="button" name="clear-btn" class="clear-btn"
-          ng-show="user.password"
-          ng-click="resetInputField('password', $event)"></span>
+          <input type="password" name="password" placeholder="Password" ng-model="user.password" />
+          <span type="button" name="clear-btn" class="clear-btn" ng-show="user.password"
+            ng-click="resetInputField('password', $event)"></span>
         </div>
+        <div class="form-err" ng-show="formError">{{ formError }}</div>
         <!-- login btn -->
         <div class="msl-form-grp act-btn">
           <button type="submit" name="login" class="msl-btn msl-btn-primary">Login</button>
         </div>
       </form>
-    </div><!-- /login -->
+    </div>
+    <!-- /login -->
+
     <!-- footer -->
     <div class="msl-footer">
-      <span class="msl-footer-split"></span>
-      Don't have an account yet? <a ui-sref="register">Create one</a>
+      <span class="msl-footer-split"></span> Don't have an account yet? <a ui-sref="register">Create one</a>
     </div>
   </div>
   <!-- auth loading -->

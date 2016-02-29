@@ -6,7 +6,8 @@ window.safeLauncher.factory('serverFactory', [
     var self = this;
 
     var SERVER_ERR = {
-      'EADDRINUSE': 'Unable to start Server. Port ::port:: already in use'
+      'EADDRINUSE': 'Unable to start Server. Port ::port:: already in use',
+      'EPERM': 'Unable to start Server at ::port::. Need elevated privileges. Try running as Administrator'
     };
 
     // Start server

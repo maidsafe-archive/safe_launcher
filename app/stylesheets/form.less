@@ -28,20 +28,22 @@
     }
     .clearfix();
   }
+  .form-err {
+    width: 100%;
+    margin-top: 8px;
+    padding: 0 8px;
+    font-family: 'Myriad Set Pro';
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 32px;
+    display: inline-block;
+    color: white;
+    background-color: @bg-error;
+  }
   .msl-form-grp {
     position: relative;
     display: flex;
     margin: 16px 0 0;
-    .form-err {
-      padding: 0 8px;
-      font-family: 'Myriad Set Pro';
-      font-size: 12px;
-      font-weight: normal;
-      line-height: 32px;
-      display: inline-block;
-      color: white;
-      background-color: @bg-error;
-    }
     input[type=text], input[type=password]  {
       width: 100%;
       height: 32px;
@@ -57,7 +59,7 @@
       }
     }
 
-    input.ng-invalid, input.ng-invalid + .clear-btn {
+    input.invalid, input.invalid + .clear-btn {
       border-color: @bg-error !important;
     }
 
