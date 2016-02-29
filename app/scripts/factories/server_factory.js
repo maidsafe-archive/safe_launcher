@@ -5,14 +5,33 @@ window.safeLauncher.factory('serverFactory', [
   function() {
     var self = this;
 
+    var SERVER_ERR = {
+      'EADDRINUSE': 'Unable to start local server. Port ::port:: already in use'
+    };
+
     // Start server
     self.start = function() {
       window.msl.startServer();
     };
 
+    // close window
+    self.closeWindow = function() {
+      window.msl.closeWindow();
+    };
+
     // Handle server error
     self.onServerError = function(callback) {
-      window.msl.onServerError(callback);
+      window.msl.onServerError(function(error) {
+        var errMsg = 'Unable to start server';
+        if (SERVER_ERR.hasOwnProperty(error.code)) {
+          errMsg = SERVER_ERR[error.code];
+          errMsg = errMsg.replace('::port::', error.port)
+        }
+        callback({
+          code: error.code,
+          message: errMsg
+        });
+      });
     };
 
     // handle server start

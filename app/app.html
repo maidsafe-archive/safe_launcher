@@ -17,7 +17,8 @@
     </div> -->
     <!-- /title bar -->
     <div class="msl-frame" ui-view></div>
-    <msl-loader ng-show="$loader.isLoading" />
+    <msl-loader ng-show="$loader.isLoading"></msl-loader>
+    <div ng-include="'views/components/alert.html'" ng-show="$msAlert.status"></div>
   </div>
   <!-- /root node -->
 

@@ -27,6 +27,24 @@ window.safeLauncher = angular
       }
     }
   };
+  $rootScope.$msAlert = {
+    status: false,
+    callback: function() {},
+    title: null,
+    body: null,
+    show: function(title, body, callback) {
+      this.status = true;
+      this.title = title;
+      this.body = body;
+      this.callback = callback;
+    },
+    hide: function() {
+      this.show = false;
+      this.title = null;
+      this.body = null;
+      this.callback();
+    }
+  }
   $rootScope.$proxyServer = false;
   $rootScope.openExternal = function(link) {
     var shell = require('electron').shell;

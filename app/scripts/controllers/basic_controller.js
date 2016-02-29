@@ -3,9 +3,12 @@
  */
 window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootScope', 'serverFactory',
   function($scope, $state, $rootScope, server) {
+
     // handle server error
     server.onServerError(function(error) {
-      console.error(error);
+      $rootScope.$msAlert.show('Server Error', error.message, function() {
+        server.closeWindow();
+      });
     });
 
     // handle server start
