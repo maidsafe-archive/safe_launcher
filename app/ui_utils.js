@@ -85,10 +85,9 @@ export default class UIUtils {
   // focus window
   focusWindow() {
     var browserWindow = this.remote.getCurrentWindow();
-    if (browserWindow.isFocused()) {
-      return;
-    }
+    this.remote.getCurrentWindow().setAlwaysOnTop(true);
     this.remote.getCurrentWindow().focus();
+    this.remote.getCurrentWindow().setAlwaysOnTop(false);
   }
 
   // start proxy server
