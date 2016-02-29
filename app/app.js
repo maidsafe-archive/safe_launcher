@@ -25,10 +25,14 @@ let proxyServer = {
       env.serverPort
     ]);
     this.process.on('exit', function() {
-      proxyListener.notify(false);
+      proxyListener.onExit('Porxy Server Closed');
     });
     this.process.on('message', function(msg) {
-      proxyListener.notify(true);
+      msg = JSON.parse(msg);
+      if (msg.status) {
+        return proxyListener.onStart(msg.data);
+      }
+      proxyListener.onError(msg.data);
     });
   },
   stop: function() {

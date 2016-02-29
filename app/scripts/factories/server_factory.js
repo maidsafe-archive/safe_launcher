@@ -6,7 +6,7 @@ window.safeLauncher.factory('serverFactory', [
     var self = this;
 
     var SERVER_ERR = {
-      'EADDRINUSE': 'Unable to start local server. Port ::port:: already in use'
+      'EADDRINUSE': 'Unable to start Server. Port ::port:: already in use'
     };
 
     // Start server
@@ -22,8 +22,8 @@ window.safeLauncher.factory('serverFactory', [
     // Handle server error
     self.onServerError = function(callback) {
       window.msl.onServerError(function(error) {
-        var errMsg = 'Unable to start server';
-        if (SERVER_ERR.hasOwnProperty(error.code)) {
+        var errMsg = 'Unable to start Local Server';
+        if (error.hasOwnProperty('code') && SERVER_ERR.hasOwnProperty(error.code)) {
           errMsg = SERVER_ERR[error.code];
           errMsg = errMsg.replace('::port::', error.port)
         }
@@ -80,9 +80,34 @@ window.safeLauncher.factory('serverFactory', [
     };
 
     // start proxy server
-    self.startProxyServer = function(callback) {
-      window.msl.startProxyServer(callback);
+    self.startProxyServer = function() {
+      window.msl.startProxyServer();
     };
+
+    // handle proxy error
+    self.onProxyError = function(callback) {
+      window.msl.onProxyError(function(error) {
+        var errMsg = 'Unable to start Local Server';
+        if (error.hasOwnProperty('code') && SERVER_ERR.hasOwnProperty(error.code)) {
+          errMsg = SERVER_ERR[error.code];
+          errMsg = errMsg.replace('::port::', error.port)
+        }
+        callback({
+          code: error.code,
+          message: errMsg
+        });
+      });
+    }
+
+    // handle proxy exit
+    self.onProxyExit = function(callback) {
+      window.msl.onProxyExit(callback);
+    }
+
+    // handle proxy start
+    self.onProxyStart = function(callback) {
+      window.msl.onProxyStart(callback);
+    }
 
     // stop proxy server
     self.stopProxyServer = function() {

@@ -1,10 +1,32 @@
 class ProxyListener {
-  constructor(callback) {
-    this.callback = callback;
+  constructor() {
+    this.errorCb = null;
+    this.exitCb = null;
+    this.startCb = null;
   }
 
-  notify(status) {
-    this.callback(status);
+  registerOnError(callback) {
+    this.errorCb = callback;
+  }
+
+  registerOnExit(callback) {
+    this.exitCb = callback;
+  }
+
+  registerOnStart(callback) {
+    this.startCb = callback;
+  }
+
+  onExit(msg) {
+    this.exitCb(msg);
+  }
+
+  onError(err) {
+    this.errorCb(err);
+  }
+
+  onStart(msg) {
+    this.startCb(msg);
   }
 }
 
@@ -15,6 +37,7 @@ export default class UIUtils {
     this.remote = remote;
     this.restServer = restServer;
     this.proxy = proxy;
+    this.proxyListener = new ProxyListener();
   }
 
   // login
@@ -91,8 +114,23 @@ export default class UIUtils {
   }
 
   // start proxy server
-  startProxyServer(callback) {
-    this.proxy.start(new ProxyListener(callback));
+  startProxyServer() {
+    this.proxy.start(this.proxyListener);
+  }
+
+  // handle proxy error
+  onProxyError(callback) {
+    this.proxyListener.registerOnError(callback);
+  }
+
+  // handle proxy exit
+  onProxyExit(callback) {
+    this.proxyListener.registerOnExit(callback);
+  }
+
+  // handle proxy start
+  onProxyStart(callback) {
+    this.proxyListener.registerOnStart(callback);
   }
 
   // stop proxy server

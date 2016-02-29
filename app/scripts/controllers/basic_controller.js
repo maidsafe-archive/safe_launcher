@@ -5,8 +5,9 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
   function($scope, $state, $rootScope, server) {
 
     // handle server error
-    server.onServerError(function(error) {
-      $rootScope.$msAlert.show('Server Error', error.message, function() {
+    server.onServerError(function(err) {
+      $rootScope.$loader.hide();
+      $rootScope.$msAlert.show('Server Error', err.message, function() {
         server.closeWindow();
       });
     });
@@ -18,18 +19,35 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
 
     // handle server shutdown
     server.onServerShutdown(function() {
+      $rootScope.$loader.hide();
       console.log('Server Stopped');
+    });
+
+    // handle proxy start
+    server.onProxyStart(function(msg) {
+      $rootScope.$loader.hide();
+      console.log(msg);
+    });
+
+    // handle proxy stop
+    server.onProxyExit(function(msg) {
+      $rootScope.$loader.hide();
+      console.log(msg);
+    });
+
+    // handle proxy error
+    server.onProxyError(function(err) {
+      $rootScope.$loader.hide();
+      $rootScope.$msAlert.show('Proxy Server Error', err.message, function() {
+        server.closeWindow();
+      });
     });
 
     // initialize application
     $scope.initApplication = function() {
-      server.start();
       $rootScope.$loader.show();
-      server.startProxyServer(function(status) {
-        console.log('Proxy Server Started');
-        $rootScope.$loader.hide();
-        $rootScope.$proxyServer = status;
-      });
+      server.start();
+      server.startProxyServer();
     };
   }
 ]);
