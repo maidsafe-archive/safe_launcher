@@ -1,8 +1,8 @@
 /**
  * Validate Fields Factory
  */
-window.safeLauncher.factory('validateFieldsFactory', [ 'MESSAGES', 'CONSTANTS', 'utilsFactory',
-  function(MESSAGES, CONSTANTS, utils) {
+window.safeLauncher.factory('validateFieldsFactory', [ 'MESSAGES', 'CONSTANTS',
+  function(MESSAGES, CONSTANTS) {
     var self = this;
     self.AUTH_FIELDS = {
       'PIN': 'pin',

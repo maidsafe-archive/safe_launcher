@@ -108,7 +108,7 @@ window.safeLauncher.factory('serverFactory', [
     // handle proxy start
     self.onProxyStart = function(callback) {
       window.msl.onProxyStart(callback);
-    }
+    };
 
     // stop proxy server
     self.stopProxyServer = function() {
