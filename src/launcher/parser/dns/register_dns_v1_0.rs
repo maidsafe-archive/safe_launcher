@@ -65,7 +65,7 @@ impl traits::Action for RegisterDns {
                                                           vec![public_signing_key],
                                                           &secret_signing_key,
                                                           None));
-        try!(unwrap_result!(params.client.lock()).put(Data::StructuredData(struct_data), None));
+        try!(unwrap_result!(params.client.lock()).put(Data::Structured(struct_data), None));
         Ok(None)
     }
 }

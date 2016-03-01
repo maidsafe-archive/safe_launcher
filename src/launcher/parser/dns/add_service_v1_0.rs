@@ -54,7 +54,7 @@ impl traits::Action for AddService {
                                                           dir_to_map.get_key().clone()),
                                                          &signing_key,
                                                          None));
-        try!(unwrap_result!(params.client.lock()).post(Data::StructuredData(struct_data), None));
+        try!(unwrap_result!(params.client.lock()).post(Data::Structured(struct_data), None));
         Ok(None)
     }
 }
