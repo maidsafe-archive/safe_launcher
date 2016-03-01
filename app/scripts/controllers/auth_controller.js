@@ -5,6 +5,8 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
   'authFactory', 'serverFactory', 'validateFieldsFactory',
   function($scope, $state, $rootScope, $timeout, auth, server, validate) {
     var LOGIN_TIMEOUT = 90000;
+    var FIELD_FOCUS_DELAY = 100;
+
     $scope.user = {};
     $scope.formError = null;
 
@@ -113,18 +115,21 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       var errMsg = null;
       var formName = 'registerPin';
 
-      errMsg = validate.validatePin($scope.user.pin);
+      errMsg = validate.validateField($scope.user.pin, validate.AUTH_FIELDS.PIN);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'pin');
       }
       hideFormError($scope[formName], 'pin');
 
-      errMsg = validate.validateConfirmPIN($scope.user.pin, $scope.user.confirmPin);
+      errMsg = validate.validateConfirmationField($scope.user.pin, $scope.user.confirmPin, validate.AUTH_FIELDS.CONFIRM_PIN);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'confirmPin');
       }
       hideFormError($scope[formName], 'confirmPin');
       $scope.tabs.currentPos = $scope.tabs.state[1];
+      $timeout(function() {
+        $scope.focusField('registerKeyword', 'keyword');
+      }, FIELD_FOCUS_DELAY);
       return true;
     };
 
@@ -133,18 +138,21 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       var errMsg = null;
       var formName = 'registerKeyword';
 
-      errMsg = validate.validateKeyword($scope.user.keyword);
+      errMsg = validate.validateField($scope.user.keyword, validate.AUTH_FIELDS.KEYWORD);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'keyword');
       }
       hideFormError($scope[formName], 'keyword');
 
-      errMsg = validate.validateConfirmKeyword($scope.user.keyword, $scope.user.confirmKeyword);
+      errMsg = validate.validateConfirmationField($scope.user.keyword, $scope.user.confirmKeyword, validate.AUTH_FIELDS.CONFIRM_KEYWORD);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'confirmKeyword');
       }
       hideFormError($scope[formName], 'confirmKeyword');
       $scope.tabs.currentPos = $scope.tabs.state[2];
+      $timeout(function() {
+        $scope.focusField('registerPassword', 'password');
+      }, FIELD_FOCUS_DELAY);
       return true;
     };
 
@@ -152,13 +160,13 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     $scope.validatePassword = function() {
       var errMsg = null;
       var formName = 'registerPassword';
-      errMsg = validate.validatePassword($scope.user.password);
+      errMsg = validate.validateField($scope.user.password, validate.AUTH_FIELDS.PASSWORD);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'password');
       }
       hideFormError($scope[formName], 'password');
 
-      errMsg = validate.validateConfirmPassword($scope.user.password, $scope.user.confirmPassword);
+      errMsg = validate.validateConfirmationField($scope.user.password, $scope.user.confirmPassword, validate.AUTH_FIELDS.CONFIRM_PASSWORD);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'confirmPassword');
       }
@@ -225,6 +233,13 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       $scope.user[model] = null;
       input.removeClass('invalid');
       input.focus();
+    };
+
+    // focus field
+    $scope.focusField = function(form, field) {
+      var form = $('form[name="' + form + '"]');
+      var input = form.find('input[name="' + field + '"]').focus();
+      return true;
     };
   }
 ]);
