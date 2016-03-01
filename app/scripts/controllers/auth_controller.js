@@ -94,7 +94,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     };
 
     // show form error
-    var showFormErr = function(err, form, field) {
+    var showFormError = function(err, form, field) {
       var fieldEle = getFormEle(form, field);
       fieldEle.addClass('invalid');
       fieldEle.focus();
@@ -102,7 +102,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     };
 
     // hide form error
-    var hideFormErr = function(form, field) {
+    var hideFormError = function(form, field) {
       var fieldEle = getFormEle(form, field);
       fieldEle.removeClass('invalid');
       $scope.formError = null;
@@ -186,50 +186,37 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     $scope.login = function() {
       var timer = null;
       var errMsg = null;
+      
       errMsg = validate.validatePin($scope.user.pin);
       if (errMsg) {
-        return showFormErr(errMsg, $scope.mslLogin, 'pin');
+        return showFormError(errMsg, $scope.mslLogin, 'pin');
       }
+      hideFormError($scope.mslLogin, 'pin');
 
-      hideFormErr($scope.mslLogin, 'pin');
       errMsg = validate.validateKeyword($scope.user.keyword);
       if (errMsg) {
-        return showFormErr(errMsg, $scope.mslLogin, 'keyword');
+        return showFormError(errMsg, $scope.mslLogin, 'keyword');
       }
+      hideFormError($scope.mslLogin, 'keyword');
 
-      // validate.isPinValid($scope.user.pin, function(err, data) {
-      //   if (err) {
-      //     return showFormErr(err, $scope.mslLogin, 'pin');
-      //   }
-      //   valid = true;
-      //   hideFormErr($scope.mslLogin, 'pin');
-      // });
+      errMsg = validate.validatePassword($scope.user.password);
+      if (errMsg) {
+        return showFormError(errMsg, $scope.mslLogin, 'password');
+      }
+      hideFormError($scope.mslLogin, 'password');
 
-      // if (!$scope.mslLogin.$valid) {
-      //   return;
-      // }
-      // if (!$scope.user.hasOwnProperty('pin') || !$scope.user.pin) {
-      //   return $scope.mslLogin.pin.$setValidity('customValidation', false);
-      // }
-      // if (!$scope.user.hasOwnProperty('keyword') || !$scope.user.keyword) {
-      //   return $scope.mslLogin.keyword.$setValidity('customValidation', false);
-      // }
-      // if (!$scope.user.hasOwnProperty('password') || !$scope.user.password) {
-      //   return $scope.mslLogin.password.$setValidity('customValidation', false);
-      // }
       var reset = function() {
         $scope.user = {};
         $timeout.cancel(timer);
       };
 
       $scope.authLoader.show();
-      if (!$rootScope.$$phase) {
-        $rootScope.$apply();
-      }
+
       timer = $timeout(function() {
         $scope.authLoader.error = true;
         reset();
       }, LOGIN_TIMEOUT);
+
       authRes.onComplete = function(err) {
         reset();
         if (err) {
@@ -238,9 +225,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         }
         $state.go('user');
       };
-      if (!valid) {
-        return;
-      }
       auth.login($scope.user, authRes.onResponse);
     };
 
