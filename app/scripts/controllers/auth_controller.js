@@ -110,74 +110,59 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
 
     // validate pin
     $scope.validatePin = function() {
-      if (!$scope.registerPin.$valid) {
-        return;
+      var errMsg = null;
+      var formName = 'registerPin';
+
+      errMsg = validate.validatePin($scope.user.pin);
+      if (errMsg) {
+        return showFormError(errMsg, $scope[formName], 'pin');
       }
-      var form = $('form[name = ' + $scope.registerPin.$name + ']');
-      var pin = null;
-      var confirmPin = null;
-      if (!$scope.user.hasOwnProperty('pin') || !$scope.user.pin) {
-        $scope.registerPin.pin.$setValidity('customValidation', false);
-        pin = form.find('input[name=' + $scope.registerPin.pin.$name + ']');
-        $scope.showErrorMsg(pin, 'Can\'t be left blank');
-        return;
+      hideFormError($scope[formName], 'pin');
+
+      errMsg = validate.validateConfirmPIN($scope.user.pin, $scope.user.confirmPin);
+      if (errMsg) {
+        return showFormError(errMsg, $scope[formName], 'confirmPin');
       }
-      if (!$scope.user.hasOwnProperty('confirmPin') || !$scope.user.confirmPin) {
-        $scope.registerPin.confirmPin.$setValidity('customValidation', false);
-        confirmPin = form.find('input[name=' + $scope.registerPin.confirmPin.$name + ']');
-        $scope.showErrorMsg(confirmPin, 'Can\'t be left blank');
-        return;
-      }
+      hideFormError($scope[formName], 'confirmPin');
       $scope.tabs.currentPos = $scope.tabs.state[1];
       return true;
     };
 
     // validate keyword
     $scope.validateKeyword = function() {
-      if (!$scope.registerKeyword.$valid) {
-        return;
-      }
-      var form = $('form[name = ' + $scope.registerKeyword.$name + ']');
-      var keyword = null;
-      var confirmKeyword = null;
+      var errMsg = null;
+      var formName = 'registerKeyword';
 
-      if (!$scope.user.hasOwnProperty('keyword') || !$scope.user.keyword) {
-        $scope.registerKeyword.keyword.$setValidity('customValidation', false);
-        keyword = form.find('input[name=' + $scope.registerKeyword.keyword.$name + ']');
-        $scope.showErrorMsg(keyword, 'Can\'t be left blank');
-        return;
+      errMsg = validate.validateKeyword($scope.user.keyword);
+      if (errMsg) {
+        return showFormError(errMsg, $scope[formName], 'keyword');
       }
-      if (!$scope.user.hasOwnProperty('confirmKeyword') || !$scope.user.confirmKeyword) {
-        $scope.registerKeyword.confirmKeyword.$setValidity('customValidation', false);
-        confirmKeyword = form.find('input[name=' + $scope.registerKeyword.confirmKeyword.$name + ']');
-        $scope.showErrorMsg(confirmKeyword, 'Can\'t be left blank');
-        return;
+      hideFormError($scope[formName], 'keyword');
+
+      errMsg = validate.validateConfirmKeyword($scope.user.keyword, $scope.user.confirmKeyword);
+      if (errMsg) {
+        return showFormError(errMsg, $scope[formName], 'confirmKeyword');
       }
+      hideFormError($scope[formName], 'confirmKeyword');
       $scope.tabs.currentPos = $scope.tabs.state[2];
       return true;
     };
 
     // validate password
     $scope.validatePassword = function() {
-      if (!$scope.registerPassword.$valid) {
-        return;
+      var errMsg = null;
+      var formName = 'registerPassword';
+      errMsg = validate.validatePassword($scope.user.password);
+      if (errMsg) {
+        return showFormError(errMsg, $scope[formName], 'password');
       }
-      var form = $('form[name = ' + $scope.registerPassword.$name + ']');
-      var password = null;
-      var confirmPassword = null;
+      hideFormError($scope[formName], 'password');
 
-      if (!$scope.user.hasOwnProperty('password') || !$scope.user.password) {
-        $scope.registerPassword.password.$setValidity('customValidation', false);
-        password = form.find('input[name=' + $scope.registerPassword.password.$name + ']');
-        $scope.showErrorMsg(password, 'Can\'t be left blank');
-        return;
+      errMsg = validate.validateConfirmPassword($scope.user.password, $scope.user.confirmPassword);
+      if (errMsg) {
+        return showFormError(errMsg, $scope[formName], 'confirmPassword');
       }
-      if (!$scope.user.hasOwnProperty('confirmPassword') || !$scope.user.confirmPassword) {
-        $scope.registerPassword.confirmPassword.$setValidity('customValidation', false);
-        confirmPassword = form.find('input[name=' + $scope.registerPassword.confirmPassword.$name + ']');
-        $scope.showErrorMsg(confirmPassword, 'Can\'t be left blank');
-        return;
-      }
+      hideFormError($scope[formName], 'confirmPassword');
       register();
       return true;
     };
@@ -186,31 +171,30 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     $scope.login = function() {
       var timer = null;
       var errMsg = null;
-      
-      errMsg = validate.validatePin($scope.user.pin);
-      if (errMsg) {
-        return showFormError(errMsg, $scope.mslLogin, 'pin');
-      }
-      hideFormError($scope.mslLogin, 'pin');
+      var fieldName = null;
+      var formFields = [ 'pin', 'keyword', 'password' ];
 
-      errMsg = validate.validateKeyword($scope.user.keyword);
-      if (errMsg) {
-        return showFormError(errMsg, $scope.mslLogin, 'keyword');
+      for(var i = 0; i < formFields.length; i++ ) {
+        fieldName = formFields[i];
+        if (fieldName === 'pin') {
+          errMsg = validate.validatePin($scope.user[fieldName]);
+        }
+        if (fieldName === 'keyword') {
+          errMsg = validate.validateKeyword($scope.user[fieldName]);
+        }
+        if (fieldName === 'password') {
+          errMsg = validate.validatePassword($scope.user[fieldName]);
+        }
+        if (errMsg) {
+          return showFormError(errMsg, $scope.mslLogin, fieldName);
+        }
+        hideFormError($scope.mslLogin, fieldName);
       }
-      hideFormError($scope.mslLogin, 'keyword');
-
-      errMsg = validate.validatePassword($scope.user.password);
-      if (errMsg) {
-        return showFormError(errMsg, $scope.mslLogin, 'password');
-      }
-      hideFormError($scope.mslLogin, 'password');
 
       var reset = function() {
         $scope.user = {};
         $timeout.cancel(timer);
       };
-
-      $scope.authLoader.show();
 
       timer = $timeout(function() {
         $scope.authLoader.error = true;
@@ -225,9 +209,12 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         }
         $state.go('user');
       };
+
+      $scope.authLoader.show();
       auth.login($scope.user, authRes.onResponse);
     };
 
+    // cancel request
     $scope.cancelRequest = function() {
       authRes.cancel();
       $scope.authLoader.hide();
@@ -262,16 +249,14 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     // };
 
     // reset input field
-    // $scope.resetInputField = function(model, $event) {
-    //   var input = angular.element($event.target.previousElementSibling);
-    //   if (input[0].nodeName !== 'INPUT') {
-    //     return;
-    //   }
-    //   var form = input[0].form.name;
-    //   $scope.user[model] = null;
-    //   $scope[form][input[0].name].$setValidity('customValidation', true);
-    //   input.removeClass('ng-invalid ng-invalid-custom-validation');
-    //   input.focus();
-    // };
+    $scope.resetInputField = function(model, $event) {
+      var input = angular.element($event.target.previousElementSibling);
+      if (input[0].nodeName !== 'INPUT') {
+        return;
+      }
+      $scope.user[model] = null;
+      input.removeClass('invalid');
+      input.focus();
+    };
   }
 ]);

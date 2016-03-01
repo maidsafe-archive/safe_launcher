@@ -17,19 +17,19 @@
         <!-- pin -->
         <div class="msl-form-grp">
           <input type="password" name="pin" placeholder="PIN"
-          ng-model="user.pin"
-          msl-validate-pin/>
+          ng-model="user.pin" />
           <span name="clear-btn" class="clear-btn"
           ng-show="user.pin"
           ng-click="resetInputField('pin', $event)"></span>
         </div>
         <!-- confirm pin -->
         <div class="msl-form-grp">
-          <input type="password" name="confirmPin" placeholder="Confirm PIN" ng-model="user.confirmPin" target-name="pin" msl-validate-pin msl-validate-confirmation/>
+          <input type="password" name="confirmPin" placeholder="Confirm PIN" ng-model="user.confirmPin" />
           <span name="clear-btn" class="clear-btn"
           ng-show="user.confirmPin"
           ng-click="resetInputField('confirmPin', $event)"></span>
         </div>
+        <div class="form-err" ng-show="formError">{{ formError }}</div>
         <!-- register btn -->
         <div class="msl-form-grp act-btn">
           <button type="submit" name="validatePinBtn" class="msl-btn msl-btn-primary">Next</button>
@@ -41,19 +41,19 @@
         <!-- keyword -->
         <div class="msl-form-grp">
           <input type="password" name="keyword" placeholder="Keyword"
-          ng-model="user.keyword"
-          msl-validate-keyword/>
+          ng-model="user.keyword" />
           <span name="clear-btn" class="clear-btn"
           ng-show="user.keyword"
           ng-click="resetInputField('keyword', $event)"></span>
         </div>
         <!-- confirm keyword -->
         <div class="msl-form-grp">
-          <input type="password" name="confirmKeyword" placeholder="Confirm Keyword" ng-model="user.confirmKeyword" target-name="keyword" msl-validate-keyword msl-validate-confirmation />
+          <input type="password" name="confirmKeyword" placeholder="Confirm Keyword" ng-model="user.confirmKeyword" />
           <span name="clear-btn" class="clear-btn"
           ng-show="user.confirmKeyword"
           ng-click="resetInputField('confirmKeyword', $event)"></span>
         </div>
+        <div class="form-err" ng-show="formError">{{ formError }}</div>
         <!-- register btn -->
         <div class="msl-form-grp act-btn">
           <button type="submit" name="validateKeywordBtn" class="msl-btn msl-btn-primary">Next</button>
@@ -65,8 +65,7 @@
         <!-- password -->
         <div class="msl-form-grp">
           <input type="password" name="password" placeholder="Password"
-          ng-model="user.password"
-          msl-validate-password/>
+          ng-model="user.password" />
           <span name="clear-btn" class="clear-btn"
           ng-show="user.password"
           ng-click="resetInputField('password', $event)"></span>
@@ -75,15 +74,12 @@
         <div class="msl-form-grp">
           <input type="password" name="confirmPassword"
           placeholder="Confirm Password"
-          ng-model="user.confirmPassword"
-          target-name="password"
-          msl-validate-password
-          msl-validate-confirmation />
+          ng-model="user.confirmPassword" />
           <span name="clear-btn" class="clear-btn"
           ng-show="user.confirmPassword"
           ng-click="resetInputField('confirmPassword', $event)"></span>
         </div>
-
+        <div class="form-err" ng-show="formError">{{ formError }}</div>
         <!-- register btn -->
         <div class="msl-form-grp act-btn">
           <button type="submit" name="validatePasswordBtn" class="msl-btn msl-btn-primary">Register</button>

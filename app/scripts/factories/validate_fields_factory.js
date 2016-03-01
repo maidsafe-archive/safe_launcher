@@ -5,6 +5,10 @@ window.safeLauncher.factory('validateFieldsFactory', [ 'MESSAGES', 'CONSTANTS', 
   function(MESSAGES, CONSTANTS, utils) {
     var self = this;
 
+    var validateConfirmation  = function() {
+
+    };
+
     // validate pin
     self.validatePin = function(val) {
       if (!val) {
@@ -41,8 +45,37 @@ window.safeLauncher.factory('validateFieldsFactory', [ 'MESSAGES', 'CONSTANTS', 
       return null;
     };
 
-    self.validateConfirmPIN = function(val) {
+    // validate confirm pin
+    self.validateConfirmPIN = function(val, match) {
+      if (!match) {
+        return MESSAGES.CONFIRM_PASSWORD_FIELD_BLANK;
+      }
+      if (val !== match) {
+        return MESSAGES.ENTRIES_DONT_MATCH;
+      }
+      return null;
+    };
 
+    // validate confirm keyword
+    self.validateConfirmKeyword = function(val, match) {
+      if (!match) {
+        return MESSAGES.CONFIRM_KEYWORD_FIELD_BLANK;
+      }
+      if (val !== match) {
+        return MESSAGES.ENTRIES_DONT_MATCH;
+      }
+      return null;
+    };
+
+    // validate confirm password
+    self.validateConfirmPassword = function(val, match) {
+      if (!match) {
+        return MESSAGES.CONFIRM_PASSWORD_FIELD_BLANK;
+      }
+      if (val !== match) {
+        return MESSAGES.ENTRIES_DONT_MATCH;
+      }
+      return null;
     };
 
     return self;
