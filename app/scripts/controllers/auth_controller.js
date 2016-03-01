@@ -121,7 +121,8 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       }
       hideFormError($scope[formName], 'pin');
 
-      errMsg = validate.validateConfirmationField($scope.user.pin, $scope.user.confirmPin, validate.AUTH_FIELDS.CONFIRM_PIN);
+      errMsg = validate.validateConfirmationField($scope.user.pin, $scope.user.confirmPin,
+        validate.AUTH_FIELDS.CONFIRM_PIN);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'confirmPin');
       }
@@ -144,7 +145,8 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       }
       hideFormError($scope[formName], 'keyword');
 
-      errMsg = validate.validateConfirmationField($scope.user.keyword, $scope.user.confirmKeyword, validate.AUTH_FIELDS.CONFIRM_KEYWORD);
+      errMsg = validate.validateConfirmationField($scope.user.keyword, $scope.user.confirmKeyword,
+        validate.AUTH_FIELDS.CONFIRM_KEYWORD);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'confirmKeyword');
       }
@@ -166,7 +168,8 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       }
       hideFormError($scope[formName], 'password');
 
-      errMsg = validate.validateConfirmationField($scope.user.password, $scope.user.confirmPassword, validate.AUTH_FIELDS.CONFIRM_PASSWORD);
+      errMsg = validate.validateConfirmationField($scope.user.password, $scope.user.confirmPassword,
+        validate.AUTH_FIELDS.CONFIRM_PASSWORD);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'confirmPassword');
       }
@@ -186,7 +189,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         validate.AUTH_FIELDS.PASSWORD
       ];
 
-      for(var i = 0; i < formFields.length; i++ ) {
+      for (var i = 0; i < formFields.length; i++) {
         fieldName = formFields[i];
         errMsg = validate.validateField($scope.user[fieldName], fieldName);
         if (errMsg) {
@@ -237,8 +240,8 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
 
     // focus field
     $scope.focusField = function(form, field) {
-      var form = $('form[name="' + form + '"]');
-      var input = form.find('input[name="' + field + '"]').focus();
+      var formEle = $('form[name="' + form + '"]');
+      var input = formEle.find('input[name="' + field + '"]').focus();
       return true;
     };
   }

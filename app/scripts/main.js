@@ -44,7 +44,7 @@ window.safeLauncher = angular
       this.body = null;
       this.callback();
     }
-  }
+  };
   $rootScope.$proxyServer = false;
   $rootScope.openExternal = function(link) {
     var shell = require('electron').shell;

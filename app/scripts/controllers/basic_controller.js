@@ -3,7 +3,6 @@
  */
 window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootScope', 'serverFactory',
   function($scope, $state, $rootScope, server) {
-
     // handle server error
     server.onServerError(function(err) {
       $rootScope.$loader.hide();

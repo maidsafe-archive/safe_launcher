@@ -26,7 +26,7 @@ window.safeLauncher.factory('serverFactory', [
         var errMsg = 'Unable to start Local Server';
         if (error.hasOwnProperty('code') && SERVER_ERR.hasOwnProperty(error.code)) {
           errMsg = SERVER_ERR[error.code];
-          errMsg = errMsg.replace('::port::', error.port)
+          errMsg = errMsg.replace('::port::', error.port);
         }
         callback({
           code: error.code,
@@ -91,19 +91,19 @@ window.safeLauncher.factory('serverFactory', [
         var errMsg = 'Unable to start Local Server';
         if (error.hasOwnProperty('code') && SERVER_ERR.hasOwnProperty(error.code)) {
           errMsg = SERVER_ERR[error.code];
-          errMsg = errMsg.replace('::port::', error.port)
+          errMsg = errMsg.replace('::port::', error.port);
         }
         callback({
           code: error.code,
           message: errMsg
         });
       });
-    }
+    };
 
     // handle proxy exit
     self.onProxyExit = function(callback) {
       window.msl.onProxyExit(callback);
-    }
+    };
 
     // handle proxy start
     self.onProxyStart = function(callback) {
