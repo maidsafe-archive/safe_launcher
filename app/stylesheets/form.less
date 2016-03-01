@@ -29,15 +29,19 @@
   }
   .form-err {
     width: 100%;
-    margin-top: 8px;
+    height: 23px;
+    margin: 5px 0;
     padding: 0 8px;
     font-family: 'Myriad Set Pro';
     font-size: 12px;
     font-weight: normal;
-    line-height: 32px;
+    line-height: 23px;
     display: inline-block;
     color: white;
-    background-color: @bg-error;
+    background-color: transparent;
+    &.onErr {
+      background-color: @bg-error;
+    }
   }
   .msl-form-desc {
     width: 100%;
@@ -55,7 +59,7 @@
   .msl-form-grp {
     position: relative;
     display: flex;
-    margin: 16px 0 0;
+    padding: 16px 0 0;
     &.no-margin {
       margin: 0;
     }
@@ -102,7 +106,7 @@
     }
   }
   .act-btn {
-    margin: 28px 0 30px;
+    padding: 0 0 30px;
     button {
       margin: 0 auto;
       display: block;

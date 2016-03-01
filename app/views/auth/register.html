@@ -32,7 +32,7 @@
           ng-show="user.confirmPin"
           ng-click="resetInputField('confirmPin', $event)"></span>
         </div>
-        <div class="form-err" ng-show="formError">{{ formError }}</div>
+        <div class="form-err" ng-class="{onErr: formError}">{{ formError || '&nbsp;' }}</div>
         <!-- register btn -->
         <div class="msl-form-grp act-btn">
           <button type="submit" name="validatePinBtn" class="msl-btn msl-btn-primary">Next</button>
@@ -59,7 +59,7 @@
           ng-show="user.confirmKeyword"
           ng-click="resetInputField('confirmKeyword', $event)"></span>
         </div>
-        <div class="form-err" ng-show="formError">{{ formError }}</div>
+        <div class="form-err" ng-class="{onErr: formError}">{{ formError || '&nbsp;' }}</div>
         <!-- register btn -->
         <div class="msl-form-grp act-btn">
           <button type="submit" name="validateKeywordBtn" class="msl-btn msl-btn-primary">Next</button>
@@ -88,7 +88,7 @@
           ng-show="user.confirmPassword"
           ng-click="resetInputField('confirmPassword', $event)"></span>
         </div>
-        <div class="form-err" ng-show="formError">{{ formError }}</div>
+        <div class="form-err" ng-class="{onErr: formError}">{{ formError || '&nbsp;' }}</div>
         <!-- register btn -->
         <div class="msl-form-grp act-btn">
           <button type="submit" name="validatePasswordBtn" class="msl-btn msl-btn-primary">Register</button>

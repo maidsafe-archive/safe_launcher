@@ -29,7 +29,7 @@
           <span type="button" name="clear-btn" class="clear-btn" ng-show="user.password"
             ng-click="resetInputField('password', $event)"></span>
         </div>
-        <div class="form-err" ng-show="formError">{{ formError }}</div>
+        <div class="form-err" ng-class="{onErr: formError}">{{ formError || '&nbsp;' }}</div>
         <!-- login btn -->
         <div class="msl-form-grp act-btn">
           <button type="submit" name="login" class="msl-btn msl-btn-primary">Login</button>
