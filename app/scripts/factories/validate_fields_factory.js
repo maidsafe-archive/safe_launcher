@@ -4,13 +4,17 @@
 window.safeLauncher.factory('validateFieldsFactory', [ 'MESSAGES', 'CONSTANTS', 'utilsFactory',
   function(MESSAGES, CONSTANTS, utils) {
     var self = this;
-
-    var validateConfirmation  = function() {
-
+    self.AUTH_FIELDS = {
+      'PIN': 'pin',
+      'KEYWORD': 'keyword',
+      'PASSWORD': 'password',
+      'CONFIRM_PIN': 'confirmPin',
+      'CONFIRM_KEYWORD': 'confirmKeyword',
+      'CONFIRM_PASSWORD': 'confirmPassword'
     };
 
     // validate pin
-    self.validatePin = function(val) {
+    var validatePin = function(val) {
       if (!val) {
         return MESSAGES.PIN_FIELD_BLANK;
       }
@@ -24,7 +28,7 @@ window.safeLauncher.factory('validateFieldsFactory', [ 'MESSAGES', 'CONSTANTS', 
     };
 
     // validate keyword
-    self.validateKeyword = function(val) {
+    var validateKeyword = function(val) {
       if (!val) {
         return MESSAGES.KEYWORD_FIELD_BLANK;
       }
@@ -35,7 +39,7 @@ window.safeLauncher.factory('validateFieldsFactory', [ 'MESSAGES', 'CONSTANTS', 
     };
 
     // valiate password
-    self.validatePassword = function(val) {
+    var validatePassword = function(val) {
       if (!val) {
         return MESSAGES.PASSWORD_FIELD_BLANK;
       }
@@ -76,6 +80,18 @@ window.safeLauncher.factory('validateFieldsFactory', [ 'MESSAGES', 'CONSTANTS', 
         return MESSAGES.ENTRIES_DONT_MATCH;
       }
       return null;
+    };
+
+    self.validateField = function(val, fieldName) {
+      if (fieldName === self.AUTH_FIELDS.PIN) {
+        return validatePin(val);
+      }
+      if (fieldName === self.AUTH_FIELDS.KEYWORD) {
+        return validateKeyword(val);
+      }
+      if (fieldName === self.AUTH_FIELDS.PASSWORD) {
+        return validatePassword(val);
+      }
     };
 
     return self;

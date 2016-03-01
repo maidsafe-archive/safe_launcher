@@ -172,19 +172,15 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       var timer = null;
       var errMsg = null;
       var fieldName = null;
-      var formFields = [ 'pin', 'keyword', 'password' ];
+      var formFields = [
+        validate.AUTH_FIELDS.PIN,
+        validate.AUTH_FIELDS.KEYWORD,
+        validate.AUTH_FIELDS.PASSWORD
+      ];
 
       for(var i = 0; i < formFields.length; i++ ) {
         fieldName = formFields[i];
-        if (fieldName === 'pin') {
-          errMsg = validate.validatePin($scope.user[fieldName]);
-        }
-        if (fieldName === 'keyword') {
-          errMsg = validate.validateKeyword($scope.user[fieldName]);
-        }
-        if (fieldName === 'password') {
-          errMsg = validate.validatePassword($scope.user[fieldName]);
-        }
+        errMsg = validate.validateField($scope.user[fieldName], fieldName);
         if (errMsg) {
           return showFormError(errMsg, $scope.mslLogin, fieldName);
         }
@@ -219,34 +215,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       authRes.cancel();
       $scope.authLoader.hide();
     };
-
-    // show error text
-    // $scope.showErrorMsg = function(ele, msg) {
-    //   var parent = ele[0].parentNode;
-    //   var children = parent.children;
-    //   var target = children[children.length - 1];
-    //
-    //   if (target.dataset.name === 'formError') {
-    //     target.textContent = msg;
-    //     return;
-    //   }
-    //   var errFild = document.createElement('span');
-    //   errFild.setAttribute('class', 'form-err');
-    //   errFild.setAttribute('data-name', 'formError');
-    //   errFild.innerHTML = msg;
-    //   parent.appendChild(errFild);
-    // };
-
-    // $scope.hideErrorMsg = function(ele) {
-    //   var parent = ele[0].parentNode;
-    //   var children = parent.children;
-    //   var target = children[children.length - 1];
-    //   ele.removeClass('ng-invalid');
-    //   if (target.dataset.name !== 'formError') {
-    //     return;
-    //   }
-    //   target.remove();
-    // };
 
     // reset input field
     $scope.resetInputField = function(model, $event) {
