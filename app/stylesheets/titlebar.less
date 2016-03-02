@@ -1,0 +1,63 @@
+.msl-titlebar {
+  width: 100%;
+  height: 32px;
+  background-color: @msl-title-bg;
+  color: white;
+  padding: 0;
+  position: relative;
+  z-index: 999;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+  button {
+    -webkit-app-region: no-drag;
+  }
+  > .lt, > .rt {
+    width: 50%;
+    display: block;
+    float: left;
+  }
+  > .lt {
+    text-align: left;
+  }
+  > .rt {
+    text-align: right;
+    .rt-i {
+      display: inline-block;
+      float: right;
+    }
+    .clearfix();
+  }
+  .msl-title {
+    margin: 0;
+    padding: 0 0 0 32px;
+    font-size: 14px;
+    line-height: 32px;
+    font-weight: normal;
+    position: relative;
+    &:before {
+      content: "";
+      width: 24px;
+      height: 24px;
+      margin: 4px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-image: url('../images/app_icon.png');
+      background-size: 24px;
+    }
+  }
+  .title-btn {
+    width: 32px;
+    height: 32px;
+    padding: 10px;
+    margin: 0;
+    border: 0;
+    outline: 0;
+    background-color: transparent;
+    cursor: pointer;
+    img {
+      width: 100%;
+    }
+  }
+  .clearfix();
+}

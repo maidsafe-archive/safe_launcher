@@ -1,0 +1,114 @@
+.msl-li {
+  .msl-li-h {
+    margin: 0 16px 16px;
+    padding: 0;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: normal;
+    color: @msl-txt-clr-d;
+    border-bottom: 1px solid @msl-border-clr;
+  }
+  .msl-li-i {
+    padding: 8px 16px;
+    position: relative;
+    cursor: pointer;
+    &.disabled {
+      > .li-i-desc {
+        opacity: 0.5;
+      }
+    }
+    &.open {
+      background-color: white;
+      > .li-i-desc {
+        .li-i-desc-main {
+           > .icn {
+             transform: rotate(180deg);
+           }
+        }
+        .li-i-desc-sub {
+          display: block;
+          &.required {
+            display: block;
+          }
+          > .name {
+            display: inline-block;
+          }
+          > .val {
+            display: inline-block;
+          }
+        }
+      }
+    }
+    > .li-icn {
+      width: 40px;
+      height: 40px;
+      float: left;
+      margin-right: 16px;
+      display: inline-block;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 40px;
+      color: white;
+      font-size: 20px;
+      font-weight: 600;
+    }
+    > .li-i-desc {
+      float: left;
+      .li-i-desc-main {
+        margin: 0;
+        padding: 0;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 24px;
+        > .name {
+          display: inline-block;
+        }
+        > .icn {
+          width: 10px;
+          height: 10px;
+          display: inline-block;
+          background-image: url('../images/down-chevron.svg');
+          background-size: 10px;
+        }
+      }
+      .li-i-desc-sub {
+        margin: 0;
+        padding: 0 8px 0 0;
+        display: none;
+        font-size: 12px;
+        font-weight: normal;
+        line-height: 24px;
+        color: @msl-txt-clr-d;
+        > .name {
+          display: none;
+        }
+        > .val {
+          display: none;
+        }
+        &.required {
+          display: inline;
+          > .val {
+            display: inline-block;
+          }
+        }
+      }
+    }
+    > .li-i-action {
+      width: 20%;
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      text-align: right;
+      button {
+        background-color: transparent;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: @msl-danger-btn;
+        cursor: pointer;
+        padding: 4px 0;
+      }
+    }
+    .clearfix();
+  }
+}

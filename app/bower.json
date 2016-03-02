@@ -1,0 +1,11 @@
+{
+  "name": "safe_launcher",
+  "description": "SAFE launcher - gateway to the SAFE Network",
+  "dependencies": {
+    "angular": "^1.4.0",
+    "angular-ui-router": "~0.2.15",
+    "jquery": "~2.1.4",
+    "open-sans-fontface": "~1.4.2",
+    "myriad-font": "~0.0.2"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "name": "production",
+  "serverPort": 8100,
+  "proxyPort": 8101
+}

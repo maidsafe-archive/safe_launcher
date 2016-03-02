@@ -1,0 +1,8 @@
+<div>
+  <!-- frame header -->
+  <div class="msl-frame-h">
+    <div class="msl-frame-h-i" ng-repeat="tab in tabs" ng-click="selectTab($index)" ng-class="{ active: currentTab == $index }"><span class="icn"><img ng-src="{{tab.icon}}" alt="status" /></span>{{tab.heading}}</div>
+  </div><!-- /frame header -->
+  <!-- frame container -->
+  <div class="msl-frame-cntr" ng-transclude></div><!-- /frame container -->
+</div>

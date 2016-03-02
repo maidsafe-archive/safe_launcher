@@ -1,0 +1,22 @@
+<div class="msl-prompt" ng-show="confirmation.status">
+  <div class="msl-prompt-b">
+    <div class="msl-prompt-cont">
+      <h3 class="msl-prompt-h">
+        {{ confirmation.data.permissions.list.length !== 0 ? "Allow SAFE Drive Access?" : "Authorisation Request" }}
+      </h3>
+      <div class="msl-prompt-body">
+        {{ confirmation.data.payload.app.name + ' ' +
+        confirmation.data.payload.app.version +' by '+
+        confirmation.data.payload.app.vendor + ' ' }}
+        <span ng-if="confirmation.data.permissions.list.length !== 0">
+          is requesting access for:
+          <b ng-repeat="permission in confirmation.data.permissions.list">{{ parsePermission(permission) }}</b>
+        </span>
+      </div>
+      <div class="msl-prompt-foot">
+        <button type="button" class="deny" name="deny" ng-click="confirmResponse(confirmation.data, false)">Deny</button>
+        <button type="button" class="allow" name="allow" ng-click="confirmResponse(confirmation.data, true)">Allow</button>
+      </div>
+    </div>
+  </div>
+</div>

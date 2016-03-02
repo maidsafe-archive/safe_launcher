@@ -1,35 +1,78 @@
-# safe_launcher
+safe_launcher
+==============
 
-[![](https://img.shields.io/badge/Project%20SAFE-Approved-green.svg)](http://maidsafe.net/applications) [![](https://img.shields.io/badge/License-GPL3-green.svg)](https://github.com/maidsafe/safe_launcher/blob/master/COPYING)
+# Quick start
+The development dependency of this project is [Node.js](https://nodejs.org).
+Build the [safe_ffi](https://github.com/maidsafe/safe_ffi) and copy the `.dll` for Windows
+, `.so` for Linux or `.dylib` for OSX to the `app/api/ffi` folder.
 
-
-**Primary Maintainer:**     Spandan Sharma (spandan.sharma@maidsafe.net)
-
-**Secondary Maintainer:**   Krishna Kumar (krishna.kumar@maidsafe.net)
-
-|Crate|Linux/OS X|Windows|Coverage|Issues|
-|:---:|:--------:|:-----:|:------:|:----:|
-|[![](http://meritbadge.herokuapp.com/safe_launcher)](https://crates.io/crates/safe_launcher)|[![Build Status](https://travis-ci.org/maidsafe/safe_launcher.svg?branch=master)](https://travis-ci.org/maidsafe/safe_launcher)|[![Build status](https://ci.appveyor.com/api/projects/status/xnsjhx27snoh4lmy/branch/master?svg=true)](https://ci.appveyor.com/project/MaidSafe-QA/safe-launcher/branch/master)|[![Coverage Status](https://coveralls.io/repos/maidsafe/safe_launcher/badge.svg?branch=master)](https://coveralls.io/r/maidsafe/safe_launcher?branch=master)|[![Stories in Ready](https://badge.waffle.io/maidsafe/safe_launcher.png?label=ready&title=Ready)](https://waffle.io/maidsafe/safe_launcher)|
-
-| [API Documentation - master branch](http://maidsafe.net/safe_launcher/master) | [SAFE Network System Documentation](http://systemdocs.maidsafe.net) | [MaidSafe website](http://maidsafe.net) | [SAFE Network Forum](https://forum.safenetwork.io) |
-|:------:|:-------:|:-------:|:-------:|
-
-## Prerequisite
-
-[libsodium](https://github.com/jedisct1/libsodium) is a native dependency, and can be installed by following the instructions [for Windows](https://github.com/maidsafe/QA/blob/master/Documentation/Install%20libsodium%20for%20Windows.md) or [for OS X and Linux](https://github.com/maidsafe/QA/blob/master/Documentation/Install%20libsodium%20for%20OS%20X%20or%20Linux.md).
-
-## Build Instructions
-
-`safe_launcher` can interface conditionally against either the routing crate or a mock used for local testing.
-
-To use it with the Mock:
+So just make sure you have it installed.
+Then type few commands known to every Node developer...
 ```
-cargo build --features "use-mock-routing"
-cargo test --features "use-mock-routing"
+npm install
+npm start
 ```
 
-To interface it with actual routing (default):
+# Development
+
+#### Installation
+
 ```
-cargo build
-cargo test
+npm install
 ```
+It will also download Electron runtime, and install dependencies for second `package.json` & `bower.json` file inside `app` folder.
+
+#### Starting the app
+
+```
+npm start
+```
+
+#### Adding npm modules to your app
+
+Remember to add your dependency to `app/package.json` file, so do:
+```
+cd app
+npm install name_of_npm_module --save
+```
+
+#### Unit tests
+
+To run it go with standard:
+```
+npm test
+```
+
+# Making a distributable package
+
+To make ready for distribution package use command based on the platform:
+```
+npm run package
+```
+this will generate the package files in the `app_dist` folder
+
+
+# Making a release
+
+To make ready for distribution installer use command:
+```
+npm run release
+```
+It will start the packaging process for operating system you are running this command on. Ready for distribution file will be outputted to `releases` directory.
+
+You can create Windows installer only when running on Windows, the same is true for Linux and OSX. So to generate all three installers you need all three operating systems.
+
+## Mac only
+
+#### App signing
+
+The Mac release supports [code signing](https://developer.apple.com/library/mac/documentation/Security/Conceptual/CodeSigningGuide/Procedures/Procedures.html). To sign the `.app` in the release image, include the certificate ID in the command as so,
+```
+npm run release -- --sign A123456789
+```
+
+## Windows only
+
+#### Installer
+
+The installer is built using [NSIS](http://nsis.sourceforge.net). You have to install NSIS version 3.0, and add its folder to PATH in Environment Variables.
