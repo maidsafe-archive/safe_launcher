@@ -4,24 +4,11 @@
 window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootScope', 'serverFactory',
   function($scope, $state, $rootScope, server) {
     var LIST_COLORS = [ 'bg-light-green', 'bg-blue', 'bg-yellow', 'bg-pink', 'bg-purple', 'bg-green', 'bg-orange' ];
-    $scope.proxyState = false;
     $scope.confirmation = {
       status: false,
       data: {}
     };
     $scope.manageListApp = [];
-
-    var Loader = {
-      show: function() {
-        $rootScope.$loader = true;
-      },
-      hide: function() {
-        $rootScope.$loader = false;
-        if (!$rootScope.$$phase) {
-          $rootScope.$apply();
-        }
-      }
-    };
 
     var showConfirmation = function(data) {
       $scope.confirmation.status = true;
@@ -51,40 +38,19 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
     };
 
     var proxyListener = function(status) {
-      Loader.hide();
-      $scope.proxyState = status;
+      $rootScope.$loader.hide();
+      $rootScope.$proxyServer = status;
     };
 
     // toggle proxy server
     var toggleProxyServer = function() {
-      $scope.proxyState = !$scope.proxyState;
-      Loader.show();
-      if (!$scope.proxyState) {
+      $rootScope.$proxyServer = !$rootScope.$proxyServer;
+      $rootScope.$loader.show();
+      if (!$rootScope.$proxyServer) {
         return server.stopProxyServer();
       }
       server.startProxyServer(proxyListener);
     };
-
-    // start server
-    server.start();
-
-    // start proxy server
-    toggleProxyServer();
-
-    // handle server error
-    server.onServerError(function(error) {
-      console.error(error);
-    });
-
-    // handle server start
-    server.onServerStarted(function() {
-      console.log('Server Started');
-    });
-
-    // handle server shutdown
-    server.onServerShutdown(function() {
-      console.log('Server Stopped');
-    });
 
     // handle session creation
     server.onSessionCreated(function(session) {
@@ -97,7 +63,7 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
         status: true,
         permissions: session.info.permissions.list
       });
-      Loader.hide();
+      $rootScope.$loader.hide();
       $scope.$apply();
     });
 
@@ -128,7 +94,7 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
     $scope.confirmResponse = function(payload, status) {
       hideConfirmation();
       if (status) {
-        Loader.show();
+        $rootScope.$loader.show();
       }
       server.confirmResponse(payload, status);
     };

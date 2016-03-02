@@ -56,5 +56,15 @@ var server = http.createServer(function(req, res) {
 
 proxy.on('error', function(err, req, res) {});
 server.listen(args.proxyPort, function() {
-  process.send('Proxy Started');
+// server.listen(args.serverPort, function() {
+  process.send(JSON.stringify( {
+    status: true,
+    data: 'Proxy Started'
+  }));
+});
+server.on('error', function(err) {
+  process.send(JSON.stringify({
+    status: false,
+    data: err
+  }))
 });
