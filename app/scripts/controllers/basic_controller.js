@@ -24,6 +24,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
 
     // handle proxy start
     server.onProxyStart(function(msg) {
+      $rootScope.$proxyServer = true;
       $rootScope.$loader.hide();
       console.log(msg);
     });
