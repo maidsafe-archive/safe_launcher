@@ -8,8 +8,7 @@ import UIUtils from './ui_utils';
 import * as api from './api/safe';
 import RESTServer from './server/boot';
 import childProcess from 'child_process';
-import {formatResponse} from './server/utils';
-import { ipcRenderer as ipc } from 'electron';
+import { formatResponse } from './server/utils';
 
 let restServer = new RESTServer(api, env.serverPort);
 let proxyServer = {
@@ -52,4 +51,13 @@ window.onbeforeunload = function(e) {
 
 window.msl = new UIUtils(api, remote, restServer, proxyServer);
 
-ipc.on('ffi-closed', window.msl.closeWindow);
+api.onTerminated(function() {
+  require('remote').dialog.showMessageBox({
+    type: 'error',
+    buttons: [ 'Ok' ],
+    title: 'FFI process terminated',
+    message: 'FFI process terminated and the application will not work as expected. Try starting the application again.'
+  }, function() {
+    window.msl.closeWindow();
+  });
+});

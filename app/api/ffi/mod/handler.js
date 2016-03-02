@@ -50,7 +50,8 @@ module.exports = function(libPath) {
   this.dispatcher = function(message) {
     try {
       if (!lib && !loadLibrary()) {
-        return util.sendError(message.id, 999, 'Library did not load');
+        // util.sendError(message.id, 999, 'Library did not load');
+        return process.exit();
       }
       switch (message.module) {
         case 'auth':
