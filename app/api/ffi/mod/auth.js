@@ -13,7 +13,13 @@ var safeDriveKey;
 var registeredClientHandle;
 var unregisteredClientHandle;
 
-var unregisteredClient = function(lib) {
+var registerObserver = function(lib, clientHandle, callback) {
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+  lib.register_network_event_observer(clientHandle, callback);
+  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+};
+
+var unregisteredClient = function(lib, observer) {
   var unregisteredClient = ref.alloc(clientHandlePtrPtr);
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   var result = lib.create_unregistered_client(unregisteredClient);
@@ -22,6 +28,7 @@ var unregisteredClient = function(lib) {
     return false;
   }
   unregisteredClientHandle = unregisteredClient.deref();
+  registerObserver(lib, unregisteredClientHandle, observer);
   return true;
 };
 
@@ -48,7 +55,7 @@ var setSafeDriveKey = function(lib) {
   return;
 };
 
-var register = function(lib, request) {
+var register = function(lib, request, observer) {
   var params = request.params;
   var regClient = ref.alloc(clientHandlePtrPtr);
   var res;
@@ -63,6 +70,7 @@ var register = function(lib, request) {
     return util.sendError(request.id, res);
   }
   registeredClientHandle = regClient.deref();
+  registerObserver(lib, registeredClientHandle, observer);
   var safeDriveError = setSafeDriveKey(lib);
   if (safeDriveError) {
     return util.sendError(request.id, 999, safeDriveError.toString());
@@ -70,7 +78,7 @@ var register = function(lib, request) {
   util.send(request.id);
 };
 
-var login = function(lib, request) {
+var login = function(lib, request, observer) {
   var params = request.params;
   var regClient = ref.alloc(clientHandlePtrPtr);
   var res;
@@ -85,6 +93,7 @@ var login = function(lib, request) {
     return util.sendError(request.id, res);
   }
   registeredClientHandle = regClient.deref();
+  registerObserver(lib, registeredClientHandle, observer);
   setSafeDriveKey(lib);
   util.send(request.id);
 };
@@ -97,8 +106,8 @@ exports.getSafeDriveKey = function() {
   return safeDriveKey;
 };
 
-exports.getUnregisteredClient = function(lib) {
-  if (!unregisteredClientHandle && !unregisteredClient(lib)) {
+exports.getUnregisteredClient = function(lib, observer) {
+  if (!unregisteredClientHandle && !unregisteredClient(lib, observer)) {
     return;
   }
   return unregisteredClientHandle;
@@ -143,21 +152,23 @@ exports.drop = function(lib) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     lib.drop_client(unregisteredClientHandle);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    unregisteredClientHandle = null;
   }
   if (registeredClientHandle) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     lib.drop_client(registeredClientHandle);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    registeredClientHandle = null;
   }
 };
 
-exports.execute = function(lib, request) {
+exports.execute = function(lib, request, observer) {
   switch (request.action) {
     case 'register':
-      register(lib, request);
+      register(lib, request, observer);
       break;
     case 'login':
-      login(lib, request);
+      login(lib, request, observer);
       break;
     case 'app-dir-key':
       getAppDirectoryKey(lib, request);

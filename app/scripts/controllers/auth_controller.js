@@ -2,9 +2,9 @@
  * Authentication Controller
  */
 window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootScope', '$timeout',
-  'authFactory', 'serverFactory', 'validateFieldsFactory',
-  function($scope, $state, $rootScope, $timeout, auth, server, validate) {
-    var LOGIN_TIMEOUT = 90000;
+  'authFactory', 'fieldValidator',
+  function($scope, $state, $rootScope, $timeout, auth, validator) {
+    var REQUEST_TIMEOUT = 90 * 1000;
     var FIELD_FOCUS_DELAY = 100;
 
     $scope.user = {};
@@ -49,45 +49,59 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       }
     };
 
-    var AuthResponse = function() {
+    var Request = function(callback) {
       var self = this;
-      self.status = true;
-      self.onResponse = function(err) {
-        if (!self.status) {
+      var alive = true;
+      var timer;
+
+      var onResponse = function(err) {
+        if (!alive) {
           return;
         }
-        self.onComplete(err);
+        alive = false;
+        $scope.authLoader.hide();
+        callback(err);
+        $timeout.cancel(timer);
       };
-      self.onComplete = function(err) {};
+
       self.cancel = function() {
-        console.log('Request canceled');
-        self.status = false;
+        onResponse(new Error('Request cancelled'));
+        alive = false;
+      };
+
+      self.execute = function(func) {
+        $scope.authLoader.show();
+        timer = $timeout(function() {
+          onResponse(new Error('Operation timed out'));
+          alive = false;
+        }, REQUEST_TIMEOUT);
+        func(onResponse);
       };
     };
 
-    var authRes = new AuthResponse();
+    var onAuthResponse = function(err) {
+      $scope.user = {};
+      if (err) {
+        $scope.authLoader.error = true;
+        $scope.authLoader.show();
+        return $scope.$applyAsync();
+      }
+      $state.go('user');
+    };
 
     // register user
     var register = function() {
-      var reset = function() {
-        $scope.user = {};
-        $scope.tabs.init();
-      };
       var payload = {
         pin: $scope.user.pin,
         keyword: $scope.user.keyword,
         password: $scope.user.password
       };
-      $scope.authLoader.show();
-      authRes.onComplete = function(err) {
-        reset();
-        if (err) {
-          $scope.authLoader.error = true;
-          return;
-        }
-        $state.go('user');
-      };
-      auth.register(payload, authRes.onResponse);
+      var request = new Request(onAuthResponse);
+      $scope.cancelRequest = request.cancel;
+      request.execute(function(done) {
+        auth.register(payload, done);
+      });
+      $scope.tabs.init();
     };
 
     var getFormEle = function(form, field) {
@@ -115,14 +129,14 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       var errMsg = null;
       var formName = 'registerPin';
 
-      errMsg = validate.validateField($scope.user.pin, validate.AUTH_FIELDS.PIN);
+      errMsg = validator.validateField($scope.user.pin, validator.AUTH_FIELDS.PIN);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'pin');
       }
       hideFormError($scope[formName], 'pin');
 
-      errMsg = validate.validateConfirmationField($scope.user.pin, $scope.user.confirmPin,
-        validate.AUTH_FIELDS.CONFIRM_PIN);
+      errMsg = validator.validateConfirmationField($scope.user.pin, $scope.user.confirmPin,
+        validator.AUTH_FIELDS.CONFIRM_PIN);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'confirmPin');
       }
@@ -139,14 +153,14 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       var errMsg = null;
       var formName = 'registerKeyword';
 
-      errMsg = validate.validateField($scope.user.keyword, validate.AUTH_FIELDS.KEYWORD);
+      errMsg = validator.validateField($scope.user.keyword, validator.AUTH_FIELDS.KEYWORD);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'keyword');
       }
       hideFormError($scope[formName], 'keyword');
 
-      errMsg = validate.validateConfirmationField($scope.user.keyword, $scope.user.confirmKeyword,
-        validate.AUTH_FIELDS.CONFIRM_KEYWORD);
+      errMsg = validator.validateConfirmationField($scope.user.keyword, $scope.user.confirmKeyword,
+        validator.AUTH_FIELDS.CONFIRM_KEYWORD);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'confirmKeyword');
       }
@@ -162,14 +176,14 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     $scope.validatePassword = function() {
       var errMsg = null;
       var formName = 'registerPassword';
-      errMsg = validate.validateField($scope.user.password, validate.AUTH_FIELDS.PASSWORD);
+      errMsg = validator.validateField($scope.user.password, validator.AUTH_FIELDS.PASSWORD);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'password');
       }
       hideFormError($scope[formName], 'password');
 
-      errMsg = validate.validateConfirmationField($scope.user.password, $scope.user.confirmPassword,
-        validate.AUTH_FIELDS.CONFIRM_PASSWORD);
+      errMsg = validator.validateConfirmationField($scope.user.password, $scope.user.confirmPassword,
+        validator.AUTH_FIELDS.CONFIRM_PASSWORD);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'confirmPassword');
       }
@@ -180,51 +194,28 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
 
     // user login
     $scope.login = function() {
-      var timer = null;
       var errMsg = null;
       var fieldName = null;
       var formFields = [
-        validate.AUTH_FIELDS.PIN,
-        validate.AUTH_FIELDS.KEYWORD,
-        validate.AUTH_FIELDS.PASSWORD
+        validator.AUTH_FIELDS.PIN,
+        validator.AUTH_FIELDS.KEYWORD,
+        validator.AUTH_FIELDS.PASSWORD
       ];
 
       for (var i = 0; i < formFields.length; i++) {
         fieldName = formFields[i];
-        errMsg = validate.validateField($scope.user[fieldName], fieldName);
+        errMsg = validator.validateField($scope.user[fieldName], fieldName);
         if (errMsg) {
           return showFormError(errMsg, $scope.mslLogin, fieldName);
         }
         hideFormError($scope.mslLogin, fieldName);
       }
 
-      var reset = function() {
-        $scope.user = {};
-        $timeout.cancel(timer);
-      };
-
-      timer = $timeout(function() {
-        $scope.authLoader.error = true;
-        reset();
-      }, LOGIN_TIMEOUT);
-
-      authRes.onComplete = function(err) {
-        reset();
-        if (err) {
-          $scope.authLoader.error = true;
-          return $scope.$applyAsync();
-        }
-        $state.go('user');
-      };
-
-      $scope.authLoader.show();
-      auth.login($scope.user, authRes.onResponse);
-    };
-
-    // cancel request
-    $scope.cancelRequest = function() {
-      authRes.cancel();
-      $scope.authLoader.hide();
+      var request = new Request(onAuthResponse);
+      $scope.cancelRequest = request.cancel;
+      request.execute(function(done) {
+        auth.login($scope.user, done);
+      });
     };
 
     // reset input field

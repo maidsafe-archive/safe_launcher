@@ -1,12 +1,12 @@
 import childProcess from 'child_process';
 import * as libSodium from 'libsodium-wrappers';
-import { ipcRenderer as ipc } from 'electron';
 
 var workerPath = __dirname;
 workerPath += workerPath.indexOf('ffi') === -1 ? '/api/ffi/worker.js' : '/worker.js';
 var workerProcess = childProcess.fork(workerPath);
 var callbackPool = {};
 var isClosed = false;
+var networkStateListener;
 
 var addToCallbackPool = function(id, callback) {
   if (!callbackPool[id]) {
@@ -20,11 +20,16 @@ workerProcess.on('close', function() {
     return;
   }
   isClosed = true;
-  ipc.send('ffi-closed');
+  if (networkStateListener) {
+    networkStateListener(-1);
+  }
 });
 
 workerProcess.on('message', function(msg) {
-  if (!callbackPool[msg.id]) {
+  // console.log(msg);
+  if (msg.id === 0 && networkStateListener) {
+    return networkStateListener(msg.data.state);
+  } else if (!callbackPool[msg.id]) {
     return;
   }
   let isError = msg.errorCode !== 0;
@@ -56,4 +61,8 @@ export var close = function() {
   }
   isClosed = true;
   workerProcess.kill();
+};
+
+export var setNetworkStateListener = function(callback) {
+  networkStateListener = callback;
 };

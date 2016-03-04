@@ -8,8 +8,7 @@ import UIUtils from './ui_utils';
 import * as api from './api/safe';
 import RESTServer from './server/boot';
 import childProcess from 'child_process';
-import {formatResponse} from './server/utils';
-import { ipcRenderer as ipc } from 'electron';
+import { formatResponse } from './server/utils';
 
 let restServer = new RESTServer(api, env.serverPort);
 let proxyServer = {
@@ -52,4 +51,50 @@ window.onbeforeunload = function(e) {
 
 window.msl = new UIUtils(api, remote, restServer, proxyServer);
 
-ipc.on('ffi-closed', window.msl.closeWindow);
+var onFfiProcessTerminated = function(title, msg) {
+  require('remote').dialog.showMessageBox({
+    type: 'error',
+    buttons: [ 'Ok' ],
+    title: title,
+    message: msg
+  }, function() {
+    window.msl.closeWindow();
+  });
+};
+
+var onConnectionLost = function() {
+  require('remote').dialog.showMessageBox({
+    type: 'error',
+    buttons: [ 'Ok' ],
+    title: 'Connection Drop',
+    message: 'Connection lost with the Network. Log in again to continue'
+  }, function() {
+    api.auth.dropClients();
+    window.location.hash = 'login';
+  });
+};
+
+api.setNetworkStateListener(function(state) {
+  switch (state) {
+    case -1:
+      onFfiProcessTerminated('FFI process terminated',
+        'FFI process terminated and the application will not work as expected.' +
+        'Try starting the application again.');
+      break;
+
+    case 0:
+      console.log('connected');
+      break;
+
+    case 1:
+      onConnectionLost();
+      break;
+
+    case 2:
+      onConnectionLost();
+      break;
+    default:
+      onFfiProcessTerminated('FFI process terminated', 'FFI library could not be loaded.');
+      break;
+  }
+});
