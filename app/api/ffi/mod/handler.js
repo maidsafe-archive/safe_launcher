@@ -67,7 +67,7 @@ module.exports = function(libPath) {
 
   self.dispatcher = function(message) {
     try {
-      if (!lib && !loadLibrary()) {        
+      if (!lib && !loadLibrary()) {
         return networkObserver(LIB_LOAD_ERROR);
       }
       switch (message.module) {

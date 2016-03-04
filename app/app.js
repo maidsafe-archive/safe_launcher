@@ -67,7 +67,7 @@ var onConnectionLost = function() {
     type: 'error',
     buttons: [ 'Ok' ],
     title: 'Connection Drop',
-    message: 'Connection lost with the Network. Login again to continue'
+    message: 'Connection lost with the Network. Log in again to continue'
   }, function() {
     api.auth.dropClients();
     window.location.hash = 'login';
