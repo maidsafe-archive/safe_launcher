@@ -41,4 +41,10 @@ export default class Auth {
     }, callback);
   }
 
+  dropClients() {
+    this.send({
+      module: 'clean'
+    });
+  }
+
 }

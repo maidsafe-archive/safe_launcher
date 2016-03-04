@@ -47,7 +47,14 @@ export default class UIUtils {
 
   // register
   register(pin, keyword, password, callback) {
-    this.api.auth.register(String(pin), keyword, password, callback);
+    var self = this;
+    this.api.auth.register(String(pin), keyword, password, function(err) {
+      if (err) {
+        return callback(err);
+      }
+      self.api.auth.dropClients();
+      callback(err);
+    });
   }
 
   // close browser window

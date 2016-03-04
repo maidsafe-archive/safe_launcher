@@ -58,6 +58,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         if (!alive) {
           return;
         }
+        alive = false;
         $scope.authLoader.hide();
         callback(err);
         $timeout.cancel(timer);
@@ -72,6 +73,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         $scope.authLoader.show();
         timer = $timeout(function() {
           onResponse(new Error('Operation timed out'));
+          alive = false;
         }, REQUEST_TIMEOUT);
         func(onResponse);
       };

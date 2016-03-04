@@ -6,7 +6,7 @@ workerPath += workerPath.indexOf('ffi') === -1 ? '/api/ffi/worker.js' : '/worker
 var workerProcess = childProcess.fork(workerPath);
 var callbackPool = {};
 var isClosed = false;
-var onTermintatedListener;
+var networkStateListener;
 
 var addToCallbackPool = function(id, callback) {
   if (!callbackPool[id]) {
@@ -20,13 +20,16 @@ workerProcess.on('close', function() {
     return;
   }
   isClosed = true;
-  if (onTermintatedListener) {
-    onTermintatedListener();
+  if (networkStateListener) {
+    networkStateListener(-1);
   }
 });
 
 workerProcess.on('message', function(msg) {
-  if (!callbackPool[msg.id]) {
+  // console.log(msg);
+  if (msg.id === 0 && networkStateListener) {
+    return networkStateListener(msg.data.state);
+  } else if (!callbackPool[msg.id]) {
     return;
   }
   let isError = msg.errorCode !== 0;
@@ -60,6 +63,6 @@ export var close = function() {
   workerProcess.kill();
 };
 
-export var onTerminated = function(callback) {
-  onTermintatedListener = callback;
+export var setNetworkStateListener = function(callback) {
+  networkStateListener = callback;
 };

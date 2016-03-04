@@ -51,13 +51,50 @@ window.onbeforeunload = function(e) {
 
 window.msl = new UIUtils(api, remote, restServer, proxyServer);
 
-api.onTerminated(function() {
+var onFfiProcessTerminated = function(title, msg) {
   require('remote').dialog.showMessageBox({
     type: 'error',
     buttons: [ 'Ok' ],
-    title: 'FFI process terminated',
-    message: 'FFI process terminated and the application will not work as expected. Try starting the application again.'
+    title: title,
+    message: msg
   }, function() {
     window.msl.closeWindow();
   });
+};
+
+var onConnectionLost = function() {
+  require('remote').dialog.showMessageBox({
+    type: 'error',
+    buttons: [ 'Ok' ],
+    title: 'Connection Drop',
+    message: 'Connection lost with the Network. Login again to continue'
+  }, function() {
+    api.auth.dropClients();
+    window.location.hash = 'login';
+  });
+};
+
+api.setNetworkStateListener(function(state) {
+  switch (state) {
+    case -1:
+      onFfiProcessTerminated('FFI process terminated',
+        'FFI process terminated and the application will not work as expected.' +
+        'Try starting the application again.');
+      break;
+
+    case 0:
+      console.log('connected');
+      break;
+
+    case 1:
+      onConnectionLost();
+      break;
+
+    case 2:
+      onConnectionLost();
+      break;
+    default:
+      onFfiProcessTerminated('FFI process terminated', 'FFI library could not be loaded.');
+      break;
+  }
 });

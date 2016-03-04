@@ -3,7 +3,7 @@ import DNS from './mod/dns';
 import Auth from './mod/auth';
 import * as client from './ffi/client.js';
 
-export var onTerminated = client.onTerminated;
+export var setNetworkStateListener = client.setNetworkStateListener;
 export var close = client.close;
 export var nfs = new NFS(client.send);
 export var dns = new DNS(client.send);
