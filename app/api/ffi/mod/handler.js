@@ -67,8 +67,8 @@ module.exports = function(libPath) {
 
   self.dispatcher = function(message) {
     try {
-      if (!lib && !loadLibrary()) {
-        return util.sendError(message.id, LIB_LOAD_ERROR, 'Library did not load');
+      if (!lib && !loadLibrary()) {        
+        return networkObserver(LIB_LOAD_ERROR);
       }
       switch (message.module) {
         case 'auth':
