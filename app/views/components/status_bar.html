@@ -1,0 +1,34 @@
+<!-- Connecting -->
+<div class="msl-status-bar-b connected loading" ng-if="network.status === 0">
+  <h3 class="desc">{{ network.message.CONNECTING }}</h3>
+  <button type="button" name="okay" class="msl-btn act-btn" ng-click="network.hide()">Okay</button>
+</div>
+<!-- Connecting -->
+
+<!-- Connected -->
+<div class="msl-status-bar-b connected" ng-if="network.status === 1">
+  <h3 class="desc">{{ network.message.CONNECTED }}</h3>
+  <button type="button" name="okay" class="msl-btn act-btn" ng-click="network.hide()">Okay</button>
+</div>
+<!-- Connected -->
+
+<!-- Disconnected -->
+<div class="msl-status-bar-b retry" ng-if="network.status === 2">
+  <h3 class="desc">{{ network.message.DISCONNECTED }}</h3>
+  <button type="button" name="okay" class="msl-btn act-btn" ng-click="network.retry()">Retry</button>
+</div>
+<!-- Disconnected -->
+
+<!-- Disconnected -->
+<div class="msl-status-bar-b disconnected" ng-if="network.status === 2">
+  <h3 class="desc">{{ network.message.DISCONNECTED }}</h3>
+  <button type="button" name="okay" class="msl-btn act-btn" ng-click="network.retry()">Retry</button>
+</div>
+<!-- Disconnected -->
+
+<!-- Retrying -->
+<div class="msl-status-bar-b loading" ng-if="network.status === 3">
+  <h3 class="desc">{{ network.message.RETRY }}</h3>
+  <!-- <button type="button" name="okay" class="msl-btn act-btn" ng-click="network.retry()">Retry</button> -->
+</div>
+<!-- Retrying -->

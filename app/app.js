@@ -116,6 +116,7 @@ window.document.addEventListener('drop', function(e) {
   e.preventDefault();
   e.stopPropagation();
 });
+
 window.document.addEventListener('dragover', function(e) {
   e.preventDefault();
   e.stopPropagation();
