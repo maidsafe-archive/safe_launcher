@@ -16,7 +16,7 @@ window.safeLauncher.constant('MESSAGES', {
   'CONFIRM_PASSWORD_FIELD_BLANK': 'Field can\'t be left blank, please confirm Password',
   'ENTRIES_DONT_MATCH': 'Entries don\'t match, please check and try again',
   'NETWORK_NOT_CONNECTED': 'Waiting for establishing connection with SAFE Network'
-});1
+});
 
 // Constants
 window.safeLauncher.constant('CONSTANTS', {

@@ -158,8 +158,6 @@ var getAppDirectoryKey = function(lib, request) {
   }
 };
 
-
-
 exports.drop = function(lib) {
   dropUnregisteredClient(lib);
   if (registeredClientHandle) {

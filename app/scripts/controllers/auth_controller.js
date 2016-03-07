@@ -136,7 +136,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       if ($rootScope.network.status !== NETWORK_STATE.CONNECTED) {
         return showFormError(MESSAGES.NETWORK_NOT_CONNECTED);
       }
-      
       errMsg = validator.validateField($scope.user.pin, validator.AUTH_FIELDS.PIN);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'pin');
