@@ -114,6 +114,7 @@ window.safeLauncher.factory('serverFactory', [
     self.stopProxyServer = function() {
       window.msl.stopProxyServer();
     };
+
     return self;
   }
 ]);

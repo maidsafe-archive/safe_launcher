@@ -95,9 +95,11 @@
     background-color: white;
     &.connected {
       background-color: @status-bg;
+       > .desc { color: white; }
     }
     &.disconnected {
       background-color: @bg-error;
+      > .desc { color: white; }
     }
     &.loading {
       &:after {
@@ -117,7 +119,7 @@
       font-size: 14px;
       font-weight: normal;
       line-height: 36px;
-      color: white;
+      color: @msl-txt-1;
       float: left;
     }
     > .act-btn {
