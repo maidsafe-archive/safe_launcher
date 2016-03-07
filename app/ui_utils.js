@@ -157,4 +157,7 @@ export default class UIUtils {
     this.onNetworkStateChange = callback;
   }
 
+  reconnect() {
+    this.api.restart();
+  }
 }

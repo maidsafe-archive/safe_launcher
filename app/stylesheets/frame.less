@@ -78,3 +78,71 @@
     }
   }
 }
+
+// status bar
+.msl-status-bar {
+  width: 100%;
+  height: 36px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  overflow: hidden;
+  .msl-status-bar-b {
+    height: inherit;
+    padding: 0 0 0 4px;
+    margin: 0;
+    background-color: white;
+    &.connected {
+      background-color: @status-bg;
+       > .desc { color: white; }
+    }
+    &.disconnected {
+      background-color: @bg-error;
+      > .desc { color: white; }
+    }
+    &.loading {
+      &:after {
+        content: '';
+        width: 30%;
+        height: 4px;
+        position: absolute;
+        bottom: 0;
+        left: -30%;
+        background-color: @bg-error;
+        animation: loadConn 1.5s linear infinite;
+      }
+    }
+    > .desc {
+      margin: 0;
+      padding: 0 0 0 4px;
+      font-size: 14px;
+      font-weight: normal;
+      line-height: 36px;
+      color: @msl-txt-1;
+      float: left;
+    }
+    > .act-btn {
+      float: right;
+      line-height: 28px;
+      margin: 4px;
+      padding: 0 8px;
+      color: white;
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+      &:active {
+        background-color: rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+}
+
+@keyframes loadConn {
+  0% {
+    left: -30%;
+  }
+  100% {
+    left: 100%;
+  }
+}

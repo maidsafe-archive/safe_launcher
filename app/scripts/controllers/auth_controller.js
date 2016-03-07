@@ -2,8 +2,8 @@
  * Authentication Controller
  */
 window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootScope', '$timeout',
-  'authFactory', 'fieldValidator',
-  function($scope, $state, $rootScope, $timeout, auth, validator) {
+  'authFactory', 'fieldValidator', 'MESSAGES',
+  function($scope, $state, $rootScope, $timeout, auth, validator, MESSAGES) {
     var REQUEST_TIMEOUT = 90 * 1000;
     var FIELD_FOCUS_DELAY = 100;
 
@@ -111,16 +111,20 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
 
     // show form error
     var showFormError = function(err, form, field) {
-      var fieldEle = getFormEle(form, field);
-      fieldEle.addClass('invalid');
-      fieldEle.focus();
+      if (form && field) {
+        var fieldEle = getFormEle(form, field);
+        fieldEle.addClass('invalid');
+        fieldEle.focus();
+      }
       $scope.formError = err;
     };
 
     // hide form error
     var hideFormError = function(form, field) {
-      var fieldEle = getFormEle(form, field);
-      fieldEle.removeClass('invalid');
+      if (form && field) {
+        var fieldEle = getFormEle(form, field);
+        fieldEle.removeClass('invalid');
+      }
       $scope.formError = null;
     };
 
@@ -129,6 +133,9 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       var errMsg = null;
       var formName = 'registerPin';
 
+      if ($rootScope.network.status !== NETWORK_STATE.CONNECTED) {
+        return showFormError(MESSAGES.NETWORK_NOT_CONNECTED);
+      }
       errMsg = validator.validateField($scope.user.pin, validator.AUTH_FIELDS.PIN);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'pin');
@@ -201,6 +208,10 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         validator.AUTH_FIELDS.KEYWORD,
         validator.AUTH_FIELDS.PASSWORD
       ];
+
+      if ($rootScope.network.status !== NETWORK_STATE.CONNECTED) {
+        return showFormError(MESSAGES.NETWORK_NOT_CONNECTED);
+      }
 
       for (var i = 0; i < formFields.length; i++) {
         fieldName = formFields[i];

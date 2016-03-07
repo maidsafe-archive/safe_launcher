@@ -14,7 +14,8 @@ window.safeLauncher.constant('MESSAGES', {
   'PASSWORD_FIELD_BLANK': 'Password field can\'t be left blank',
   'PASSWORD_SIX_CHAR_LONG': 'Password must be at least 6 characters long',
   'CONFIRM_PASSWORD_FIELD_BLANK': 'Field can\'t be left blank, please confirm Password',
-  'ENTRIES_DONT_MATCH': 'Entries don\'t match, please check and try again'
+  'ENTRIES_DONT_MATCH': 'Entries don\'t match, please check and try again',
+  'NETWORK_NOT_CONNECTED': 'Waiting for establishing connection with SAFE Network'
 });
 
 // Constants

@@ -16,6 +16,9 @@
     <!-- <div class="msl-titlebar" ng-include="'views/components/titlebar.html'">
     </div> -->
     <!-- /title bar -->
+    <!-- status bar -->
+    <div class="msl-status-bar" ng-show="network.show" ng-include="'views/components/status_bar.html'"></div>
+    <!-- /status bar -->
     <div class="msl-frame" ui-view></div>
     <msl-loader ng-show="$loader.isLoading"></msl-loader>
     <div ng-include="'views/components/alert.html'" ng-show="$msAlert.status"></div>

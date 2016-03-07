@@ -51,10 +51,26 @@ window.safeLauncher = angular
     shell.openExternal(link.toString());
   };
   $rootScope.network = {
-    status: 1
+    status: window.NETWORK_STATE.CONNECTING,
+    show: true,
+    messages: {
+      'CONNECTED': 'Connected to the SAFE Network',
+      'CONNECTING': 'Trying to connect with SAFE Network',
+      'DISCONNECTED': 'Can\'t reach the SAFE Network',
+      'RETRY': 'Retrying connection...'
+    },
+    hide: function() {
+      this.show = false;
+    },
+    retry: function() {
+      this.status = window.NETWORK_STATE.RETRY;
+      window.msl.reconnect();
+    }
   };
   window.msl.setNetworkStateChangeListener(function(state) {
+    $rootScope.network.show = true;
     $rootScope.network.status = state;
+    $rootScope.$applyAsync();
     console.log($rootScope.network);
   });
 } ]);

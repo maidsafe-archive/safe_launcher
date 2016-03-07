@@ -49,10 +49,11 @@ window.onbeforeunload = function(e) {
   e.returnValue = true;
 };
 
-var NETWORK_STATE = {
-  CONNECTED: 0,
-  CONNECTING: 1,
-  DISCONNECTED: 2
+window.NETWORK_STATE = {
+  CONNECTING: 0,
+  CONNECTED: 1,
+  DISCONNECTED: 2,
+  RETRY: 3
 };
 
 window.msl = new UIUtils(api, remote, restServer, proxyServer);
@@ -77,8 +78,6 @@ var onConnectionLost = function() {
   }, function() {
     api.auth.dropClients();
     window.location.hash = 'login';
-    window.msl.networkStateChange(NETWORK_STATE.CONNECTING);
-    api.restart();
   });
 };
 
@@ -116,6 +115,7 @@ window.document.addEventListener('drop', function(e) {
   e.preventDefault();
   e.stopPropagation();
 });
+
 window.document.addEventListener('dragover', function(e) {
   e.preventDefault();
   e.stopPropagation();
