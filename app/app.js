@@ -49,6 +49,12 @@ window.onbeforeunload = function(e) {
   e.returnValue = true;
 };
 
+var NETWORK_STATE = {
+  CONNECTED: 0,
+  CONNECTING: 1,
+  DISCONNECTED: 2
+};
+
 window.msl = new UIUtils(api, remote, restServer, proxyServer);
 
 var onFfiProcessTerminated = function(title, msg) {
@@ -71,6 +77,8 @@ var onConnectionLost = function() {
   }, function() {
     api.auth.dropClients();
     window.location.hash = 'login';
+    window.msl.networkStateChange(NETWORK_STATE.CONNECTING);
+    api.restart();
   });
 };
 
@@ -84,17 +92,31 @@ api.setNetworkStateListener(function(state) {
 
     case 0:
       console.log('connected');
+      window.msl.networkStateChange(NETWORK_STATE.CONNECTED);
       break;
 
     case 1:
+      window.msl.networkStateChange(NETWORK_STATE.DISCONNECTED);
       onConnectionLost();
       break;
 
     case 2:
+      window.msl.networkStateChange(NETWORK_STATE.DISCONNECTED);
       onConnectionLost();
       break;
+
     default:
       onFfiProcessTerminated('FFI process terminated', 'FFI library could not be loaded.');
       break;
   }
+});
+
+// Disabling drag and drop
+window.document.addEventListener('drop', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+});
+window.document.addEventListener('dragover', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
 });

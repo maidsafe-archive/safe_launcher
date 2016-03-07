@@ -38,6 +38,7 @@ export default class UIUtils {
     this.restServer = restServer;
     this.proxy = proxy;
     this.proxyListener = new ProxyListener();
+    this.onNetworkStateChange = null;
   }
 
   // login
@@ -144,4 +145,16 @@ export default class UIUtils {
   stopProxyServer() {
     this.proxy.stop();
   }
+
+  networkStateChange(state) {
+    if (!this.onNetworkStateChange) {
+      return;
+    }
+    this.onNetworkStateChange(state);
+  }
+
+  setNetworkStateChangeListener(callback) {
+    this.onNetworkStateChange = callback;
+  }
+
 }
