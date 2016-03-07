@@ -50,4 +50,11 @@ window.safeLauncher = angular
     var shell = require('electron').shell;
     shell.openExternal(link.toString());
   };
+  $rootScope.network = {
+    status: 1
+  };
+  window.msl.setNetworkStateChangeListener(function(state) {
+    $rootScope.network.status = state;
+    console.log($rootScope.network);
+  });
 } ]);

@@ -91,6 +91,12 @@ module.exports = function(libPath) {
           dns.execute(lib, message);
           break;
 
+        case 'connect':
+          if (auth.getUnregisteredClient(lib, networkObserver)) {
+            networkObserver(0);
+          }
+          break;
+
         case 'clean':
           self.cleanup();
           break;
