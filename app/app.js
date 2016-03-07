@@ -49,10 +49,10 @@ window.onbeforeunload = function(e) {
   e.returnValue = true;
 };
 
-var NETWORK_STATE = {
-  CONNECTED: 0,
-  CONNECTING: 1,
-  DISCONNECTED: 2
+window.NETWORK_STATE = {
+  CONNECTING: 0,
+  CONNECTED: 1,  
+  DISCONNECTED: 2,
 };
 
 window.msl = new UIUtils(api, remote, restServer, proxyServer);
@@ -76,9 +76,7 @@ var onConnectionLost = function() {
     message: 'Connection lost with the Network. Log in again to continue'
   }, function() {
     api.auth.dropClients();
-    window.location.hash = 'login';
-    window.msl.networkStateChange(NETWORK_STATE.CONNECTING);
-    api.restart();
+    window.location.hash = 'login';      
   });
 };
 
