@@ -1,6 +1,6 @@
 <div class="msl-auth" ng-controller="authController">
   <!-- auth banner -->
-  <div class="msl-auth-bnr" ng-show="authLoader.isLoading">
+  <div class="msl-auth-bnr">
     <img src="./images/launcher_rocket.svg" alt="Auth banner" />
   </div><!-- /auth banner -->
   <div class="msl-auth-b" ng-show="!authLoader.isLoading">
@@ -14,9 +14,6 @@
 
       <!-- pin base -->
       <form name="registerPin" ng-show="tabs.currentPos === tabs.state[0]" ng-submit="validatePin()">
-        <p class="msl-form-desc">
-          Pins should be at least <span class="bold">4 characters long</span> and <span class="bold">made of numbers</span> only
-        </p>
         <!-- pin -->
         <div class="msl-form-grp no-margin">
           <input type="password" name="pin" placeholder="PIN"
@@ -41,9 +38,6 @@
 
       <!-- keyword -->
       <form name="registerKeyword" ng-show="tabs.currentPos === tabs.state[1]" ng-submit="validateKeyword()">
-        <p class="msl-form-desc">
-          Keyword should be at least <span class="bold">6 characters long</span>
-        </p>
         <!-- keyword -->
         <div class="msl-form-grp no-margin">
           <input type="password" name="keyword" ng-load="log()" placeholder="Keyword"
@@ -68,9 +62,6 @@
 
       <!-- password -->
       <form name="registerPassword" ng-show="tabs.currentPos === tabs.state[2]" ng-submit="validatePassword()">
-        <p class="msl-form-desc">
-          Password should be at least <span class="bold">6 characters long</span>
-        </p>
         <!-- password -->
         <div class="msl-form-grp no-margin">
           <input type="password" name="password" id="password" placeholder="Password"
