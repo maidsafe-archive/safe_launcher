@@ -12,11 +12,13 @@ export default class Permission {
 
   isValid() {
     let self = this;
-    self.list.forEach(function(permission) {
+    var permission = null;
+    for(var i = 0; i < self.list.length; i++) {
+      permission = self.list[i];
       if (self._PERMISSION_LIST.indexOf(permission) === -1) {
         return false;
       }
-    });
+    }
     return true;
   }
 
