@@ -70,13 +70,14 @@ var onFfiProcessTerminated = function(title, msg) {
 };
 
 var onConnectionLost = function() {
+  // TODO change from window prompt to app prompt
   require('remote').dialog.showMessageBox({
     type: 'error',
     buttons: [ 'Ok' ],
     title: 'Connection Drop',
     message: 'Connection lost with the Network. Log in again to continue'
   }, function() {
-    api.auth.dropClients();
+    api.restart();
     window.location.hash = 'login';
   });
 };

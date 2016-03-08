@@ -105,7 +105,10 @@ var login = function(lib, request, observer) {
   registeredClientHandle = regClient.deref();
   dropUnregisteredClient(lib);
   registerObserver(lib, registeredClientHandle, observer);
-  setSafeDriveKey(lib);
+  var safeDriveError = setSafeDriveKey(lib);
+  if (safeDriveError) {
+    return util.sendError(request.id, 999, safeDriveError.toString());
+  }
   util.send(request.id);
 };
 

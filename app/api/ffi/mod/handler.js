@@ -65,10 +65,6 @@ module.exports = function(libPath) {
     return false;
   };
 
-  self.cleanup = function() {
-    auth.drop(lib);
-  };
-
   self.dispatcher = function(message) {
     try {
       if (!lib && !loadLibrary()) {
@@ -99,10 +95,6 @@ module.exports = function(libPath) {
           if (auth.getUnregisteredClient(lib, networkObserver)) {
             networkObserver(0);
           }
-          break;
-
-        case 'clean':
-          self.cleanup();
           break;
 
         default:
