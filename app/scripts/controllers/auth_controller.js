@@ -142,8 +142,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       }
       hideFormError($scope[formName], 'pin');
 
-      errMsg = validator.validateConfirmationField($scope.user.pin, $scope.user.confirmPin,
-        validator.AUTH_FIELDS.CONFIRM_PIN);
+      errMsg = validator.validateConfirmationField($scope.user.pin, $scope.user.confirmPin);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'confirmPin');
       }
@@ -166,8 +165,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       }
       hideFormError($scope[formName], 'keyword');
 
-      errMsg = validator.validateConfirmationField($scope.user.keyword, $scope.user.confirmKeyword,
-        validator.AUTH_FIELDS.CONFIRM_KEYWORD);
+      errMsg = validator.validateConfirmationField($scope.user.keyword, $scope.user.confirmKeyword);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'confirmKeyword');
       }
@@ -189,8 +187,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       }
       hideFormError($scope[formName], 'password');
 
-      errMsg = validator.validateConfirmationField($scope.user.password, $scope.user.confirmPassword,
-        validator.AUTH_FIELDS.CONFIRM_PASSWORD);
+      errMsg = validator.validateConfirmationField($scope.user.password, $scope.user.confirmPassword);
       if (errMsg) {
         return showFormError(errMsg, $scope[formName], 'confirmPassword');
       }
