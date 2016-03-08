@@ -19,7 +19,7 @@ var registerObserver = function(lib, clientHandle, callback) {
   /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
 };
 
-var dropUnregisteredClient = function(lib) {  
+var dropUnregisteredClient = function(lib) {
   if (unregisteredClientHandle) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     lib.drop_client(unregisteredClientHandle);
