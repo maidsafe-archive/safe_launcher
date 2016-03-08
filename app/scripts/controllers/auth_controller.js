@@ -86,6 +86,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         $scope.authLoader.show();
         return $scope.$applyAsync();
       }
+      $rootScope.network.hide();
       $state.go('user');
     };
 

@@ -6,7 +6,7 @@
     {{ $state.current.name === 'login' ? "Logging" : "Registering" }} you on the SAFE Network.
   </div>
   <div class="msl-auth-loading-desc" ng-show="authLoader.error">
-    {{ $state.current.name === 'login' ? "Login" : "Registration" }} failed!<br>Please enter the correct details
+    {{ $state.current.name === 'login' ? "Login" : "Registration" }} failed!<br>Try again.
   </div>
   <div class="msl-auth-loading-act">
     <button ng-show="!authLoader.error" type="button" name="cancelLoading" class="msl-btn msl-btn-primary" ng-click="cancelRequest()">Cancel</button>
