@@ -48,11 +48,7 @@ module.exports = function(libPath) {
     if (!lib) {
       throw new Error('FFI library not yet initialised');
     }
-    var client = auth.getRegisteredClient();
-    if (!client) {
-      client = auth.getUnregisteredClient(lib, networkObserver);
-    }
-    return client;
+    return message.isAuthorised ? auth.getRegisteredClient() : auth.getUnregisteredClient(lib, networkObserver);
   };
 
   var loadLibrary = function() {

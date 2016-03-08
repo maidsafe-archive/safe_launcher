@@ -79,7 +79,7 @@ var register = function(lib, request, observer) {
     return util.sendError(request.id, res);
   }
   registeredClientHandle = regClient.deref();
-  dropUnregisteredClient(lib);
+  // dropUnregisteredClient(lib);
   registerObserver(lib, registeredClientHandle, observer);
   var safeDriveError = setSafeDriveKey(lib);
   if (safeDriveError) {
@@ -103,7 +103,7 @@ var login = function(lib, request, observer) {
     return util.sendError(request.id, res);
   }
   registeredClientHandle = regClient.deref();
-  dropUnregisteredClient(lib);
+  // dropUnregisteredClient(lib);
   registerObserver(lib, registeredClientHandle, observer);
   var safeDriveError = setSafeDriveKey(lib);
   if (safeDriveError) {
