@@ -53,7 +53,6 @@ export default class UIUtils {
       if (err) {
         return callback(err);
       }
-      self.api.auth.dropClients();
       callback(err);
     });
   }

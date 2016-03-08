@@ -104,9 +104,8 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
 
     // Parse authorise permissions
     $scope.parsePermission = function(str) {
-      str = str.toLowerCase();
+      str = str.toUpperCase();
       str = str.replace(/_/g, ' ');
-      str = str[0].toUpperCase() + str.slice(1);
       return str;
     };
 
