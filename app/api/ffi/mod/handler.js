@@ -23,6 +23,7 @@ module.exports = function(libPath) {
 
   var methodsToRegister = function() {
     return {
+      'init_logging': [ 'int', [] ],
       'create_unregistered_client': [ 'int', [ clientHandlePtrPtr ] ],
       'create_account': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
       'log_in': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
@@ -54,7 +55,7 @@ module.exports = function(libPath) {
   var loadLibrary = function() {
     try {
       lib = ffi.Library(libPath, methodsToRegister());
-      return true;
+      return lib.init_logging() === 0;
     } catch (e) {
       console.log('Ffi load error', e);
     }
