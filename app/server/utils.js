@@ -127,7 +127,7 @@ export var formatResponse = function(data) {
       delete obj.user_metadata;
     }
     if (obj.hasOwnProperty('metadata') && typeof obj.metadata === 'string' && obj.metadata) {
-      obj.metadata = JSON.parse(obj.metadata);
+      obj.metadata = (obj.metadata && obj.metadata[0] === '{') ? JSON.parse(obj.metadata) : obj.metadata;
     }
     var formattedObj = {};
     for (let key in obj) {
@@ -157,19 +157,21 @@ export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
     if (!self.sessionInfo) {
       return msg;
     }
-    self.res.set('Content-Type', 'text/plain');
     return self.sessionInfo.encryptResponse(msg);
   };
 
   var generalResponse = function(err, data) {
+    let status = 200;
     if (err) {
       if (err.hasOwnProperty('errorCode')) {
         err.description = errorCodeLookup(err.errorCode);
       }
+      if (err.description && err.description.toLowerCase().indexOf('notfound') > -1) {
+        status = 404;
+      }
       err = encrypt(err);
-      return self.res.status(500).send(err);
+      return self.res.status(400).send(err);
     }
-    let status = data ? 200 : 202;
     if (data) {
       self.res.status(status).send(encrypt(formatResponse(data)));
     } else {
@@ -177,13 +179,18 @@ export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
     }
   };
 
-  var fileReponse = function(err, data) {
+  var fileResponse = function(err, data) {
+    var status = 200;
     if (err) {
+      status = 400;
       if (err.hasOwnProperty('errorCode')) {
         err.description = errorCodeLookup(err.errorCode);
       }
+      if (err.description && err.description.toLowerCase().indexOf('notfound') > -1) {
+        status = 404;
+      }
       err = encrypt(err);
-      return self.res.status(500).send(err);
+      return self.res.status(status).send(err);
     }
     data = formatResponse(data);
     var content = new Buffer(data.content, 'base64');
@@ -197,11 +204,13 @@ export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
     self.res.set('file-size', data.metadata.size);
     self.res.set('file-created-time', data.metadata.createdOn);
     self.res.set('file-modified-time', data.metadata.modifiedOn);
-    self.res.set('file-metadata', data.metadata.userMetadata);
-    res.status(200).send(content);
+    if (data.metadata.userMetadata) {
+      self.res.set('file-metadata', data.metadata.userMetadata);
+    }
+    res.status(status).send(content);
   };
 
-  self.onResponse = self.isFileResponse ? fileReponse : generalResponse;
+  self.onResponse = self.isFileResponse ? fileResponse : generalResponse;
 
   return self;
 };

@@ -10,3 +10,4 @@ Thumbs.db
 /app/api/ffi/safe_ffi.dll
 /app/bower_components
 /app_dist
+/.idea
