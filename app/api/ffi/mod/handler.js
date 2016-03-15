@@ -55,7 +55,9 @@ module.exports = function(libPath) {
   var loadLibrary = function() {
     try {
       lib = ffi.Library(libPath, methodsToRegister());
+      /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
       return lib.init_logging() === 0;
+      /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     } catch (e) {
       console.log('Ffi load error', e);
     }

@@ -16,28 +16,30 @@ export function errorCodeLookup(errCode) {
       return 'CoreError::ReceivedUnexpectedData';
     case CLIENT_ERROR_START_RANGE - 5:
       return 'CoreError::VersionCacheMiss';
-    case CLIENT_ERROR_START_RANGE - 6:
-      return 'CoreError::RoutingMessageCacheMiss';
-    case CLIENT_ERROR_START_RANGE - 8:
+    case CLIENT_ERROR_START_RANGE - 7:
       return 'CoreError::RootDirectoryAlreadyExists';
-    case CLIENT_ERROR_START_RANGE - 9:
+    case CLIENT_ERROR_START_RANGE - 8:
       return 'CoreError::RandomDataGenerationFailure';
-    case CLIENT_ERROR_START_RANGE - 10:
+    case CLIENT_ERROR_START_RANGE - 9:
       return 'CoreError::OperationForbiddenForClient';
-    case CLIENT_ERROR_START_RANGE - 11:
+    case CLIENT_ERROR_START_RANGE - 10:
       return 'CoreError::Unexpected';
-    case CLIENT_ERROR_START_RANGE - 12:
+    case CLIENT_ERROR_START_RANGE - 11:
       return 'CoreError::RoutingError';
-    case CLIENT_ERROR_START_RANGE - 13:
+    case CLIENT_ERROR_START_RANGE - 12:
       return 'CoreError::RoutingInterfaceError';
-    case CLIENT_ERROR_START_RANGE - 14:
+    case CLIENT_ERROR_START_RANGE - 13:
       return 'CoreError::UnsupportedSaltSizeForPwHash';
-    case CLIENT_ERROR_START_RANGE - 15:
+    case CLIENT_ERROR_START_RANGE - 14:
       return 'CoreError::UnsuccessfulPwHash';
-    case CLIENT_ERROR_START_RANGE - 16:
+    case CLIENT_ERROR_START_RANGE - 15:
       return 'CoreError::OperationAborted';
-    case CLIENT_ERROR_START_RANGE - 17:
+    case CLIENT_ERROR_START_RANGE - 16:
       return 'CoreError::MpidMessagingError';
+    case CLIENT_ERROR_START_RANGE - 17:
+      return 'CoreError::GetFailure';
+    case CLIENT_ERROR_START_RANGE - 18:
+      return 'CoreError::MutationFailure';  
     case NFS_ERROR_START_RANGE - 1:
       return 'NfsError::DirectoryAlreadyExistsWithSameName';
     case NFS_ERROR_START_RANGE - 2:
