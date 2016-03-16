@@ -17,6 +17,20 @@ npm start
 
 # Development
 
+### Using Vagrant
+
+We are providing a virtual machine image to make development very easy. You will need [vagrant](https://www.vagrantup.com/) and [virtualbox](https://www.virtualbox.org/). You can set the system up by running:
+
+```
+vagrant up
+```
+
+From within the root directory. The first run might take a while as vagrant will download the image, the latest version of nodejs (latest 0.5) and rust (latest stable) and compile safe_ffi (github master) for you (and put it inside the appropriate launcher directory). Once everything is done, you can log into the system by running `vagrant ssh` and install and run this version of the safe launcher via `cd /vagrant && npm install && npm start`. Once you are done, you can stop the virtual machine by running `vagrant suspend` outside of that box and just do `vagrant up` again to bring it back up.
+
+**Updating the image**: safe_ffi will automatically fetch the latest version and build that on every `vagrant up` or `vagrant reload` (if you want to trigger that). To update rust or node, you need to _provision_ the vagrant image again: In order to do that, run `vagrant reload --provision`.
+
+
+
 #### Installation
 
 ```
