@@ -9,6 +9,7 @@
 - Post Package workflow integration
 - API Version Updated to 0.4
 - Error Codes updated to match with safe_core
+- CORS `Authorization` header added to permitted header list
 
 ##[0.4.0]
   - UX update
