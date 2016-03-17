@@ -4,8 +4,11 @@
 // window from here.
 
 import env from './env';
-import { app, BrowserWindow } from 'electron';
-import devHelper from './vendor/electron_boilerplate/dev_helper';
+import { app, BrowserWindow, remote } from 'electron';
+import { setAppMenu } from './vendor/electron_boilerplate/menu_helper';
+
+const Menu = remote.Menu;
+const MenuItem = remote.MenuItem;
 
 var mainWindow;
 
@@ -17,10 +20,15 @@ app.on('ready', function() {
   });
   mainWindow.loadURL('file://' + __dirname + '/app.html');
 
+
   if (env.name !== 'production') {
-    devHelper.setDevMenu();
+    setAppMenu(false);
     mainWindow.openDevTools();
+  } else {
+    setAppMenu(false);
   }
+
+  mainWindow.setMenuBarVisibility(false);
   //
   // mainWindow.on('blur', function(d) {
   //   if (env.name !== 'production') {
