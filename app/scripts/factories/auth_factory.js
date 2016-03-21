@@ -1,8 +1,8 @@
 /**
  * Authentication Factory
  */
-window.safeLauncher.factory('authFactory', [
-  function() {
+window.safeLauncher.factory('authFactory', [ 'serverFactory',
+  function(server) {
     var self = this;
 
     // Login
@@ -14,6 +14,9 @@ window.safeLauncher.factory('authFactory', [
     self.register = function(user, callback) {
       window.msl.register(user.pin, user.keyword, user.password, callback);
     };
+
+    self.onAuthorisationReq = server.onAuthRequest;
+    self.confirmAuthorisation = server.confirmResponse;
 
     return self;
   }

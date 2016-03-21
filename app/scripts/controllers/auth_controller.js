@@ -10,6 +10,13 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     $scope.user = {};
     $scope.formError = null;
 
+    // handle authorisation before user logged-in
+    auth.onAuthorisationReq(function(payload) {
+      if (!$rootScope.isUserLogged) {
+        auth.confirmAuthorisation(payload, false);
+      }
+    });
+
     // registration tabbing
     $scope.tabs = {
       state: [ 'PIN', 'KEYWORD', 'PASSWORD' ],
@@ -87,6 +94,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         return $scope.$applyAsync();
       }
       $rootScope.network.hide();
+      $rootScope.isUserLogged = true;
       $state.go('user');
     };
 
