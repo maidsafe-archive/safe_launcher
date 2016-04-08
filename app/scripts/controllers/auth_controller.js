@@ -12,7 +12,8 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
 
     // handle authorisation before user logged-in
     auth.onAuthorisationReq(function(payload) {
-      if (!$rootScope.isUserLogged) {
+      // expected userLogged to be "true" or "false"
+      if (!JSON.parse($state.params.userLogged)) {
         auth.confirmAuthorisation(payload, false);
       }
     });
@@ -94,8 +95,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         return $scope.$applyAsync();
       }
       $rootScope.network.hide();
-      $rootScope.isUserLogged = true;
-      $state.go('user');
+      $state.go('user', { userLogged: true });
     };
 
     // register user

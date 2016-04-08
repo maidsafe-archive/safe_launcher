@@ -14,7 +14,6 @@ window.safeLauncher = angular
 ])
 .run([ '$rootScope', '$state', '$stateParams', function($rootScope, $state, $stateParams) {
   $rootScope.$state = $state;
-  $rootScope.isUserLogged = false;
   $rootScope.$stateParams = $stateParams;
   $rootScope.$loader = {
     isLoading: false,
