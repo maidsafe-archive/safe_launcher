@@ -2,22 +2,18 @@
  * Router
  */
 window.safeLauncher.config(function($stateProvider, $urlRouterProvider) {
-  $urlRouterProvider.otherwise(function($injector, $location) {
-    var state = $injector.get('$state');
-    state.go('login', { userLogged: false });
-    return $location.path();
-  });
+  $urlRouterProvider.otherwise('login');
   $stateProvider
   .state('login', {
-      url: '/login?userLogged',
+      url: '/login',
       templateUrl: 'views/auth/login.html'
     })
   .state('register', {
-    url: '/register?userLogged',
+    url: '/register',
     templateUrl: 'views/auth/register.html'
   })
   .state('user', {
-    url: '/user?userLogged',
+    url: '/user',
     templateUrl: 'views/user/base.html'
   });
 });
