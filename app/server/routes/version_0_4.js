@@ -31,4 +31,4 @@ router.get('/dns/:serviceName/:longName/:filePath', DNS.getFile);
 router.get('/dns', DNS.listLongNames);
 router.get('/dns/:longName', DNS.listServices);
 
-export { router as versionOneRouter };
+export { router as router_0_4 };

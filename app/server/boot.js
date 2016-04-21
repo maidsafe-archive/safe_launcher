@@ -4,7 +4,7 @@ import express from 'express';
 import EventEmitter from 'events';
 import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
-import { versionOneRouter } from './routes/version_one';
+import { router_0_4 } from './routes/version_0_4';
 import { CreateSession } from './controllers/auth';
 import { decryptRequest } from './utils';
 
@@ -56,7 +56,8 @@ export default class RESTServer {
 
     app.use(function(req, res, next) {
       res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+      res.header("Access-Control-Allow-Methods", "DELETE, GET, OPTIONS, POST, PUT");
       next();
     });
 
@@ -80,8 +81,8 @@ export default class RESTServer {
     app.get('/pac-file', function(req, res) {
       res.download(path.resolve(__dirname, 'server/web_proxy.pac'));
     });
-    app.use('/', versionOneRouter);
-    app.use('/v1', versionOneRouter);
+    app.use('/', router_0_4);
+    app.use('/0.4', router_0_4);
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {
