@@ -1,5 +1,8 @@
 # SAFE Launcher Change Log
 
+##[0.4.2]
+  - safe_ffi 0.6.2
+
 ##[0.4.1]
 - safe_ffi 0.5.0
 - 500 Error code removed
