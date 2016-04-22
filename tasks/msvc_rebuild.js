@@ -4,6 +4,8 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var childProcess = require('child_process');
 var path = require('path');
+var os = require('os');
+var electronVersion = require(path.resolve('./node_modules/electron-prebuilt/package.json')).version;
 
 var packagerPath = path.resolve('./node_modules/.bin/npm');
 if (process.platform === 'win32') {
@@ -11,19 +13,19 @@ if (process.platform === 'win32') {
 }
 
 var executeMsvcRebuild = function() {
-    var msvcVersion = gutil.env.msvc_version;
-    if (!msvcVersion) {
-      throw '--msvc_version params required';
-    }
-    var childp = childProcess.spawn(packagerPath, [
-      'config',
-      'set',
-      'msvs_version',
-      msvcVersion
-    ]);
-
-    childp.on('error', function(err) {
-      gutil.log(err);
+    // var msvcVersion = gutil.env.msvc_version;
+    // if (!msvcVersion) {
+    //   throw '--msvc_version params required';
+    // }
+    var targetPaths = [ './app/node_modules/ref', './app/node_modules/ffi' ];
+    targetPaths.forEach(function(target) {
+      var childp = childProcess.exec('cd ' + path.resolve(target) + ' && node-gyp rebuild --target=' +
+        electronVersion + ' --arch=' + os.arch() + ' --dist-url=https://atom.io/download/atom-shell', function(err, stdout) {
+          if (err) {
+            return gutil.log(err);
+          }
+          gutil.log(stdout);
+        });
     });
 };
 

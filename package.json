@@ -34,7 +34,7 @@
     "start": "node ./tasks/start",
     "test": "gulp test",
     "package": "gulp package --env=production",
-    "msvc_rebuild": "gulp msvc_rebuild --msvc_version"
+    "msvc_rebuild": "gulp msvc_rebuild"
   },
   "dependencies": {}
 }
