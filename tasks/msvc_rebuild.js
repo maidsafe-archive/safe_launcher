@@ -13,10 +13,6 @@ if (process.platform === 'win32') {
 }
 
 var executeMsvcRebuild = function() {
-    // var msvcVersion = gutil.env.msvc_version;
-    // if (!msvcVersion) {
-    //   throw '--msvc_version params required';
-    // }
     var targetPaths = [ './app/node_modules/ref', './app/node_modules/ffi' ];
     targetPaths.forEach(function(target) {
       var childp = childProcess.exec('cd ' + path.resolve(target) + ' && node-gyp rebuild --target=' +
