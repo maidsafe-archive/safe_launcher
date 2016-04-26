@@ -10,6 +10,8 @@ var electronVersion = require(path.resolve('./node_modules/electron-prebuilt/pac
 var packagerPath = path.resolve('./node_modules/.bin/npm');
 if (process.platform === 'win32') {
   packagerPath += '.cmd';
+} else {
+  return gutil.error('msvc_rebuild is supported only on Windows');
 }
 
 var executeMsvcRebuild = function() {
