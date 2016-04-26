@@ -10,6 +10,13 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     $scope.user = {};
     $scope.formError = null;
 
+    // handle authorisation before user logged-in
+    auth.onAuthorisationReq(function(payload) {
+      if (!$rootScope.isAuthenticated) {
+        auth.confirmAuthorisation(payload, false);
+      }
+    });
+
     // registration tabbing
     $scope.tabs = {
       state: [ 'PIN', 'KEYWORD', 'PASSWORD' ],
