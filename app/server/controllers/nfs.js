@@ -4,7 +4,7 @@ import fs from 'fs';
 
 
 class FileUploader {
-  
+
   constructor(req, res, sessionInfo, responseHandler) {
     this.req = req;
     this.res = res;
@@ -12,15 +12,14 @@ class FileUploader {
     this.responseHandler = responseHandler;
   }
 
-  upload() {    
+  upload() {
     let reqBody = JSON.parse(this.req.body.toString());
-    console.log(reqBody);
     let fileContent = fs.readFileSync(reqBody.localFilePath).toString('base64');
     this.req.app.get('api').nfs.modifyFileContent(fileContent, 0, reqBody.filePath, reqBody.isPathShared,
     this.sessionInfo.appDirKey, this.sessionInfo.hasSafeDriveAccess(), this.responseHandler.onResponse);
   }
 
-};
+}
 
 
 let deleteOrGetDirectory = function(req, res, isDelete) {
@@ -137,20 +136,19 @@ export var createFile = function(req, res) {
     return responseHandler.onResponse('Invalid request. filePath missing');
   }
   reqBody.isPathShared = reqBody.isPathShared || false;
-  reqBody.metadata = reqBody.metadata || '';  
+  reqBody.metadata = reqBody.metadata || '';
   req.app.get('api').nfs.createFile(reqBody.filePath, reqBody.metadata, reqBody.isPathShared,
     sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), function(err) {
       if (err) {
         return responseHandler.onResponse(err);
       }
-      console.log('localFilePath', reqBody.localFilePath);
       if (reqBody.localFilePath) {
         try {
           if (fs.statSync(reqBody.localFilePath).isFile()) {
             uploader = new FileUploader(req, res, sessionInfo, responseHandler);
             uploader.upload();
           } else {
-            responseHandler.onResponse('localFilePath is not a file');    
+            responseHandler.onResponse('localFilePath is not referring to a valid file');
           }
         } catch (e) {
           return responseHandler.onResponse('localFilePath is not valid' + e.message);
