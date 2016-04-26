@@ -125,7 +125,6 @@ export var modifyDirectory = function(req, res) {
 
 
 export var createFile = function(req, res) {
-  let uploader;
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
     return res.sendStatus(401);
@@ -145,7 +144,7 @@ export var createFile = function(req, res) {
       if (reqBody.localFilePath) {
         try {
           if (fs.statSync(reqBody.localFilePath).isFile()) {
-            uploader = new FileUploader(req, res, sessionInfo, responseHandler);
+            let uploader = new FileUploader(req, res, sessionInfo, responseHandler);
             uploader.upload();
           } else {
             responseHandler.onResponse('localFilePath is not referring to a valid file');
