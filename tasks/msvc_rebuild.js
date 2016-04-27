@@ -7,10 +7,7 @@ var path = require('path');
 var os = require('os');
 var electronVersion = require(path.resolve('./node_modules/electron-prebuilt/package.json')).version;
 
-var packagerPath = path.resolve('./node_modules/.bin/npm');
-if (process.platform === 'win32') {
-  packagerPath += '.cmd';
-} else {
+if (process.platform !== 'win32') {
   return gutil.error('msvc_rebuild is supported only on Windows');
 }
 
