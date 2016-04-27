@@ -8,7 +8,7 @@ var os = require('os');
 var electronVersion = require(path.resolve('./node_modules/electron-prebuilt/package.json')).version;
 
 if (process.platform !== 'win32') {
-  return gutil.error('msvc_rebuild is supported only on Windows');
+  return new gutil.PluginError('msvc_rebuild', 'msvc_rebuild is supported only on Windows');
 }
 
 var executeMsvcRebuild = function() {
