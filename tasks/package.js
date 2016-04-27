@@ -35,7 +35,7 @@ var packageForOs = {
   }
 };
 
-var onPackageCompleted = function(code) {  
+var onPackageCompleted = function(code) {
   if (code !== 0) {
     return;
   }
@@ -43,8 +43,8 @@ var onPackageCompleted = function(code) {
   var versionFileName = 'version';
   var filesToRemove = [ 'LICENSE', 'LICENSES.chromium.html' ];
   var appVersion = require(pathUtil.resolve('./app/package.json')).version;
-  
-  var versionFilePath = packagePath + versionFileName;  
+
+  var versionFilePath = pathUtil.resolve(packagePath, versionFileName);  
 
   filesToRemove.forEach(function(fileName) {
     fileName = pathUtil.resolve(packagePath, fileName);
@@ -52,14 +52,14 @@ var onPackageCompleted = function(code) {
       fs.unlinkSync(fileName);
     } catch (e) {
       if (e.code === 'ENOENT') {
-        gutil.log('%s file not present to be deleted', fileName);  
+        gutil.log('%s file not present to be deleted', fileName);
       } else {
         throw e;
       }
     }
   });
-  gutil.log('Updating version file');  
-  fs.writeFileSync(versionFilePath, appVersion);  
+  gutil.log('Updating version file');
+  fs.writeFileSync(versionFilePath, appVersion);
 };
 
 var packageApp = function() {
