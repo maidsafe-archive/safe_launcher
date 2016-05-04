@@ -1,11 +1,28 @@
 'use strict'
 
 var gulp = require('gulp');
+var gutils = require('gulp-util');
 var pathUtil = require('path');
 var jscs = require('gulp-jscs');
 var jshint = require('gulp-jshint');
 var stylish = require('gulp-jscs-stylish');
 var childProcess = require('child_process');
+var babel = require('gulp-babel');
+var fse = require('fs-extra')
+var path = require('path');
+var exec = require('child_process').exec;
+
+var destDir = path.resolve('testApp');
+
+var apiPaths = [
+  './app/api/**',
+  '!./app/api/ffi/safe_ffi.dll'
+];
+
+var serverPaths = [
+  './app/server/**',
+];
+
 
 var gulpPath = pathUtil.resolve('./node_modules/.bin/electron-mocha');
 if (process.platform === 'win32') {
@@ -15,12 +32,12 @@ if (process.platform === 'win32') {
 process.env['mocha-unfunk-style'] = 'plain';
 
 var runMochaTests = function() {
-  childProcess.spawn(gulpPath, [
+  var mochaTest = childProcess.spawn(gulpPath, [
     '--renderder',
     '--compilers',
     'js:babel-core/register',
     '--timeout',
-    '30000',
+    '50000',
     '-R',
     'mocha-unfunk-reporter',
     './tests/*'
@@ -29,17 +46,54 @@ var runMochaTests = function() {
   });
 }
 
+gulp.task('babelApi', function() {
+  gulp.src(apiPaths)
+  .pipe(babel())
+  .pipe(gulp.dest(path.resolve(destDir, 'api')));
+});
+
+gulp.task('babelServer', function() {
+  gulp.src(serverPaths)
+  .pipe(babel())
+  .pipe(gulp.dest(path.resolve(destDir, 'server')));
+});
+
+gulp.task('clean', function() {
+  fse.removeSync('./testApp/api');
+  fse.removeSync('./testApp/server');
+});
+
+gulp.task('copy', function() {
+  fse.copySync('./app/api/ffi/safe_ffi.dll', path.resolve(destDir, 'api', 'ffi', 'safe_ffi.dll'));
+  fse.copySync('./app/package.json', path.resolve(destDir, 'package.json'));
+});
+
+gulp.task('installPackages', function(cb) {
+  exec('cd testApp && npm install', function(err, stdout, stderr) {
+    console.log(stdout);
+    console.log(stderr);
+    cb(err);
+  });
+});
+
+gulp.task('msvc_rebuild', function(cb) {
+  exec('npm run msvc_rebuild --env=test', function(err, stdout, stderr) {
+    console.log(stdout);
+    console.log(stderr);
+    cb(err);
+  });
+});
+
 var executeTest = function() {
 
-  gulp.src(['./app/*.js', './app/api/**/**/*.js', './app/scripts/**/*js'])
-    .pipe(jshint({
-      esnext: true
-    })) // hint (optional)
-    .pipe(jscs()) // enforce style guide
-    .pipe(stylish.combineWithHintResults()) // combine with jshint results
-    .pipe(jshint.reporter('jshint-stylish'));
-
-  // runMochaTests();
+  // gulp.src(['./app/*.js', './app/api/**/**/*.js', './app/scripts/**/*js'])
+  //   .pipe(jshint({
+  //     esnext: true
+  //   })) // hint (optional)
+    // .pipe(jscs()) // enforce style guide
+    // .pipe(stylish.combineWithHintResults()) // combine with jshint results
+    // .pipe(jshint.reporter('jshint-stylish'));
+    runMochaTests();
 };
 
-gulp.task('test', executeTest);
+gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'copy', 'installPackages', 'msvc_rebuild' ], executeTest);

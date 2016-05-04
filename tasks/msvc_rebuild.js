@@ -13,6 +13,8 @@ if (process.platform !== 'win32') {
 
 var executeMsvcRebuild = function() {
     var targetPaths = [ './app/node_modules/ref', './app/node_modules/ffi' ];
+    var testTargetPaths = [ './testApp/node_modules/ref', './testApp/node_modules/ffi' ];
+    targetPaths = gutil.env._[0] === 'test' ? testTargetPaths : targetPaths;
     targetPaths.forEach(function(target) {
       var childp = childProcess.exec('cd ' + path.resolve(target) + ' && node-gyp rebuild --target=' +
         electronVersion + ' --arch=' + os.arch() + ' --dist-url=https://atom.io/download/atom-shell', function(err, stdout) {
