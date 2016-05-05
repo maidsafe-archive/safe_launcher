@@ -11,10 +11,11 @@ import { decryptRequest } from './utils';
 class ServerEventEmitter extends EventEmitter {};
 
 export default class RESTServer {
-  constructor(api, port) {
+  constructor(api, port, callback) {
     this.port = port;
     this.app = express();
     this.server = null;
+    this.callback = callback || function() {};
     this.EVENT_TYPE = {
       ERROR: 'error',
       STARTED: 'started',
@@ -98,22 +99,17 @@ export default class RESTServer {
     });
     app.set('port', this.port);
     this.server = http.createServer(app);
-    this.server.listen(this.port, function() {
-      if (process.send) {
-        console.log('listening');
-        process.send('listening');
-      }
-    });
+    this.server.listen(this.port, this.callback);
     this.server.on('error', this._onError(this.EVENT_TYPE.ERROR, eventEmitter));
     this.server.on('close', this._onClose(this.EVENT_TYPE.STOPPED, eventEmitter));
     this.server.on('listening', this._onListening(this.EVENT_TYPE.STARTED, eventEmitter));
   }
 
   stop() {
-    if (!server) {
+    if (!this.server) {
       return;
     }
-    server.close();
+    this.server.close();
   }
 
   removeSession(id) {

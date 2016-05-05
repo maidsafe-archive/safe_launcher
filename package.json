@@ -20,6 +20,7 @@
     "jshint": "^2.9.1",
     "mocha-unfunk-reporter": "^0.4.0",
     "q": "^1.4.1",
+    "request": "^2.72.0",
     "rollup": "^0.21.0",
     "should": "^8.2.1",
     "tree-kill": "^0.1.1",
