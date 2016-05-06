@@ -1,7 +1,5 @@
 var should = require('should');
 var utils = require('./test_utils');
-var fork = require('child_process').fork;
-var request = require('request');
 
 describe('Authorisation', function() {
   var child = null;

@@ -148,6 +148,33 @@ var revokeApp = function(token, callback) {
   });
 };
 
+var createDir = function(token, dirPath, callback) {
+  var payload = {
+    dirPath: dirPath,
+    isPrivate: true,
+    userMetadata: '',
+    isVersioned: false,
+    isPathShared: false
+  };
+  payload = new Uint8Array(new Buffer(JSON.stringify(payload)));
+  payload = new Buffer(sodium.crypto_secretbox_easy(payload, keys.symNonce, keys.symKey)).toString('base64');
+  request({
+    method: 'POST',
+    uri: SERVER_URL + '/nfs/directory',
+    headers: {
+      'content-type': 'text/plain',
+      'authorization': token
+    },
+    body: payload
+  }, function(err, res, body) {
+    if (err) {
+      console.error(err);
+      return process.exit();
+    }
+    callback(res.statusCode);
+  });
+};
+
 module.exports = {
   login: login,
   register: register,
@@ -158,4 +185,5 @@ module.exports = {
   removeAllEventListener: removeAllEventListener,
   getToken: getToken,
   revokeApp: revokeApp,
+  createDir: createDir,
 };
