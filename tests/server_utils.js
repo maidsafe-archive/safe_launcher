@@ -12,3 +12,24 @@ exports.start = function(port, callback) {
 exports.stop = function() {
   server.stop();
 };
+
+exports.registerAuthApproval = function(allow) {
+  server.addEventListener(server.EVENT_TYPE.AUTH_REQUEST, function(payload) {
+    if (allow) {
+      return server.authApproved(payload);
+    }
+    return server.authRejected(payload);
+  });
+};
+
+exports.removeAllEventListener = function() {
+  server.removeAllEventListener(server.EVENT_TYPE.AUTH_REQUEST);
+};
+
+exports.login = function(pin, keyword, password, callback) {
+  api.auth.login(String(pin), keyword, password, callback)
+};
+
+exports.register = function(pin, keyword, password, callback) {
+  api.auth.register(String(pin), keyword, password, callback);
+};
