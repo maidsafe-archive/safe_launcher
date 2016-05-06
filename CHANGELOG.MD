@@ -1,5 +1,8 @@
 # SAFE Launcher Change Log
 
+##[0.4.3]
+  - safe_ffi dependencies updated
+
 ##[0.4.2]
   - safe_ffi 0.6.2
 
