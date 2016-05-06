@@ -175,6 +175,40 @@ var createDir = function(token, dirPath, callback) {
   });
 };
 
+var deleteDir = function(token, dirName, callback) {
+  request({
+    method: 'DELETE',
+    uri: SERVER_URL + '/nfs/directory/' + dirName + '/false',
+    headers: {
+      'content-type': 'text/plain',
+      'authorization': token
+    }
+  }, function(err, res, body) {
+    if (err) {
+      console.error(err);
+      return process.exit();
+    }
+    callback(res.statusCode);
+  });
+};
+
+var getDir = function(token, dirName, callback) {
+  request({
+    method: 'GET',
+    uri: SERVER_URL + '/nfs/directory/' + dirName + '/false',
+    headers: {
+      'content-type': 'text/plain',
+      'authorization': token
+    }
+  }, function(err, res, body) {
+    if (err) {
+      console.error(err);
+      return process.exit();
+    }
+    callback(res.statusCode);
+  });
+};
+
 module.exports = {
   login: login,
   register: register,
@@ -186,4 +220,6 @@ module.exports = {
   getToken: getToken,
   revokeApp: revokeApp,
   createDir: createDir,
+  deleteDir: deleteDir,
+  getDir: getDir,
 };
