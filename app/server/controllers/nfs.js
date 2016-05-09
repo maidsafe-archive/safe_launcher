@@ -225,7 +225,7 @@ export var modifyFileContent = function(req, res) {
     return responseHandler.onResponse('Invalid request.');
   }
 
-  if (query.offset && isNaN(query.offset)) {
+  if (!query.offset || isNaN(query.offset)) {
     return responseHandler.onResponse('Invalid request. offset should be a number');
   }
 
