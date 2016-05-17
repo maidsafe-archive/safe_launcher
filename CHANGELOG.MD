@@ -1,5 +1,9 @@
 # SAFE Launcher Change Log
 
+##[0.4.4]
+  - depend on safe_core instead of the deprecated safe_ffi
+  - dependency updated to safe_core 0.14.6
+
 ##[0.4.3]
   - safe_ffi dependencies updated
 
