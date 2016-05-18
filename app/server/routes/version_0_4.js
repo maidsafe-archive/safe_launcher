@@ -29,7 +29,7 @@ router.put('/dns', DNS.addService);
 router.delete('/dns/:longName', DNS.deleteDns);
 router.delete('/dns/:serviceName/:longName', DNS.deleteService);
 router.get('/dns/:serviceName/:longName', DNS.getHomeDirectory);
-router.get('/dns/:serviceName/:longName/:filePath', DNS.getFile);
+router.get('/dns/:filePath/:serviceName/:longName', DNS.getFile);
 router.get('/dns', DNS.listLongNames);
 router.get('/dns/:longName', DNS.listServices);
 

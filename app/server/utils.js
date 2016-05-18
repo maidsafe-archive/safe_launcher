@@ -71,7 +71,7 @@ export var decryptRequest = function(req, res, next) {
     req.headers['sessionId'] = sessionId;
     next();
   } catch (e) {
-    return res.sendStatus(401);
+    return res.status(400).send(e);
   }
 }
 

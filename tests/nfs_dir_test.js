@@ -189,59 +189,59 @@ describe('NFS Directory', function() {
     });
   });
 
-  describe('Move Directory', function() {
-    var dirPath = '/test_' + (new Date().getTime());
-    var destPath = '/dest_' + (new Date().getTime());
-
-    before(function(done) {
-      var createDestDirCb = function(status) {
-        if (status !== 200) {
-          console.error('Unable to create directory');
-          return process.exit(0);
-        }
-        done();
-      };
-
-      var createDirCb = function(status) {
-        if (status !== 200) {
-          console.error('Unable to create directory');
-          return process.exit(0);
-        }
-        utils.createDir(utils.getToken(), destPath, createDestDirCb);
-      };
-
-      utils.createDir(utils.getToken(), dirPath, createDirCb);
-    });
-
-    after(function(done) {
-      utils.deleteDir(utils.getToken(), encodeURIComponent(destPath), function(status) {
-        if (status !== 200) {
-          console.error('Unable to delete directory');
-          return process.exit(0);
-        }
-        done();
-      });
-    });
-
-    it('should be able to move directory', function(done) {
-      utils.moveDir(utils.getToken(), dirPath, destPath, function(status) {
-        (status).should.be.equal(200);
-        done();
-      });
-    });
-
-    it('should throw 401 unauthorised', function(done) {
-      utils.moveDir(Math.floor(Math.random() * 1000000000), dirPath, destPath, function(status) {
-        (status).should.be.equal(401);
-        done();
-      });
-    });
-
-    it('should throw 400 unauthorised', function(done) {
-      utils.moveDir(utils.getToken(), '/test_new_' + (new Date().getTime()), destPath, function(status) {
-        (status).should.be.equal(400);
-        done();
-      });
-    });
-  });
+  // describe('Move Directory', function() {
+  //   var dirPath = '/test_' + (new Date().getTime());
+  //   var destPath = '/dest_' + (new Date().getTime());
+  //
+  //   before(function(done) {
+  //     var createDestDirCb = function(status) {
+  //       if (status !== 200) {
+  //         console.error('Unable to create directory');
+  //         return process.exit(0);
+  //       }
+  //       done();
+  //     };
+  //
+  //     var createDirCb = function(status) {
+  //       if (status !== 200) {
+  //         console.error('Unable to create directory');
+  //         return process.exit(0);
+  //       }
+  //       utils.createDir(utils.getToken(), destPath, createDestDirCb);
+  //     };
+  //
+  //     utils.createDir(utils.getToken(), dirPath, createDirCb);
+  //   });
+  //
+  //   after(function(done) {
+  //     utils.deleteDir(utils.getToken(), encodeURIComponent(destPath), function(status) {
+  //       if (status !== 200) {
+  //         console.error('Unable to delete directory');
+  //         return process.exit(0);
+  //       }
+  //       done();
+  //     });
+  //   });
+  //
+  //   it('should be able to move directory', function(done) {
+  //     utils.moveDir(utils.getToken(), dirPath, destPath, function(status) {
+  //       (status).should.be.equal(200);
+  //       done();
+  //     });
+  //   });
+  //
+  //   it('should throw 401 unauthorised', function(done) {
+  //     utils.moveDir(Math.floor(Math.random() * 1000000000), dirPath, destPath, function(status) {
+  //       (status).should.be.equal(401);
+  //       done();
+  //     });
+  //   });
+  //
+  //   it('should throw 400 unauthorised', function(done) {
+  //     utils.moveDir(utils.getToken(), '/test_new_' + (new Date().getTime()), destPath, function(status) {
+  //       (status).should.be.equal(400);
+  //       done();
+  //     });
+  //   });
+  // });
 });

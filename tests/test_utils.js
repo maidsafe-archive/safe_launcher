@@ -401,6 +401,168 @@ var moveDir = function(token, srcPath, destPath, callback) {
   });
 };
 
+// DNS
+var registerDns = function(token, longName, serviceName, dirPath, callback) {
+  var payload = {
+    longName: longName,
+    serviceName: serviceName,
+    serviceHomeDirPath: dirPath,
+    isPathShared: false
+  };
+  payload = encryptPayload(payload);
+  request({
+    method: 'POST',
+    uri: SERVER_URL + '/dns',
+    headers: {
+      'content-type': 'text/plain',
+      'authorization': token
+    },
+    body: payload
+  }, function(err, res, body) {
+    if (err) {
+      return process.exit(0);
+    }
+    callback(res.statusCode);
+  });
+};
+
+var deleteDns = function(token, longName, callback) {
+  request({
+    method: 'DELETE',
+    uri: SERVER_URL + '/dns/' + encodeURIComponent(longName),
+    headers: {
+      'content-type': 'text/plain',
+      'authorization': token
+    }
+  }, function(err, res, body) {
+    if (err) {
+      return process.exit(0);
+    }
+    callback(res.statusCode);
+  });
+};
+
+var createPublicId = function(token, longName, callback) {
+  request({
+    method: 'POST',
+    uri: SERVER_URL + '/dns/' + encodeURIComponent(longName),
+    headers: {
+      'content-type': 'text/plain',
+      'authorization': token
+    }
+  }, function(err, res, body) {
+    if (err) {
+      return process.exit(0);
+    }
+    callback(res.statusCode);
+  });
+};
+
+var addService = function(token, longName, serviceName, dirPath, callback) {
+  var payload = {
+    longName: longName,
+    serviceName: serviceName,
+    serviceHomeDirPath: dirPath,
+    isPathShared: false
+  };
+  payload = encryptPayload(payload);
+  request({
+    method: 'PUT',
+    uri: SERVER_URL + '/dns',
+    headers: {
+      'content-type': 'text/plain',
+      'authorization': token
+    },
+    body: payload
+  }, function(err, res, body) {
+    if (err) {
+      return process.exit(0);
+    }
+    callback(res.statusCode);
+  });
+};
+
+var deleteService = function(token, longName, serviceName, callback) {
+  request({
+    method: 'DELETE',
+    uri: SERVER_URL + '/dns/' + encodeURIComponent(serviceName) + '/' + encodeURIComponent(longName),
+    headers: {
+      'content-type': 'text/plain',
+      'authorization': token
+    }
+  }, function(err, res, body) {
+    if (err) {
+      return process.exit(0);
+    }
+    callback(res.statusCode);
+  });
+};
+
+var getHomeDir = function(token, longName, serviceName, callback) {
+  request({
+    method: 'GET',
+    uri: SERVER_URL + '/dns/' + encodeURIComponent(serviceName) + '/' + encodeURIComponent(longName),
+    headers: {
+      'content-type': 'text/plain',
+      'authorization': token
+    }
+  }, function(err, res, body) {
+    if (err) {
+      return process.exit(0);
+    }
+    callback(res.statusCode);
+  });
+};
+
+var getFilePath = function(token, longName, serviceName, filePath, callback) {
+  var url = SERVER_URL + '/dns/' + encodeURIComponent(filePath) + '/' + encodeURIComponent(serviceName) + '/' + encodeURIComponent(longName);
+  request({
+    method: 'GET',
+    uri: url,
+    headers: {
+      'content-type': 'text/plain',
+      'authorization': token
+    }
+  }, function(err, res, body) {
+    if (err) {
+      return process.exit(0);
+    }
+    callback(res.statusCode);
+  });
+};
+
+var getLongNames = function(token, callback) {
+  request({
+    method: 'GET',
+    uri: SERVER_URL + '/dns',
+    headers: {
+      'content-type': 'text/plain',
+      'authorization': token
+    }
+  }, function(err, res, body) {
+    if (err) {
+      return process.exit(0);
+    }
+    callback(res.statusCode);
+  });
+};
+
+var getServices = function(token, longName, callback) {
+  request({
+    method: 'GET',
+    uri: SERVER_URL + '/dns/' + encodeURIComponent(longName),
+    headers: {
+      'content-type': 'text/plain',
+      'authorization': token
+    }
+  }, function(err, res, body) {
+    if (err) {
+      return process.exit(0);
+    }
+    callback(res.statusCode);
+  });
+};
+
 module.exports = {
   login: login,
   register: register,
@@ -422,4 +584,13 @@ module.exports = {
   updateFileContent: updateFileContent,
   moveFile: moveFile,
   moveDir: moveDir,
+  registerDns: registerDns,
+  deleteDns: deleteDns,
+  createPublicId: createPublicId,
+  addService: addService,
+  deleteService: deleteService,
+  getHomeDir: getHomeDir,
+  getFilePath: getFilePath,
+  getLongNames: getLongNames,
+  getServices: getServices,
 };
