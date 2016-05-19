@@ -65,7 +65,7 @@ export var decryptRequest = function(req, res, next) {
       let reqBodyUIntArray = new Uint8Array(new Buffer(req.body, 'base64'));
       let reqBody = sodium.crypto_secretbox_open_easy(reqBodyUIntArray, sessionInfo.nonce, sessionInfo.secretKey);
       req.body = new Buffer(reqBody);
-      log.debug('Decrypted Request Body ' + reqBody);
+      log.debug('Decrypted Request Body');
     }
     if (Object.keys(req.query).length > 0) {
       log.debug('Decrypting Request Query Parameters');
