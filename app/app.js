@@ -9,14 +9,23 @@ import * as api from './api/safe';
 import RESTServer from './server/boot';
 import childProcess from 'child_process';
 import { formatResponse } from './server/utils';
+import { log } from './logger/log';
+
+// log.init();
+log.debug('Application starting');
+
+// console.log(remote.global);
+// env.log = log;
 
 let restServer = new RESTServer(api, env.serverPort);
 let proxyServer = {
   process: null,
   start: function(proxyListener) {
     if (this.process) {
+      log.warn('Trying to start proxy server which is already running');
       return;
     }
+    log.info('Starting proxy server');
     this.process = childProcess.fork(path.resolve(__dirname, 'server/web_proxy.js'), [
       '--proxyPort',
       env.proxyPort,
@@ -24,13 +33,17 @@ let proxyServer = {
       env.serverPort
     ]);
     this.process.on('exit', function() {
+      log.info('Proxy server stopped');
       proxyListener.onExit('Porxy Server Closed');
     });
     this.process.on('message', function(msg) {
+      log.debug('Proxy Server - onMessage event - recieved - ' + msg);
       msg = JSON.parse(msg);
       if (msg.status) {
+        log.info('Proxy server started');
         return proxyListener.onStart(msg.data);
       }
+      log.error('Proxy server error :: ' + msg.data);
       proxyListener.onError(msg.data);
     });
   },
@@ -38,6 +51,7 @@ let proxyServer = {
     if (!this.process) {
       return;
     }
+    log.info('Stopping proxy server');
     this.process.kill();
     this.process = null;
   }
@@ -83,24 +97,28 @@ var onConnectionLost = function() {
 };
 
 api.setNetworkStateListener(function(state) {
+  log.debug('Network state change event recieved :: ' + state);
   switch (state) {
     case -1:
+    log.info('Network state change event :: FFI ERROR');
       onFfiProcessTerminated('FFI process terminated',
         'FFI process terminated and the application will not work as expected.' +
         'Try starting the application again.');
       break;
 
     case 0:
-      console.log('connected');
+      log.info('Connected with Network');
       window.msl.networkStateChange(NETWORK_STATE.CONNECTED);
       break;
 
     case 1:
+      log.info('Network connection lost');
       window.msl.networkStateChange(NETWORK_STATE.DISCONNECTED);
       onConnectionLost();
       break;
 
     case 2:
+      log.info('Network connection lost');
       window.msl.networkStateChange(NETWORK_STATE.DISCONNECTED);
       onConnectionLost();
       break;

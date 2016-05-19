@@ -1,3 +1,5 @@
+import { log } from './../../logger/log';
+
 export default class NFS {
 
   constructor(msgSender) {
@@ -7,6 +9,7 @@ export default class NFS {
 
   createDirectory(dirPath, isPrivate, isVersioned, userMetadata, isPathShared,
     hasSafeDriveAccess, appDirKey, callback) {
+    log.debug('Invoking API NFS::createDirectory - FFI::' + this.MODULE + '::create-dir');
     this.send({
       module: this.MODULE,
       action: 'create-dir',
@@ -24,6 +27,7 @@ export default class NFS {
   }
 
   getDirectory(dirPath, isPathShared, hasSafeDriveAccess, appDirKey, callback) {
+    log.debug('Invoking API NFS::getDirectory - FFI::' + this.MODULE + '::get-dir');
     this.send({
       module: this.MODULE,
       action: 'get-dir',
@@ -38,6 +42,7 @@ export default class NFS {
   }
 
   deleteDirectory(dirPath, isPathShared, hasSafeDriveAccess, appDirKey, callback) {
+      log.debug('Invoking API NFS::deleteDirectory - FFI::' + this.MODULE + '::delete-dir');
       this.send({
         module: this.MODULE,
         action: 'delete-dir',
@@ -52,6 +57,7 @@ export default class NFS {
     }
 
     modifyDirectory(name, userMetadata, dirPath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+      log.debug('Invoking API NFS::modifyDirectory - FFI::' + this.MODULE + '::modify-dir');
       var payload = {
         module: this.MODULE,
         action: 'modify-dir',
@@ -74,6 +80,7 @@ export default class NFS {
     }
 
     createFile(filePath, userMetadata, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+      log.debug('Invoking API NFS::createFile - FFI::' + this.MODULE + '::create-file');
       this.send({
         module: this.MODULE,
         action: 'create-file',
@@ -89,6 +96,7 @@ export default class NFS {
     }
 
     deleteFile(filePath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+      log.debug('Invoking API NFS::deleteFile - FFI::' + this.MODULE + '::delete-file');
       this.send({
         module: this.MODULE,
         action: 'delete-file',
@@ -103,6 +111,7 @@ export default class NFS {
     }
 
     modifyFileMeta(name, userMetadata, filePath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+      log.debug('Invoking API NFS::modifyFileMeta - FFI::' + this.MODULE + '::modify-file-meta');
       var payload = {
         module: this.MODULE,
         action: 'modify-file-meta',
@@ -125,6 +134,7 @@ export default class NFS {
     }
 
     modifyFileContent(contentBytes, offset, filePath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+      log.debug('Invoking API NFS::modifyFileContent - FFI::' + this.MODULE + '::modify-file-content');
       var payload = {
         module: this.MODULE,
         action: 'modify-file-content',
@@ -146,6 +156,7 @@ export default class NFS {
     }
 
     getFile(filePath, isPathShared, offset, length, hasSafeDriveAccess, appDirKey, callback) {
+      log.debug('Invoking API NFS::getFile - FFI::' + this.MODULE + '::get-file');
       this.send({
         module: this.MODULE,
         action: 'get-file',
