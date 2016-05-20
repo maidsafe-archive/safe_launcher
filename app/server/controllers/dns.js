@@ -56,7 +56,7 @@ export var getFile = function(req, res) {
   }
   let offset = req.query.offset || 0;
   let length = req.query.length || 0;
-  log.debug('DNS - Invoking getFile API for ' + longName + ', ' + serviceName + ', ' filePath);
+  log.debug('DNS - Invoking getFile API for ' + longName + ', ' + serviceName + ', ' + filePath);
   req.app.get('api').dns.getFile(longName, serviceName, filePath, offset, length, hasSafeDriveAccess, appDirKey,
     responseHandler.onResponse);
 };
@@ -128,5 +128,6 @@ export var createPublicId = function(req, res) {
     return res.sendStatus(401);
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);
+  log.debug('DNS - Invoking createPublicId API for ' + req.params.longName);
   req.app.get('api').dns.createPublicId(req.params.longName, sessionInfo.appDirKey, responseHandler.onResponse);
 };
