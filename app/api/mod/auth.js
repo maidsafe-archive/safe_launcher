@@ -1,3 +1,5 @@
+import { log } from './../../logger/log';
+
 export default class Auth {
 
   constructor(msgSender) {
@@ -6,6 +8,7 @@ export default class Auth {
   }
 
   register(pin, keyword, password, callback) {
+    log.debug('Invoking Auth::resgister API');
     this.send({
       module: this.MODULE,
       action: 'register',
@@ -18,6 +21,7 @@ export default class Auth {
   }
 
   login(pin, keyword, password, callback) {
+    log.debug('Invoking Auth::login API');
     this.send({
       module: this.MODULE,
       action: 'login',
@@ -30,6 +34,7 @@ export default class Auth {
   }
 
   getAppDirectoryKey(appId, appName, vendor, callback) {
+    log.debug('Invoking Auth::getAppDirectoryKey API');
     this.send({
       module: this.MODULE,
       action: 'app-dir-key',

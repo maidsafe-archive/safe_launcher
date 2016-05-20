@@ -1,5 +1,12 @@
 {
   "name": "development",
   "serverPort": 8100,
-  "proxyPort": 8101
+  "proxyPort": 8101,
+  "log": {
+    "level": "silly",
+    "file": {
+      "maxFileSize": 10000,
+      "maxFiles": 10
+    }
+  }
 }
