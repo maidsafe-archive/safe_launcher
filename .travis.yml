@@ -13,6 +13,6 @@ cache:
   cargo: true
 install:
   - ls && git clone https://github.com/maidsafe/safe_core.git && cd safe_core  && ls
-  - cargo build --release --verbose
+  - cargo build --release --verbose RUST_BACKTRACE=1
 after_install:
   - cd .. && ls
