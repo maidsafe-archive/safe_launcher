@@ -12,9 +12,7 @@ sudo: false
 cache:
   cargo: true
 install:
-  - set evn $SAFE_CORE_REPO_PATH = `pwd`/safe_core
-  - ls && git clone https://github.com/maidsafe/safe_core.git $SAFE_CORE_REPO_PATH 
-  - echo %$SAFE_CORE_REPO_PATH% && cd $SAFE_CORE_REPO_PATH && ls 
+  - ls && git clone https://github.com/maidsafe/safe_core.git && cd safe_core  && ls
   - cargo build --release --verbose
 after_install:
   - cd .. && ls
