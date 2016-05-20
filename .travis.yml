@@ -7,29 +7,14 @@ os:
   - osx
 language: rust
 rust:
-# - beta
-  - stable
   - nightly
-matrix:
-  allow_failures:
-    - rust: nightly
 sudo: false
 cache:
   cargo: true
-  directories:
-    - $HOME/libsodium
-    - $HOME/elfutils
-before_install:
-  - ls && git clone https://github.com/maidsafe/safe_core.git && cd safe_core && ls && echo pwd && set evn $TRAVIS_BUILD_DIR=`pwd`/safe_core
 install:
-  - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
-  - . install_libsodium.sh
-script:
-  - curl -sSL https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/build_and_run_tests.sh | bash && cd safe_core
-before_cache:
-  - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_elfutils.sh
-  - . install_elfutils.sh
-after_success:
-  - curl -sSL https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/after_success.sh | bash
+  - set evn $SAFE_CORE_REPO_PATH = './safe_core'
+  - ls && git clone https://github.com/maidsafe/safe_core.git $SAFE_CORE_REPO_PATH 
+  - cd $SAFE_CORE_REPO_PATH && ls 
+  - cargo build --release --verbose
 after_install:
   - cd .. && ls
