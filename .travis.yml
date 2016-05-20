@@ -20,7 +20,7 @@ cache:
     - $HOME/libsodium
     - $HOME/elfutils
 before_install:
-  - cd .. && git clone https://github.com/maidsafe/safe_core.git && cd safe_core
+  - ls && git clone https://github.com/maidsafe/safe_core.git && cd safe_core
 install:
   - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
   - . install_libsodium.sh
