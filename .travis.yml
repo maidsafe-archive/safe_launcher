@@ -6,6 +6,8 @@ os:
 language: rust
 rust:
   - nightly
+python:
+  - "2.7"  
 sudo: false
 cache:
   cargo: true
@@ -22,5 +24,6 @@ script:
   - cp -i target/release/libsafe_core.a $TRAVIS_BUILD_DIR/app/api/ffi
   - cd $TRAVIS_BUILD_DIR && ls
   - node -v
+  - python --version
   - npm install
   - npm test
