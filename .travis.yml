@@ -4,7 +4,6 @@ env:
     - Features=use-mock-routing
 os:
   - linux
-  - osx
 language: rust
 rust:
   - nightly
@@ -16,6 +15,6 @@ install:
   - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
   - . install_libsodium.sh
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
-  - cargo test --no-run --features clippy || true
+  - cargo build --release --verbose --features $Features
 after_install:
   - cd .. && ls
