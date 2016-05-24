@@ -1,7 +1,6 @@
 env:
   global:
     - secure: kERfGEJxywTI3AvAsOCcjQBuxrAiJ7aOWooLmtxy8QWzNkVUlhY2A5xGWCqyKunMmjj9+cJ2FtrejYDo9FcXtmL2MlU0M6YZ1vLCeYTMsxMurZNXH0o64X0pFRsYAxR/uYgiZKujXBTcXiRlKkBd2G+aVetKPUl3rTi3nrejlto=
-    - Features=use-mock-routing
 os:
   - linux
 language: rust
@@ -14,7 +13,8 @@ install:
   - cd ..
   - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
   - . install_libsodium.sh
+script:
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
-  - cargo build --release --verbose --features $Features
+  - cargo build --release --verbose --features use-mock-routing
 after_install:
   - cd .. && ls
