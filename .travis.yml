@@ -16,5 +16,4 @@ install:
 script:
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
-after_install:
-  - cd .. && ls
+  - ls && cd target && ls && cd release && ls
