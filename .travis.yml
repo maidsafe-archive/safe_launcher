@@ -16,4 +16,6 @@ install:
 script:
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
-  - cd .. && ls
+  - cp -i target/release/libsafe_core.a $TRAVIS_BUILD_DIR/app/api/ffi
+  - cd $TRAVIS_BUILD_DIR && ls
+  - npm test
