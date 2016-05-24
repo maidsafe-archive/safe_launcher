@@ -18,4 +18,6 @@ script:
   - cargo build --release --verbose --features use-mock-routing
   - cp -i target/release/libsafe_core.a $TRAVIS_BUILD_DIR/app/api/ffi
   - cd $TRAVIS_BUILD_DIR && ls
+  - node -v
+  - npm install
   - npm test
