@@ -15,27 +15,6 @@ install:
   - cd ..
   - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
   - . install_libsodium.sh
-script: 
-  if [[ $TRAVIS_RUST_VERSION = nightly ]]; then
-  # Don't make a Clippy failure result in overall failure for now
-  cargo test --no-run --features clippy || true
-  for Feature in $Features; do
-    cargo test --no-run --features "clippy $Feature" || true
-  done
-else
-  # Run the tests for each feature
-  for Feature in $Features; do
-    cargo build --release --verbose --features $Feature
-    cargo test --release --features $Feature
-  done
-  if [ -z "$Features" ]; then
-    # There are no features, so run the default test suite
-    cargo build --release --verbose
-    cargo test --release
-  else
-    # We currently don't run the default tests if there are any features
-    cargo test --release --verbose --no-run
-  fi
-fi
+  - cargo test --no-run --features clippy || true
 after_install:
   - cd .. && ls
