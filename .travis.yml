@@ -12,7 +12,10 @@ sudo: false
 cache:
   cargo: true
 install:
+  - cd ..
+  - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
+  - . install_libsodium.sh
   - ls && git clone https://github.com/maidsafe/safe_core.git && cd safe_core  && ls
-  - cargo build --release --verbose RUST_BACKTRACE=1
+  - cargo build --release --verbose
 after_install:
   - cd .. && ls
