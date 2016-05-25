@@ -30,7 +30,8 @@ script:
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
   - ls target/release
-  - cp -i target/release/libsafe_core.a $TRAVIS_BUILD_DIR/app/api/ffi
+  - cp -i target/release/libsafe_core.so $TRAVIS_BUILD_DIR/app/api/ffi
+  - ls $TRAVIS_BUILD_DIR/app/api/ffi
   - cd $TRAVIS_BUILD_DIR && ls
   - rm -rf $HOME/.node-gyp
   - python --version
