@@ -1,6 +1,7 @@
 env:
   global:
     - secure: kERfGEJxywTI3AvAsOCcjQBuxrAiJ7aOWooLmtxy8QWzNkVUlhY2A5xGWCqyKunMmjj9+cJ2FtrejYDo9FcXtmL2MlU0M6YZ1vLCeYTMsxMurZNXH0o64X0pFRsYAxR/uYgiZKujXBTcXiRlKkBd2G+aVetKPUl3rTi3nrejlto=
+    - CXX=g++-4.8
 os:
   - linux
 language: rust
@@ -9,6 +10,12 @@ rust:
 python:
   - "2.7"  
 sudo: false
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
 cache:
   cargo: true
 install:
