@@ -78,20 +78,20 @@ gulp.task('copy', function() {
 });
 
 gulp.task('installPackages', function(cb) {
-  exec('cd testApp && npm install', function(err, stdout, stderr) {
+  exec('npm run msvc_rebuild --env=test && cd testApp && npm install', function(err, stdout, stderr) {
     console.log(stdout);
     console.log(stderr);
     cb(err);
   });
 });
 
-gulp.task('msvc_rebuild', function(cb) {
-  exec('npm run msvc_rebuild --env=test', function(err, stdout, stderr) {
-    console.log(stdout);
-    console.log(stderr);
-    cb(err);
-  });
-});
+// gulp.task('msvc_rebuild', function(cb) {
+//   exec('npm run msvc_rebuild --env=test', function(err, stdout, stderr) {
+//     console.log(stdout);
+//     console.log(stderr);
+//     cb(err);
+//   });
+// });
 
 var executeTest = function() {
 
@@ -105,4 +105,4 @@ var executeTest = function() {
     runMochaTests();
 };
 
-gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'copy', 'installPackages', 'msvc_rebuild' ], executeTest);
+gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'copy', 'installPackages' ], executeTest);
