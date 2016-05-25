@@ -16,7 +16,7 @@ var destDir = path.resolve('testApp');
 
 var apiPaths = [
   './app/api/**',
-  '!./app/api/ffi/safe_ffi.dll'
+  '!./app/api/ffi/libsafe_core.dll'
 ];
 
 var serverPaths = [
@@ -64,7 +64,7 @@ gulp.task('clean', function() {
 });
 
 gulp.task('copy', function() {
-  fse.copySync('./app/api/ffi/safe_ffi.dll', path.resolve(destDir, 'api', 'ffi', 'safe_ffi.dll'));
+  fse.copySync('./app/api/ffi/libsafe_core.dll', path.resolve(destDir, 'api', 'ffi', 'libsafe_core.dll'));
   fse.copySync('./app/package.json', path.resolve(destDir, 'package.json'));
 });
 

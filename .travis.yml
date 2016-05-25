@@ -1,35 +1,37 @@
 env:
   global:
     - secure: kERfGEJxywTI3AvAsOCcjQBuxrAiJ7aOWooLmtxy8QWzNkVUlhY2A5xGWCqyKunMmjj9+cJ2FtrejYDo9FcXtmL2MlU0M6YZ1vLCeYTMsxMurZNXH0o64X0pFRsYAxR/uYgiZKujXBTcXiRlKkBd2G+aVetKPUl3rTi3nrejlto=
-    - Features=use-mock-routing
+    - CXX=g++-4.8
 os:
   - linux
-  - osx
 language: rust
 rust:
-# - beta
-  - stable
   - nightly
-matrix:
-  allow_failures:
-    - rust: nightly
+python:
+  - "2.7"
 sudo: false
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
 cache:
   cargo: true
-  directories:
-    - $HOME/libsodium
-    - $HOME/elfutils
-before_install:
-  - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
 install:
+  - pwd && cd ..
   - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
   - . install_libsodium.sh
+  - . $HOME/.nvm/nvm.sh
+  - nvm install 5.5
+  - nvm use 5.5
+  - node -v
 script:
-  - curl -sSL https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/build_and_run_tests.sh | bash
-before_cache:
-  - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_elfutils.sh
-  - . install_elfutils.sh
-after_success:
-  - curl -sSL https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/after_success.sh | bash
-after_install:
-  - cd .. && ls
+  - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
+  - cargo build --release --verbose --features use-mock-routing
+  - cp -i target/release/libsafe_core.a $TRAVIS_BUILD_DIR/app/api/ffi
+  - cd $TRAVIS_BUILD_DIR && ls
+  - rm -rf $HOME/.node-gyp
+  - python --version
+  - npm install
+  - npm test
