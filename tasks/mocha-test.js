@@ -10,13 +10,22 @@ var childProcess = require('child_process');
 var babel = require('gulp-babel');
 var fse = require('fs-extra')
 var path = require('path');
+var os = require('os');
 var exec = require('child_process').exec;
 
 var destDir = path.resolve('testApp');
+var ffiName = null;
 
+if (os.platform() === 'darwin') {
+  ffiName = 'libsafe_core.dylib';
+} else if(os.platform() === 'linux') {
+  ffiName = 'libsafe_core.so';
+} else {
+  ffiName = 'libsafe_core.dll';
+}
 var apiPaths = [
   './app/api/**',
-  '!./app/api/ffi/libsafe_core.dll'
+  '!./app/api/ffi/' + ffiName
 ];
 
 var serverPaths = [
@@ -64,7 +73,7 @@ gulp.task('clean', function() {
 });
 
 gulp.task('copy', function() {
-  fse.copySync('./app/api/ffi/libsafe_core.dll', path.resolve(destDir, 'api', 'ffi', 'libsafe_core.dll'));
+  fse.copySync('./app/api/ffi/' + ffiName, path.resolve(destDir, 'api', 'ffi', ffiName));
   fse.copySync('./app/package.json', path.resolve(destDir, 'package.json'));
 });
 
