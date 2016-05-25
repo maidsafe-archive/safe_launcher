@@ -21,7 +21,7 @@ if (os.platform() === 'darwin') {
 } else if(os.platform() === 'linux') {
   ffiName = 'libsafe_core.so';
 } else {
-  ffiName = 'libsafe_core.dll';
+  ffiName = 'safe_core.dll';
 }
 var apiPaths = [
   './app/api/**',
