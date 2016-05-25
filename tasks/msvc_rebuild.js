@@ -26,4 +26,4 @@ var executeMsvcRebuild = function() {
     });
 };
 
-gulp.task('msvc_rebuild', [], executeMsvcRebuild);
+gulp.task('msvc_rebuild', executeMsvcRebuild);
