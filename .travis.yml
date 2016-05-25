@@ -16,8 +16,8 @@ install:
   - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
   - . install_libsodium.sh
   - . $HOME/.nvm/nvm.sh
-  - nvm install 5.5.0
-  - nvm use 5.5.0
+  - nvm install 5.5
+  - nvm use 5.5
   - node -v
 script:
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
