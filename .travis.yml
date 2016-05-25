@@ -2,6 +2,7 @@ env:
   global:
     - secure: kERfGEJxywTI3AvAsOCcjQBuxrAiJ7aOWooLmtxy8QWzNkVUlhY2A5xGWCqyKunMmjj9+cJ2FtrejYDo9FcXtmL2MlU0M6YZ1vLCeYTMsxMurZNXH0o64X0pFRsYAxR/uYgiZKujXBTcXiRlKkBd2G+aVetKPUl3rTi3nrejlto=
     - CXX=g++-4.8
+    - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
 os:
   - linux
 language: rust
@@ -26,14 +27,12 @@ install:
   - nvm install 5.5
   - nvm use 5.5
   - node -v
+  - python --version
 script:
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
-  - ls target/release
-  - cp -i target/release/libsafe_core.so $TRAVIS_BUILD_DIR/app/api/ffi
-  - ls $TRAVIS_BUILD_DIR/app/api/ffi
-  - cd $TRAVIS_BUILD_DIR && ls
-  - rm -rf $HOME/.node-gyp
-  - python --version
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; cp -i target/release/libsafe_core.so $FFIDest; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; cp -i target/release/libsafe_core.dylib $FFIDest; fi
+  - cd $TRAVIS_BUILD_DIR
   - npm install
   - npm test

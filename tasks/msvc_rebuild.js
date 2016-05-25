@@ -7,11 +7,10 @@ var path = require('path');
 var os = require('os');
 var electronVersion = require(path.resolve('./node_modules/electron-prebuilt/package.json')).version;
 
-if (process.platform !== 'win32') {
-  return new gutil.PluginError('msvc_rebuild', 'msvc_rebuild is supported only on Windows');
-}
-
 var executeMsvcRebuild = function() {
+    if (process.platform !== 'win32') {
+      return gutil.log('msvc_rebuild is supported only on Windows');
+    }
     var targetPaths = [ './app/node_modules/ref', './app/node_modules/ffi' ];
     var testTargetPaths = [ './testApp/node_modules/ref', './testApp/node_modules/ffi' ];
     targetPaths = gutil.env._[0] === 'test' ? testTargetPaths : targetPaths;
