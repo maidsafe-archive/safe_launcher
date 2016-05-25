@@ -27,3 +27,4 @@ var executeMsvcRebuild = function() {
 };
 
 gulp.task('msvc_rebuild', [], executeMsvcRebuild);
+module.exports = gulp;
