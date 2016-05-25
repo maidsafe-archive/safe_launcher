@@ -8,7 +8,11 @@ language: rust
 rust:
   - nightly
 python:
+<<<<<<< HEAD
   - "2.7"
+=======
+  - "2.7"  
+>>>>>>> 97a6fb768f535cc31c3068ca8820e47e1886b5fd
 sudo: false
 addons:
   apt:
