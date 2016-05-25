@@ -78,7 +78,7 @@ gulp.task('copy', function() {
 });
 
 gulp.task('installPackages', function(cb) {
-  exec('npm run msvc_rebuild --env=test && cd testApp && npm install', function(err, stdout, stderr) {
+  exec('cd testApp && npm install && cd .. && gulp msvc_rebuild --env=test', function(err, stdout, stderr) {
     console.log(stdout);
     console.log(stderr);
     cb(err);
