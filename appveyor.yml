@@ -21,8 +21,7 @@ install:
   - cd ..
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
-  - dir && dir target && dir target\release
   - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\api\ffi
-  - cd ..\safe_launcher
+  - cd %APPVEYOR_BUILD_FOLDER%
   - npm install
   - npm test
