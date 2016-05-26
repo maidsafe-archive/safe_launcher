@@ -24,4 +24,8 @@ install:
   - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\api\ffi
   - cd %APPVEYOR_BUILD_FOLDER%
   - npm install
+
+build: false
+
+test_script:
   - npm test
