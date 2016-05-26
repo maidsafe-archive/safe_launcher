@@ -31,8 +31,8 @@ install:
 script:
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; cp -i target/release/libsafe_core.so $FFIDest; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; cp -i target/release/libsafe_core.dylib $FFIDest; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp -i target/release/libsafe_core.so $FFIDest; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp -i target/release/libsafe_core.dylib $FFIDest; fi
   - cd $TRAVIS_BUILD_DIR
   - npm install
   - npm test
