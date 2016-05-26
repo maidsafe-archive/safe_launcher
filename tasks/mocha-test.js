@@ -129,4 +129,4 @@ var executeTest = function(cb) {
     // runMochaTests(cb);
 };
 
-gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'copy', 'installPackages', 'mocha' ], executeTest);
+gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'copy', 'installPackages' ], executeTest);
