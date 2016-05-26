@@ -21,7 +21,7 @@ if (os.platform() === 'darwin') {
 } else if(os.platform() === 'linux') {
   ffiName = 'libsafe_core.so';
 } else {
-  ffiName = 'safe_core.dll';
+  ffiName = 'safe_ffi.dll';
 }
 var apiPaths = [
   './app/api/**',
@@ -40,8 +40,8 @@ if (process.platform === 'win32') {
 
 process.env['mocha-unfunk-style'] = 'plain';
 
-var runMochaTests = function() {
-  var mochaTest = childProcess.spawn(gulpPath, [
+var runMochaTests = function(cb) {
+  childProcess.spawn(gulpPath, [
     '--renderder',
     '--compilers',
     'js:babel-core/register',
@@ -52,6 +52,8 @@ var runMochaTests = function() {
     './tests/*'
   ], {
     stdio: 'inherit'
+  }).on('exit', function() {
+    cb();
   });
 }
 
