@@ -1,0 +1,27 @@
+platform:
+  - x64
+environment:
+  global:
+    RUST_BACKTRACE: 1
+    Features: "use-mock-routing"
+
+install:
+  - ps: |
+        $url = "https://github.com/maidsafe/QA/raw/master/Powershell%20Scripts/AppVeyor"
+        Start-FileDownload "$url/Install%20Rust.ps1" -FileName "Install Rust.ps1"
+        Start-FileDownload "$url/Install%20MinGW.ps1" -FileName "Install MinGW.ps1"
+        Start-FileDownload "$url/Install%20libsodium.ps1" -FileName "Install libsodium.ps1"
+        Start-FileDownload "$url/Build.ps1" -FileName "Build.ps1"
+        Start-FileDownload "$url/Run%20Tests.ps1" -FileName "Run Tests.ps1"
+        . ".\Install Rust.ps1"
+        . ".\Install MinGW.ps1"
+        . ".\Install libsodium.ps1"
+        Install-Product node Stable
+  - cmd: node -v
+  - cd ..
+  - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
+  - cargo build --release --verbose --features use-mock-routing
+  - copy target/release/safe_core.dll ../safe_launcher/app/api/ffi
+  - cd ../safe_launcher
+  - npm install
+  - npm test
