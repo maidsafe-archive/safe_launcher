@@ -196,51 +196,51 @@ describe("DNS", function() {
   });
 
   // Delete Services
-  // describe('Delete Services', function() {
-  //   var longName = 'long' + (new Date().getTime());
-  //   var serviceName = 'service' + (new Date().getTime());
-  //
-  //   before(function(done) {
-  //     utils.registerDns(utils.getToken(), longName, serviceName, dirPath, function(status) {
-  //       if (status !== 200) {
-  //         console.log('Unable to create DNS: ' + status);
-  //         return process.exit(0);
-  //       }
-  //       done();
-  //     });
-  //   });
-  //
-  //   after(function(done) {
-  //     utils.deleteDns(utils.getToken(), longName, function(status) {
-  //       if (status !== 200) {
-  //         console.log('Unable to delete DNS: ' + status);
-  //         return process.exit(0);
-  //       }
-  //       done();
-  //     });
-  //   });
-  //
-  //   it('should be able to delete service', function(done) {
-  //     utils.deleteService(utils.getToken(), longName, serviceName, function(status) {
-  //       (status).should.be.equal(200);
-  //       done();
-  //     });
-  //   });
-  //
-  //   it('should throw unauthorised 401', function(done) {
-  //     utils.deleteService(Math.floor(Math.random() * 1000000000), longName, serviceName, function(status) {
-  //       (status).should.be.equal(401);
-  //       done();
-  //     });
-  //   });
-  //
-  //   it('should throw 400 directory path not found', function(done) {
-  //     utils.deleteService(utils.getToken(), ('/test_' + (new Date().getTime())), serviceName, function(status) {
-  //       (status).should.be.equal(400);
-  //       done();
-  //     });
-  //   });
-  // });
+  describe('Delete Services', function() {
+    var longName = 'long' + (new Date().getTime());
+    var serviceName = 'service' + (new Date().getTime());
+
+    before(function(done) {
+      utils.registerDns(utils.getToken(), longName, serviceName, dirPath, function(status) {
+        if (status !== 200) {
+          console.log('Unable to create DNS: ' + status);
+          return process.exit(0);
+        }
+        done();
+      });
+    });
+
+    after(function(done) {
+      utils.deleteDns(utils.getToken(), longName, function(status) {
+        if (status !== 200) {
+          console.log('Unable to delete DNS: ' + status);
+          return process.exit(0);
+        }
+        done();
+      });
+    });
+
+    it('should be able to delete service', function(done) {
+      utils.deleteService(utils.getToken(), longName, serviceName, function(status) {
+        (status).should.be.equal(200);
+        done();
+      });
+    });
+
+    it('should throw unauthorised 401', function(done) {
+      utils.deleteService(Math.floor(Math.random() * 1000000000), longName, serviceName, function(status) {
+        (status).should.be.equal(401);
+        done();
+      });
+    });
+
+    it('should throw 400 directory path not found', function(done) {
+      utils.deleteService(utils.getToken(), ('/test_' + (new Date().getTime())), serviceName, function(status) {
+        (status).should.be.equal(400);
+        done();
+      });
+    });
+  });
 
   // Get home directory
   describe('Get home directory', function() {
