@@ -21,7 +21,7 @@ install:
   - cd ..
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
-  - copy target/release/safe_core.dll ../safe_launcher/app/api/ffi
-  - cd ../safe_launcher
+  - copy .\target\release\safe_core.dll ..\safe_launcher\app\api\ffi
+  - cd ..\safe_launcher
   - npm install
   - npm test
