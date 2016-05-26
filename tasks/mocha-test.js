@@ -95,7 +95,7 @@ gulp.task('installPackages', function(cb) {
 //   });
 // });
 
-var executeTest = function() {
+var executeTest = function(cb) {
 
   // gulp.src(['./app/*.js', './app/api/**/**/*.js', './app/scripts/**/*js'])
   //   .pipe(jshint({
@@ -104,7 +104,7 @@ var executeTest = function() {
     // .pipe(jscs()) // enforce style guide
     // .pipe(stylish.combineWithHintResults()) // combine with jshint results
     // .pipe(jshint.reporter('jshint-stylish'));
-    runMochaTests();
+    runMochaTests(cb);
 };
 
 gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'copy', 'installPackages' ], executeTest);
