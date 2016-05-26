@@ -73,7 +73,7 @@ gulp.task('clean', function() {
 });
 
 gulp.task('copy', function() {
-  fse.copySync('./app/api/ffi/' + ffiName, path.resolve(destDir, 'api', 'ffi', ffiName));
+  fse.copySync(path.resolve('./app/api/ffi', ffiName), path.resolve(destDir, 'api', 'ffi', ffiName));
   fse.copySync('./app/package.json', path.resolve(destDir, 'package.json'));
 });
 
