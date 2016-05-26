@@ -41,19 +41,24 @@ if (process.platform === 'win32') {
 process.env['mocha-unfunk-style'] = 'plain';
 
 var runMochaTests = function(cb) {
-  childProcess.spawn(gulpPath, [
-    '--renderder',
-    '--compilers',
-    'js:babel-core/register',
-    '--timeout',
-    '50000',
-    '-R',
-    'mocha-unfunk-reporter',
-    './tests/*'
-  ], {
-    stdio: 'inherit'
-  }).on('exit', function() {
-    cb();
+  // childProcess.spawn(gulpPath, [
+  //   '--renderder',
+  //   '--compilers',
+  //   'js:babel-core/register',
+  //   '--timeout',
+  //   '50000',
+  //   '-R',
+  //   'mocha-unfunk-reporter',
+  //   './tests/*'
+  // ], {
+  //   stdio: 'inherit'
+  // }).on('exit', function() {
+  //   cb();
+  // });
+  exec(gulpPath + '--renderder --compilers js:babel-core/register --timeout 50000 -R mocha-unfunk-reporter ./tests/*', function(err, stdout, stderr) {
+    console.log(stdout);
+    console.log(stderr);
+    cb(err);
   });
 }
 
@@ -95,22 +100,22 @@ gulp.task('installPackages', function(cb) {
 //   });
 // });
 
-gulp.task('mocha', function(cb) {
-  childProcess.spawn(gulpPath, [
-    '--renderder',
-    '--compilers',
-    'js:babel-core/register',
-    '--timeout',
-    '50000',
-    '-R',
-    'mocha-unfunk-reporter',
-    './tests/*'
-  ], {
-    stdio: 'inherit'
-  }).on('exit', function() {
-    cb();
-  });
-});
+// gulp.task('mocha', function(cb) {
+//   childProcess.spawn(gulpPath, [
+//     '--renderder',
+//     '--compilers',
+//     'js:babel-core/register',
+//     '--timeout',
+//     '50000',
+//     '-R',
+//     'mocha-unfunk-reporter',
+//     './tests/*'
+//   ], {
+//     stdio: 'inherit'
+//   }).on('exit', function() {
+//     cb();
+//   });
+// });
 
 var executeTest = function(cb) {
 
