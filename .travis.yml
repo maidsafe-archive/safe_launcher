@@ -5,7 +5,6 @@ env:
     - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
 os:
   - linux
-  - osx
 language: rust
 rust:
   - nightly

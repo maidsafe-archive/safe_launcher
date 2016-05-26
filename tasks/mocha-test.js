@@ -95,6 +95,23 @@ gulp.task('installPackages', function(cb) {
 //   });
 // });
 
+gulp.task('mocha', function(cb) {
+  childProcess.spawn(gulpPath, [
+    '--renderder',
+    '--compilers',
+    'js:babel-core/register',
+    '--timeout',
+    '50000',
+    '-R',
+    'mocha-unfunk-reporter',
+    './tests/*'
+  ], {
+    stdio: 'inherit'
+  }).on('exit', function() {
+    cb();
+  });
+});
+
 var executeTest = function(cb) {
 
   // gulp.src(['./app/*.js', './app/api/**/**/*.js', './app/scripts/**/*js'])
@@ -104,7 +121,7 @@ var executeTest = function(cb) {
     // .pipe(jscs()) // enforce style guide
     // .pipe(stylish.combineWithHintResults()) // combine with jshint results
     // .pipe(jshint.reporter('jshint-stylish'));
-    runMochaTests(cb);
+    // runMochaTests(cb);
 };
 
-gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'copy', 'installPackages' ], executeTest);
+gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'copy', 'installPackages', 'mocha' ], executeTest);
