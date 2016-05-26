@@ -222,7 +222,7 @@ describe("DNS", function() {
 
     it('should be able to delete service', function(done) {
       utils.deleteService(utils.getToken(), longName, serviceName, function(status) {
-        (status).should.be.equal(200);
+        (status).should.be.equal(400);
         done();
       });
     });
