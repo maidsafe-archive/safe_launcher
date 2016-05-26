@@ -34,7 +34,7 @@ let proxyServer = {
     ]);
     this.process.on('exit', function() {
       log.info('Proxy server stopped');
-      proxyListener.onExit('Porxy Server Closed');
+      proxyListener.onExit('Proxy Server Closed');
     });
     this.process.on('message', function(msg) {
       log.debug('Proxy Server - onMessage event - recieved - ' + msg);

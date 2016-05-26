@@ -39,7 +39,9 @@ export function errorCodeLookup(errCode) {
     case CLIENT_ERROR_START_RANGE - 17:
       return 'CoreError::GetFailure';
     case CLIENT_ERROR_START_RANGE - 18:
-      return 'CoreError::MutationFailure';  
+      return 'CoreError::MutationFailure';
+    case CLIENT_ERROR_START_RANGE - 19:
+      return 'CoreError::SelfEncryptionError';    
     case NFS_ERROR_START_RANGE - 1:
       return 'NfsError::DirectoryAlreadyExistsWithSameName';
     case NFS_ERROR_START_RANGE - 2:
