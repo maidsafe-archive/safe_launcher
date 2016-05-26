@@ -5,6 +5,7 @@ env:
     - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
 os:
   - linux
+  - osx
 language: rust
 rust:
   - nightly
@@ -23,7 +24,11 @@ install:
   - pwd && cd ..
   - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
   - . install_libsodium.sh
-  - . $HOME/.nvm/nvm.sh
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then . $HOME/.nvm/nvm.sh; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf ~/.nvm; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then git clone https://github.com/creationix/nvm.git ~/.nvm; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source ~/.nvm/nvm.sh; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source ~/.nvm/nvm.sh; fi
   - nvm install 5.5
   - nvm use 5.5
   - node -v
