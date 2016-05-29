@@ -14,6 +14,7 @@ sudo: false
 addons:
   apt:
     sources:
+      - llvm-toolchain-precise-3.8
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
@@ -23,8 +24,6 @@ install:
   - pwd && cd ..
   - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
   - . install_libsodium.sh
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo apt-get install -qq g++-4.8 ; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export CXX="g++-4.8"8 ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then . $HOME/.nvm/nvm.sh; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf ~/.nvm; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then git clone https://github.com/creationix/nvm.git ~/.nvm; fi
