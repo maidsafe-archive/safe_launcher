@@ -18,14 +18,13 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
+      - clang-3.6
 cache:
   cargo: true
 install:
   - pwd && cd ..
   - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
   - . install_libsodium.sh
-  - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$CC" = "gcc" ]; then export CC=gcc-4.8; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ./configure --disable-openssl --enable-assert; else ./configure --enable-assert; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then . $HOME/.nvm/nvm.sh; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf ~/.nvm; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then git clone https://github.com/creationix/nvm.git ~/.nvm; fi
