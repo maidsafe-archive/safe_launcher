@@ -5,19 +5,19 @@ env:
 compiler:
   - gcc
   - clang
+matrix:
+  exclude:
+    - os: osx
+      compiler: gcc  
 os:
-  - osx
   - linux
+  - osx
 language: rust
 rust:
   - nightly
 python:
   - "2.7"
 sudo: false
-matrix:
-  exclude:
-    - os: osx
-      compiler: gcc
 addons:
   apt:
     sources:

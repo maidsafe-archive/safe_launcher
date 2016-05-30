@@ -113,16 +113,16 @@ gulp.task('installPackages', function(cb) {
 //   });
 // });
 
-var executeTest = function() {
+var executeTest = function(cb) {
 
   // gulp.src(['./app/*.js', './app/api/**/**/*.js', './app/scripts/**/*js'])
   //   .pipe(jshint({
   //     esnext: true
   //   })) // hint (optional)
-    // .pipe(jscs()) // enforce style guide
-    // .pipe(stylish.combineWithHintResults()) // combine with jshint results
-    // .pipe(jshint.reporter('jshint-stylish'));
-    // runMochaTests(cb);
+  // .pipe(jscs()) // enforce style guide
+  // .pipe(stylish.combineWithHintResults()) // combine with jshint results
+  // .pipe(jshint.reporter('jshint-stylish'));
+  // runMochaTests(cb);
     exec(gulpPath + '--renderder --compilers js:babel-core/register --timeout 50000 -R mocha-unfunk-reporter ./tests/*', function(err, stdout, stderr) {
       console.log(stdout);
       console.log(stderr);
