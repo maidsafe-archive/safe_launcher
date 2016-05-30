@@ -12,7 +12,6 @@ var fse = require('fs-extra')
 var path = require('path');
 var os = require('os');
 var exec = require('child_process').exec;
-var execSync = require('exec-sync');
 
 var destDir = path.resolve('testApp');
 var ffiName = null;
