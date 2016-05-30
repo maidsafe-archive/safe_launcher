@@ -2,23 +2,22 @@ env:
   global:
     - secure: kERfGEJxywTI3AvAsOCcjQBuxrAiJ7aOWooLmtxy8QWzNkVUlhY2A5xGWCqyKunMmjj9+cJ2FtrejYDo9FcXtmL2MlU0M6YZ1vLCeYTMsxMurZNXH0o64X0pFRsYAxR/uYgiZKujXBTcXiRlKkBd2G+aVetKPUl3rTi3nrejlto=
     - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
-    
 compiler:
   - gcc
   - clang
-  
-matrix:
-  exclude:
-    - os: osx
-      compiler: gcc    
 os:
   - osx
+  - linux
 language: rust
 rust:
   - nightly
 python:
   - "2.7"
 sudo: false
+matrix:
+  exclude:
+    - os: osx
+      compiler: gcc
 addons:
   apt:
     sources:
