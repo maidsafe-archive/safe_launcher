@@ -123,7 +123,7 @@ var executeTest = function(cb) {
   // .pipe(stylish.combineWithHintResults()) // combine with jshint results
   // .pipe(jshint.reporter('jshint-stylish'));
   // runMochaTests(cb);
-    exec(gulpPath + '--renderder --compilers js:babel-core/register --timeout 50000 -R mocha-unfunk-reporter ./tests/*', function(err, stdout, stderr) {
+    exec(gulpPath + ' --renderder --compilers js:babel-core/register --timeout 50000 -R mocha-unfunk-reporter ./tests/*', function(err, stdout, stderr) {
       console.log(stdout);
       console.log(stderr);
       cb(err);
