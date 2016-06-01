@@ -21,8 +21,7 @@ if (os.platform() === 'darwin') {
 } else if(os.platform() === 'linux') {
   ffiName = 'libsafe_core.so';
 } else {
-  // ffiName = 'safe_core.dll';
-  ffiName = 'safe_ffi.dll';
+  ffiName = 'safe_core.dll';
 }
 var apiPaths = [
   './app/api/**',
@@ -78,6 +77,19 @@ gulp.task('clean', function() {
 
 gulp.task('copy', function() {
   fse.copySync(path.resolve('./app/api/ffi', ffiName), path.resolve(destDir, 'api', 'ffi', ffiName));
+  var ls = exec('ls ./testApp/api/ffi', function (error, stdout, stderr) {
+   if (error) {
+     console.log(error.stack);
+     console.log('Error code: ' + error.code);
+     console.log('Signal received: ' + error.signal);
+   }
+   console.log('Child Process STDOUT: ' + stdout);
+   console.log('Child Process STDERR: ' + stderr);
+ });
+
+ ls.on('exit', function (code) {
+   console.log('Child process exited with exit code ' + code);
+ });
   fse.copySync('./app/package.json', path.resolve(destDir, 'package.json'));
 });
 
