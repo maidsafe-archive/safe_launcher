@@ -12,6 +12,7 @@ var fse = require('fs-extra')
 var path = require('path');
 var os = require('os');
 var exec = require('child_process').exec;
+var gulpMocha = require('gulp-electron-mocha');
 
 var destDir = path.resolve('testApp');
 var ffiName = null;
@@ -21,7 +22,8 @@ if (os.platform() === 'darwin') {
 } else if(os.platform() === 'linux') {
   ffiName = 'libsafe_core.so';
 } else {
-  ffiName = 'safe_core.dll';
+  // ffiName = 'safe_core.dll';
+  ffiName = 'safe_ffi.dll';
 }
 var apiPaths = [
   './app/api/**',
@@ -109,6 +111,18 @@ gulp.task('installPackages', function(cb) {
 //   });
 // });
 
+gulp.task('mocha', function() {
+  gulp.src('./tests', {read: false})
+  .pipe(gulpMocha.default({
+    electronMocha: {
+      renderer: true,
+      'no-timeout': true,
+      compilers: 'js:babel-core/register',
+      R: 'mocha-unfunk-reporter',
+    }
+  }))
+});
+
 var executeTest = function(cb) {
   // gulp.src(['./app/*.js', './app/api/**/**/*.js', './app/scripts/**/*js'])
   //   .pipe(jshint({
@@ -118,12 +132,12 @@ var executeTest = function(cb) {
   // .pipe(stylish.combineWithHintResults()) // combine with jshint results
   // .pipe(jshint.reporter('jshint-stylish'));
   // runMochaTests(cb);
-  exec(gulpPath + ' --renderder --compilers js:babel-core/register --timeout 50000 -R mocha-unfunk-reporter ./tests/*',
-    { timeout: 100000 }, function(error, stdout, stderr) {
-    console.log(stdout);
-    console.log(stderr);
-    cb(error);
-  });
+  // exec(gulpPath + ' --renderder --compilers js:babel-core/register --timeout 50000 -R mocha-unfunk-reporter ./tests/*',
+  //   { timeout: 100000 }, function(error, stdout, stderr) {
+  //   console.log(stdout);
+  //   console.log(stderr);
+  //   cb(error);
+  // });
 };
 
-gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'copy', 'installPackages' ], executeTest);
+gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'copy', 'installPackages', 'mocha' ]);
