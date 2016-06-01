@@ -11,7 +11,7 @@ var babel = require('gulp-babel');
 var fse = require('fs-extra')
 var path = require('path');
 var os = require('os');
-var exec = require('child_process').exec;
+var exec = require('child_process').execSync;
 
 var destDir = path.resolve('testApp');
 var ffiName = null;
@@ -80,12 +80,8 @@ gulp.task('copy', function() {
   fse.copySync('./app/package.json', path.resolve(destDir, 'package.json'));
 });
 
-gulp.task('installPackages', function(cb) {
-  exec('cd testApp && ls api/ffi && npm install && cd .. && gulp msvc_rebuild --env=test', function(err, stdout, stderr) {
-    console.log(stdout);
-    console.log(stderr);
-    cb(err);
-  });
+gulp.task('installPackages', function() {
+  exec('cd testApp && ls api/ffi && npm install && cd .. && gulp msvc_rebuild --env=test');
 });
 
 // gulp.task('msvc_rebuild', function(cb) {
@@ -96,7 +92,7 @@ gulp.task('installPackages', function(cb) {
 //   });
 // });
 
-var executeTest = function(cb) {
+var executeTest = function() {
   // gulp.src(['./app/*.js', './app/api/**/**/*.js', './app/scripts/**/*js'])
   //   .pipe(jshint({
   //     esnext: true
@@ -105,11 +101,7 @@ var executeTest = function(cb) {
   // .pipe(stylish.combineWithHintResults()) // combine with jshint results
   // .pipe(jshint.reporter('jshint-stylish'));
   // runMochaTests(cb);
-  exec(gulpPath + ' --renderder --compilers js:babel-core/register --timeout 50000 -R mocha-unfunk-reporter ./tests', function(err, stdout, stderr) {
-    console.log(stdout);
-    console.log(stderr);
-    cb(err);
-  });
+  exec(gulpPath + ' --renderder --compilers js:babel-core/register --timeout 50000 -R mocha-unfunk-reporter ./tests');
 };
 
 gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'copy', 'installPackages' ], executeTest);
