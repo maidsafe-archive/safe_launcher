@@ -1,10 +1,15 @@
 platform:
   - x64
+image: Visual Studio 2013
+os: unstable
 environment:
+  nodejs_version: "6.2"
   global:
     RUST_BACKTRACE: 1
     Features: "use-mock-routing"
-
+cache:
+  - node_modules
+  - '%APPDATA%\npm-cache'
 install:
   - ps: |
         $url = "https://github.com/maidsafe/QA/raw/master/Powershell%20Scripts/AppVeyor"
@@ -16,16 +21,18 @@ install:
         . ".\Install Rust.ps1"
         . ".\Install MinGW.ps1"
         . ".\Install libsodium.ps1"
-        Install-Product node Stable
-  - cmd: node -v
+        Install-Product node $env:nodejs_version $env:PLATFORM
+  - node --version
+  - npm --version
+  - set npm_config_arch=%PLATFORM:x86=ia32%
   - cd ..
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
   - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\api\ffi
   - cd %APPVEYOR_BUILD_FOLDER%
-  - npm install
+  - npm install --progress false --depth 0
 
-build: false
+build: off
 
 test_script:
   - npm test
