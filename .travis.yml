@@ -2,19 +2,9 @@ env:
   global:
     - secure: kERfGEJxywTI3AvAsOCcjQBuxrAiJ7aOWooLmtxy8QWzNkVUlhY2A5xGWCqyKunMmjj9+cJ2FtrejYDo9FcXtmL2MlU0M6YZ1vLCeYTMsxMurZNXH0o64X0pFRsYAxR/uYgiZKujXBTcXiRlKkBd2G+aVetKPUl3rTi3nrejlto=
     - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
-compiler:
-  - gcc
-  - clang
+    - CXX=g++-4.8
 os:
   - linux
-  - osx
-matrix:
-  exclude:
-    - os: osx
-      compiler: gcc
-  include:
-    - os: linux
-      env: CXX=g++-4.8
 language: rust
 rust:
   - nightly
@@ -24,37 +14,26 @@ sudo: false
 addons:
   apt:
     sources:
-    - ubuntu-toolchain-r-test
+      - ubuntu-toolchain-r-test
     packages:
-    - xvfb
-    - g++-4.8
-    - clang-3.6
+      - g++-4.8
 cache:
   cargo: true
-
-before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
 install:
   - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
   - . install_libsodium.sh
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then . $HOME/.nvm/nvm.sh; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf ~/.nvm; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then git clone https://github.com/creationix/nvm.git ~/.nvm; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source ~/.nvm/nvm.sh; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source ~/.nvm/nvm.sh; fi
+  - . $HOME/.nvm/nvm.sh
   - nvm install 5.5
   - nvm use 5.5
   - node -v
   - python --version
-
 before_script:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; sh -e /etc/init.d/xvfb start; fi
-
+  - export DISPLAY=:99.0; sh -e /etc/init.d/xvfb start
 script:
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp target/release/libsafe_core.so $FFIDest; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp target/release/libsafe_core.dylib $FFIDest; fi
+  - cp target/release/libsafe_core.so $FFIDest
+  - ls $FFIDest
   - cd $TRAVIS_BUILD_DIR
   - npm install
   - npm test
