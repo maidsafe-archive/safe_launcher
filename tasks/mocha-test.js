@@ -22,8 +22,7 @@ if (os.platform() === 'darwin') {
 } else if(os.platform() === 'linux') {
   ffiName = 'libsafe_core.so';
 } else {
-  // ffiName = 'safe_core.dll';
-  ffiName = 'safe_ffi.dll';
+  ffiName = 'safe_core.dll';
 }
 var apiPaths = [
   './app/api/**',
@@ -42,23 +41,22 @@ if (process.platform === 'win32') {
 
 process.env['mocha-unfunk-style'] = 'plain';
 
-var runMochaTests = function(cb) {
-  // childProcess.spawn(gulpPath, [
-  //   '--renderder',
-  //   '--compilers',
-  //   'js:babel-core/register',
-  //   '--timeout',
-  //   '50000',
-  //   '-R',
-  //   'mocha-unfunk-reporter',
-  //   './tests/*'
-  // ], {
-  //   stdio: 'inherit'
-  // }).on('exit', function() {
-  //   cb();
-  // });
-
-}
+// var runMochaTests = function(cb) {
+//   childProcess.spawn(gulpPath, [
+//     '--renderder',
+//     '--compilers',
+//     'js:babel-core/register',
+//     '--timeout',
+//     '50000',
+//     '-R',
+//     'mocha-unfunk-reporter',
+//     './tests/*'
+//   ], {
+//     stdio: 'inherit'
+//   }).on('exit', function() {
+//     cb();
+//   });
+// }
 
 gulp.task('babelApi', function() {
   gulp.src(apiPaths)
@@ -103,41 +101,26 @@ gulp.task('installPackages', function(cb) {
   });
 });
 
-// gulp.task('msvc_rebuild', function(cb) {
-//   exec('npm run msvc_rebuild --env=test', function(err, stdout, stderr) {
-//     console.log(stdout);
-//     console.log(stderr);
-//     cb(err);
-//   });
-// });
-
 gulp.task('mocha', function() {
   gulp.src('./tests', {read: false})
   .pipe(gulpMocha.default({
     electronMocha: {
       renderer: true,
-      'no-timeout': true,
+      'timeout': 50000,
       compilers: 'js:babel-core/register',
       R: 'mocha-unfunk-reporter',
     }
   }))
 });
 
-var executeTest = function(cb) {
-  // gulp.src(['./app/*.js', './app/api/**/**/*.js', './app/scripts/**/*js'])
-  //   .pipe(jshint({
-  //     esnext: true
-  //   })) // hint (optional)
-  // .pipe(jscs()) // enforce style guide
-  // .pipe(stylish.combineWithHintResults()) // combine with jshint results
-  // .pipe(jshint.reporter('jshint-stylish'));
-  // runMochaTests(cb);
-  // exec(gulpPath + ' --renderder --compilers js:babel-core/register --timeout 50000 -R mocha-unfunk-reporter ./tests/*',
-  //   { timeout: 100000 }, function(error, stdout, stderr) {
-  //   console.log(stdout);
-  //   console.log(stderr);
-  //   cb(error);
-  // });
-};
+// var executeTest = function(cb) {
+//   gulp.src(['./app/*.js', './app/api/**/**/*.js', './app/scripts/**/*js'])
+//     .pipe(jshint({
+//       esnext: true
+//     })) // hint (optional)
+//   .pipe(jscs()) // enforce style guide
+//   .pipe(stylish.combineWithHintResults()) // combine with jshint results
+//   .pipe(jshint.reporter('jshint-stylish'));
+// };
 
 gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'copy', 'installPackages', 'mocha' ]);
