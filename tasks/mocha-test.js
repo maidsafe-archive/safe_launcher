@@ -13,6 +13,9 @@ var path = require('path');
 var os = require('os');
 var exec = require('child_process').exec;
 var gulpMocha = require('gulp-electron-mocha');
+var shell = require('gulp-shell');
+var install = require("gulp-install");
+var exec = require('gulp-exec');
 
 var destDir = path.resolve('testApp');
 var ffiName = null;
@@ -22,7 +25,8 @@ if (os.platform() === 'darwin') {
 } else if(os.platform() === 'linux') {
   ffiName = 'libsafe_core.so';
 } else {
-  ffiName = 'safe_core.dll';
+  // ffiName = 'safe_core.dll';
+  ffiName = 'safe_ffi.dll';
 }
 var apiPaths = [
   './app/api/**',
@@ -77,32 +81,33 @@ gulp.task('clean', function() {
 
 gulp.task('copy', function() {
   fse.copySync(path.resolve('./app/api/ffi', ffiName), path.resolve(destDir, 'api', 'ffi', ffiName));
-  var ls = exec('ls ./testApp/api/ffi', function (error, stdout, stderr) {
-   if (error) {
-     console.log(error.stack);
-     console.log('Error code: ' + error.code);
-     console.log('Signal received: ' + error.signal);
-   }
-   console.log('Child Process STDOUT: ' + stdout);
-   console.log('Child Process STDERR: ' + stderr);
- });
-
- ls.on('exit', function (code) {
-   console.log('Child process exited with exit code ' + code);
- });
   fse.copySync('./app/package.json', path.resolve(destDir, 'package.json'));
 });
 
-gulp.task('installPackages', function(cb) {
-  exec('cd testApp && npm install && cd .. && gulp msvc_rebuild --env=test', function(error, stdout, stderr) {
-    console.log(stdout);
-    console.log(stderr);
-    cb(error);
-  });
+gulp.task('installPackages', function() {
+  return gulp.src('./testApp/package.json')
+  .pipe(gulp.dest('./testApp'))
+  .pipe(install());
 });
 
-gulp.task('mocha', function() {
-  gulp.src('./tests', {read: false})
+gulp.task('test_msvc_rebuild', [ 'installPackages' ], function() {
+  var options = {
+    continueOnError: false, // default = false, true means don't emit error event
+    pipeStdout: false, // default = false, true means stdout is written to file.contents
+    customTemplatingThing: "test" // content passed to gutil.template()
+  };
+  var reportOptions = {
+  	err: true, // default = true, false means don't write err
+  	stderr: true, // default = true, false means don't write stderr
+  	stdout: true // default = true, false means don't write stdout
+  }
+  return gulp.src(path.resolve(__dirname, '..'))
+  .pipe(exec('cd <%= file.path %> && gulp msvc_rebuild --env=test'))
+  .pipe(exec.reporter(reportOptions));
+});
+
+gulp.task('mocha', [ 'test_msvc_rebuild' ], function() {
+  return gulp.src('./tests', {read: false})
   .pipe(gulpMocha.default({
     electronMocha: {
       renderer: true,
@@ -123,4 +128,4 @@ gulp.task('mocha', function() {
 //   .pipe(jshint.reporter('jshint-stylish'));
 // };
 
-gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'copy', 'installPackages', 'mocha' ]);
+gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'copy', 'mocha' ]);

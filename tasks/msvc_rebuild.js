@@ -6,23 +6,31 @@ var childProcess = require('child_process');
 var path = require('path');
 var os = require('os');
 var electronVersion = require(path.resolve('./node_modules/electron-prebuilt/package.json')).version;
+var shell = require('gulp-shell');
+var exec = require('gulp-exec');
 
-var executeMsvcRebuild = function() {
-    if (process.platform !== 'win32') {
-      return gutil.log('msvc_rebuild is supported only on Windows');
-    }
-    var targetPaths = [ './app/node_modules/ref', './app/node_modules/ffi' ];
-    var testTargetPaths = [ './testApp/node_modules/ref', './testApp/node_modules/ffi' ];
-    targetPaths = gutil.env._[0] === 'test' ? testTargetPaths : targetPaths;
-    targetPaths.forEach(function(target) {
-      var childp = childProcess.exec('cd ' + path.resolve(target) + ' && node-gyp rebuild --target=' +
-        electronVersion + ' --arch=' + os.arch() + ' --dist-url=https://atom.io/download/atom-shell', function(err, stdout) {
-          if (err) {
-            return gutil.log(err);
-          }
-          gutil.log(stdout);
-        });
-    });
-};
-
-gulp.task('msvc_rebuild', executeMsvcRebuild);
+gulp.task('msvc_rebuild', function() {
+  if (process.platform !== 'win32') {
+    return gutil.log('msvc_rebuild is supported only on Windows');
+  }
+  var options = {
+    continueOnError: false, // default = false, true means don't emit error event
+    pipeStdout: false, // default = false, true means stdout is written to file.contents
+    customTemplatingThing: "test" // content passed to gutil.template()
+  };
+  var reportOptions = {
+  	err: true, // default = true, false means don't write err
+  	stderr: true, // default = true, false means don't write stderr
+  	stdout: true // default = true, false means don't write stdout
+  }
+  console.log(process.argv);
+  var rootFolder = gutil.env.env === 'test' ? 'testApp' : 'app';
+  var packages = ['ref', 'ffi'];
+  var targetPath = path.resolve(rootFolder, 'node_modules');
+  return gulp.src('./')
+  .pipe(exec('cd ' + path.resolve(targetPath, packages[0]) + ' && node-gyp rebuild --target=' +
+      electronVersion + ' --arch=' + os.arch() + ' --dist-url=https://atom.io/download/atom-shell && cd .. && cd ' +
+       packages[1] + ' && node-gyp rebuild --target=' +
+      electronVersion + ' --arch=' + os.arch() + ' --dist-url=https://atom.io/download/atom-shell', options))
+  .pipe(exec.reporter(reportOptions));
+});
