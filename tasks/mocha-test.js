@@ -25,7 +25,8 @@ if (os.platform() === 'darwin') {
 } else if(os.platform() === 'linux') {
   ffiName = 'libsafe_core.so';
 } else {
-  ffiName = 'safe_core.dll';
+  // ffiName = 'safe_core.dll';
+  ffiName = 'safe_ffi.dll';
 }
 var apiPaths = [
   './app/api/**',
@@ -34,6 +35,10 @@ var apiPaths = [
 
 var serverPaths = [
   './app/server/**',
+];
+
+var loggerPaths = [
+  './app/logger/**',
 ];
 
 
@@ -73,6 +78,12 @@ gulp.task('babelServer', function() {
   .pipe(gulp.dest(path.resolve(destDir, 'server')));
 });
 
+gulp.task('babelLogger', function() {
+  gulp.src(loggerPaths)
+  .pipe(babel())
+  .pipe(gulp.dest(path.resolve(destDir, 'logger')));
+});
+
 gulp.task('clean', function() {
   fse.removeSync('./testApp/api');
   fse.removeSync('./testApp/server');
@@ -81,6 +92,7 @@ gulp.task('clean', function() {
 gulp.task('copy', function() {
   fse.copySync(path.resolve('./app/api/ffi', ffiName), path.resolve(destDir, 'api', 'ffi', ffiName));
   fse.copySync('./app/package.json', path.resolve(destDir, 'package.json'));
+  fse.copySync('./app/env.js', path.resolve(destDir, 'env.js'));
 });
 
 gulp.task('installPackages', function() {
@@ -127,4 +139,4 @@ gulp.task('mocha', [ 'test_msvc_rebuild' ], function() {
 //   .pipe(jshint.reporter('jshint-stylish'));
 // };
 
-gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'copy', 'mocha' ]);
+gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'babelLogger', 'copy', 'mocha' ]);
