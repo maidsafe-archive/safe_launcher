@@ -43,10 +43,10 @@ script:
   - zip safe_launcher.zip app_dist/
 
 deploy:
-  - provider: releases
-    api_key: eb180462a017b15432d4ca6371360450d5a80870
-    file:
-      - $TRAVIS_BUILD_DIR/safe_launcher.zip
-    skip_cleanup: true
-    draft: true
-    tag_name: 'safe_release'
+- provider: releases
+  api_key: eb180462a017b15432d4ca6371360450d5a80870
+  file:
+    - $TRAVIS_BUILD_DIR/safe_launcher.zip
+  skip_cleanup: true
+  draft: true
+  tag_name: 'safe_release'
