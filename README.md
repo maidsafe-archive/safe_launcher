@@ -3,7 +3,7 @@ safe_launcher
 
 # Quick start
 The development dependency of this project is [Node.js](https://nodejs.org).
-Build the [safe_ffi](https://github.com/maidsafe/safe_ffi) with feature `use-mock-network` and copy the `.dll` for Windows
+Build the [safe_core](https://github.com/maidsafe/safe_core) with feature `use-mock-network` and copy the `.dll` for Windows
 , `.so` for Linux or `.dylib` for OSX to the `app/api/ffi` folder.
 
 The launcher can be developed/tested only with ffi with mock feature or by running a local network only.

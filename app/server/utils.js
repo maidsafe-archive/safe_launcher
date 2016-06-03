@@ -3,6 +3,7 @@ import mime from 'mime';
 import * as sodium from 'libsodium-wrappers';
 import sessionManager from './session_manager';
 import { errorCodeLookup } from './error_code_lookup';
+import { log } from './../logger/log';
 
 export var getSessionIdFromRequest = function(req) {
   let authHeader = req.get('Authorization');
@@ -36,10 +37,14 @@ export var getSessionIdFromRequest = function(req) {
 
 export var decryptRequest = function(req, res, next) {
   if (!req.get('Authorization')) {
+    log.debug('Unauthorised Request ::' + req.path);
     return next();
   }
+  log.debug('Authorised Request ::' + req.path);
   let sessionId = getSessionIdFromRequest(req);
+  log.debug('Decrypted session id :: ' + sessionId);
   if (!sessionId) {
+    log.warn('Session Id not found');
     return res.sendStatus(401);
   }
   let sessionInfo = sessionManager.get(sessionId);
@@ -56,22 +61,27 @@ export var decryptRequest = function(req, res, next) {
     // var path = new Uint8Array(new Buffer(req.path.substr(1), 'base64'));
     // req.url = new Buffer(sodium.crypto_secretbox_open_easy(path, sessionInfo.nonce, sessionInfo.secretKey)).toString();
     if (req.body && Object.keys(req.body).length > 0) {
+      log.debug('Decrypting Request Body');
       let reqBodyUIntArray = new Uint8Array(new Buffer(req.body, 'base64'));
       let reqBody = sodium.crypto_secretbox_open_easy(reqBodyUIntArray, sessionInfo.nonce, sessionInfo.secretKey);
       req.body = new Buffer(reqBody);
+      log.debug('Decrypted Request Body');
     }
     if (Object.keys(req.query).length > 0) {
+      log.debug('Decrypting Request Query Parameters');
       var query = Object.keys(req.query)[0];
       let queryUIntArray = new Uint8Array(new Buffer(query, 'base64'));
       let reqQuery = sodium.crypto_secretbox_open_easy(queryUIntArray, sessionInfo.nonce, sessionInfo.secretKey);
       reqQuery = new Buffer(reqQuery).toString();
+      log.debug('Decrypted Request Query Params :: ' + reqQuery);
       reqQuery = parseQueryString(reqQuery);
       req.query = reqQuery;
     }
     req.headers['sessionId'] = sessionId;
     next();
   } catch (e) {
-    return res.status(400).send(e);
+    log.error('Decryption Error - Authorised Request - ' + e.message);
+    return res.sendStatus(401);
   }
 }
 

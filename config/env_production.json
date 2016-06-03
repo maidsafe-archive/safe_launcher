@@ -1,5 +1,12 @@
 {
   "name": "production",
   "serverPort": 8100,
-  "proxyPort": 8101
+  "proxyPort": 8101,
+  "log": {
+    "level": "debug",
+    "file": {
+      "maxFileSize": 10000,
+      "maxFiles": 10
+    }
+  }
 }

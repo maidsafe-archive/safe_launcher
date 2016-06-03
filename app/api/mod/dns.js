@@ -1,3 +1,5 @@
+import { log } from './../../logger/log';
+
 export default class DNS {
 
   constructor(msgSender) {
@@ -6,6 +8,7 @@ export default class DNS {
   }
 
   getHomeDirectory(longName, serviceName, hasSafeDriveAccess, appDirKey, callback) {
+    log.debug('Invoking API DNS::getHomeDirectory - FFI::' + this.MODULE + '::get-home-dir');
     this.send({
       module: this.MODULE,
       action: 'get-home-dir',
@@ -21,6 +24,7 @@ export default class DNS {
 
   register(longName, serviceName, serviceHomeDirPath, isPathShared,
     hasSafeDriveAccess, appDirKey, callback) {
+    log.debug('Invoking API DNS::register - FFI::' + this.MODULE + '::register-dns');
     this.send({
       module: this.MODULE,
       action: 'register-dns',
@@ -38,6 +42,7 @@ export default class DNS {
 
   addService(longName, serviceName, serviceHomeDirPath, isPathShared,
     hasSafeDriveAccess, appDirKey, callback) {
+    log.debug('Invoking API DNS::addService - FFI::' + this.MODULE + '::add-service');
     this.send({
       module: this.MODULE,
       action: 'add-service',
@@ -54,6 +59,7 @@ export default class DNS {
   }
 
   getFile(longName, serviceName, filePath, offset, length, hasSafeDriveAccess, appDirKey, callback) {
+    log.debug('Invoking API DNS::getFile - FFI::' + this.MODULE + '::get-file');
     this.send({
       module: this.MODULE,
       action: 'get-file',
@@ -72,6 +78,7 @@ export default class DNS {
   }
 
   deleteDns(longName, hasSafeDriveAccess, appDirKey, callback) {
+    log.debug('Invoking API DNS::deleteDns - FFI::' + this.MODULE + '::delete-dns');
     this.send({
       module: this.MODULE,
       action: 'delete-dns',
@@ -85,6 +92,7 @@ export default class DNS {
   }
 
   deleteService(longName, serviceName, hasSafeDriveAccess, appDirKey, callback) {
+    log.debug('Invoking API DNS::deleteService - FFI::' + this.MODULE + '::delete-dns');
     this.send({
       module: this.MODULE,
       action: 'delete-dns',
@@ -99,6 +107,7 @@ export default class DNS {
   }
 
   createPublicId(longName, appDirKey, callback) {
+    log.debug('Invoking API DNS::createPublicId - FFI::' + this.MODULE + '::register-public-id');
     this.send({
       module: this.MODULE,
       action: 'register-public-id',
@@ -112,6 +121,7 @@ export default class DNS {
   }
 
   listLongNames(appDirKey, callback) {
+    log.debug('Invoking API DNS::listLongNames - FFI::' + this.MODULE + '::get-long-names');
     this.send({
       module: this.MODULE,
       action: 'get-long-names',
@@ -124,6 +134,7 @@ export default class DNS {
   }
 
   listServices(longName, appDirKey, callback) {
+    log.debug('Invoking API DNS::listServices - FFI::' + this.MODULE + '::get-services');
     this.send({
       module: this.MODULE,
       action: 'get-services',
