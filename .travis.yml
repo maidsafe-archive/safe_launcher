@@ -31,6 +31,7 @@ install:
   - python --version
 before_script:
   - export DISPLAY=:99.0; sh -e /etc/init.d/xvfb start
+
 script:
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
@@ -46,11 +47,12 @@ before_deploy:
   - ls $TRAVIS_BUILD_DIR/app_dist
   - zip safe_launcher.zip $TRAVIS_BUILD_DIR/app_dist/
   - ls $TRAVIS_BUILD_DIR
+
 deploy:
-- provider: releases
-  api_key: eb180462a017b15432d4ca6371360450d5a80870
-  file:
-    - $TRAVIS_BUILD_DIR/safe_launcher.zip
-  skip_cleanup: true
-  draft: true
-  tag_name: 'safe_release'
+  - provider: releases
+    api_key: eb180462a017b15432d4ca6371360450d5a80870
+    file:
+      - $TRAVIS_BUILD_DIR/safe_launcher.zip
+    skip_cleanup: true
+    draft: true
+    tag_name: 'safe_release'
