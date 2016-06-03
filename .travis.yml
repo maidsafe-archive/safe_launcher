@@ -48,6 +48,5 @@ deploy:
   file:
     - $TRAVIS_BUILD_DIR/safe_launcher.zip
   skip_cleanup: true
-  edge: true
   on:
     tags: true
