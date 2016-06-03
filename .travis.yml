@@ -57,4 +57,4 @@ deploy:
     draft: true
     tag_name: 'safe_release'
     on:
-      tags: true
+      all_branches: true
