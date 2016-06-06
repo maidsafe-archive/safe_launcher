@@ -2,10 +2,16 @@ env:
   global:
   - secure: kERfGEJxywTI3AvAsOCcjQBuxrAiJ7aOWooLmtxy8QWzNkVUlhY2A5xGWCqyKunMmjj9+cJ2FtrejYDo9FcXtmL2MlU0M6YZ1vLCeYTMsxMurZNXH0o64X0pFRsYAxR/uYgiZKujXBTcXiRlKkBd2G+aVetKPUl3rTi3nrejlto=
   - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
-  - CXX=g++-4.8
+compiler:
+  - gcc
+  - clang
 os:
   - linux
   - osx
+matrix:
+  exclude:
+    - os: osx
+      compiler: gcc  
 osx_image: xcode7.2
 language: rust
 rust:
@@ -16,12 +22,17 @@ sudo: true
 addons:
   apt:
     sources:
-    - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.8
+      - ubuntu-toolchain-r-test
     packages:
-    - g++-4.8
-    - xvfb
+      - g++-4.8
+      - xvfb
+      - clang-3.6
 cache:
   cargo: true
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CXX=g++-4.8; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
 install:
   - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
   - ". install_libsodium.sh"
@@ -32,10 +43,10 @@ install:
   - python --version
 
 before_script:
-  - export APP_VERSION=`git log -1 | tr '[:upper:]' '[:lower:]' | grep "version change to " | tr -d ' '*versionchangeto`
+  - APP_VERSION=`git log -1 | tr '[:upper:]' '[:lower:]' | grep "version change to " | tr -d ' '*versionchangeto`
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; sh -e /etc/init.d/xvfb start; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export RELEASE_NAME=safe_launcher-v$APP_VERSION-linux-x64.tar.gz; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export RELEASE_NAME=safe_launcher-v$APP_VERSION-osx-x64.tar.gz; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export RELEASE_NAME=safe_launcher-v${APP_VERSION}-linux-x64.tar.gz; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export RELEASE_NAME=safe_launcher-v${APP_VERSION}-osx-x64.tar.gz; fi
 
 script:
   - export RUST_BACKTRACE=1
