@@ -32,14 +32,16 @@ install:
   - python --version
 
 before_script:
+  - export APP_VERSION=`git log -1 | tr '[:upper:]' '[:lower:]' | grep "version change to " | tr -d ' '*versionchangeto`
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; export DISPLAY=:99.0; sh -e /etc/init.d/xvfb start; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; export RELEASE_NAME=safe_launcher-v-linux-x64.tar.gz; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; export RELEASE_NAME=safe_launcher-v-osx-x64.tar.gz; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; export RELEASE_NAME=safe_launcher-v$APP_VERSION-linux-x64.tar.gz; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; export RELEASE_NAME=safe_launcher-v$APP_VERSION-osx-x64.tar.gz; fi
 
 script:
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
-  - cp target/release/libsafe_core.so $FFIDest
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp target/release/libsafe_core.so $FFIDest; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp target/release/libsafe_core.dylib $FFIDest; fi
   - cd $TRAVIS_BUILD_DIR
   - npm install
 
@@ -47,7 +49,7 @@ before_deploy:
   - npm run package
   - ls $TRAVIS_BUILD_DIR
   - ls $TRAVIS_BUILD_DIR/app_dist
-  - tar -zcvf $RELEASE_NAME $TRAVIS_BUILD_DIR/app_dist/
+  - tar -zcvf $RELEASE_NAME app_dist/
   - ls $TRAVIS_BUILD_DIR
 deploy:
   provider: releases
