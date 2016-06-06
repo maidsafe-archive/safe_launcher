@@ -15,6 +15,10 @@ matrix:
       env: >
         PLATFORM=osx-x64
   fast_finish: true
+addons:
+  apt:
+    packages:
+      - xvfb
 language: generic
 python:
   - '2.7'
