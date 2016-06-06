@@ -1,22 +1,19 @@
 env:
   global:
-  - secure: kERfGEJxywTI3AvAsOCcjQBuxrAiJ7aOWooLmtxy8QWzNkVUlhY2A5xGWCqyKunMmjj9+cJ2FtrejYDo9FcXtmL2MlU0M6YZ1vLCeYTMsxMurZNXH0o64X0pFRsYAxR/uYgiZKujXBTcXiRlKkBd2G+aVetKPUl3rTi3nrejlto=
   - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
   - PROJECT_NAME=safe_launcher
-# os:
-#   - osx
-#   - linux
+  - secure: HhpVaBtT+7P6QDSQiRlOlTJmczxnDCGGM2SOps0kr04/+2LicoX4ZSBrJ0TNKKAmVABoGPxHYCR9j2hqENWJNeLF6T3kVjcOa9ocRRN6LMq2Qme7ZT1tmgVgVfzGZ/wTbF3pphyhOSFzyigPUVRctusR2aTOOAmzFBp6mjKteOfsXDTEQoyx391FlHxKbHsAPVLiM/CbjUioSC0bybStaNCdi+x16HMeG6buClXio7QEnSd/+M76K8g24lXiOvfwELs7beRM4UYPzPLIWkrf4zRgjHKayEEh7rmuypZFhBQO3KWNQr03zELkn2pO6duOE3QsfFxFIOQT8u1R8CX8cvYEb7/AkJgSq+ELH5Fb5dcufwjdOH58WQZPsbWykVqeoeSRjFc6MkonEjfc+Vzd7ZJJcRbdIbguMLl+xVk6bvLMd9xeOavtyeeRcRQ+gkMrTyr9V/BKcAhFC8NdkgUWeIGg9VIidpAx6mlYnl1a0lZjxlVU3c6fGjyemmx+Vwa//b/4Up7bQOtMX+xcB/4ou4t4rIZj9KBfvbS8K6WrW0T5qPkc0xMR3Q8yYuxwacdoPcqPZnzguL7DnjilCc9RtkFeRJz2CX6IfskLqZ4Kwn05tBgibdRa/ZglvLDifb3SXSZGEeYn+tSZHER5Aw5+utY1i0HnYoFSdSsm8WtVyfI=
 matrix:
   include:
-    - os: linux
-      env: >
-        PLATFORM=linux-x64
-    - os: osx
-      env: >
-        PLATFORM=osx-x64
+  - os: linux
+    env: |
+      PLATFORM=linux-x64
+  - os: osx
+    env: |
+      PLATFORM=osx-x64
 language: generic
 python:
-  - '2.7'
+- '2.7'
 osx_image: xcode7.2
 sudo: required
 dist: trusty
@@ -35,36 +32,36 @@ install:
   - node --version
   - npm --version
   - python --version
-
 before_script:
   - export DISPLAY=:99.0;
-  # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
 script:
-  - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
-  - cargo build --release --verbose --features use-mock-routing
-  # - cp target/release/libsafe_core.dylib $FFIDest
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
-  - cd $TRAVIS_BUILD_DIR
-  - npm install
-
+- git clone https://github.com/maidsafe/safe_core.git && cd safe_core
+- cargo build --release --verbose --features use-mock-routing
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
+- cd $TRAVIS_BUILD_DIR
+- npm install
 before_deploy:
-  - npm run package
-  - ls $TRAVIS_BUILD_DIR
-  - ls $TRAVIS_BUILD_DIR/app_dist
-  - tar -zcvf ${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz $TRAVIS_BUILD_DIR/app_dist/
+  -git config --global user.name shankar2105
+  - git config --global user.email shankar21mail@gmail.com
+  - git fetch --tags
+  - |
+    if [ -z $(git tag -l "$PROJECT_VERSION") ]; then
+      git tag $PROJECT_VERSION -am "Version $PROJECT_VERSION" $TRAVIS_COMMIT
+      git push https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} tag $PROJECT_VERSION > /dev/null 2>&1
+    fi
+  - npm run package - ls $TRAVIS_BUILD_DIR - ls $TRAVIS_BUILD_DIR/app_dist
+  - tar czf ${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz $TRAVIS_BUILD_DIR/app_dist/
   - ls $TRAVIS_BUILD_DIR
 deploy:
   provider: releases
-  api_key:
-    secure: rAuOXlXDTCc9/A9X7cB/tXi6J8kQyS6jdjjNpqHRjNR4dn50HNAIIaORM56RYtp8ct9aFa1gaBREhJjsLnDtR4r32SccJsgmhzWSw/P5PJqdSgPGD58YyDKpdMvRBFGPGSWoP7JJWCOzuH63YI9JNwSCouk0jV+wnXEg5eTjhGQ7tVXPEiOZibFD7HoXa9p6iAanp6kqVxxKZ+BFR0/yXGjh76Dps/UtFMo6phyk+tUpZxZhQBXZY1wqDDGosVeW6qtrHxGiIZ4yK0HdqvBGnVGc6+Bvc7gBKlyiDu+ZoPKsXCDWeMBFM1OouNOFGlw4KZSJp94OyWb9n29WY4IgfttvvhH6cHirTgTl+lc4kHNCmP/KqKYqWXKo2yZBvI9igwKxGQSDtKqJpDp4UxGG+C8PF9dzuzGGd+f+6uYBQx32lTBv6D2EP62M5K+tJNVJEbUxEvM8m1G7xD+26yUKe0xSJALSYJw7KxKpCrzezz3EIG5w5BivGZ+9R07RM+QGens9R6j3AMyTVA7rZxrHkT5UJdZyiQwNGvQTX2I05UHbIpxGKUb7sOQphXExBHW5EOYUFXt38G32VwqemkcmbDCMNsuQGHXkeoLVHFC2mCIrzp6x1p+8wpZfVHmMpbO7sRjAop+p2Ac+xd3PpcsnRsOJw2Q7WiM/IRM+SqomVNk=
-  file:  ${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz
+  api_key: ${GH_TOKEN}
+  file: "${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz"
   skip_cleanup: true
-  tag_name: ${PROJECT_VERSION}
+  tag_name: "${PROJECT_VERSION}"
   draft: true
   on:
     repo: shankar2105/safe_launcher
     branch: travis_integration
-    condition: >
-        (-n "$PROJECT_VERSION") &&
-        (-n "$PLATFORM")
+    condition: |
+      (-n "$PROJECT_VERSION") && (-n "$PLATFORM")
