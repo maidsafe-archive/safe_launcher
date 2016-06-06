@@ -48,8 +48,6 @@ deploy:
     provider: GitHub
     auth_token:
       secure: iimCzx78OtZMM3jV9ghYF2U4T+xsrS/xY3EAnaegN8yjk5d2cc+EaklmQhEkkAnb
-    artifact:
-      - path: safe_launcher.zip
-        name: safe_launcher
+    artifact: 'safe_launcher.zip'
     draft: true
     prerelease: false
