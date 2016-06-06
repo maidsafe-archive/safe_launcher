@@ -13,7 +13,7 @@ matrix:
         PLATFORM=linux-x64
     - os: osx
       env: >
-        PLATFORM=osx-x64    
+        PLATFORM=osx-x64
   fast_finish: true
 language: generic
 python:
@@ -24,7 +24,7 @@ dist: trusty
 cache:
   cargo: true
 install:
-  - curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=$CHANNEL
+  - curl -sSf https://static.rust-lang.org/rustup.sh | sh
   - rustc -V
   - cargo -V
   - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
