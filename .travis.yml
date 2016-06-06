@@ -65,6 +65,4 @@ deploy:
   on:
     repo: shankar2105/safe_launcher
     branch: travis_integration
-    condition: >
-        (-n "$PROJECT_VERSION") &&
-        (-n "$PLATFORM")
+    
