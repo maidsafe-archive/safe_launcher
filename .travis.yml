@@ -36,7 +36,6 @@ install:
 
 before_script:
   - export PROJECT_VERSION=$(git log -1 | grep -i "version change to" | sed "s/.*[vV]ersion change to v\{0,1\}//")
-  - echo "${PROJECT_VERSION}"
   - export DISPLAY=:99.0;
   # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
 script:
@@ -52,7 +51,7 @@ before_deploy:
   - npm run package
   - ls $TRAVIS_BUILD_DIR
   - ls $TRAVIS_BUILD_DIR/app_dist
-  - tar -zcvf $RELEASE_NAME $TRAVIS_BUILD_DIR/app_dist/
+  - tar -zcvf ${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz $TRAVIS_BUILD_DIR/app_dist/
   - ls $TRAVIS_BUILD_DIR
 deploy:
   provider: releases
@@ -65,4 +64,3 @@ deploy:
   on:
     repo: shankar2105/safe_launcher
     branch: travis_integration
-    
