@@ -46,7 +46,9 @@ before_deploy:
   - git config --global user.email shankar21mail@gmail.com
   - git fetch --tags
   - if [ -z $(git tag -l "$PROJECT_VERSION") ]; then git tag $PROJECT_VERSION -am "Version $PROJECT_VERSION" $TRAVIS_COMMIT; git push https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} tag $PROJECT_VERSION > /dev/null 2>&1; fi
-  - npm run package - ls $TRAVIS_BUILD_DIR - ls $TRAVIS_BUILD_DIR/app_dist
+  - npm run package
+  - ls $TRAVIS_BUILD_DIR
+  - ls $TRAVIS_BUILD_DIR/app_dist
   - tar czf ${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz $TRAVIS_BUILD_DIR/app_dist/
   - ls $TRAVIS_BUILD_DIR
 deploy:
