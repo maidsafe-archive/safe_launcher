@@ -5,7 +5,6 @@ os: unstable
 environment:
   nodejs_version: "6.2"
   global:
-    RUST_BACKTRACE: 1
     GH_TOKEN:
       secure: Y+2qAj6Y4/7d+Fvv4/5TF8FU6fPOqlFio6mH+8P2dnH2bX+Dj6AVpAt/D0ODqPoJ
     Features: "use-mock-routing"
