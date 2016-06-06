@@ -7,8 +7,8 @@ env:
 #   - linux
 matrix:
   include:
-    - os: linux
     - os: osx
+    - os: linux
 language: rust
 rust:
   - stable
