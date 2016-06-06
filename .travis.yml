@@ -7,8 +7,8 @@ env:
 #   - linux
 matrix:
   include:
-    - os: osx
     - os: linux
+    - os: osx
 language: rust
 rust:
   - stable
@@ -30,6 +30,7 @@ install:
 
 before_script:
   - APP_VERSION="$(git log -1 | tr '[:upper:]' '[:lower:]' | grep "version change to " | tr -d ' '*versionchangeto)"
+  - echo "${APP_VERSION}"
   - export DISPLAY=:99.0;
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
   # - export RELEASE_NAME=safe_launcher.tar.gz
