@@ -22,6 +22,8 @@ sudo: required
 dist: trusty
 cache:
   cargo: true
+before_install:
+  - export PROJECT_VERSION=$(git log -1 | grep -i "version change to" | sed "s/.*[vV]ersion change to v\{0,1\}//")
 install:
   - curl -sSf https://static.rust-lang.org/rustup.sh | sh
   - rustc -V
@@ -35,7 +37,6 @@ install:
   - python --version
 
 before_script:
-  - export PROJECT_VERSION=$(git log -1 | grep -i "version change to" | sed "s/.*[vV]ersion change to v\{0,1\}//")
   - export DISPLAY=:99.0;
   # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
 script:
@@ -64,3 +65,6 @@ deploy:
   on:
     repo: shankar2105/safe_launcher
     branch: travis_integration
+    condition: >
+        (-n "$PROJECT_VERSION") &&
+        (-n "$PLATFORM")
