@@ -46,7 +46,10 @@ deploy:
   provider: releases
   api_key:
     secure: rAuOXlXDTCc9/A9X7cB/tXi6J8kQyS6jdjjNpqHRjNR4dn50HNAIIaORM56RYtp8ct9aFa1gaBREhJjsLnDtR4r32SccJsgmhzWSw/P5PJqdSgPGD58YyDKpdMvRBFGPGSWoP7JJWCOzuH63YI9JNwSCouk0jV+wnXEg5eTjhGQ7tVXPEiOZibFD7HoXa9p6iAanp6kqVxxKZ+BFR0/yXGjh76Dps/UtFMo6phyk+tUpZxZhQBXZY1wqDDGosVeW6qtrHxGiIZ4yK0HdqvBGnVGc6+Bvc7gBKlyiDu+ZoPKsXCDWeMBFM1OouNOFGlw4KZSJp94OyWb9n29WY4IgfttvvhH6cHirTgTl+lc4kHNCmP/KqKYqWXKo2yZBvI9igwKxGQSDtKqJpDp4UxGG+C8PF9dzuzGGd+f+6uYBQx32lTBv6D2EP62M5K+tJNVJEbUxEvM8m1G7xD+26yUKe0xSJALSYJw7KxKpCrzezz3EIG5w5BivGZ+9R07RM+QGens9R6j3AMyTVA7rZxrHkT5UJdZyiQwNGvQTX2I05UHbIpxGKUb7sOQphXExBHW5EOYUFXt38G32VwqemkcmbDCMNsuQGHXkeoLVHFC2mCIrzp6x1p+8wpZfVHmMpbO7sRjAop+p2Ac+xd3PpcsnRsOJw2Q7WiM/IRM+SqomVNk=
-  file: app_dist
+  file: $TRAVIS_BUILD_DIR/safe_launcher.zip
+  skip_cleanup: true
+  tag_name: 'safe_release'
+  draft: true
   on:
     repo: shankar2105/safe_launcher
     branch: travis_integration

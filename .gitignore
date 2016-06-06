@@ -8,6 +8,11 @@ Thumbs.db
 /releases/
 /tmp/
 /app/api/ffi/safe_ffi.dll
+/app/api/ffi/libsafe_core.so
+/app/api/ffi/libsafe_core.so
+/app/api/ffi/libsafe_core.dylib
+install_libsodium.sh
+safe_launcher.zip
 /app/bower_components
 /app_dist
 /.idea
