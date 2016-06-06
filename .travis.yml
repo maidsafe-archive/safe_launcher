@@ -3,8 +3,8 @@ env:
   - secure: kERfGEJxywTI3AvAsOCcjQBuxrAiJ7aOWooLmtxy8QWzNkVUlhY2A5xGWCqyKunMmjj9+cJ2FtrejYDo9FcXtmL2MlU0M6YZ1vLCeYTMsxMurZNXH0o64X0pFRsYAxR/uYgiZKujXBTcXiRlKkBd2G+aVetKPUl3rTi3nrejlto=
   - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
 os:
-  - linux
   - osx
+  - linux
 language: rust
 rust:
   - stable
