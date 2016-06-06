@@ -8,12 +8,12 @@ env:
 #   - linux
 matrix:
   include:
-    - os: osx
-      env: >
-        PLATFORM=osx-x64
     - os: linux
       env: >
         PLATFORM=linux-x64
+    - os: osx
+      env: >
+        PLATFORM=osx-x64    
   fast_finish: true
 language: generic
 python:
