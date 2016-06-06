@@ -1,59 +1,52 @@
 env:
   global:
-    - secure: kERfGEJxywTI3AvAsOCcjQBuxrAiJ7aOWooLmtxy8QWzNkVUlhY2A5xGWCqyKunMmjj9+cJ2FtrejYDo9FcXtmL2MlU0M6YZ1vLCeYTMsxMurZNXH0o64X0pFRsYAxR/uYgiZKujXBTcXiRlKkBd2G+aVetKPUl3rTi3nrejlto=
-    - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
-    - CXX=g++-4.8
+  - secure: kERfGEJxywTI3AvAsOCcjQBuxrAiJ7aOWooLmtxy8QWzNkVUlhY2A5xGWCqyKunMmjj9+cJ2FtrejYDo9FcXtmL2MlU0M6YZ1vLCeYTMsxMurZNXH0o64X0pFRsYAxR/uYgiZKujXBTcXiRlKkBd2G+aVetKPUl3rTi3nrejlto=
+  - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
+  - CXX=g++-4.8
 os:
-  - linux
+- linux
 language: rust
 rust:
-  - nightly
+- nightly
 python:
-  - "2.7"
+- '2.7'
 sudo: true
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+    - ubuntu-toolchain-r-test
     packages:
-      - g++-4.8
-      - xvfb
+    - g++-4.8
+    - xvfb
 cache:
   cargo: true
-
 install:
-  - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
-  - . install_libsodium.sh
-  - . $HOME/.nvm/nvm.sh
-  - nvm install 5.5
-  - nvm use 5.5
-  - node -v
-  - python --version
+- curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
+- ". install_libsodium.sh"
+- ". $HOME/.nvm/nvm.sh"
+- nvm install 5.5
+- nvm use 5.5
+- node -v
+- python --version
 before_script:
-  - export DISPLAY=:99.0; sh -e /etc/init.d/xvfb start
-
+- export DISPLAY=:99.0; sh -e /etc/init.d/xvfb start
 script:
-  - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
-  - cargo build --release --verbose --features use-mock-routing
-  - cp target/release/libsafe_core.so $FFIDest
-  # - ls $FFIDest
-  - cd $TRAVIS_BUILD_DIR
-  - npm install
-  # - npm test
-
+- git clone https://github.com/maidsafe/safe_core.git && cd safe_core
+- cargo build --release --verbose --features use-mock-routing
+- cp target/release/libsafe_core.so $FFIDest
+- cd $TRAVIS_BUILD_DIR
+- npm install
 before_deploy:
-  - npm run package
-  - ls $TRAVIS_BUILD_DIR
-  - ls $TRAVIS_BUILD_DIR/app_dist
-  - zip safe_launcher.zip $TRAVIS_BUILD_DIR/app_dist/
-  - ls $TRAVIS_BUILD_DIR
+- npm run package
+- ls $TRAVIS_BUILD_DIR
+- ls $TRAVIS_BUILD_DIR/app_dist
+- zip safe_launcher.zip $TRAVIS_BUILD_DIR/app_dist/
+- ls $TRAVIS_BUILD_DIR
 deploy:
-  - provider: releases
-    api_key: 3cfc773e7d0bd7e6de6e9a618262516986276307
-    file:
-      - $TRAVIS_BUILD_DIR/safe_launcher.zip
-    skip_cleanup: true
-    draft: true
-    tag_name: 'safe_release'
-    on:
-      all_branches: true
+  provider: releases
+  api_key:
+    secure: rAuOXlXDTCc9/A9X7cB/tXi6J8kQyS6jdjjNpqHRjNR4dn50HNAIIaORM56RYtp8ct9aFa1gaBREhJjsLnDtR4r32SccJsgmhzWSw/P5PJqdSgPGD58YyDKpdMvRBFGPGSWoP7JJWCOzuH63YI9JNwSCouk0jV+wnXEg5eTjhGQ7tVXPEiOZibFD7HoXa9p6iAanp6kqVxxKZ+BFR0/yXGjh76Dps/UtFMo6phyk+tUpZxZhQBXZY1wqDDGosVeW6qtrHxGiIZ4yK0HdqvBGnVGc6+Bvc7gBKlyiDu+ZoPKsXCDWeMBFM1OouNOFGlw4KZSJp94OyWb9n29WY4IgfttvvhH6cHirTgTl+lc4kHNCmP/KqKYqWXKo2yZBvI9igwKxGQSDtKqJpDp4UxGG+C8PF9dzuzGGd+f+6uYBQx32lTBv6D2EP62M5K+tJNVJEbUxEvM8m1G7xD+26yUKe0xSJALSYJw7KxKpCrzezz3EIG5w5BivGZ+9R07RM+QGens9R6j3AMyTVA7rZxrHkT5UJdZyiQwNGvQTX2I05UHbIpxGKUb7sOQphXExBHW5EOYUFXt38G32VwqemkcmbDCMNsuQGHXkeoLVHFC2mCIrzp6x1p+8wpZfVHmMpbO7sRjAop+p2Ac+xd3PpcsnRsOJw2Q7WiM/IRM+SqomVNk=
+  file: app_dist
+  on:
+    repo: shankar2105/safe_launcher
+    branch: travis_integration

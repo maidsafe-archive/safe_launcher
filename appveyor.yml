@@ -37,3 +37,19 @@ build: off
 
 test_script:
   - npm test
+
+before_deploy:
+  - npm run packages
+  - 7z a safe_launcher.zip %APPVEYOR_BUILD_FOLDER%\app_dist
+
+deploy:
+    release: safe_launcher-v$(appveyor_build_version)
+    description: 'test release'
+    provider: GitHub
+    auth_token:
+      secure: iimCzx78OtZMM3jV9ghYF2U4T+xsrS/xY3EAnaegN8yjk5d2cc+EaklmQhEkkAnb
+    artifact:
+      - path: safe_launcher.zip
+        name: safe_launcher
+    draft: true
+    prerelease: false
