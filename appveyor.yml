@@ -6,7 +6,11 @@ environment:
   nodejs_version: "6.2"
   global:
     RUST_BACKTRACE: 1
+    GH_TOKEN:
+      secure: Y+2qAj6Y4/7d+Fvv4/5TF8FU6fPOqlFio6mH+8P2dnH2bX+Dj6AVpAt/D0ODqPoJ
     Features: "use-mock-routing"
+    PROJECT_NAME: safe_launcher
+    RUST_BACKTRACE: 1
 cache:
   - node_modules
   - '%APPDATA%\npm-cache'
@@ -22,6 +26,11 @@ install:
         . ".\Install MinGW.ps1"
         . ".\Install libsodium.ps1"
         Install-Product node $env:nodejs_version $env:PLATFORM
+
+        if ($env:APPVEYOR_REPO_COMMIT_MESSAGE -match "[vV]ersion change to v?(.*)") {
+          $env:PROJECT_VERSION = $matches[1]
+          $env:DEPLOY = "true"
+        }
   - node --version
   - npm --version
   - set npm_config_arch=%PLATFORM:x86=ia32%
@@ -39,15 +48,21 @@ test_script:
   # - npm test
 
 before_deploy:
+  - ps: |
+      if (git tag -l "$env:PROJECT_VERSION") {
+        echo "Tag $env:PROJECT_VERSION already exists"
+      } else {
+        echo "Creating tag $env:PROJECT_VERSION"
+        git tag $env:PROJECT_VERSION -am "Version $env:PROJECT_VERSION" $APPVEYOR_REPO_COMMIT
+        git push "https://$env:GH_TOKEN@github.com/$env:APPVEYOR_REPO_NAME" tag $env:PROJECT_VERSION
+      }
   - npm run packages
-  - 7z a safe_launcher.zip %APPVEYOR_BUILD_FOLDER%\app_dist
-
+  - 7z a "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM.zip" %APPVEYOR_BUILD_FOLDER%\app_dist
 deploy:
-    release: safe_launcher-v$(appveyor_build_version)
-    description: 'test release'
-    provider: GitHub
-    auth_token:
-      secure: iimCzx78OtZMM3jV9ghYF2U4T+xsrS/xY3EAnaegN8yjk5d2cc+EaklmQhEkkAnb
-    artifact: 'safe_launcher.zip'
-    draft: true
-    prerelease: false
+  provider: GitHub
+  auth_token: $(GH_TOKEN)
+  tag: $(PROJECT_VERSION)
+  artifact: '$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM.zip'
+  draft: true
+  on:
+    DEPLOY: true

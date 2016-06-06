@@ -3,6 +3,7 @@ env:
   - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
   - PROJECT_NAME=safe_launcher
   - secure: HhpVaBtT+7P6QDSQiRlOlTJmczxnDCGGM2SOps0kr04/+2LicoX4ZSBrJ0TNKKAmVABoGPxHYCR9j2hqENWJNeLF6T3kVjcOa9ocRRN6LMq2Qme7ZT1tmgVgVfzGZ/wTbF3pphyhOSFzyigPUVRctusR2aTOOAmzFBp6mjKteOfsXDTEQoyx391FlHxKbHsAPVLiM/CbjUioSC0bybStaNCdi+x16HMeG6buClXio7QEnSd/+M76K8g24lXiOvfwELs7beRM4UYPzPLIWkrf4zRgjHKayEEh7rmuypZFhBQO3KWNQr03zELkn2pO6duOE3QsfFxFIOQT8u1R8CX8cvYEb7/AkJgSq+ELH5Fb5dcufwjdOH58WQZPsbWykVqeoeSRjFc6MkonEjfc+Vzd7ZJJcRbdIbguMLl+xVk6bvLMd9xeOavtyeeRcRQ+gkMrTyr9V/BKcAhFC8NdkgUWeIGg9VIidpAx6mlYnl1a0lZjxlVU3c6fGjyemmx+Vwa//b/4Up7bQOtMX+xcB/4ou4t4rIZj9KBfvbS8K6WrW0T5qPkc0xMR3Q8yYuxwacdoPcqPZnzguL7DnjilCc9RtkFeRJz2CX6IfskLqZ4Kwn05tBgibdRa/ZglvLDifb3SXSZGEeYn+tSZHER5Aw5+utY1i0HnYoFSdSsm8WtVyfI=
+
 matrix:
   include:
   - os: linux
@@ -11,16 +12,24 @@ matrix:
   - os: osx
     env: |
       PLATFORM=osx-x64
+
 language: generic
+
 python:
-- '2.7'
+  - '2.7'
+
 osx_image: xcode7.2
+
 sudo: required
+
 dist: trusty
+
 cache:
   cargo: true
+
 before_install:
   - export PROJECT_VERSION=$(git log -1 | grep -i "version change to" | sed "s/.*[vV]ersion change to v\{0,1\}//")
+
 install:
   - curl -sSf https://static.rust-lang.org/rustup.sh | sh
   - rustc -V
@@ -34,6 +43,7 @@ install:
   - python --version
 before_script:
   - export DISPLAY=:99.0;
+
 script:
 - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
 - cargo build --release --verbose --features use-mock-routing
@@ -41,6 +51,7 @@ script:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
 - cd $TRAVIS_BUILD_DIR
 - npm install
+
 before_deploy:
   - git config --global user.name shankar2105
   - git config --global user.email shankar21mail@gmail.com
@@ -51,6 +62,7 @@ before_deploy:
   - ls $TRAVIS_BUILD_DIR/app_dist
   - tar czf ${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz $TRAVIS_BUILD_DIR/app_dist/
   - ls $TRAVIS_BUILD_DIR
+
 deploy:
   provider: releases
   api_key: ${GH_TOKEN}
