@@ -49,7 +49,7 @@ before_deploy:
   - ls $TRAVIS_BUILD_DIR
 deploy:
   - provider: releases
-    api_key: 3e9a4c8c1bde16b6907047e2784717b48f9af8cb
+    api_key: 3cfc773e7d0bd7e6de6e9a618262516986276307
     file:
       - $TRAVIS_BUILD_DIR/safe_launcher.zip
     skip_cleanup: true
