@@ -14,11 +14,6 @@ matrix:
     - os: osx
       env: >
         PLATFORM=osx-x64
-  fast_finish: true
-addons:
-  apt:
-    packages:
-      - xvfb
 language: generic
 python:
   - '2.7'
@@ -43,9 +38,7 @@ before_script:
   - export PROJECT_VERSION=$(git log -1 | grep -i "version change to" | sed "s/.*[vV]ersion change to v\{0,1\}//")
   - echo "${PROJECT_VERSION}"
   - export DISPLAY=:99.0;
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
-  # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export RELEASE_NAME=safe_launcher-v${APP_VERSION}-linux-x64.tar.gz; fi
-  # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export RELEASE_NAME=safe_launcher-v${APP_VERSION}-osx-x64.tar.gz; fi
+  # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
 script:
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
