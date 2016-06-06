@@ -31,12 +31,12 @@ install:
   - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\api\ffi
   - dir %APPVEYOR_BUILD_FOLDER%\app\api\ffi
   - cd %APPVEYOR_BUILD_FOLDER%
-  - npm install --progress false --depth 0
 
 build: off
 
 test_script:
-  - npm test
+  - npm install --progress false --depth 0
+  # - npm test
 
 before_deploy:
   - npm run packages
