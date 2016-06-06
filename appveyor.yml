@@ -48,6 +48,9 @@ test_script:
 
 before_deploy:
   - ps: |
+      git config --global user.name shankar2105
+      git config --global user.email shankar21mail@gmail.com
+      git fetch --tags
       if (git tag -l "$env:PROJECT_VERSION") {
         echo "Tag $env:PROJECT_VERSION already exists"
       } else {
