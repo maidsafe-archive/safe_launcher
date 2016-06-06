@@ -2,13 +2,19 @@ env:
   global:
   - secure: kERfGEJxywTI3AvAsOCcjQBuxrAiJ7aOWooLmtxy8QWzNkVUlhY2A5xGWCqyKunMmjj9+cJ2FtrejYDo9FcXtmL2MlU0M6YZ1vLCeYTMsxMurZNXH0o64X0pFRsYAxR/uYgiZKujXBTcXiRlKkBd2G+aVetKPUl3rTi3nrejlto=
   - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
+  - PROJECT_NAME=safe_launcher
 # os:
 #   - osx
 #   - linux
 matrix:
   include:
     - os: linux
+      env: >
+        PLATFORM=linux-x64
     - os: osx
+      env: >
+        PLATFORM=osx-x64
+  fast_finish: true
 language: rust
 rust:
   - stable
@@ -29,13 +35,12 @@ install:
   - python --version
 
 before_script:
-  - APP_VERSION="$(git log -1 | tr '[:upper:]' '[:lower:]' | grep "version change to " | tr -d ' '*versionchangeto)"
-  - echo "${APP_VERSION}"
+  - export PROJECT_VERSION=$(git log -1 | grep -i "version change to" | sed "s/.*[vV]ersion change to v\{0,1\}//")
+  - echo "${PROJECT_VERSION}"
   - export DISPLAY=:99.0;
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
-  # - export RELEASE_NAME=safe_launcher.tar.gz
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export RELEASE_NAME="safe_launcher-v${APP_VERSION}-linux-x64.tar.gz"; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export RELEASE_NAME="safe_launcher-v${APP_VERSION}-osx-x64.tar.gz"; fi
+  # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export RELEASE_NAME=safe_launcher-v${APP_VERSION}-linux-x64.tar.gz; fi
+  # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export RELEASE_NAME=safe_launcher-v${APP_VERSION}-osx-x64.tar.gz; fi
 script:
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
@@ -55,10 +60,13 @@ deploy:
   provider: releases
   api_key:
     secure: rAuOXlXDTCc9/A9X7cB/tXi6J8kQyS6jdjjNpqHRjNR4dn50HNAIIaORM56RYtp8ct9aFa1gaBREhJjsLnDtR4r32SccJsgmhzWSw/P5PJqdSgPGD58YyDKpdMvRBFGPGSWoP7JJWCOzuH63YI9JNwSCouk0jV+wnXEg5eTjhGQ7tVXPEiOZibFD7HoXa9p6iAanp6kqVxxKZ+BFR0/yXGjh76Dps/UtFMo6phyk+tUpZxZhQBXZY1wqDDGosVeW6qtrHxGiIZ4yK0HdqvBGnVGc6+Bvc7gBKlyiDu+ZoPKsXCDWeMBFM1OouNOFGlw4KZSJp94OyWb9n29WY4IgfttvvhH6cHirTgTl+lc4kHNCmP/KqKYqWXKo2yZBvI9igwKxGQSDtKqJpDp4UxGG+C8PF9dzuzGGd+f+6uYBQx32lTBv6D2EP62M5K+tJNVJEbUxEvM8m1G7xD+26yUKe0xSJALSYJw7KxKpCrzezz3EIG5w5BivGZ+9R07RM+QGens9R6j3AMyTVA7rZxrHkT5UJdZyiQwNGvQTX2I05UHbIpxGKUb7sOQphXExBHW5EOYUFXt38G32VwqemkcmbDCMNsuQGHXkeoLVHFC2mCIrzp6x1p+8wpZfVHmMpbO7sRjAop+p2Ac+xd3PpcsnRsOJw2Q7WiM/IRM+SqomVNk=
-  file: $RELEASE_NAME
+  file:  ${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz
   skip_cleanup: true
-  tag_name: safe_launcher_release_$TRAVIS_OS_NAME
+  tag_name: ${PROJECT_VERSION}
   draft: true
   on:
     repo: shankar2105/safe_launcher
     branch: travis_integration
+    condition: >
+        (-n "$PROJECT_VERSION") &&
+        (-n "$PLATFORM")
