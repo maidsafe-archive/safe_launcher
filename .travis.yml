@@ -10,7 +10,7 @@ matrix:
   include:
     - os: osx
       env: >
-      PLATFORM=osx-x64
+        PLATFORM=osx-x64
     - os: linux
       env: >
         PLATFORM=linux-x64
