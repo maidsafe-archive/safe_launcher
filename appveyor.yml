@@ -60,9 +60,12 @@ before_deploy:
       }
   - npm run package
   - ps: |
-    $NAME = "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM"
-    7z a ../$NAME.zip $env:APPVEYOR_BUILD_FOLDER\app_dist
-    Push-AppveyorArtifact ../$NAME.zip
+      $NAME = "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM"
+      cd app_dist
+      7z a ../$NAME.zip *
+      Push-AppveyorArtifact ../$NAME.zip
+  - dir
+  - cd ..
   - dir
 deploy:
   provider: GitHub
