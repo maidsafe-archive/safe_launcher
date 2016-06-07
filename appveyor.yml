@@ -59,12 +59,12 @@ before_deploy:
         git push "https://$env:GH_TOKEN@github.com/$env:APPVEYOR_REPO_NAME" tag $env:PROJECT_VERSION
       }
   - npm run package
-  - 7z a "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM.zip" %APPVEYOR_BUILD_FOLDER%\app_dist
+  - ps: 7z a '$(PROJECT_NAME)-v$(PROJECT_VERSION)-win-$(PLATFORM).zip' %APPVEYOR_BUILD_FOLDER%\app_dist
 deploy:
   provider: GitHub
   auth_token: $(GH_TOKEN)
   tag: $(PROJECT_VERSION)
-  artifact: '$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM.zip'
+  artifact: '$(PROJECT_NAME)-v$(PROJECT_VERSION)-win-$(PLATFORM).zip'
   draft: true
   on:
     DEPLOY: true
