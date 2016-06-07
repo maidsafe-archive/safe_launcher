@@ -64,7 +64,7 @@ deploy:
   provider: GitHub
   auth_token: $(GH_TOKEN)
   tag: $(PROJECT_VERSION)
-  artifact: '$(PROJECT_NAME)-v$(PROJECT_VERSION)-win-$(PLATFORM).zip'
+  artifact: /.*\.zip/
   draft: true
   on:
     DEPLOY: true
