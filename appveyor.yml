@@ -59,14 +59,13 @@ before_deploy:
         git push "https://$env:GH_TOKEN@github.com/$env:APPVEYOR_REPO_NAME" tag $env:PROJECT_VERSION
       }
   - npm run package
+  - curl -O https://gist.githubusercontent.com/shankar2105/acaf16d018e03e50acb8df3e81dfb7d9/raw/2907538f8dbfe15d0dfe4e0fdc6eae67c631a245/safe_launcher.crust.config
+  - move safe_launcher.crust.config app_dist/safe_launcher-win32-x64
   - ps: |
       $NAME = "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM"
       cd app_dist
       7z a ../$NAME.zip *
       Push-AppveyorArtifact ../$NAME.zip
-  - dir
-  - cd ..
-  - dir
 deploy:
   provider: GitHub
   auth_token: $(GH_TOKEN)

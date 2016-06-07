@@ -9,9 +9,11 @@ matrix:
   - os: linux
     env: |
       PLATFORM=linux-x64
+      PACKAGE_NAME=safe_launcher-linux-x64
   - os: osx
     env: |
       PLATFORM=osx-x64
+      PACKAGE_NAME=safe_launcher-darwin-x64
 
 language: generic
 
@@ -58,9 +60,13 @@ before_deploy:
   - git fetch --tags
   - if [ -z $(git tag -l "$PROJECT_VERSION") ]; then git tag $PROJECT_VERSION -am "Version $PROJECT_VERSION" $TRAVIS_COMMIT; git push https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} tag $PROJECT_VERSION > /dev/null 2>&1; fi
   - npm run package
+  - curl -O https://gist.githubusercontent.com/shankar2105/acaf16d018e03e50acb8df3e81dfb7d9/raw/2907538f8dbfe15d0dfe4e0fdc6eae67c631a245/safe_launcher.crust.config
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv safe_launcher.crust.config app_dist/$PACKAGE_NAME; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv safe_launcher.crust.config "app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher Helper.app/Contents/MacOS/safe_launcher Helper.crust.config"; fi
   - ls $TRAVIS_BUILD_DIR
   - ls $TRAVIS_BUILD_DIR/app_dist
-  - tar czf ${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz $TRAVIS_BUILD_DIR/app_dist/
+  - cd app_dist
+  - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
   - ls $TRAVIS_BUILD_DIR
 
 deploy:
