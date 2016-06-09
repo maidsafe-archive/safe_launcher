@@ -17,3 +17,4 @@ safe_launcher.zip
 /app_dist
 /.idea
 /testApp
+/app/api/ffi/safe_core.dll

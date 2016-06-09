@@ -42,9 +42,5 @@
     "test": "gulp test",
     "package": "gulp package --env=production",
     "msvc_rebuild": "gulp msvc_rebuild --env=production"
-  },
-  "dependencies": {
-    "fs-extra": "^0.30.0",
-    "winston": "^2.2.0"
   }
 }
