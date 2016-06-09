@@ -40,6 +40,10 @@ var loggerPaths = [
   './app/logger/**',
 ];
 
+var rootPaths = [
+  './app/env.js'
+];
+
 
 var gulpPath = pathUtil.resolve('./node_modules/.bin/electron-mocha');
 if (process.platform === 'win32') {
@@ -83,15 +87,28 @@ gulp.task('babelLogger', function() {
   .pipe(gulp.dest(path.resolve(destDir, 'logger')));
 });
 
+gulp.task('babelRoot', function() {
+  gulp.src(rootPaths)
+  .pipe(babel())
+  .pipe(gulp.dest(path.resolve('.', destDir)));
+});
+
 gulp.task('clean', function() {
   fse.removeSync('./testApp/api');
   fse.removeSync('./testApp/server');
+  fse.removeSync('./testApp/*.js');
+  fse.removeSync('./testApp/*.json');
 });
 
 gulp.task('copy', function() {
   fse.copySync(path.resolve('./app/api/ffi', ffiName), path.resolve(destDir, 'api', 'ffi', ffiName));
   fse.copySync('./app/package.json', path.resolve(destDir, 'package.json'));
-  fse.copySync('./app/env.js', path.resolve(destDir, 'env.js'));
+});
+
+gulp.task('finalize', function() {
+  var manifest = fse.readJsonSync(path.resolve(destDir, 'package.json'));
+  manifest.env = fse.readJsonSync(path.resolve('.', 'config', 'env_test.json'));
+  fse.writeJsonSync(path.resolve(destDir, 'package.json'), manifest);
 });
 
 gulp.task('installPackages', function() {
@@ -138,4 +155,4 @@ gulp.task('mocha', [ 'test_msvc_rebuild' ], function() {
 //   .pipe(jshint.reporter('jshint-stylish'));
 // };
 
-gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'babelLogger', 'copy', 'mocha' ]);
+gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'babelLogger', 'babelRoot', 'copy', 'finalize', 'mocha' ]);
