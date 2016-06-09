@@ -55,6 +55,11 @@ script:
 - npm install
 
 before_deploy:
+  - cd safe_core
+  - cargo build --release
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
+  - cd $TRAVIS_BUILD_DIR
   - git config --global user.name shankar2105
   - git config --global user.email shankar21mail@gmail.com
   - git fetch --tags
