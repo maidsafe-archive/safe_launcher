@@ -32,9 +32,15 @@ var startWorker = function() {
     }
   });
 
-  workerProcess.on('message', function(msg) {
-    log.debug('FFI onmessage :: ' + msg);
-    if (msg.id === 0 && networkStateListener) {
+  workerProcess.on('message', function(msg) {    
+    if (msg.id === 'log') {
+      if (msg.data.level === 'ERROR') {
+        log.error(msg.data.msg);
+      } else {
+        log.debug(msg.data.msg);
+      }
+      return;
+    } else if (msg.id === 0 && networkStateListener) {
       return networkStateListener(msg.data.state);
     } else if (!callbackPool[msg.id]) {
       return;
@@ -46,10 +52,10 @@ var startWorker = function() {
     delete callbackPool[id];
     for (let i in callbacks) {
       if (isError) {
-        log.debug('invoking Error Response callback :: callback id - ' + id);
+        log.verbose('invoking Error Response callback :: callback id - ' + id);
         callbacks[i](msg);
       } else {
-        log.debug('invoking Response callback :: callback id - ' + id);
+        log.verbose('invoking Response callback :: callback id - ' + id);
         callbacks[i](null, msg.data);
       }
     }
@@ -60,17 +66,19 @@ var startWorker = function() {
   });
 };
 
-export var send = function(msg, callback) {
-  log.debug('Sending message to FFI ' + msg);
+export var send = function(message, callback) {
+  let strMessage = JSON.stringify(message);
+  log.debug('Sending message to FFI - ' + message.module + ' - ' + (message.action || ''));
+  log.verbose('Sending message to FFI ' + strMessage);
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  let id = new Buffer(libSodium.crypto_hash(JSON.stringify(msg))).toString('base64');
-  log.debug('Message callback ID' + id + ' ' + msg);
+  let id = new Buffer(libSodium.crypto_hash(strMessage)).toString('base64');
+  log.verbose('Message callback ID' + id + ' ' + strMessage);
   /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   if (callback) {
     addToCallbackPool(id, callback);
   }
-  msg.id = id;
-  workerProcess.send(msg);
+  message.id = id;
+  workerProcess.send(message);
 };
 
 export var close = function() {
