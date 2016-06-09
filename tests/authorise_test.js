@@ -5,9 +5,12 @@ describe('Authorisation', function() {
   var child = null;
 
   before(function(done) {
-    utils.login(true, function() {
-      utils.startLauncher(function() {
-        done();
+    utils.register(function(regKeys) {
+      utils.setRegisteredKeys(regKeys);
+      utils.login(true, function() {
+        utils.startLauncher(function() {
+          done();
+        });
       });
     });
   });

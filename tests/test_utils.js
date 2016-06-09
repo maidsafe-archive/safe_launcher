@@ -37,9 +37,14 @@ var setToken = function(token) {
   authToken = 'bearer ' + token;
 };
 
+
 var getToken = function() {
   return authToken;
 }
+
+var setRegisteredKeys = function(keys) {
+  registeredKeys = keys;
+};
 
 var generateAuthKeys = function() {
   var pin_len = 4;
@@ -83,7 +88,7 @@ var register = function(callback) {
       console.error(err);
       return process.exit(0);
     }
-    callback();
+    callback(regKeys);
   });
 };
 
@@ -571,6 +576,7 @@ module.exports = {
   authoriseApp: authoriseApp,
   registerAuthApproval: registerAuthApproval,
   removeAllEventListener: removeAllEventListener,
+  setRegisteredKeys: setRegisteredKeys,
   getToken: getToken,
   revokeApp: revokeApp,
   createDir: createDir,
