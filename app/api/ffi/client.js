@@ -32,7 +32,7 @@ var startWorker = function() {
     }
   });
 
-  workerProcess.on('message', function(msg) {    
+  workerProcess.on('message', function(msg) {
     if (msg.id === 'log') {
       if (msg.data.level === 'ERROR') {
         log.error(msg.data.msg);

@@ -14,7 +14,7 @@ var registeredClientHandle;
 var unregisteredClientHandle;
 
 var registerObserver = function(lib, clientHandle, callback) {
-  util.send('log', {level: 'DEBUG', msg: 'FFI/mod/auth.js - Registering observer'});
+  util.send('log', { level: 'DEBUG', msg: 'FFI/mod/auth.js - Registering observer' });
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   lib.register_network_event_observer(clientHandle, callback);
   /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
@@ -22,7 +22,7 @@ var registerObserver = function(lib, clientHandle, callback) {
 
 var dropUnregisteredClient = function(lib) {
   if (unregisteredClientHandle) {
-    util.send('log', {level: 'DEBUG', msg: 'FFI/mod/auth.js - Dropping unregisteredClientHandle'});
+    util.send('log', { level: 'DEBUG', msg: 'FFI/mod/auth.js - Dropping unregisteredClientHandle' });
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     lib.drop_client(unregisteredClientHandle);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
@@ -32,7 +32,7 @@ var dropUnregisteredClient = function(lib) {
 
 var unregisteredClient = function(lib, observer) {
   var unregisteredClient = ref.alloc(clientHandlePtrPtr);
-  util.send('log', {level: 'DEBUG', msg: 'FFI/mod/auth.js - Create Unregistered Client Handle'});
+  util.send('log', { level: 'DEBUG', msg: 'FFI/mod/auth.js - Create Unregistered Client Handle' });
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   var result = lib.create_unregistered_client(unregisteredClient);
   /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
@@ -48,7 +48,7 @@ var setSafeDriveKey = function(lib) {
   var sizePtr = ref.alloc(int);
   var capacityPtr = ref.alloc(int);
   var resultPtr = ref.alloc(int);
-  util.send('log', {level: 'DEBUG', msg: 'FFI/mod/auth.js - get SafeDrive Dir Key'});
+  util.send('log', { level: 'DEBUG', msg: 'FFI/mod/auth.js - get SafeDrive Dir Key' });
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   var pointer = lib.get_safe_drive_key(sizePtr, capacityPtr, resultPtr, registeredClientHandle);
   /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
@@ -56,7 +56,7 @@ var setSafeDriveKey = function(lib) {
   if (result !== 0) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     lib.drop_null_ptr(pointer);
-    util.send('log', {level: 'ERROR', msg: ('FFI/mod/auth.js - get SafeDrive Dir Key with code ' + result)});
+    util.send('log', { level: 'ERROR', msg: ('FFI/mod/auth.js - get SafeDrive Dir Key with code ' + result) });
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     return new Error('Failed with error code ' + result);
   }
@@ -144,7 +144,7 @@ var getAppDirectoryKey = function(lib, request) {
     var sizePtr = ref.alloc(int);
     var capacityPtr = ref.alloc(int);
     var resultPtr = ref.alloc(int);
-    util.send('log', {level: 'DEBUG', msg: 'FFI/mod/auth.js - Getting App Root Dir Key'});
+    util.send('log', { level: 'DEBUG', msg: 'FFI/mod/auth.js - Getting App Root Dir Key' });
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     var pointer = lib.get_app_dir_key(appName, appId, vendor, sizePtr, capacityPtr, resultPtr, registeredClientHandle);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
@@ -152,7 +152,10 @@ var getAppDirectoryKey = function(lib, request) {
     if (result !== 0) {
       /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
       lib.drop_null_ptr(pointer);
-      util.send('log', {level: 'ERROR', msg: ('FFI/mod/auth.js - Getting App Root Dir Key failed with code ' + result)});
+      util.send('log', {
+        level: 'ERROR',
+        msg: ('FFI/mod/auth.js - Getting App Root Dir Key failed with code ' + result)
+      });
       /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
       return util.sendError(request.id, 999, 'Failed with error code ' + result);
     }
