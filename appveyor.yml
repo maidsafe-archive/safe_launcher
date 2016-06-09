@@ -44,9 +44,12 @@ build: off
 
 test_script:
   - npm install --progress false --depth 0
-  # - npm test
+  - npm test
 
 before_deploy:
+  - cargo build --release
+  - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\api\ffi
+  - cd %APPVEYOR_BUILD_FOLDER%
   - ps: |
       git config --global user.name shankar2105
       git config --global user.email shankar21mail@gmail.com
