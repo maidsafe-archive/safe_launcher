@@ -47,6 +47,8 @@ test_script:
   - npm test
 
 before_deploy:
+  - dir
+  - cd %APPVEYOR_BUILD_FOLDER%
   - cargo build --release
   - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\api\ffi
   - cd %APPVEYOR_BUILD_FOLDER%

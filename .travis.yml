@@ -56,6 +56,8 @@ script:
 - npm test
 
 before_deploy:
+  - pwd
+  - cd $TRAVIS_BUILD_DIR
   - cd safe_core
   - cargo build --release
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
