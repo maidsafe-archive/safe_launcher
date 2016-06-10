@@ -26,7 +26,10 @@ describe("DNS", function() {
     var loginCb = function() {
       utils.startLauncher(startLauncherCb);
     };
-    utils.login(true, loginCb);
+    utils.register(function(regKeys) {
+      utils.setRegisteredKeys(regKeys);
+      utils.login(true, loginCb);
+    });
   });
 
   after(function(done) {
