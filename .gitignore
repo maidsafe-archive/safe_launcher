@@ -5,6 +5,7 @@ Thumbs.db
 
 /app/spec.js
 /build/
+/safe_core/
 /releases/
 /tmp/
 /app/api/ffi/safe_ffi.dll

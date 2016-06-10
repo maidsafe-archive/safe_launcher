@@ -54,6 +54,7 @@ after_test:
 
 before_deploy:
   - cd %APPVEYOR_BUILD_FOLDER%
+  - ls
   - ps: |
       git config --global user.name shankar2105
       git config --global user.email shankar21mail@gmail.com
