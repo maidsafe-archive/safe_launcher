@@ -254,60 +254,60 @@ describe('NFS File', function() {
     });
   });
 
-  describe('Move File', function() {
-    var fileName = '/test.txt';
-    var filePath = dirPath + fileName;
-    var destDirPath = 'dest_' + (new Date()).getTime();
-
-    before(function(done) {
-      var createDirCb = function(status) {
-        if (status !== 200) {
-          console.error('Unable to create directory :: ' + status);
-          return process.exit(0);
-        }
-        done();
-      };
-
-      var createFileCb = function(status) {
-        if (status !== 200) {
-          console.error('Unable to create file :: ' + status);
-          return process.exit(0);
-        }
-        utils.createDir(utils.getToken(), destDirPath, createDirCb);
-      };
-
-      utils.createFile(utils.getToken(), filePath, createFileCb);
-    });
-
-    after(function(done) {
-      utils.deleteDir(utils.getToken(), encodeURIComponent(destDirPath), function(status) {
-        if (status !== 200) {
-          console.error('Unable to delete directory :: ' + status);
-          return process.exit(0);
-        }
-        done();
-      });
-    });
-
-    it('should be able to move file', function(done) {
-      utils.moveFile(utils.getToken(), filePath, destDirPath, function(status) {
-        (status).should.be.equal(200);
-        done();
-      });
-    });
-
-    it('should throw 401 unauthorised', function(done) {
-      utils.moveFile(Math.floor(Math.random() * 1000000000), filePath, destDirPath, function(status) {
-        (status).should.be.equal(401);
-        done();
-      });
-    });
-
-    it('should throw 400 path not found', function(done) {
-      utils.moveFile(utils.getToken(), ('/test_' + (new Date().getTime()) + '/test.txt'), destDirPath, function(status) {
-        (status).should.be.equal(400);
-        done();
-      });
-    });
-  });
+  // describe('Move File', function() {
+  //   var fileName = '/test.txt';
+  //   var filePath = dirPath + fileName;
+  //   var destDirPath = 'dest_' + (new Date()).getTime();
+  //
+  //   before(function(done) {
+  //     var createDirCb = function(status) {
+  //       if (status !== 200) {
+  //         console.error('Unable to create directory :: ' + status);
+  //         return process.exit(0);
+  //       }
+  //       done();
+  //     };
+  //
+  //     var createFileCb = function(status) {
+  //       if (status !== 200) {
+  //         console.error('Unable to create file :: ' + status);
+  //         return process.exit(0);
+  //       }
+  //       utils.createDir(utils.getToken(), destDirPath, createDirCb);
+  //     };
+  //
+  //     utils.createFile(utils.getToken(), filePath, createFileCb);
+  //   });
+  //
+  //   after(function(done) {
+  //     utils.deleteDir(utils.getToken(), encodeURIComponent(destDirPath), function(status) {
+  //       if (status !== 200) {
+  //         console.error('Unable to delete directory :: ' + status);
+  //         return process.exit(0);
+  //       }
+  //       done();
+  //     });
+  //   });
+  //
+  //   it('should be able to move file', function(done) {
+  //     utils.moveFile(utils.getToken(), filePath, destDirPath, function(status) {
+  //       (status).should.be.equal(200);
+  //       done();
+  //     });
+  //   });
+  //
+  //   it('should throw 401 unauthorised', function(done) {
+  //     utils.moveFile(Math.floor(Math.random() * 1000000000), filePath, destDirPath, function(status) {
+  //       (status).should.be.equal(401);
+  //       done();
+  //     });
+  //   });
+  //
+  //   it('should throw 400 path not found', function(done) {
+  //     utils.moveFile(utils.getToken(), ('/test_' + (new Date().getTime()) + '/test.txt'), destDirPath, function(status) {
+  //       (status).should.be.equal(400);
+  //       done();
+  //     });
+  //   });
+  // });
 });

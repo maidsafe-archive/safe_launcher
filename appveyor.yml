@@ -33,7 +33,7 @@ install:
   - node --version
   - npm --version
   - set npm_config_arch=%PLATFORM:x86=ia32%
-  - cd ..
+  - cd %APPVEYOR_BUILD_FOLDER%
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
   - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\api\ffi
@@ -45,12 +45,14 @@ build: off
 test_script:
   - npm install --progress false --depth 0
   - npm test
-
-before_deploy:
-  - dir
+after_test:
   - cd %APPVEYOR_BUILD_FOLDER%
+  - dir
+  - cd safe_core
   - cargo build --release
   - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\api\ffi
+
+before_deploy:
   - cd %APPVEYOR_BUILD_FOLDER%
   - ps: |
       git config --global user.name shankar2105

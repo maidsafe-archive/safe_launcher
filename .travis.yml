@@ -47,19 +47,23 @@ before_script:
   - export DISPLAY=:99.0;
 
 script:
-- git clone https://github.com/maidsafe/safe_core.git && cd safe_core
-- cargo build --release --verbose --features use-mock-routing
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
-- cd $TRAVIS_BUILD_DIR
-- npm install
-- npm test
+  - cd $TRAVIS_BUILD_DIR
+  - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
+  - cargo build --release --verbose --features use-mock-routing
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
+  - cd $TRAVIS_BUILD_DIR
+  - npm install
+  - npm test
 
-before_deploy:
+after_success:
   - pwd
   - cd $TRAVIS_BUILD_DIR
+  - ls
   - cd safe_core
   - cargo build --release
+
+before_deploy:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
   - cd $TRAVIS_BUILD_DIR
