@@ -57,9 +57,7 @@ script:
   - npm test
 
 after_success:
-  - pwd
   - cd $TRAVIS_BUILD_DIR
-  - ls
   - cd safe_core
   - cargo build --release
 
@@ -67,7 +65,6 @@ before_deploy:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
   - cd $TRAVIS_BUILD_DIR
-  - ls
   - git config --global user.name shankar2105
   - git config --global user.email shankar21mail@gmail.com
   - git fetch --tags
@@ -76,12 +73,9 @@ before_deploy:
   - curl -O https://gist.githubusercontent.com/shankar2105/acaf16d018e03e50acb8df3e81dfb7d9/raw/2907538f8dbfe15d0dfe4e0fdc6eae67c631a245/safe_launcher.crust.config
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv safe_launcher.crust.config app_dist/$PACKAGE_NAME; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv safe_launcher.crust.config "app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher Helper.app/Contents/MacOS/safe_launcher Helper.crust.config"; fi
-  - ls $TRAVIS_BUILD_DIR
-  - ls $TRAVIS_BUILD_DIR/app_dist
   - cd app_dist
   - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
   - cd $TRAVIS_BUILD_DIR
-  - ls
 
 deploy:
   provider: releases
