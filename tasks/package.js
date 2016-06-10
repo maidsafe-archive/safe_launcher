@@ -69,7 +69,7 @@ var packageApp = function() {
   }
   return gulp.src('./')
   .pipe(exec(packagerPath + ' build ' + BINARY_NAME + ' --icon=' + config.icon + ' --platform=' + config.platform +
-  ' --prune --asar --asar-unpack=' + config.unpack + ' --out=' + OUT_FOLDER + ' --arch=' + os.arch() + ' --version=' + electronVersion +
+  ' --asar --asar-unpack=' + config.unpack + ' --out=' + OUT_FOLDER + ' --arch=' + os.arch() + ' --version=' + electronVersion +
   ' --overwrite'))
   .pipe(exec.reporter(reportOptions));
   // childProcess.spawn(packagerPath, [
