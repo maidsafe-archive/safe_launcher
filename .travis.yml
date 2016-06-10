@@ -80,7 +80,8 @@ before_deploy:
   - ls $TRAVIS_BUILD_DIR/app_dist
   - cd app_dist
   - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
-  - ls $TRAVIS_BUILD_DIR
+  - cd $TRAVIS_BUILD_DIR
+  - ls
 
 deploy:
   provider: releases
