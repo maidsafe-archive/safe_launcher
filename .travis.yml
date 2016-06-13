@@ -31,7 +31,7 @@ cache:
 
 before_install:
   - export PROJECT_VERSION=$(git log -1 | grep -i "version change to" | sed "s/.*[vV]ersion change to v\{0,1\}//")
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo ln -s /usr/lib/x86_64-linux-gnu/libnotify.so.4 /usr/lib/libnotify.so.1; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo ln -s /usr/lib/x86_64-linux-gnu/libnotify.so.4 /usr/lib/libnotify.so.4; fi
 install:
   - curl -sSf https://static.rust-lang.org/rustup.sh | sh
   - rustc -V
