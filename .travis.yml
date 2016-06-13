@@ -54,8 +54,6 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
   - cd $TRAVIS_BUILD_DIR
   - npm install
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm install -g electron-prebuilt; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm install -g gulp-electron-mocha; fi
   - npm test
 
 after_success:
