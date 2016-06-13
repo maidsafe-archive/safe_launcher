@@ -45,7 +45,7 @@ install:
   - python --version
 before_script:
   - export DISPLAY=:99.0;
-
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
 script:
   - cd $TRAVIS_BUILD_DIR
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
