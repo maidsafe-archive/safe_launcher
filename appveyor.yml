@@ -1,0 +1,82 @@
+platform:
+  - x64
+image: Visual Studio 2013
+os: unstable
+environment:
+  nodejs_version: "6.2"
+  global:
+    GH_TOKEN:
+      secure: Y+2qAj6Y4/7d+Fvv4/5TF8FU6fPOqlFio6mH+8P2dnH2bX+Dj6AVpAt/D0ODqPoJ
+    Features: "use-mock-routing"
+    PROJECT_NAME: safe_launcher
+    RUST_BACKTRACE: 1
+cache:
+  - node_modules
+  - '%APPDATA%\npm-cache'
+install:
+  - ps: |
+        $url = "https://github.com/maidsafe/QA/raw/master/Powershell%20Scripts/AppVeyor"
+        Start-FileDownload "$url/Install%20Rust.ps1" -FileName "Install Rust.ps1"
+        Start-FileDownload "$url/Install%20MinGW.ps1" -FileName "Install MinGW.ps1"
+        Start-FileDownload "$url/Install%20libsodium.ps1" -FileName "Install libsodium.ps1"
+        Start-FileDownload "$url/Build.ps1" -FileName "Build.ps1"
+        Start-FileDownload "$url/Run%20Tests.ps1" -FileName "Run Tests.ps1"
+        . ".\Install Rust.ps1"
+        . ".\Install MinGW.ps1"
+        . ".\Install libsodium.ps1"
+        Install-Product node $env:nodejs_version $env:PLATFORM
+
+        if ($env:APPVEYOR_REPO_COMMIT_MESSAGE -match "[vV]ersion change to v?(.*)") {
+          $env:PROJECT_VERSION = $matches[1]
+          $env:DEPLOY = "true"
+        }
+  - node --version
+  - npm --version
+  - set npm_config_arch=%PLATFORM:x86=ia32%
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
+  - cargo build --release --verbose --features use-mock-routing
+  - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\api\ffi
+  - cd %APPVEYOR_BUILD_FOLDER%
+
+build: off
+
+test_script:
+  - npm install --progress false --depth 0
+  - npm test
+after_test:
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - cd safe_core
+  - cargo build --release
+  - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\api\ffi
+
+before_deploy:
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - ls
+  - ps: |
+      git config --global user.name shankar2105
+      git config --global user.email shankar21mail@gmail.com
+      git fetch --tags
+      if (git tag -l "$env:PROJECT_VERSION") {
+        echo "Tag $env:PROJECT_VERSION already exists"
+      } else {
+        echo "Creating tag $env:PROJECT_VERSION"
+        git tag $env:PROJECT_VERSION -am "Version $env:PROJECT_VERSION" $APPVEYOR_REPO_COMMIT
+        git push "https://$env:GH_TOKEN@github.com/$env:APPVEYOR_REPO_NAME" tag $env:PROJECT_VERSION
+      }
+  - npm run package
+  - curl -O https://gist.githubusercontent.com/shankar2105/acaf16d018e03e50acb8df3e81dfb7d9/raw/2907538f8dbfe15d0dfe4e0fdc6eae67c631a245/safe_launcher.crust.config
+  - move safe_launcher.crust.config app_dist/safe_launcher-win32-x64
+  - ps: |
+      $NAME = "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM"
+      cd app_dist
+      7z a ../$NAME.zip *
+      Push-AppveyorArtifact ../$NAME.zip
+deploy:
+  provider: GitHub
+  auth_token: $(GH_TOKEN)
+  tag: $(PROJECT_VERSION)
+  artifact: /.*\.zip/
+  draft: true
+  on:
+    DEPLOY: true
