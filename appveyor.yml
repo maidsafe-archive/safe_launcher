@@ -6,7 +6,7 @@ environment:
   nodejs_version: "6.2"
   global:
     GH_TOKEN:
-      secure: Y+2qAj6Y4/7d+Fvv4/5TF8FU6fPOqlFio6mH+8P2dnH2bX+Dj6AVpAt/D0ODqPoJ
+      secure: Plf6CbvLc5BWpB51EU9Sk/RMow47fZp74uSKt1Wv20kFRf1OQS2pVuEzgXQPuyhW
     Features: "use-mock-routing"
     PROJECT_NAME: safe_launcher
     RUST_BACKTRACE: 1
@@ -54,8 +54,8 @@ before_deploy:
   - cd %APPVEYOR_BUILD_FOLDER%
   - ls
   - ps: |
-      git config --global user.name shankar2105
-      git config --global user.email shankar21mail@gmail.com
+      git config --global user.name MaidSafe-QA
+      git config --global user.email qa@maidsafe.net
       git fetch --tags
       if (git tag -l "$env:PROJECT_VERSION") {
         echo "Tag $env:PROJECT_VERSION already exists"
@@ -65,8 +65,8 @@ before_deploy:
         git push "https://$env:GH_TOKEN@github.com/$env:APPVEYOR_REPO_NAME" tag $env:PROJECT_VERSION
       }
   - npm run package
-  - curl -O https://gist.githubusercontent.com/shankar2105/acaf16d018e03e50acb8df3e81dfb7d9/raw/2907538f8dbfe15d0dfe4e0fdc6eae67c631a245/safe_launcher.crust.config
-  - move safe_launcher.crust.config app_dist/safe_launcher-win32-x64
+  - ps: git clone https://$env:GH_TOKEN@github.com/maidsafe/release_config
+  - move release_config/safe_launcher/* app_dist/safe_launcher-win32-x64
   - ps: |
       $NAME = "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM"
       cd app_dist
