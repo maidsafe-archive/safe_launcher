@@ -81,7 +81,9 @@ before_deploy:
   - curl -O https://gist.githubusercontent.com/shankar2105/acaf16d018e03e50acb8df3e81dfb7d9/raw/2907538f8dbfe15d0dfe4e0fdc6eae67c631a245/safe_launcher.crust.config
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv safe_launcher.crust.config app_dist/$PACKAGE_NAME; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv safe_launcher.crust.config "app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher Helper.app/Contents/MacOS/safe_launcher Helper.crust.config"; fi
-  - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz  -C ./app_dist .
+  - pushd ./app_dist
+  - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
+  - popd
   - cd $TRAVIS_BUILD_DIR
 
 deploy:
