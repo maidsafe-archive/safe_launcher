@@ -48,8 +48,8 @@ install:
   - ". install_libsodium.sh"
   - nvm --version
   - nvm install 5.5.0
-  - npm --version
   - node --version
+  - npm --version
   - python --version
 
 script:
