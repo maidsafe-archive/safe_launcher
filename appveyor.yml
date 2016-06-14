@@ -65,9 +65,10 @@ before_deploy:
         git push "https://$env:GH_TOKEN@github.com/$env:APPVEYOR_REPO_NAME" tag $env:PROJECT_VERSION
       }
   - npm run package
-  - ps: git clone https://$env:GH_TOKEN@github.com/maidsafe/release_config 2>&1 | Out-Null
-  - move release_config/safe_launcher/* app_dist/safe_launcher-win32-x64
   - ps: |
+      New-Item -ItemType directory -Path config
+      git clone "https://$env:GH_TOKEN@github.com/maidsafe/release_config" config  2>&1 | Out-Null
+      Copy-Item config\safe_launcher\* app_dist\safe_launcher-v$env:PROJECT_VERSION-win32-x64
       $NAME = "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM"
       cd app_dist
       7z a ../$NAME.zip *

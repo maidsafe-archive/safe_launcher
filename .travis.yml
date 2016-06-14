@@ -9,11 +9,9 @@ matrix:
   - os: linux
     env: |
       PLATFORM=linux-x64
-      PACKAGE_NAME=safe_launcher-linux-x64
   - os: osx
     env: |
       PLATFORM=osx-x64
-      PACKAGE_NAME=safe_launcher-darwin-x64
 
 language: generic
 
@@ -41,7 +39,8 @@ addons:
 before_install:
   - export PROJECT_VERSION=$(git log -1 | grep -i "version change to" | sed "s/.*[vV]ersion change to v\{0,1\}//")
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libnotify4; sudo apt-get install libgconf-2-4; fi
-
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PACKAGE_NAME = ${PROJECT_NAME}-v${PROJECT_VERSION}-linux-x64; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export PACKAGE_NAME = ${PROJECT_NAME}-v${PROJECT_VERSION}-darwin-x64; fi
 install:
   - export DISPLAY=':99.0'
   - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
