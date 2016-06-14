@@ -1,20 +1,102 @@
-sudo: true
-os:
-  - linux
-language: node_js
-node_js:
-  - "5.1"
-before_install:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-script:
-  - npm test
 env:
-  - CXX=g++-4.8
+  global:
+  - secure: GXW0WyMkipF5lh29QHMxSKl6Dpvd4Qqggu5SBGymS5KQ7VPuqgEE2A8YwQDIGf4IEZUoAcAb1W7oPwQ0/kv7omlF2S8gmals1BeGKStU1np6lIIH64B87w4RIDhD+limVAfKgWb3Oldj6PDAm8gjbWjPiZF/6oxH4hd/+d9r2GY=
+  - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
+  - PROJECT_NAME=safe_launcher
+
+matrix:
+  include:
+  - os: linux
+    env: |
+      PLATFORM=linux-x64
+      PLATFORM_NAME=linux
+  - os: osx
+    env: |
+      PLATFORM=osx-x64
+      PLATFORM_NAME=darwin
+language: generic
+
+python:
+  - '2.7'
+
+branches:
+  only:
+    - master
+
+osx_image: xcode7.2
+
+sudo: required
+
+dist: trusty
+
+cache:
+  cargo: true
+
 addons:
   apt:
-    sources:
-      - ubuntu-toolchain-r-test
     packages:
       - xvfb
-      - g++-4.8
+
+before_install:
+  - export PROJECT_VERSION=$(git log -1 | grep -i "version change to" | sed "s/.*[vV]ersion change to v\{0,1\}//")
+  - export PACKAGE_NAME="$PROJECT_NAME-v$PROJECT_VERSION-$PLATFORM_NAME-x64"
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libnotify4; sudo apt-get install libgconf-2-4; fi
+install:
+  - export DISPLAY=':99.0'
+  - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+  - curl -sSf https://static.rust-lang.org/rustup.sh | sh
+  - rustc -V
+  - cargo -V
+  - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
+  - ". install_libsodium.sh"
+  - nvm --version
+  - nvm install 5.5.0
+  - node --version
+  - npm --version
+  - python --version
+
+script:
+  - cd $TRAVIS_BUILD_DIR
+  - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
+  - cargo build --release --verbose --features use-mock-routing
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
+  - cd $TRAVIS_BUILD_DIR
+  - npm install
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm install -g electron-prebuilt; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm install -g gulp-electron-mocha; fi
+  - npm test
+
+after_success:
+  - cd $TRAVIS_BUILD_DIR
+  - cd safe_core
+  - cargo build --release
+
+before_deploy:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
+  - cd $TRAVIS_BUILD_DIR
+  - git config --global user.name MaidSafe-QA
+  - git config --global user.email qa@maidsafe.net
+  - git fetch --tags
+  - if [ -z $(git tag -l "$PROJECT_VERSION") ]; then git tag $PROJECT_VERSION -am "Version $PROJECT_VERSION" $TRAVIS_COMMIT; git push https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} tag $PROJECT_VERSION > /dev/null 2>&1; fi
+  - npm run package
+  - git clone https://${GH_TOKEN}@github.com/maidsafe/release_config
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* "app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher Helper.app/Contents/MacOS/"; fi
+  - pushd ./app_dist
+  - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
+  - popd
+  - cd $TRAVIS_BUILD_DIR
+
+deploy:
+  provider: releases
+  api_key: ${GH_TOKEN}
+  file: "${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz"
+  skip_cleanup: true
+  tag_name: "${PROJECT_VERSION}"
+  draft: true
+  on:
+    branch: master
+    condition: |
+      (-n "$PROJECT_VERSION") && (-n "$PLATFORM")
