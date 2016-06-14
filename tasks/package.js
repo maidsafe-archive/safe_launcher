@@ -9,8 +9,9 @@ var childProcess = require('child_process');
 var pathUtil = require('path');
 var electronVersion = require(pathUtil.resolve('./node_modules/electron-prebuilt/package.json')).version;
 var exec = require('gulp-exec');
+var packageJson = require('../app/package.json');
 
-var BINARY_NAME = 'safe_launcher';
+var BINARY_NAME = 'safe_launcher-v' + packageJson.version;
 var OUT_FOLDER = 'app_dist';
 
 var packagerPath = pathUtil.resolve('./node_modules/.bin/electron-packager');

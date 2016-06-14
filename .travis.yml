@@ -85,7 +85,6 @@ before_deploy:
   - git clone https://${GH_TOKEN}@github.com/maidsafe/release_config
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* "app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher Helper.app/Contents/MacOS/"; fi
-  - rm -r release_config
   - pushd ./app_dist
   - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
   - popd
@@ -99,5 +98,6 @@ deploy:
   tag_name: "${PROJECT_VERSION}"
   draft: true
   on:
+    branch: master
     condition: |
       (-n "$PROJECT_VERSION") && (-n "$PLATFORM")

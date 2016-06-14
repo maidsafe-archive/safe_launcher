@@ -65,7 +65,7 @@ before_deploy:
         git push "https://$env:GH_TOKEN@github.com/$env:APPVEYOR_REPO_NAME" tag $env:PROJECT_VERSION
       }
   - npm run package
-  - ps: git clone https://$env:GH_TOKEN@github.com/maidsafe/release_config
+  - ps: git clone https://$env:GH_TOKEN@github.com/maidsafe/release_config 2>&1 | Out-Null
   - move release_config/safe_launcher/* app_dist/safe_launcher-win32-x64
   - ps: |
       $NAME = "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM"
