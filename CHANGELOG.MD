@@ -1,5 +1,8 @@
 # SAFE Launcher Change Log
 
+##[0.4.6]
+ - update safe_core to 0.15.1
+
 ##[0.4.5]
   - update safe_core to 0.15.0
   - launcher uses winston for logging
