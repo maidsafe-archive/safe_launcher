@@ -39,7 +39,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libnotify4; sudo apt-get install libgconf-2-4; fi
 
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; export DISPLAY=':99.0'; Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=':99.0'; Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &; fi
   - curl -sSf https://static.rust-lang.org/rustup.sh | sh
   - rustc -V
   - cargo -V
