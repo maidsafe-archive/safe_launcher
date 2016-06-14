@@ -25,8 +25,7 @@ var paths = {
         './images/**',
         './vendor/**',
         './**/*.html',
-        './**/*.+(jpg|png|svg)',
-        '!./server/boot.js'
+        './**/*.+(jpg|png|svg)'
     ],
 }
 
@@ -81,7 +80,6 @@ var bundleApplication = function () {
     return Q.all([
         bundle(srcDir.path('background.js'), destDir.path('background.js')),
         bundle(srcDir.path('app.js'), destDir.path('app.js')),
-        bundle(srcDir.path('server', 'boot.js'), destDir.path('server', 'boot.js')),
     ]);
 };
 
