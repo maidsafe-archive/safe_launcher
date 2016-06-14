@@ -3,7 +3,7 @@
   "serverPort": 8100,
   "proxyPort": 8101,
   "log": {
-    "level": "silly",
+    "level": "warn",
     "file": {
       "maxFileSize": 10000,
       "maxFiles": 10

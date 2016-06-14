@@ -44,40 +44,40 @@ build: off
 test_script:
   - npm install --progress false --depth 0
   - npm test
-after_test:
-  - cd %APPVEYOR_BUILD_FOLDER%
-  - cd safe_core
-  - cargo build --release
-  - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\api\ffi
+# after_test:
+#   - cd %APPVEYOR_BUILD_FOLDER%
+#   - cd safe_core
+#   - cargo build --release
+#   - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\api\ffi
 
-before_deploy:
-  - cd %APPVEYOR_BUILD_FOLDER%
-  - ls
-  - ps: |
-      git config --global user.name MaidSafe-QA
-      git config --global user.email qa@maidsafe.net
-      git fetch --tags
-      if (git tag -l "$env:PROJECT_VERSION") {
-        echo "Tag $env:PROJECT_VERSION already exists"
-      } else {
-        echo "Creating tag $env:PROJECT_VERSION"
-        git tag $env:PROJECT_VERSION -am "Version $env:PROJECT_VERSION" $APPVEYOR_REPO_COMMIT
-        git push "https://$env:GH_TOKEN@github.com/$env:APPVEYOR_REPO_NAME" tag $env:PROJECT_VERSION
-      }
-  - npm run package
-  - ps: |
-      New-Item -ItemType directory -Path config
-      git clone "https://$env:GH_TOKEN@github.com/maidsafe/release_config" config  2>&1 | Out-Null
-      Copy-Item config\safe_launcher\* app_dist\safe_launcher-v$env:PROJECT_VERSION-win32-x64
-      $NAME = "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM"
-      cd app_dist
-      7z a ../$NAME.zip *
-      Push-AppveyorArtifact ../$NAME.zip
-deploy:
-  provider: GitHub
-  auth_token: $(GH_TOKEN)
-  tag: $(PROJECT_VERSION)
-  artifact: /.*\.zip/
-  draft: true
-  on:
-    DEPLOY: true
+# before_deploy:
+#   - cd %APPVEYOR_BUILD_FOLDER%
+#   - ls
+#   - ps: |
+#       git config --global user.name MaidSafe-QA
+#       git config --global user.email qa@maidsafe.net
+#       git fetch --tags
+#       if (git tag -l "$env:PROJECT_VERSION") {
+#         echo "Tag $env:PROJECT_VERSION already exists"
+#       } else {
+#         echo "Creating tag $env:PROJECT_VERSION"
+#         git tag $env:PROJECT_VERSION -am "Version $env:PROJECT_VERSION" $APPVEYOR_REPO_COMMIT
+#         git push "https://$env:GH_TOKEN@github.com/$env:APPVEYOR_REPO_NAME" tag $env:PROJECT_VERSION
+#       }
+#   - npm run package
+#   - ps: |
+#       New-Item -ItemType directory -Path config
+#       git clone "https://$env:GH_TOKEN@github.com/maidsafe/release_config" config  2>&1 | Out-Null
+#       Copy-Item config\safe_launcher\* app_dist\safe_launcher-v$env:PROJECT_VERSION-win32-x64
+#       $NAME = "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM"
+#       cd app_dist
+#       7z a ../$NAME.zip *
+#       Push-AppveyorArtifact ../$NAME.zip
+# deploy:
+#   provider: GitHub
+#   auth_token: $(GH_TOKEN)
+#   tag: $(PROJECT_VERSION)
+#   artifact: /.*\.zip/
+#   draft: true
+#   on:
+#     DEPLOY: true
