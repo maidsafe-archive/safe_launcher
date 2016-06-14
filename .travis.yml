@@ -39,12 +39,13 @@ install:
   - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
   - ". install_libsodium.sh"
   - nvm --version
-  - nvm install 6.2
+  - nvm install 5.5.0
   - node --version
   - npm --version
   - python --version
 before_script:
   - export DISPLAY=:99.0
+  - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
 script:
   - cd $TRAVIS_BUILD_DIR
