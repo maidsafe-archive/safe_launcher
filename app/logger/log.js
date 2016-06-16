@@ -21,7 +21,7 @@ class Logger {
   //   return;
   // }
 
-  constructor() {    
+  constructor() {
     var self = this;
     // TODO pass log id that can used for the log visualiser
     // let id = 'uid_' + 1001;
@@ -32,43 +32,37 @@ class Logger {
     let executablePath = require('remote').app.getPath('exe');
     let executableDirPath = path.dirname(executablePath);
     let logFilePath = path.resolve(executableDirPath, path.basename(executablePath).split('.')[0] + '_ui.log');
-    fse.ensureFileSync(logFilePath);
-    // let logId = this._getLogId();
-    // this.meta = {
-    //   uid: logId
-    // };
-    var logLevel = env.log ? (env.log.level ? env.log.level : 'debug') : 'debug';
-    this.logger = new (winston.Logger)({
-      transports: [
-        new (winston.transports.Console)({
-          level: logLevel,
-          formatter: consoleFormatter
-        }),
-        new (winston.transports.File)({
-          filename: logFilePath,
-          maxsize: env.log.file.maxFileSize,
-          maxFiles: env.log.file.maxFiles,
-          tailable: true,
-          options: {
-            flags: 'w'
-          },
-          level: logLevel
-        })
-      ]
+
+    let transports = [];
+    var logLevel = env && env.log ? (env.log.level ? env.log.level : 'debug') : 'debug';
+    try {
+      process.stdout.write('\n');
+      transports.push(new (winston.transports.Console)({
+        level: logLevel,
+        handleExceptions: true,
+        formatter: consoleFormatter
+      }));
+    } catch (e) {
+      console.log('Console Logger initialisation failed');
+    }
+    try {
+      fse.ensureFileSync(logFilePath);
+      transports.push(new (winston.transports.File)({
+        filename: logFilePath,
+        maxsize: env.log.file.maxFileSize,
+        maxFiles: env.log.file.maxFiles,
+        tailable: true,
+        options: {
+          flags: 'w'
+        },
+        level: logLevel
+      }));
+    } catch (e) {
+      console.log('File logger could not be added ', e.message);
+    }
+    self.logger = new (winston.Logger)({
+      transports: transports
     });
-    // if (env.log.http && logId) {
-    //   let ffiLogFilePath = path.resolve(executableDirPath, path.basename(executablePath).split('.')[0] + '.log');
-    //   this.logger.add(winston.transports.Http, {
-    //     host: env.log.http.host,
-    //     port: env.log.http.port,
-    //     path: env.log.http.path,
-    //     level: 'silly'
-    //   });
-    //   this.ffiLogWatcher = new FFILogWatcher(ffiLogFilePath, function(log) {
-    //     self.ffi(log);
-    //   });
-    //   this.ffiLogWatcher.listen();
-    // }
   }
 
   info(msg) {
@@ -91,9 +85,6 @@ class Logger {
     this.logger.verbose(msg);
   }
 
-  silly(msg) {
-    this.logger.silly(msg);
-  }
 }
 
 export var log = new Logger();

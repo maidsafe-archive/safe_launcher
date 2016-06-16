@@ -31,7 +31,7 @@ var registerOrAddService = function(req, res, isRegister) {
 };
 
 export var getHomeDirectory = function(req, res) {
-  let sessionInfo = req.headers['sessionId'] ? sessionManager.get(res.headers['sessionId']) : null;
+  let sessionInfo = req.headers.sessionId ? sessionManager.get(req.headers.sessionId) : null;
   let appDirKey = sessionInfo ? sessionInfo.appDirKey : null;
   let hasSafeDriveAccess = sessionInfo ? sessionInfo.hasSafeDriveAccess() : false;
   let longName = req.params.longName;
@@ -43,7 +43,7 @@ export var getHomeDirectory = function(req, res) {
 };
 
 export var getFile = function(req, res) {
-  let sessionInfo = req.headers['sessionId'] ? sessionManager.get(res.headers['sessionId']) : null;
+  let sessionInfo = req.headers.sessionId ? sessionManager.get(req.headers.sessionId) : null;
   let appDirKey = sessionInfo ? sessionInfo.appDirKey : null;
   var reqParams = req.params;
   let hasSafeDriveAccess = sessionInfo ? sessionInfo.hasSafeDriveAccess() : false;
@@ -54,8 +54,8 @@ export var getFile = function(req, res) {
   if (!(longName && serviceName && filePath)) {
     return responseHandler.onResponse('Invalid request. Required parameters are not found');
   }
-  let offset = req.query.offset || 0;
-  let length = req.query.length || 0;
+  let offset = parseInt(req.query.offset) || 0;
+  let length = parseInt(req.query.length) || 0;
   log.debug('DNS - Invoking getFile API for ' + longName + ', ' + serviceName + ', ' + filePath);
   req.app.get('api').dns.getFile(longName, serviceName, filePath, offset, length, hasSafeDriveAccess, appDirKey,
     responseHandler.onResponse);
