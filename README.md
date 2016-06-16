@@ -1,8 +1,9 @@
-safe_launcher
-==============
+# safe_launcher
+
+**Maintainer:** Spandan Sharma (spandan.sharma@maidsafe.net)
 
 # Quick start
-The development dependency of this project is [Node.js](https://nodejs.org).
+The development dependency of this project is [Node.js v5.5](https://nodejs.org/download/release/v5.5.0/).
 Build the [safe_core](https://github.com/maidsafe/safe_core) with feature `use-mock-network` and copy the `.dll` for Windows
 , `.so` for Linux or `.dylib` for OSX to the `app/api/ffi` folder.
 
@@ -78,3 +79,19 @@ npm run release -- --sign A123456789
 #### Installer
 
 The installer is built using [NSIS](http://nsis.sourceforge.net). You have to install NSIS version 3.0, and add its folder to PATH in Environment Variables.
+
+# License
+
+Licensed under either of
+
+* the MaidSafe.net Commercial License, version 1.0 or later ([LICENSE](LICENSE))
+* the General Public License (GPL), version 3 ([COPYING](COPYING) or http://www.gnu.org/licenses/gpl-3.0.en.html)
+
+at your option.
+
+# Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the
+work by you, as defined in the MaidSafe Contributor Agreement, version 1.1 ([CONTRIBUTOR]
+(CONTRIBUTOR)), shall be dual licensed as above, and you agree to be bound by the terms of the
+MaidSafe Contributor Agreement, version 1.1.
