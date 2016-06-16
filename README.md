@@ -3,7 +3,7 @@
 **Maintainer:** Spandan Sharma (spandan.sharma@maidsafe.net)
 
 # Quick start
-The development dependency of this project is [Node.js](https://nodejs.org).
+The development dependency of this project is [Node.js v5.5](https://nodejs.org/download/release/v5.5.0/).
 Build the [safe_core](https://github.com/maidsafe/safe_core) with feature `use-mock-network` and copy the `.dll` for Windows
 , `.so` for Linux or `.dylib` for OSX to the `app/api/ffi` folder.
 
