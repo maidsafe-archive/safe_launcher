@@ -1,20 +1,97 @@
-sudo: true
-os:
-  - linux
-language: node_js
-node_js:
-  - "5.1"
-before_install:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-script:
-  - npm test
 env:
-  - CXX=g++-4.8
+  global:
+  - secure: g7WTo8ofUjRFP5ce3+8imSm7V6V9jmyNvkPST1m6q8XOcfTTH2ualDS5At3Zk1mHG9x656LKQfC/voeUq7RK17AJ3wtMp6R84kmzF0v3Y0hRUn5ALOXQIEtPb4V+c8TxOrInZLxVQSxLlSZg9Bjia5U/8SjpYWHn0NqSiNkZvt2NKdNDCvx3krHpDVAD6nUui4qf0JCU3SbjMfaLwuDRgr2Hs5cDVa+y6EyVkODLqMjiz5k9yXEhom3H5gaSzm/tLwXHnxtPrNaQXEIvI8jgyEA9f3NPRjM2eAAbg9pbAiJjNSkStgA6Vvq1ANMQ7H3Q4D/ml7LGPGlsKq5M/C5cL8IEq8JHndTFOxuMLv9322P6z5VeAx5BD2xlbXdOivxac4iqbduVns9NEyHxi3g9y9K2ssC7f7p6JxyBXxuN4b0HPwJdGC3+1WcA+XdIxeeudeg3K+QcHyUc5obq6pb7iasgD5x3DDSSe4pKdwIUUbYUotptvxwYYzVKY/E9g2Kid2KyGbO3WTitLdk4fLQ6BF1dqkGNcDSJb3s5/W40lcq7KODQvmBQy7iUMTZnLk2FogZtyXbf8c+V2joF3EDX+lW0N3OBLf/Q2p3jKNzl+F9xJhcFa5t1ZORJRLG5Ap+zm12qh/lpkoFegGqmt3Y6yDGS9rrVpgEsb7qOmQX2VQ0=
+  - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
+  - PROJECT_NAME=safe_launcher
+
+matrix:
+  include:
+  - os: linux
+    env: |
+      PLATFORM=linux-x64
+      PLATFORM_NAME=linux
+  - os: osx
+    env: |
+      PLATFORM=osx-x64
+      PLATFORM_NAME=darwin
+language: generic
+
+python:
+  - '2.7'
+
+osx_image: xcode7.2
+
+sudo: required
+
+dist: trusty
+
+cache:
+  cargo: true
+
 addons:
   apt:
-    sources:
-      - ubuntu-toolchain-r-test
     packages:
       - xvfb
-      - g++-4.8
+
+before_install:
+  - export PROJECT_VERSION=$(git log -1 | grep -i "version change to" | sed "s/.*[vV]ersion change to v\{0,1\}//")
+  - export PACKAGE_NAME="$PROJECT_NAME-v$PROJECT_VERSION-$PLATFORM_NAME-x64"
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libnotify4; sudo apt-get install libgconf-2-4; fi
+install:
+  - export DISPLAY=':99.0'
+  - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+  - curl -sSf https://static.rust-lang.org/rustup.sh | sh
+  - rustc -V
+  - cargo -V
+  - curl -sSLO https://github.com/maidsafe/QA/raw/master/Bash%20Scripts/Travis/install_libsodium.sh
+  - ". install_libsodium.sh"
+  - nvm --version
+  - nvm install 5.5.0
+  - node --version
+  - npm --version
+  - python --version
+
+script:
+  - cd $TRAVIS_BUILD_DIR
+  - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
+  - cargo build --release --verbose --features use-mock-routing
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
+  - cd $TRAVIS_BUILD_DIR
+  - npm install
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm install -g electron-prebuilt; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm install -g gulp-electron-mocha; fi
+  - npm test
+
+before_deploy:
+  - cd $TRAVIS_BUILD_DIR
+  - cd safe_core
+  - cargo build --release
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
+  - cd $TRAVIS_BUILD_DIR
+  - git config --global user.name MaidSafe-QA
+  - git config --global user.email qa@maidsafe.net
+  - git fetch --tags
+  - if [ -z $(git tag -l "$PROJECT_VERSION") ]; then git tag $PROJECT_VERSION -am "Version $PROJECT_VERSION" $TRAVIS_COMMIT; git push https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} tag $PROJECT_VERSION > /dev/null 2>&1; fi
+  - npm run package
+  - git clone https://${GH_TOKEN}@github.com/maidsafe/release_config
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/safe_launcher.crust.config release_config/safe_launcher/safe_launcher-v$PROJECT_VERSION\ Helper.crust.config; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/safe_launcher-v$PROJECT_VERSION.app/Contents/Frameworks/safe_launcher-v$PROJECT_VERSION\ Helper.app/Contents/MacOS/; fi
+  - pushd ./app_dist
+  - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
+  - popd
+  - cd $TRAVIS_BUILD_DIR
+
+deploy:
+  provider: releases
+  api_key: ${GH_TOKEN}
+  file: "${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz"
+  skip_cleanup: true
+  tag_name: "${PROJECT_VERSION}"
+  draft: true
+  on:
+    all_branches: true
+    condition: |
+      (-n "$PROJECT_VERSION") && (-n "$PLATFORM")
