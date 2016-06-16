@@ -520,7 +520,7 @@ var getHomeDir = function(token, longName, serviceName, callback) {
 };
 
 var getFilePath = function(token, longName, serviceName, filePath, callback) {
-  var url = SERVER_URL + '/dns/' + encodeURIComponent(filePath) + '/' + encodeURIComponent(serviceName) + '/' + encodeURIComponent(longName);
+  var url = SERVER_URL + '/dns/' + encodeURIComponent(serviceName) + '/' + encodeURIComponent(longName) + '/' + encodeURIComponent(filePath);
   request({
     method: 'GET',
     uri: url,
