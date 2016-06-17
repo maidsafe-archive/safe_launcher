@@ -10,15 +10,16 @@ var hanlder = new Hanlder(libPath);
 
 var onMessage = hanlder.dispatcher;
 
-var BeforeExit = function(hanlder) {
+var BeforeExit = function(handle) {
+  this.handler = handle;
+  var self = this;
   this.cleanUp = function() {
-    if (!handler) {
+    if (!self.handler || !self.handler.cleanUp || typeof self.handler.cleanUp !== 'function') {
       return;
     }
-    handler.cleanUp();
+    self.handler.cleanUp();
   };
   return this.cleanUp;
 };
-
 process.on('message', onMessage);
 process.on('beforeExit', new BeforeExit(hanlder));
