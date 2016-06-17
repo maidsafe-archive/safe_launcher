@@ -74,19 +74,19 @@ gulp.task('babelRoot', function() {
   .pipe(gulp.dest(path.resolve('.', destDir)));
 });
 
-gulp.task('clean', function() {
+gulp.task('testClean', function() {
   fse.removeSync('./testApp/api');
   fse.removeSync('./testApp/server');
   fse.removeSync('./testApp/*.js');
   fse.removeSync('./testApp/*.json');
 });
 
-gulp.task('copy', function() {
+gulp.task('testCopy', function() {
   fse.copySync(path.resolve('./app/api/ffi', ffiName), path.resolve(destDir, 'api', 'ffi', ffiName));
   fse.copySync('./app/package.json', path.resolve(destDir, 'package.json'));
 });
 
-gulp.task('test_finalize', function() {
+gulp.task('testFinalise', function() {
   var manifest = fse.readJsonSync(path.resolve(destDir, 'package.json'));
   manifest.env = fse.readJsonSync(path.resolve('.', 'config', 'env_test.json'));
   fse.writeJsonSync(path.resolve(destDir, 'package.json'), manifest);
@@ -98,7 +98,7 @@ gulp.task('installPackages', function() {
   .pipe(install());
 });
 
-gulp.task('test_msvc_rebuild', [ 'installPackages' ], function() {
+gulp.task('testMsvcRebuild', [ 'installPackages' ], function() {
   var options = {
     continueOnError: false, // default = false, true means don't emit error event
     pipeStdout: false, // default = false, true means stdout is written to file.contents
@@ -114,7 +114,7 @@ gulp.task('test_msvc_rebuild', [ 'installPackages' ], function() {
   .pipe(exec.reporter(reportOptions));
 });
 
-gulp.task('mocha', [ 'test_msvc_rebuild' ], function() {
+gulp.task('mocha', [ 'testMsvcRebuild' ], function() {
   return gulp.src('./tests', {read: false})
   .pipe(gulpMocha.default({
     electronMocha: {
@@ -136,4 +136,4 @@ gulp.task('mocha', [ 'test_msvc_rebuild' ], function() {
 //   .pipe(jshint.reporter('jshint-stylish'));
 // };
 
-gulp.task('test', [ 'clean', 'babelApi', 'babelServer', 'babelLogger', 'babelRoot', 'copy', 'test_finalize', 'mocha' ]);
+gulp.task('test', [ 'testClean', 'babelApi', 'babelServer', 'babelLogger', 'babelRoot', 'testCopy', 'testFinalise', 'mocha' ]);
