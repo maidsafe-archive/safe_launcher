@@ -1,5 +1,9 @@
 # SAFE Launcher Change Log
 
+##[0.4.6]
+ - update to safe_core to 0.15.1
+ - Remote process logging integration
+
 ##[0.4.5]
   - update safe_core to 0.15.0
   - launcher uses winston for logging
