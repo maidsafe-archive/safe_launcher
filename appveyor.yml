@@ -71,8 +71,7 @@ before_deploy:
   - npm run package
   - ps: |
       New-Item -ItemType directory -Path config_files
-      git clone -q "https://$env:GH_TOKEN@github.com/maidsafe/release_config" config_files  2>&1 | Out-Null
-      ls config_files
+      git clone -q "https://$env:GH_TOKEN@github.com/maidsafe/release_config" config_files 2>&1 | Out-Null
       Copy-Item config_files\safe_launcher\* app_dist\safe_launcher-v$env:PROJECT_VERSION-win32-x64
       $NAME = "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM"
       cd app_dist
