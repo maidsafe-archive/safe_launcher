@@ -6,8 +6,7 @@ environment:
   nodejs_version: "5.5.0"
   global:
     GH_TOKEN:
-      # secure: l+aIZyW2V4zjmC5fMMNNTVXtRf812RiOYtqac8p4/qSPdA+PrSRv4sBEosdNkrJs
-      secure: pz4UQNCdP57gDQMZIDnNGD3ZF2IVjA7S1qQgLgKA9DCGq/42YZS9Ys8FM/FmCtU/
+      secure: yk5yL+kilHMAjmPHqbN/RgTIM++fIsSfZnizC1Ch1inR9m/Mm6bv0ZpL6Lj0vzmy
     Features: "use-mock-routing"
     PROJECT_NAME: safe_launcher
     RUST_BACKTRACE: 1
@@ -27,7 +26,9 @@ install:
         . ".\Install libsodium.ps1"
         Install-Product node $env:nodejs_version $env:PLATFORM
 
-        if ($env:APPVEYOR_REPO_COMMIT_MESSAGE -match "[vV]ersion change to v?(.*)") {
+        $commit_message = "$env:APPVEYOR_REPO_COMMIT_MESSAGE $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED"
+
+        if ($commit_message -match "[vV]ersion change to v?(.*)") {
           $env:PROJECT_VERSION = $matches[1]
           $env:DEPLOY = "true"
         }
