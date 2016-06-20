@@ -6,7 +6,7 @@ environment:
   nodejs_version: "5.5.0"
   global:
     GH_TOKEN:
-      secure: pz4UQNCdP57gDQMZIDnNGD3ZF2IVjA7S1qQgLgKA9DCGq/42YZS9Ys8FM/FmCtU/
+      secure: yk5yL+kilHMAjmPHqbN/RgTIM++fIsSfZnizC1Ch1inR9m/Mm6bv0ZpL6Lj0vzmy
     Features: "use-mock-routing"
     PROJECT_NAME: safe_launcher
     RUST_BACKTRACE: 1
@@ -55,14 +55,14 @@ before_deploy:
   - cd %APPVEYOR_BUILD_FOLDER%
   - ls
   - ps: |
-      git config --global user.name shankar2105
-      git config --global user.email shankar21mail@gmail.com
-      git fetch -q --tags
-      if (git tag -q -l "$env:PROJECT_VERSION") {
+      git config --global user.name MaidSafe-QA
+      git config --global user.email qa@maidsafe.net
+      git fetch --tags
+      if (git tag -l "$env:PROJECT_VERSION") {
         echo "Tag $env:PROJECT_VERSION already exists"
       } else {
         echo "Creating tag $env:PROJECT_VERSION"
-        git tag -q $env:PROJECT_VERSION -am "Version $env:PROJECT_VERSION" $APPVEYOR_REPO_COMMIT 2>&1 | Out-Null
+        git tag $env:PROJECT_VERSION -am "Version $env:PROJECT_VERSION" $APPVEYOR_REPO_COMMIT 2>&1 | Out-Null
         git push -q "https://$env:GH_TOKEN@github.com/$env:APPVEYOR_REPO_NAME" tag $env:PROJECT_VERSION 2>&1 | Out-Null
       }
   - npm run package
