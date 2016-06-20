@@ -1,6 +1,7 @@
 env:
   global:
-  - secure: g7WTo8ofUjRFP5ce3+8imSm7V6V9jmyNvkPST1m6q8XOcfTTH2ualDS5At3Zk1mHG9x656LKQfC/voeUq7RK17AJ3wtMp6R84kmzF0v3Y0hRUn5ALOXQIEtPb4V+c8TxOrInZLxVQSxLlSZg9Bjia5U/8SjpYWHn0NqSiNkZvt2NKdNDCvx3krHpDVAD6nUui4qf0JCU3SbjMfaLwuDRgr2Hs5cDVa+y6EyVkODLqMjiz5k9yXEhom3H5gaSzm/tLwXHnxtPrNaQXEIvI8jgyEA9f3NPRjM2eAAbg9pbAiJjNSkStgA6Vvq1ANMQ7H3Q4D/ml7LGPGlsKq5M/C5cL8IEq8JHndTFOxuMLv9322P6z5VeAx5BD2xlbXdOivxac4iqbduVns9NEyHxi3g9y9K2ssC7f7p6JxyBXxuN4b0HPwJdGC3+1WcA+XdIxeeudeg3K+QcHyUc5obq6pb7iasgD5x3DDSSe4pKdwIUUbYUotptvxwYYzVKY/E9g2Kid2KyGbO3WTitLdk4fLQ6BF1dqkGNcDSJb3s5/W40lcq7KODQvmBQy7iUMTZnLk2FogZtyXbf8c+V2joF3EDX+lW0N3OBLf/Q2p3jKNzl+F9xJhcFa5t1ZORJRLG5Ap+zm12qh/lpkoFegGqmt3Y6yDGS9rrVpgEsb7qOmQX2VQ0=
+  # - secure: g7WTo8ofUjRFP5ce3+8imSm7V6V9jmyNvkPST1m6q8XOcfTTH2ualDS5At3Zk1mHG9x656LKQfC/voeUq7RK17AJ3wtMp6R84kmzF0v3Y0hRUn5ALOXQIEtPb4V+c8TxOrInZLxVQSxLlSZg9Bjia5U/8SjpYWHn0NqSiNkZvt2NKdNDCvx3krHpDVAD6nUui4qf0JCU3SbjMfaLwuDRgr2Hs5cDVa+y6EyVkODLqMjiz5k9yXEhom3H5gaSzm/tLwXHnxtPrNaQXEIvI8jgyEA9f3NPRjM2eAAbg9pbAiJjNSkStgA6Vvq1ANMQ7H3Q4D/ml7LGPGlsKq5M/C5cL8IEq8JHndTFOxuMLv9322P6z5VeAx5BD2xlbXdOivxac4iqbduVns9NEyHxi3g9y9K2ssC7f7p6JxyBXxuN4b0HPwJdGC3+1WcA+XdIxeeudeg3K+QcHyUc5obq6pb7iasgD5x3DDSSe4pKdwIUUbYUotptvxwYYzVKY/E9g2Kid2KyGbO3WTitLdk4fLQ6BF1dqkGNcDSJb3s5/W40lcq7KODQvmBQy7iUMTZnLk2FogZtyXbf8c+V2joF3EDX+lW0N3OBLf/Q2p3jKNzl+F9xJhcFa5t1ZORJRLG5Ap+zm12qh/lpkoFegGqmt3Y6yDGS9rrVpgEsb7qOmQX2VQ0=
+  - secure: k2dzYez4jnEcytMwn1Y/1UjXV8IYBWfFxvM+n41nYYPDecy9fnnyNdN8J4oNmMlHRt0452vy7R6h95457dS7t/DnkX2Sgz7RqHDaTCZM3PjZH4bojfZO2D24J5AK6DMAG0JKxO7L6U4ACMCFslRabFtowp0xeVbXsy3B4zdMpRP1wW/ZfUdvoeTh8xsBr/RGzy7fsYaDNLtPRhrjeifLeVboiox01sodqz7ycLTjecRMO8HzfTQlBjAGURNUWXB5Xo6PE8Xvyiz/rDVNv137Fazaq93bQLnfLpmyOHL2uxYElAMG/k8bpWSln90nHokZzRu5zYMTUCBKCQgdXLJzjauqIYKULO3sSpFmZFOBGKdG57ggqDfIV6BN6kD8ePexNWUH9sjA4qwbXh65eTiXPnXC61xLL8U3KEqHPh5uPG5xsQS7Oa3jZBmxfFgOb06/mCntYNcaUWVDIBrYoxaYP8965Wdcccsuuzw3awFOefnPhWCsMJ+/rw91z+ya7sg9qh2WMwS6gNOum8o4ZcQUFmob1EtS0+76CChKFOjCZ9o7Y/si93YcTh+Mfs3QM0Oq0RJAj1Gu+wQH4GTScXCdv0yM3r2rh8vzTDXVIjPnaRULtHzXjfaE2tu48TAs7/E4jUFS3UD9F1fW+C1cUQyJIuBDe9/3uIUTc2qI/dEi830=
   - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
   - PROJECT_NAME=safe_launcher
 
@@ -37,6 +38,7 @@ before_install:
   - export PROJECT_VERSION=$(git log -1 | grep -i "version change to" | sed "s/.*[vV]ersion change to v\{0,1\}//")
   - export PACKAGE_NAME="$PROJECT_NAME-v$PROJECT_VERSION-$PLATFORM_NAME-x64"
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libnotify4; sudo apt-get install libgconf-2-4; fi
+
 install:
   - export DISPLAY=':99.0'
   - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
@@ -70,8 +72,10 @@ before_deploy:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
   - cd $TRAVIS_BUILD_DIR
-  - git config --global user.name MaidSafe-QA
-  - git config --global user.email qa@maidsafe.net
+  # - git config --global user.name MaidSafe-QA
+  # - git config --global user.email qa@maidsafe.net
+  - git config --global user.name shankar2105
+  - git config --global user.email shankar21mail@gmail.com
   - git fetch --tags
   - if [ -z $(git tag -l "$PROJECT_VERSION") ]; then git tag $PROJECT_VERSION -am "Version $PROJECT_VERSION" $TRAVIS_COMMIT; git push https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} tag $PROJECT_VERSION > /dev/null 2>&1; fi
   - npm run package

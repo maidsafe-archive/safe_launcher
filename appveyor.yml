@@ -6,7 +6,8 @@ environment:
   nodejs_version: "5.5.0"
   global:
     GH_TOKEN:
-      secure: l+aIZyW2V4zjmC5fMMNNTVXtRf812RiOYtqac8p4/qSPdA+PrSRv4sBEosdNkrJs
+      # secure: l+aIZyW2V4zjmC5fMMNNTVXtRf812RiOYtqac8p4/qSPdA+PrSRv4sBEosdNkrJs
+      secure: pz4UQNCdP57gDQMZIDnNGD3ZF2IVjA7S1qQgLgKA9DCGq/42YZS9Ys8FM/FmCtU/
     Features: "use-mock-routing"
     PROJECT_NAME: safe_launcher
     RUST_BACKTRACE: 1
@@ -53,8 +54,10 @@ before_deploy:
   - cd %APPVEYOR_BUILD_FOLDER%
   - ls
   - ps: |
-      git config --global user.name MaidSafe-QA
-      git config --global user.email qa@maidsafe.net
+      # git config --global user.name MaidSafe-QA
+      # git config --global user.email qa@maidsafe.net
+      git config --global user.name shankar2105
+      git config --global user.email shankar21mail@gmail.com
       git fetch --tags
       if (git tag -l "$env:PROJECT_VERSION") {
         echo "Tag $env:PROJECT_VERSION already exists"
