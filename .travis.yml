@@ -3,7 +3,7 @@ env:
   - secure: rO9VFzfu7vsR+WDYuihvI3JTmPbHlHP6whcddh6R17AknJcdt7aI1fu7MOK7di2IorqKWLoPVzZ2PMIVV+7uf14uq4tETwqoKAO0ImvkwGCZduCni6FOVjg7VlE9Zi+g7ZF2jvZ9AqGAjFyrVuSv3+s40Z+WfgY0eU5OYERRtSeenxAiHF0dTKqn1qad7VMM/AsLDL3NCl/IxqfTfZkRzPKjUru4nL5HmYxLBuKmwf18qUjV4K6jqS12Pi77bXkntVJRC5ZP4h2ZiPbZ0n/MHVF3ceA/VeAPcdzCWoH/Ipo+xvq77l3WtpwoNyCBS+PxhL9PtTqKgYFMPpDAGJy5BdXGio3Mj0xwJpbZRGbFknFkXcmLnYRLZY5rNHpgExn3UPqAyLSGMGI/zlz+82RMaotwUmvix3Oy6SQ4wjmHwMnl3ZjXlACcdF/PURF1Nl52Ur4ZgKrzUxXB1QMxfDczb1DcTd7LfQV+e8p/zJ89882Ptt0rn1XMFSeWO+BJpYUtrnadD9ZIj2q89SVDiy3+Vy61T0IWuGAx0kmA9FSTkW0j6BnTgC4m8qV4LH2q6he0m/E7FlNVlkJu8h59twf40LVKwgz+vO/sACze6g1eTmBsIAZphUhlxKXxveMYCqCjatRnOMQ7VsAudhBaOyepXSazmS8GD6Qi5SNjWyAo9GQ=
   - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
   - PROJECT_NAME=safe_launcher
-  
+
 matrix:
   include:
   - os: linux
@@ -71,10 +71,8 @@ before_deploy:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
   - cd $TRAVIS_BUILD_DIR
-  # - git config --global user.name MaidSafe-QA
-  # - git config --global user.email qa@maidsafe.net
-  - git config --global user.name shankar2105
-  - git config --global user.email shankar21mail@gmail.com
+  - git config --global user.name MaidSafe-QA
+  - git config --global user.email qa@maidsafe.net
   - git fetch --tags
   - if [ -z $(git tag -l "$PROJECT_VERSION") ]; then git tag $PROJECT_VERSION -am "Version $PROJECT_VERSION" $TRAVIS_COMMIT; git push https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} tag $PROJECT_VERSION > /dev/null 2>&1; fi
   - npm run package
