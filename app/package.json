@@ -3,7 +3,7 @@
   "productName": "SAFELauncher",
   "identifier": "com.maidsafe.safe_launcher",
   "description": "SAFE Launcher - Gateway to the SAFE Network",
-  "version": "0.4.6",
+  "version": "0.0.1",
   "author": "Maidsafe",
   "copyright": "",
   "main": "background.js",
