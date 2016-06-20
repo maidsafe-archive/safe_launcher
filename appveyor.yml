@@ -6,7 +6,8 @@ environment:
   nodejs_version: "5.5.0"
   global:
     GH_TOKEN:
-      secure: yk5yL+kilHMAjmPHqbN/RgTIM++fIsSfZnizC1Ch1inR9m/Mm6bv0ZpL6Lj0vzmy
+      # secure: yk5yL+kilHMAjmPHqbN/RgTIM++fIsSfZnizC1Ch1inR9m/Mm6bv0ZpL6Lj0vzmy
+      secure: pz4UQNCdP57gDQMZIDnNGD3ZF2IVjA7S1qQgLgKA9DCGq/42YZS9Ys8FM/FmCtU/
     Features: "use-mock-routing"
     PROJECT_NAME: safe_launcher
     RUST_BACKTRACE: 1
@@ -55,8 +56,10 @@ before_deploy:
   - cd %APPVEYOR_BUILD_FOLDER%
   - ls
   - ps: |
-      git config --global user.name MaidSafe-QA
-      git config --global user.email qa@maidsafe.net
+      # git config --global user.name MaidSafe-QA
+      # git config --global user.email qa@maidsafe.net
+      git config --global user.name shankar2105
+      git config --global user.email shankar21mail@gmail.com
       git fetch --tags
       if (git tag -l "$env:PROJECT_VERSION") {
         echo "Tag $env:PROJECT_VERSION already exists"
@@ -67,9 +70,10 @@ before_deploy:
       }
   - npm run package
   - ps: |
-      New-Item -ItemType directory -Path config
-      git clone -q "https://$env:GH_TOKEN@github.com/maidsafe/release_config" config  2>&1 | Out-Null
-      Copy-Item config\safe_launcher\* app_dist\safe_launcher-v$env:PROJECT_VERSION-win32-x64
+      New-Item -ItemType directory -Path config_files
+      git clone -q "https://$env:GH_TOKEN@github.com/maidsafe/release_config" config_files  2>&1 | Out-Null
+      ls config_files
+      Copy-Item config_files\safe_launcher\* app_dist\safe_launcher-v$env:PROJECT_VERSION-win32-x64
       $NAME = "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM"
       cd app_dist
       7z a ../$NAME.zip *
