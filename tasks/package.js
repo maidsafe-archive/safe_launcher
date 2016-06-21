@@ -41,7 +41,8 @@ var config = packageForOs[utils.os()];
 
 var appVersion = require(pathUtil.resolve('./app/package.json')).version;
 var packageName = BINARY_NAME + '-' + config.platform + '-' + os.arch();
-var packageNameWithVersion = BINARY_NAME + '-v' + appVersion + '-' + config.platform.slice(0, -2) + '-' + os.arch();
+var platformName = config.platform === 'win32' ? config.platform.slice(0, -2) : config.platform;
+var packageNameWithVersion = BINARY_NAME + '-v' + appVersion + '-' + platformName + '-' + os.arch();
 
 var onPackageCompleted = function() {
   var packagePath = pathUtil.resolve('.', OUT_FOLDER, BINARY_NAME + '-' + os.platform() + '-' + os.arch());
