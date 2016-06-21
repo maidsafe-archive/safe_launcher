@@ -53,7 +53,6 @@ before_deploy:
   - cargo build --release
   - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\api\ffi
   - cd %APPVEYOR_BUILD_FOLDER%
-  - ls
   - ps: |
       git config --global user.name MaidSafe-QA
       git config --global user.email qa@maidsafe.net

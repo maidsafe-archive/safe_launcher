@@ -77,9 +77,6 @@ before_deploy:
   - if [ -z $(git tag -l "$PROJECT_VERSION") ]; then git tag $PROJECT_VERSION -am "Version $PROJECT_VERSION" $TRAVIS_COMMIT; git push https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} tag $PROJECT_VERSION > /dev/null 2>&1; fi
   - npm run package
   - git clone https://${GH_TOKEN}@github.com/maidsafe/release_config
-  - ls
-  - ls app_dist
-  - ls app_dist/$PACKAGE_NAME/
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/safe_launcher.crust.config release_config/safe_launcher/safe_launcher\ Helper.crust.config; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher\ Helper.app/Contents/MacOS/; fi
