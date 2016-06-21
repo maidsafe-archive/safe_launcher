@@ -69,7 +69,7 @@ before_deploy:
   - ps: |
       New-Item -ItemType directory -Path configFiles
       git clone -q "https://$env:GH_TOKEN@github.com/maidsafe/release_config" configFiles 2>&1 | Out-Null
-      Copy-Item configFiles\safe_launcher\* app_dist\safe_launcher-v$env:PROJECT_VERSION-win32-x64
+      Copy-Item configFiles\safe_launcher\* app_dist\safe_launcher-v$env:PROJECT_VERSION-win-x64
       $NAME = "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM"
       cd app_dist
       7z a ../$NAME.zip *
