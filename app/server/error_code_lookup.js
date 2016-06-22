@@ -48,6 +48,20 @@ export function errorCodeLookup(errCode) {
       return 'CoreError::MutationFailure::MutationError::AccountExists';
     case CLIENT_ERROR_START_RANGE - 21:
       return 'CoreError::MutationFailure::MutationError::NoSuchData';
+    case CLIENT_ERROR_START_RANGE - 22:
+      return 'CoreError::MutationFailure::MutationError::DataExists';
+    case CLIENT_ERROR_START_RANGE - 23:
+      return 'CoreError::MutationFailure::MutationError::LowBalance';
+    case CLIENT_ERROR_START_RANGE - 24:
+      return 'CoreError::MutationFailure::MutationError::InvalidSuccessor';
+    case CLIENT_ERROR_START_RANGE - 25:
+      return 'CoreError::MutationFailure::MutationError::InvalidOperation';
+    case CLIENT_ERROR_START_RANGE - 26:
+      return 'CoreError::MutationFailure::MutationError::NetworkOther';
+    case CLIENT_ERROR_START_RANGE - 27:
+      return 'CoreError::MutationFailure::MutationError::NetworkFull';
+    case CLIENT_ERROR_START_RANGE - 28:
+      return 'CoreError::SelfEncryption';
     case NFS_ERROR_START_RANGE - 1:
       return 'NfsError::DirectoryAlreadyExistsWithSameName';
     case NFS_ERROR_START_RANGE - 2:
