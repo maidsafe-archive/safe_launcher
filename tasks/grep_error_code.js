@@ -8,7 +8,8 @@ var cp = require('child_process');
 var matchWords = {
   'CORE': 'CLIENT_ERROR_START_RANGE',
   'NFS': 'NFS_ERROR_START_RANGE',
-  'DNS': 'DNS_ERROR_START_RANGE'
+  'DNS': 'DNS_ERROR_START_RANGE',
+  'FFI': 'FFI_ERROR_START_RANGE'
 };
 
 var grepData = [];
@@ -60,10 +61,11 @@ var templateFile = function(grepContent) {
     tempObj.dataArr = dataArr;
     parsedData.push(tempObj);
   }
-  template += '\tlet ' + matchWords.CORE + ' = ' + parsedData[0].startVal + ';\n';
-  template += '\tlet ' + matchWords.NFS + ' = ' + parsedData[1].startVal + ';\n';
-  template += '\tlet ' + matchWords.DNS + ' = ' + parsedData[2].startVal + ';\n';
-  template += '\tswitch (errCode) {\n';
+  template += '  let ' + matchWords.CORE + ' = ' + parsedData[0].startVal + ';\n';
+  template += '  let ' + matchWords.NFS + ' = ' + parsedData[1].startVal + ';\n';
+  template += '  let ' + matchWords.DNS + ' = ' + parsedData[2].startVal + ';\n';
+  template += '  let ' + matchWords.FFI + ' = ' + parsedData[3].startVal + ';\n';
+  template += '  switch (errCode) {\n';
 
   var grepErrorArr = function(target) {
     for(let err in target) {
@@ -79,8 +81,8 @@ var templateFile = function(grepContent) {
           }
           caseStr = caseStr.replace(/,\}\}/g, '');
           statement = statement.replace(/\{\D*\}/, '');
-          template += '\t\tcase ' + caseStr.trim() + ':\n';
-          template += '\t\t\treturn \'' + statement.trim() + '\';\n'
+          template += '    case ' + caseStr.trim() + ':\n';
+          template += '      return \'' + statement.trim() + '\';\n'
         }
       }
     }
@@ -88,7 +90,7 @@ var templateFile = function(grepContent) {
   for(let i = 0; i < parsedData.length; i++) {
     grepErrorArr(parsedData[i].dataArr);
   }
-  template += '\t\tdefault:\n\t\t\treturn \'Unexpected error\';\n\t}\n};';
+  template += '    default:\n      return \'Unexpected error\';\n  }\n};\n';
   fs.writeFile(pathUtil.resolve('.', destFile), template, (err, data) => {
     if (err) throw err;
     console.log(destFile + ' updated.');
@@ -108,6 +110,10 @@ var grepStream = through({ objectMode: true }, function(srcFile, enc, cb) {
     {
       path: pathUtil.resolve(srcFile.path, 'dns', 'errors.rs'),
       word: matchWords.DNS
+    },
+    {
+      path: pathUtil.resolve(srcFile.path, 'ffi', 'errors.rs'),
+      word: matchWords.FFI
     }
   ];
 
