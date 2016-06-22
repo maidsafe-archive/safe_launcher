@@ -37,31 +37,17 @@ export function errorCodeLookup(errCode) {
     case CLIENT_ERROR_START_RANGE - 15:
       return 'CoreError::MpidMessagingError';
     case CLIENT_ERROR_START_RANGE - 16:
-      return 'CoreError::GetFailure';
+      return 'CoreError::GetFailure::GetError::NoSuchAccount';
     case CLIENT_ERROR_START_RANGE - 17:
-      return 'CoreError::GetFailure';
+      return 'CoreError::GetFailure::GetError::NoSuchData';
     case CLIENT_ERROR_START_RANGE - 18:
-      return 'CoreError::GetFailure';
+      return 'CoreError::GetFailure::GetError::NetworkOther';
     case CLIENT_ERROR_START_RANGE - 19:
-      return 'CoreError::MutationFailure';
+      return 'CoreError::MutationFailure::MutationError::NoSuchAccount';
     case CLIENT_ERROR_START_RANGE - 20:
-      return 'CoreError::MutationFailure';
+      return 'CoreError::MutationFailure::MutationError::AccountExists';
     case CLIENT_ERROR_START_RANGE - 21:
-      return 'CoreError::MutationFailure';
-    case CLIENT_ERROR_START_RANGE - 22:
-      return 'CoreError::MutationFailure';
-    case CLIENT_ERROR_START_RANGE - 23:
-      return 'CoreError::MutationFailure';
-    case CLIENT_ERROR_START_RANGE - 24:
-      return 'CoreError::MutationFailure';
-    case CLIENT_ERROR_START_RANGE - 25:
-      return 'CoreError::MutationFailure';
-    case CLIENT_ERROR_START_RANGE - 26:
-      return 'CoreError::MutationFailure';
-    case CLIENT_ERROR_START_RANGE - 27:
-      return 'CoreError::MutationFailure';
-    case CLIENT_ERROR_START_RANGE - 28:
-      return 'CoreError::SelfEncryption';
+      return 'CoreError::MutationFailure::MutationError::NoSuchData';
     case NFS_ERROR_START_RANGE - 1:
       return 'NfsError::DirectoryAlreadyExistsWithSameName';
     case NFS_ERROR_START_RANGE - 2:

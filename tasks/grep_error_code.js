@@ -57,10 +57,11 @@ var templateFile = function(grepContent) {
   for(let i = 0; i < grepContent.length; i++) {
     var tempObj = {};
     var dataArr = grepContent[i].split('\n');
-    tempObj.startVal = dataArr[0].slice(dataArr[0].indexOf('= ') + 2, -1);
+    tempObj.startVal = dataArr[0].slice(dataArr[0].search(/=\s*\D/g)).slice(2, -1);
     tempObj.dataArr = dataArr;
     parsedData.push(tempObj);
   }
+
   template += '  let ' + matchWords.CORE + ' = ' + parsedData[0].startVal + ';\n';
   template += '  let ' + matchWords.NFS + ' = ' + parsedData[1].startVal + ';\n';
   template += '  let ' + matchWords.DNS + ' = ' + parsedData[2].startVal + ';\n';
@@ -69,22 +70,20 @@ var templateFile = function(grepContent) {
 
   var grepErrorArr = function(target) {
     for(let err in target) {
-      if (err !== '0') {
-        var caseMatch = target[err].indexOf('=> {') !== -1 ? '=> {' : '=> ';
-        var caseIndex = target[err].indexOf(caseMatch);
-        var caseIndexEnd = -1;
-        if (caseIndex !== -1) {
-          var caseStr = target[err].slice(caseIndex + caseMatch.length, caseIndexEnd);
-          var statement = target[err].slice(0, caseIndex);
-          if (statement.indexOf('(_)') !== -1) {
-            statement = statement.replace(/\(_\)/g, '');
-          }
-          caseStr = caseStr.replace(/,\}\}/g, '');
-          statement = statement.replace(/\{\D*\}/, '');
-          template += '    case ' + caseStr.trim() + ':\n';
-          template += '      return \'' + statement.trim() + '\';\n'
-        }
+      if (err === '0') {
+        continue;
       }
+      var matchStr = '=>';
+      var matchIndex = target[err].search(new RegExp(matchStr));
+      if (matchIndex === -1) {
+        continue;
+      }
+      var stmtFirstHalf = target[err].slice(0, matchIndex);
+      var stmtLastHalf = target[err].slice(matchIndex + matchStr.length);
+      stmtFirstHalf = stmtFirstHalf.split(/\s*{\s*reason:\s*/g).join('::').replace(/(\W*\}|\(_\))/g, '');
+      stmtLastHalf = stmtLastHalf.replace(/(,|}|{)/g, '');
+      template += '    case ' + stmtLastHalf.trim() + ':\n';
+      template += '      return \'' + stmtFirstHalf.trim() + '\';\n'
     }
   };
   for(let i = 0; i < parsedData.length; i++) {
@@ -123,11 +122,12 @@ var grepStream = through({ objectMode: true }, function(srcFile, enc, cb) {
       templateFile(grepData);
     });
   };
+
   restyleFiles(files.slice(), afterRestyleFiles);
-  this.push(srcFile.path);
   cb();
 });
 
+// TODO: Handle async breakdown
 gulp.task('grep_error_code', function() {
   gulp.src('./safe_core/src', { read: false })
   .pipe(grepStream);
