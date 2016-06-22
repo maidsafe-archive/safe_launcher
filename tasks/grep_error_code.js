@@ -68,10 +68,11 @@ var templateFile = function(grepContent) {
   var grepErrorArr = function(target) {
     for(let err in target) {
       if (err !== '0') {
-        var caseIndex = target[err].indexOf('=> ');
+        var caseMatch = target[err].indexOf('=> {') !== -1 ? '=> {' : '=> ';
+        var caseIndex = target[err].indexOf(caseMatch);
         var caseIndexEnd = -1;
         if (caseIndex !== -1) {
-          var caseStr = target[err].slice(caseIndex + 3, caseIndexEnd);
+          var caseStr = target[err].slice(caseIndex + caseMatch.length, caseIndexEnd);
           var statement = target[err].slice(0, caseIndex);
           if (statement.indexOf('(_)') !== -1) {
             statement = statement.replace(/\(_\)/g, '');
