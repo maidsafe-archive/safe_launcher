@@ -48,6 +48,20 @@ export function errorCodeLookup(errCode) {
       return 'CoreError::MutationFailure';
     case CLIENT_ERROR_START_RANGE - 21:
       return 'CoreError::MutationFailure';
+    case CLIENT_ERROR_START_RANGE - 22:
+      return 'CoreError::MutationFailure';
+    case CLIENT_ERROR_START_RANGE - 23:
+      return 'CoreError::MutationFailure';
+    case CLIENT_ERROR_START_RANGE - 24:
+      return 'CoreError::MutationFailure';
+    case CLIENT_ERROR_START_RANGE - 25:
+      return 'CoreError::MutationFailure';
+    case CLIENT_ERROR_START_RANGE - 26:
+      return 'CoreError::MutationFailure';
+    case CLIENT_ERROR_START_RANGE - 27:
+      return 'CoreError::MutationFailure';
+    case CLIENT_ERROR_START_RANGE - 28:
+      return 'CoreError::SelfEncryption';
     case NFS_ERROR_START_RANGE - 1:
       return 'NfsError::DirectoryAlreadyExistsWithSameName';
     case NFS_ERROR_START_RANGE - 2:
