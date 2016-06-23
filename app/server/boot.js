@@ -6,7 +6,7 @@ import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
 import { router_0_4 } from './routes/version_0_4';
 import { CreateSession } from './controllers/auth';
-import { decryptRequest } from './utils';
+import { setSession } from './utils';
 
 class ServerEventEmitter extends EventEmitter {};
 
@@ -62,18 +62,11 @@ export default class RESTServer {
       next();
     });
 
-    app.use(function(req, res, next){
-      if (req.headers['authorization']) {
-        req.body = '';
-        req.setEncoding('utf8');
-        req.on('data', function(chunk){ req.body += chunk });
-        req.on('end', function() {
-          decryptRequest(req, res, next);
-        });
-      } else {
-        bodyParser.json({strict: false})(req, res, next);
-      }
-    });
+    app.use(setSession);
+
+    app.use(bodyParser.json({strict: false}));
+
+    app.use(bodyParser.raw({ type: '*/*' }));
 
     app.use(bodyParser.urlencoded({
       extended: false
