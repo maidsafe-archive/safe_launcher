@@ -1,5 +1,5 @@
 import sessionManager from '../session_manager';
-import { ResponseHandler } from '../utils';
+import { ResponseHandler, parseReqBody } from '../utils';
 import fs from 'fs';
 import { log } from './../../logger/log';
 
@@ -13,7 +13,10 @@ class FileUploader {
   }
 
   upload() {
-    let reqBody = JSON.parse(this.req.body.toString());
+    let reqBody = parseReqBody(this.req.body);
+    if (!reqBody) {
+      return responseHandler.onResponse('Invalid request body');
+    }
     let fileContent = fs.readFileSync(reqBody.localFilePath).toString('base64');
     log.debug('NFS - FileUploader - Invoking modifying file content');
     this.req.app.get('api').nfs.modifyFileContent(fileContent, 0, reqBody.filePath, reqBody.isPathShared,
@@ -55,20 +58,23 @@ let move = function(req, res, isFile) {
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
-  let payload = JSON.parse(req.body.toString());
+  let reqBody = parseReqBody(req.body);
+  if (!reqBody) {
+    return responseHandler.onResponse('Invalid request body');
+  }
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  if (!(payload.srcPath && payload.hasOwnProperty('isSrcPathShared') && payload.destPath && payload.hasOwnProperty('isDestPathShared'))) {
+  if (!(reqBody.srcPath && reqBody.hasOwnProperty('isSrcPathShared') && reqBody.destPath && reqBody.hasOwnProperty('isDestPathShared'))) {
     return responseHandler.onResponse('Invalid request. Manadatory parameters are missing');
   }
-  payload.retainSource = payload.retainSource ? true : false;
+  reqBody.retainSource = reqBody.retainSource ? true : false;
   if (isFile) {
     log.debug('NFS - Invoking move file request');
-    req.app.get('api').nfs.moveFile(payload.srcPath, payload.isSrcPathShared, payload.destPath, payload.isDestPathShared,
-      payload.retainSource, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
+    req.app.get('api').nfs.moveFile(reqBody.srcPath, reqBody.isSrcPathShared, reqBody.destPath, reqBody.isDestPathShared,
+      reqBody.retainSource, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
   } else {
     log.debug('NFS - Invoking move directory request');
-    req.app.get('api').nfs.moveDir(payload.srcPath, payload.isSrcPathShared, payload.destPath, payload.isDestPathShared,
-      payload.retainSource, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
+    req.app.get('api').nfs.moveDir(reqBody.srcPath, reqBody.isSrcPathShared, reqBody.destPath, reqBody.isDestPathShared,
+      reqBody.retainSource, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
   }
 }
 
@@ -77,25 +83,28 @@ export var createDirectory = function(req, res) {
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
-  let params = JSON.parse(req.body.toString());
+  let reqBody = parseReqBody(req.body);
+  if (!reqBody) {
+    return responseHandler.onResponse('Invalid request body');
+  }
   let responseHandler = new ResponseHandler(res, sessionInfo);;
-  if (!params.hasOwnProperty('dirPath') || !params.dirPath) {
+  if (!reqBody.hasOwnProperty('dirPath') || !reqBody.dirPath) {
     return responseHandler.onResponse('Invalid request. dirPath missing');
   }
-  if (!params.hasOwnProperty('isPrivate')) {
-    params.isPrivate = false;
+  if (!reqBody.hasOwnProperty('isPrivate')) {
+    reqBody.isPrivate = false;
   }
-  params.isPathShared = params.isPathShared || false;
-  params.isVersioned = params.isVersioned || false;
-  params.metadata = params.metadata || '';
+  reqBody.isPathShared = reqBody.isPathShared || false;
+  reqBody.isVersioned = reqBody.isVersioned || false;
+  reqBody.metadata = reqBody.metadata || '';
 
-  if (typeof params.isVersioned !== 'boolean') {
+  if (typeof reqBody.isVersioned !== 'boolean') {
     return responseHandler.onResponse('Invalid request. isVersioned should be a boolean value');
   }
   let appDirKey = sessionInfo.appDirKey;
   log.debug('NFS - Invoking create directory request');
-  req.app.get('api').nfs.createDirectory(params.dirPath, params.isPrivate, params.isVersioned,
-    params.metadata, params.isPathShared, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey,
+  req.app.get('api').nfs.createDirectory(reqBody.dirPath, reqBody.isPrivate, reqBody.isVersioned,
+    reqBody.metadata, reqBody.isPathShared, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey,
     responseHandler.onResponse);
 }
 
@@ -113,7 +122,10 @@ export var modifyDirectory = function(req, res) {
     return res.sendStatus(401);
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  let reqBody = JSON.parse(req.body.toString());
+  let reqBody = parseReqBody(req.body);
+  if (!reqBody) {
+    return responseHandler.onResponse('Invalid request body');
+  }
   let params = req.params;
   if (!params.dirPath) {
     return responseHandler.onResponse('Invalid request. dirPath missing');
@@ -137,7 +149,10 @@ export var createFile = function(req, res) {
     return res.sendStatus(401);
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);;
-  let reqBody = JSON.parse(req.body.toString());
+  let reqBody = parseReqBody(req.body);
+  if (!reqBody) {
+    return responseHandler.onResponse('Invalid request body');
+  }
   if (!reqBody.filePath) {
     return responseHandler.onResponse('Invalid request. filePath missing');
   }
@@ -190,7 +205,10 @@ export var modifyFileMeta = function(req, res) {
     return res.sendStatus(401);
   }
   let params = req.params;
-  let reqBody = JSON.parse(req.body.toString());
+  let reqBody = parseReqBody(req.body);
+  if (!reqBody) {
+    return responseHandler.onResponse('Invalid request body');
+  }
   let responseHandler = new ResponseHandler(res, sessionInfo);;
   if (!(typeof params.filePath === 'string')) {
     return responseHandler.onResponse('Invalid request. filePath is not valid');
@@ -227,7 +245,10 @@ export var modifyFileContent = function(req, res) {
     return res.sendStatus(401);
   }
   let params = req.params;
-  let reqBody = req.body.toString('base64');
+  let reqBody = parseReqBody(req.body);
+  if (!reqBody) {
+    return responseHandler.onResponse('Invalid request body');
+  }
   let query = req.query;
   let responseHandler = new ResponseHandler(res, sessionInfo);
   if (!(typeof params.filePath === 'string')) {

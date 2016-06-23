@@ -24,15 +24,10 @@ export let CreateSession = function(data) {
     }
     log.debug('Directory key for creating an session obtained');
     let app = authReq.app;
-    let assymetricKeyPair = sodium.crypto_box_keypair();
     try {
       log.debug('Creating session');
       let sessionId = new Buffer(sodium.randombytes_buf(32)).toString('base64');
-      let appPubKey = new Uint8Array(new Buffer(authReq.publicKey, 'base64'));
-      let appNonce = new Uint8Array(new Buffer(authReq.nonce, 'base64'));
       let sessionInfo = new SessionInfo(app.id, app.name, app.version, app.vendor, data.permissions, dirKey);
-      let symmetricKey = Buffer.concat([new Buffer(sessionInfo.secretKey), new Buffer(sessionInfo.nonce)]);
-      let encryptedKey = sodium.crypto_box_easy(new Uint8Array(symmetricKey), appNonce, appPubKey, assymetricKeyPair.privateKey);
       let payload = JSON.stringify({
         id: sessionId
       });
@@ -46,8 +41,6 @@ export let CreateSession = function(data) {
       log.debug('Session created :: ' + sessionId);
       res.status(200).send({
         token: token,
-        encryptedKey: new Buffer(encryptedKey).toString('base64'),
-        publicKey: new Buffer(assymetricKeyPair.publicKey).toString('base64'),
         permissions: authReq.permissions
       });
     } catch (e) {
@@ -61,7 +54,7 @@ export var authorise = function(req, res) {
   log.debug('Authorisation request recieved');
   let authReq = req.body;
   if (!(authReq.app && authReq.app.name && authReq.app.id && authReq.app.vendor &&
-      authReq.app.version && authReq.publicKey && authReq.nonce)) {
+      authReq.app.version)) {
     log.debug('Authorisation request - fields missing');
     return res.status(400).send('Fields are missing');
   }
@@ -73,17 +66,6 @@ export var authorise = function(req, res) {
   if (!permissions.isValid()) {
     log.debug('Authorisation request - Invalid permissions requested');
     return res.status(400).send('Invalid permissions');
-  }
-  var publicKeyLength = new Buffer(authReq.publicKey, 'base64').length;
-  var nonceLength = new Buffer(authReq.nonce, 'base64').length;
-
-  if (nonceLength !== sodium.crypto_box_NONCEBYTES) {
-    log.debug('Authorisation request - Invalid nonce');
-    return res.status(400).send('Invalid nonce');
-  }
-  if (publicKeyLength !== sodium.crypto_box_PUBLICKEYBYTES) {
-    log.debug('Authorisation request - Invalid public key');
-    return res.status(400).send('Invalid public key');
   }
 
   let payload = {

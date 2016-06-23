@@ -1,5 +1,5 @@
 import sessionManager from '../session_manager';
-import { ResponseHandler } from '../utils';
+import { ResponseHandler, parseReqBody } from '../utils';
 import { log } from './../../logger/log';
 
 var registerOrAddService = function(req, res, isRegister) {
@@ -8,7 +8,7 @@ var registerOrAddService = function(req, res, isRegister) {
     return res.sendStatus(401);
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  let reqBody = JSON.parse(req.body.toString());
+  let reqBody = parseReqBody(req.body);
   if (!reqBody.longName) {
     return responseHandler.onResponse('Invalid request. longName can not be empty');
   }
