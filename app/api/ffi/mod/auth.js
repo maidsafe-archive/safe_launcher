@@ -26,6 +26,7 @@ var dropUnregisteredClient = function(lib) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     lib.drop_client(unregisteredClientHandle);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    util.send('log', { level: 'DEBUG', msg: 'FFI/mod/auth.js - Dropped unregisteredClientHandle' });
     unregisteredClientHandle = null;
   }
 };
@@ -191,6 +192,10 @@ exports.execute = function(lib, request, observer) {
       break;
     case 'app-dir-key':
       getAppDirectoryKey(lib, request);
+      break;
+    case 'drop-unregisterd-client':
+      dropUnregisteredClient(lib);
+      util.send(request.id, 'client dropped');
       break;
     default:
       util.sendError(request.id, 999, 'Invalid Action');

@@ -29,9 +29,6 @@ exports.executeForContent = function(lib, client, requestId, payload) {
   /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   var result = resultPtr.deref();
   if (result !== 0) {
-    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    lib.drop_null_ptr(pointer);
-    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     return sendError(requestId, result);
   }
   var size = sizePtr.deref();

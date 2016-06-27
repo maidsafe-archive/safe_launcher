@@ -45,4 +45,13 @@ export default class Auth {
       }
     }, callback);
   }
+
+  dropUnregisteredClient(callback) {
+    log.debug('Invoking Auth::dropUnregisteredClient API');
+    this.send({
+      module: this.MODULE,
+      action: 'drop-unregisterd-client',
+      params: {}
+    }, callback);
+  }
 }

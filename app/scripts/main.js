@@ -46,7 +46,7 @@ window.safeLauncher = angular
       this.callback = callback;
     },
     hide: function() {
-      this.show = false;
+      this.status = false;
       this.title = null;
       this.body = null;
       this.callback();
@@ -77,6 +77,9 @@ window.safeLauncher = angular
   window.msl.setNetworkStateChangeListener(function(state) {
     $rootScope.network.show = true;
     $rootScope.network.status = state;
+    if (state === window.NETWORK_STATE.DISCONNECTED) {
+      $rootScope.$msAlert.show('Network Disconnected', $rootScope.network.messages.DISCONNECTED, function() {});
+    }
     $rootScope.$applyAsync();
     console.log($rootScope.network);
   });

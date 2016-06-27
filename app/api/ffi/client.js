@@ -41,7 +41,7 @@ var startWorker = function() {
       }
       return;
     } else if (msg.id === 0 && networkStateListener) {
-      return networkStateListener(msg.data.state);
+      return networkStateListener(msg.data.state, msg.data.registeredClient);
     } else if (!callbackPool[msg.id]) {
       return;
     }
