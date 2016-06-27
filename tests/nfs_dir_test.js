@@ -35,7 +35,7 @@ describe('NFS Directory', function() {
   describe('Create Directory', function() {
     var dirPath = '/test_' + (new Date().getTime());
     after(function(done) {
-      utils.deleteDir(utils.getToken(), encodeURIComponent(dirPath), function(status) {
+      utils.deleteDir(utils.getToken(), dirPath, function(status) {
         if (status !== 200) {
           console.error('Unable to delete directory');
           process.exit(0);
@@ -80,7 +80,7 @@ describe('NFS Directory', function() {
     });
 
     after(function(done) {
-      utils.deleteDir(utils.getToken(), encodeURIComponent(dirPath), function(status) {
+      utils.deleteDir(utils.getToken(), dirPath, function(status) {
         if (status !== 200) {
           console.error('Unable to delete directory');
           process.exit(0);
@@ -90,21 +90,21 @@ describe('NFS Directory', function() {
     });
 
     it('should be able to get directory', function(done) {
-      utils.getDir(utils.getToken(), encodeURIComponent(dirPath), function(status) {
+      utils.getDir(utils.getToken(), dirPath, function(status) {
         (status).should.be.equal(200);
         done();
       });
     });
 
     it('should throw 401 unauthorised', function(done) {
-      utils.getDir(Math.floor(Math.random() * 1000000000), encodeURIComponent(dirPath), function(status) {
+      utils.getDir(Math.floor(Math.random() * 1000000000), dirPath, function(status) {
         (status).should.be.equal(401);
         done();
       });
     });
 
     it('should throw 400 directory not found', function(done) {
-      utils.getDir(utils.getToken(), encodeURIComponent('/test_' + (new Date().getTime())), function(status) {
+      utils.getDir(utils.getToken(), ('/test_' + (new Date().getTime())), function(status) {
         (status).should.be.equal(400);
         done();
       });
@@ -113,7 +113,7 @@ describe('NFS Directory', function() {
 
   // update directory
   describe('Update Directory', function() {
-    var dirPath = '/test_' + (new Date().getTime());
+    var dirPath = 'test_' + (new Date().getTime());
     var newdirName = 'new_' + (new Date().getTime());
     before(function(done) {
       utils.createDir(utils.getToken(), dirPath, function(status) {
@@ -126,7 +126,7 @@ describe('NFS Directory', function() {
     });
 
     after(function(done) {
-      utils.deleteDir(utils.getToken(), encodeURIComponent('/' + newdirName), function(status) {
+      utils.deleteDir(utils.getToken(), ('/' + newdirName), function(status) {
         if (status !== 200) {
           console.error('Unable to delete directory');
           process.exit(0);
@@ -136,21 +136,21 @@ describe('NFS Directory', function() {
     });
 
     it('should be able to update directory name', function(done) {
-      utils.updateDir(utils.getToken(), encodeURIComponent(dirPath), newdirName, function(status) {
+      utils.updateDir(utils.getToken(), dirPath, newdirName, function(status) {
         (status).should.be.equal(200);
         done();
       });
     });
 
     it('should throw 401 unauthorised', function(done) {
-      utils.updateDir(Math.floor(Math.random() * 1000000000), encodeURIComponent(dirPath), newdirName, function(status) {
+      utils.updateDir(Math.floor(Math.random() * 1000000000), dirPath, newdirName, function(status) {
         (status).should.be.equal(401);
         done();
       });
     });
 
     it('should throw 400 directory not found', function(done) {
-      utils.updateDir(utils.getToken(), encodeURIComponent('/test_' + (new Date().getTime())), newdirName, function(status) {
+      utils.updateDir(utils.getToken(), ('/test_' + (new Date().getTime())), newdirName, function(status) {
         (status).should.be.equal(400);
         done();
       });
@@ -159,7 +159,7 @@ describe('NFS Directory', function() {
 
   // delete directory
   describe('Delete Directory', function() {
-    var dirPath = '/test_' + (new Date().getTime());
+    var dirPath = 'test_' + (new Date().getTime());
     before(function(done) {
       utils.createDir(utils.getToken(), dirPath, function(status) {
         if (status !== 200) {
@@ -171,80 +171,137 @@ describe('NFS Directory', function() {
     });
 
     it('should be able to delete directory', function(done) {
-      utils.deleteDir(utils.getToken(), encodeURIComponent(dirPath), function(status) {
+      utils.deleteDir(utils.getToken(), dirPath, function(status) {
         (status).should.be.equal(200);
         done();
       });
     });
 
     it('should throw 401 unauthorised', function(done) {
-      utils.deleteDir(Math.floor(Math.random() * 1000000000), encodeURIComponent(dirPath), function(status) {
+      utils.deleteDir(Math.floor(Math.random() * 1000000000), dirPath, function(status) {
         (status).should.be.equal(401);
         done();
       });
     });
 
     it('should throw 400 directory not found', function(done) {
-      utils.deleteDir(utils.getToken(), encodeURIComponent(dirPath), function(status) {
+      utils.deleteDir(utils.getToken(), dirPath, function(status) {
         (status).should.be.equal(400);
         done();
       });
     });
   });
 
-  // describe('Move Directory', function() {
-  //   var dirPath = '/test_' + (new Date().getTime());
-  //   var destPath = '/dest_' + (new Date().getTime());
-  //
-  //   before(function(done) {
-  //     var createDestDirCb = function(status) {
-  //       if (status !== 200) {
-  //         console.error('Unable to create directory');
-  //         return process.exit(0);
-  //       }
-  //       done();
-  //     };
-  //
-  //     var createDirCb = function(status) {
-  //       if (status !== 200) {
-  //         console.error('Unable to create directory');
-  //         return process.exit(0);
-  //       }
-  //       utils.createDir(utils.getToken(), destPath, createDestDirCb);
-  //     };
-  //
-  //     utils.createDir(utils.getToken(), dirPath, createDirCb);
-  //   });
-  //
-  //   after(function(done) {
-  //     utils.deleteDir(utils.getToken(), encodeURIComponent(destPath), function(status) {
-  //       if (status !== 200) {
-  //         console.error('Unable to delete directory');
-  //         return process.exit(0);
-  //       }
-  //       done();
-  //     });
-  //   });
-  //
-  //   it('should be able to move directory', function(done) {
-  //     utils.moveDir(utils.getToken(), dirPath, destPath, function(status) {
-  //       (status).should.be.equal(200);
-  //       done();
-  //     });
-  //   });
-  //
-  //   it('should throw 401 unauthorised', function(done) {
-  //     utils.moveDir(Math.floor(Math.random() * 1000000000), dirPath, destPath, function(status) {
-  //       (status).should.be.equal(401);
-  //       done();
-  //     });
-  //   });
-  //
-  //   it('should throw 400 unauthorised', function(done) {
-  //     utils.moveDir(utils.getToken(), '/test_new_' + (new Date().getTime()), destPath, function(status) {
-  //       (status).should.be.equal(400);
-  //       done();
-  //     });
-  //   });
-  // });
+  describe('Move Directory', function() {
+    var dirPath = '/test_' + (new Date().getTime());
+    var destPath = '/dest_' + (new Date().getTime());
+
+    before(function(done) {
+      var createDestDirCb = function(status) {
+        if (status !== 200) {
+          console.error('Unable to create directory');
+          return process.exit(0);
+        }
+        done();
+      };
+
+      var createDirCb = function(status) {
+        if (status !== 200) {
+          console.error('Unable to create directory');
+          return process.exit(0);
+        }
+        utils.createDir(utils.getToken(), destPath, createDestDirCb);
+      };
+
+      utils.createDir(utils.getToken(), dirPath, createDirCb);
+    });
+
+    after(function(done) {
+      utils.deleteDir(utils.getToken(), destPath, function(status) {
+        if (status !== 200) {
+          console.error('Unable to delete directory');
+          return process.exit(0);
+        }
+        done();
+      });
+    });
+
+    it('should be able to move directory', function(done) {
+      utils.moveOrCopyDir(utils.getToken(), dirPath, destPath, true, function(status) {
+        (status).should.be.equal(200);
+        done();
+      });
+    });
+
+    it('should throw 401 unauthorised', function(done) {
+      utils.moveOrCopyDir(Math.floor(Math.random() * 1000000000), dirPath, destPath, true, function(status) {
+        (status).should.be.equal(401);
+        done();
+      });
+    });
+
+    it('should throw 400 unauthorised', function(done) {
+      utils.moveOrCopyDir(utils.getToken(), '/test_new_' + (new Date().getTime()), destPath, true, function(status) {
+        (status).should.be.equal(400);
+        done();
+      });
+    });
+  });
+
+  // copy directory
+  describe('Copy Directory', function() {
+    var dirPath = '/test_' + (new Date().getTime());
+    var destPath = '/dest_' + (new Date().getTime());
+
+    before(function(done) {
+      var createDestDirCb = function(status) {
+        if (status !== 200) {
+          console.error('Unable to create directory');
+          return process.exit(0);
+        }
+        done();
+      };
+
+      var createDirCb = function(status) {
+        if (status !== 200) {
+          console.error('Unable to create directory');
+          return process.exit(0);
+        }
+        utils.createDir(utils.getToken(), destPath, createDestDirCb);
+      };
+
+      utils.createDir(utils.getToken(), dirPath, createDirCb);
+    });
+
+    after(function(done) {
+      utils.deleteDir(utils.getToken(), destPath, function(status) {
+        if (status !== 200) {
+          console.error('Unable to delete directory');
+          return process.exit(0);
+        }
+        done();
+      });
+    });
+
+    it('should be able to copy directory', function(done) {
+      utils.moveOrCopyDir(utils.getToken(), dirPath, destPath, false, function(status) {
+        (status).should.be.equal(200);
+        done();
+      });
+    });
+
+    it('should throw 401 unauthorised', function(done) {
+      utils.moveOrCopyDir(Math.floor(Math.random() * 1000000000), dirPath, destPath, false, function(status) {
+        (status).should.be.equal(401);
+        done();
+      });
+    });
+
+    it('should throw 400 unauthorised', function(done) {
+      utils.moveOrCopyDir(utils.getToken(), '/test_new_' + (new Date().getTime()), destPath, false, function(status) {
+        (status).should.be.equal(400);
+        done();
+      });
+    });
+  });
 });

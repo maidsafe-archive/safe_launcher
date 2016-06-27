@@ -9,8 +9,15 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
       data: {}
     };
     $scope.manageListApp = [];
+    var isAuthReqProcessing = false;
+    var requestQueue = [];
 
-    var showConfirmation = function(data) {
+    var showConfirmation = function() {
+      if (isAuthReqProcessing || requestQueue.length === 0) {
+        return;
+      }
+      isAuthReqProcessing = true;
+      data = requestQueue.pop();
       $scope.confirmation.status = true;
       $scope.confirmation.data.payload = data.payload;
       $scope.confirmation.data.request = data.request;
@@ -24,6 +31,11 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
         status: false,
         data: {}
       };
+    };
+
+    var checkRequestQueue = function() {
+      isAuthReqProcessing = false;
+      showConfirmation();
     };
 
     var removeApplication = function(id) {
@@ -77,7 +89,8 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
     server.onAuthRequest(function(data) {
       console.log(data);
       server.focusWindow();
-      showConfirmation(data);
+      requestQueue.push(data);
+      showConfirmation();
     });
 
     // get list colors
@@ -97,6 +110,7 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
         $rootScope.$loader.show();
       }
       server.confirmResponse(payload, status);
+      checkRequestQueue();
     };
 
     // toggle proxy server as public function
