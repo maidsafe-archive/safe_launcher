@@ -4,8 +4,13 @@
 
 # Quick start
 The development dependency of this project is [Node.js v5.5](https://nodejs.org/download/release/v5.5.0/).
-Build the [safe_core](https://github.com/maidsafe/safe_core) with feature `use-mock-network` and copy the `.dll` for Windows
-, `.so` for Linux or `.dylib` for OSX to the `app/api/ffi` folder.
+Build [safe_core](https://github.com/maidsafe/safe_core) with the mock Routing feature:
+
+```
+cargo build --release --features use-mock-routing
+```
+
+then copy the resulting shared library (`safe_core.dll` for Windows, `libsafe_core.so` for Linux or `libsafe_core.dylib` for OS X) to the `app/api/ffi` folder of this project.
 
 The launcher can be developed/tested only with ffi with mock feature or by running a local network only.
 
