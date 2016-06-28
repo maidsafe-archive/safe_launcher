@@ -1,3 +1,5 @@
+import { log } from './../../logger/log';
+
 var Readable = require('stream').Readable;
 var util = require('util');
 

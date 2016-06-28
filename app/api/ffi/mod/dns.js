@@ -66,6 +66,19 @@ var getFile = function(lib, request) {
   }
 };
 
+
+var getFileMetadata = function(lib, request) {
+  try {
+    var payload = createPayload('get-file-metadata', request);
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    payload.data.file_path = request.params.filePath;
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    util.executeForContent(lib, request.client, request.id, payload);
+  } catch (e) {
+    util.sendError(request.id, 999, e.toString());
+  }
+};
+
 var deleteDns = function(lib, request) {
   try {
     var payload = createPayload('delete-dns', request);
@@ -124,6 +137,9 @@ exports.execute = function(lib, request) {
       break;
     case 'get-file':
       getFile(lib, request);
+      break;
+    case 'get-file-metadata':
+      getFileMetadata(lib, request);
       break;
     case 'delete-dns':
       deleteDns(lib, request);

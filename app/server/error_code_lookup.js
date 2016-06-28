@@ -61,7 +61,7 @@ export function errorCodeLookup(errCode) {
     case CLIENT_ERROR_START_RANGE - 27:
       return 'CoreError::MutationFailure::MutationError::NetworkFull';
     case CLIENT_ERROR_START_RANGE - 28:
-      return 'CoreError::SelfEncryptionError';
+      return 'CoreError::SelfEncryption';
     case NFS_ERROR_START_RANGE - 1:
       return 'NfsError::DirectoryAlreadyExistsWithSameName';
     case NFS_ERROR_START_RANGE - 2:
@@ -79,13 +79,15 @@ export function errorCodeLookup(errCode) {
     case NFS_ERROR_START_RANGE - 8:
       return 'NfsError::ParameterIsNotValid';
     case NFS_ERROR_START_RANGE - 9:
-      return 'NfsError::UnexpectedError';
+      return 'NfsError::Unexpected';
     case NFS_ERROR_START_RANGE - 10:
       return 'NfsError::UnsuccessfulEncodeDecode';
+    case NFS_ERROR_START_RANGE - 11:
+      return 'NfsError::SelfEncryption';
     case DNS_ERROR_START_RANGE:
       return 'DnsError::DnsNameAlreadyRegistered';
     case DNS_ERROR_START_RANGE - 1:
-      return 'DnsError::DnsRecordNotFound'
+      return 'DnsError::DnsRecordNotFound';
     case DNS_ERROR_START_RANGE - 2:
       return 'DnsError::ServiceAlreadyExists';
     case DNS_ERROR_START_RANGE - 3:
@@ -93,29 +95,29 @@ export function errorCodeLookup(errCode) {
     case DNS_ERROR_START_RANGE - 4:
       return 'DnsError::DnsConfigFileNotFoundOrCorrupted';
     case DNS_ERROR_START_RANGE - 5:
-      return 'DnsError::UnexpectedError';
+      return 'DnsError::Unexpected';
     case DNS_ERROR_START_RANGE - 6:
       return 'DnsError::UnsuccessfulEncodeDecode';
     case FFI_ERROR_START_RANGE - 1:
       return 'FfiError::PathNotFound';
     case FFI_ERROR_START_RANGE - 2:
-      return 'InvalidPath';
+      return 'FfiError::InvalidPath';
     case FFI_ERROR_START_RANGE - 3:
-      return 'PermissionDenied';
+      return 'FfiError::PermissionDenied';
     case FFI_ERROR_START_RANGE - 4:
-      return 'JsonParseError';
+      return 'FfiError::JsonParseError';
     case FFI_ERROR_START_RANGE - 5:
-      return 'JsonDecodeError';
+      return 'FfiError::JsonDecodeError';
     case FFI_ERROR_START_RANGE - 6:
-      return 'SpecificParseError';
+      return 'FfiError::SpecificParseError';
     case FFI_ERROR_START_RANGE - 7:
-      return 'JsonEncodeError';
+      return 'FfiError::JsonEncodeError';
     case FFI_ERROR_START_RANGE - 8:
-      return 'LocalConfigAccessFailed';
+      return 'FfiError::LocalConfigAccessFailed';
     case FFI_ERROR_START_RANGE - 9:
-      return 'Unexpected';
+      return 'FfiError::Unexpected';
     case FFI_ERROR_START_RANGE - 10:
-      return 'UnsuccessfulEncodeDecode';
+      return 'FfiError::UnsuccessfulEncodeDecode';
     default:
       return 'Unexpected error';
   }

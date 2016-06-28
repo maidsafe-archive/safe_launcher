@@ -143,6 +143,15 @@ var getFile = function(lib, request) {
   }
 };
 
+var getFileMetadata = function(lib, request) {
+  try {
+    var payload = createPayload('get-file-metadata', request);
+    util.executeForContent(lib, request.client, request.id, payload);
+  } catch (e) {
+    util.sendError(request.id, 999, e.toString());
+  }
+};
+
 var move = function(lib, request, action) {
   try {
     var payload = createPayload(action, request);
@@ -184,6 +193,9 @@ exports.execute = function(lib, request) {
       break;
     case 'get-file':
       getFile(lib, request);
+      break;
+    case 'get-file-metadata':
+      getFileMetadata(lib, request);
       break;
     case 'modify-file-content':
       modifyFileContent(lib, request);

@@ -13,7 +13,7 @@ var addToCallbackPool = function(id, callback) {
   if (!callbackPool[id]) {
     callbackPool[id] = [];
   }
-  callbackPool[id].push(callback);
+  callbackPool[id].push(callback);  
 };
 
 var startWorker = function() {
@@ -43,6 +43,7 @@ var startWorker = function() {
     } else if (msg.id === 0 && networkStateListener) {
       return networkStateListener(msg.data.state, msg.data.registeredClient);
     } else if (!callbackPool[msg.id]) {
+      log.warn('callback not found :: ' + msg.id);
       return;
     }
     let isError = msg.errorCode !== 0;
