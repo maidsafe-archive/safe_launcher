@@ -19,24 +19,9 @@ var registeredKeys = {
   password: '1111aa'
 };
 
-var encryptPayload = function(payload, isPlainText) {
-  if (!isPlainText) {
-    payload = new Uint8Array(new Buffer(JSON.stringify(payload)));
-  }
-  return new Buffer(sodium.crypto_secretbox_easy(payload, keys.symNonce, keys.symKey)).toString('base64');
-};
-
-var generateKeys = function() {
-  var generatedKeys = sodium.crypto_box_keypair();
-  keys.nonce = sodium.randombytes_buf(sodium.crypto_box_NONCEBYTES);
-  keys.pub = generatedKeys.publicKey;
-  keys.pvt = generatedKeys.privateKey;
-};
-
 var setToken = function(token) {
   authToken = 'bearer ' + token;
 };
-
 
 var getToken = function() {
   return authToken;
@@ -107,15 +92,11 @@ var killLauncher = function() {
 };
 
 var authoriseApp = function(callback) {
-  generateKeys();
-  var nonce = new Buffer(keys.nonce).toString('base64');
-  var pubKey = new Buffer(keys.pub).toString('base64');
-
   request({
     method: 'POST',
-    uri: SERVER_URL + '/auth',
+    url: SERVER_URL + '/auth',
     headers: {
-      'content-type': 'application/json'
+      'Content-Type': 'application/json'
     },
     json: {
       app: {
@@ -124,9 +105,7 @@ var authoriseApp = function(callback) {
         version: '0.0.1',
         vendor: 'MaidSafe'
       },
-      permissions: [],
-      publicKey: pubKey,
-      nonce: nonce
+      permissions: []
     }
   }, function(err, res, body) {
     if (err) {
@@ -135,13 +114,7 @@ var authoriseApp = function(callback) {
     if (res.statusCode !== 200) {
       return callback(res.statusCode);
     }
-    var authRes = body;
-    var cipher = new Uint8Array(new Buffer(authRes.encryptedKey, 'base64'));
-    var publicKey = new Uint8Array(new Buffer(authRes.publicKey, 'base64'));
-    var plainText = sodium.crypto_box_open_easy(cipher, keys.nonce, publicKey, keys.pvt);
-    keys.symKey = plainText.slice(0, sodium.crypto_secretbox_KEYBYTES);
-    keys.symNonce = plainText.slice(sodium.crypto_secretbox_KEYBYTES);
-    setToken(authRes.token);
+    setToken(body.token);
     callback(res.statusCode);
   })
 };
@@ -157,9 +130,9 @@ var removeAllEventListener = function() {
 var revokeApp = function(token, callback) {
   request({
     method: 'DELETE',
-    uri: SERVER_URL + '/auth',
+    url: SERVER_URL + '/auth',
     headers: {
-      'content-type': 'application/json',
+      'Content-Type': 'application/json',
       'authorization': token
     }
   }, function(err, res, body) {
@@ -172,23 +145,17 @@ var revokeApp = function(token, callback) {
 
 var createDir = function(token, dirPath, callback) {
   var payload = {
-    dirPath: dirPath,
     isPrivate: true,
     userMetadata: '',
-    isVersioned: false,
-    isPathShared: false
   };
-  payload = encryptPayload(payload);
-  // payload = new Uint8Array(new Buffer(JSON.stringify(payload)));
-  // payload = new Buffer(sodium.crypto_secretbox_easy(payload, keys.symNonce, keys.symKey)).toString('base64');
   request({
     method: 'POST',
-    uri: SERVER_URL + '/nfs/directory',
+    url: SERVER_URL + '/nfs/directory/APP/' + dirPath,
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'application/json',
       'authorization': token
     },
-    body: payload
+    body: JSON.stringify(payload)
   }, function(err, res, body) {
     if (err) {
       console.error(err);
@@ -201,9 +168,9 @@ var createDir = function(token, dirPath, callback) {
 var deleteDir = function(token, dirPath, callback) {
   request({
     method: 'DELETE',
-    uri: SERVER_URL + '/nfs/directory/' + dirPath + '/false',
+    url: SERVER_URL + '/nfs/directory/APP/' + dirPath,
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'text/plain',
       'authorization': token
     }
   }, function(err, res, body) {
@@ -218,9 +185,9 @@ var deleteDir = function(token, dirPath, callback) {
 var getDir = function(token, dirPath, callback) {
   request({
     method: 'GET',
-    uri: SERVER_URL + '/nfs/directory/' + dirPath + '/false',
+    url: SERVER_URL + '/nfs/directory/APP/' + dirPath,
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'text/plain',
       'authorization': token
     }
   }, function(err, res, body) {
@@ -236,18 +203,14 @@ var updateDir = function(token, dirPath, newName, callback) {
   var payload = {
     name: newName
   };
-  payload = encryptPayload(payload);
-  // payload = new Uint8Array(new Buffer(JSON.stringify(payload)));
-  // payload = new Buffer(sodium.crypto_secretbox_easy(payload, keys.symNonce, keys.symKey)).toString('base64');
-
   request({
     method: 'PUT',
-    uri: SERVER_URL + '/nfs/directory/' + dirPath + '/false',
+    url: SERVER_URL + '/nfs/directory/APP/' + dirPath,
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'application/json',
       'authorization': token
     },
-    body: payload
+    body: JSON.stringify(payload)
   }, function(err, res, body) {
     if (err) {
       console.error(err);
@@ -257,24 +220,43 @@ var updateDir = function(token, dirPath, newName, callback) {
   });
 };
 
-var createFile = function(token, filePath, callback) {
+var moveOrCopyDir = function(token, srcPath, destPath, toMove, callback) {
+  var action = toMove ? 'MOVE' : 'COPY';
   var payload = {
-    filePath: filePath,
-    metadata: '',
-    isPathShared: false,
-    localFilePath: ''
+    srcPath: srcPath,
+    srcRootPath: 'APP',
+    destPath: destPath,
+    destRootPath: 'APP',
+    action: action
   };
-  payload = encryptPayload(payload);
-  // payload = new Uint8Array(new Buffer(JSON.stringify(payload)));
-  // payload = new Buffer(sodium.crypto_secretbox_easy(payload, keys.symNonce, keys.symKey)).toString('base64');
   request({
     method: 'POST',
-    uri: SERVER_URL + '/nfs/file',
+    url: SERVER_URL + '/nfs/movedir',
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'application/json',
       'authorization': token
     },
-    body: payload
+    body: JSON.stringify(payload)
+  }, function(err, res, body) {
+    if (err) {
+      return process.exit(0);
+    }
+    callback(res.statusCode);
+  });
+};
+
+var createFile = function(token, filePath, callback) {
+  var payload = {
+    metadata: '',
+  };
+  request({
+    method: 'POST',
+    url: SERVER_URL + '/nfs/file/APP/' + filePath,
+    headers: {
+      'Content-Type': 'application/json',
+      'authorization': token
+    },
+    body: JSON.stringify(payload)
   }, function(err, res, body) {
     if (err) {
       return process.exit(0);
@@ -286,9 +268,9 @@ var createFile = function(token, filePath, callback) {
 var deleteFile = function(token, filePath, callback) {
   request({
     method: 'DELETE',
-    uri: SERVER_URL + '/nfs/file/' + encodeURIComponent(filePath) + '/false',
+    url: SERVER_URL + '/nfs/file/APP/' + filePath,
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'text/plain',
       'authorization': token
     }
   }, function(err, res, body) {
@@ -302,15 +284,17 @@ var deleteFile = function(token, filePath, callback) {
 var getFile = function(token, filePath, callback) {
   request({
     method: 'GET',
-    uri: SERVER_URL + '/nfs/file/' + encodeURIComponent(filePath) + '/false',
+    url: SERVER_URL + '/nfs/file/APP/' + filePath,
     headers: {
-      'content-type': 'text/plain',
-      'authorization': token
+      'Content-Type': 'text/plain',
+      'authorization': token,
+      'range': 'bytes=0-100'
     }
   }, function(err, res, body) {
     if (err) {
       return process.exit(0);
     }
+    console.log(body);
     callback(res.statusCode);
   })
 };
@@ -319,16 +303,14 @@ var updateFileMeta = function(token, newFileName, filePath, callback) {
   var payload = {
     name: newFileName
   };
-  payload = encryptPayload(payload);
-
   request({
     method: 'PUT',
-    uri: SERVER_URL + '/nfs/file/metadata/' + encodeURIComponent(filePath) + '/false',
+    url: SERVER_URL + '/nfs/file/metadata/APP/' + filePath,
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'application/json',
       'authorization': token
     },
-    body: payload
+    body: JSON.stringify(payload)
   }, function(err, res, body) {
     if (err) {
       return process.exit(0);
@@ -337,17 +319,43 @@ var updateFileMeta = function(token, newFileName, filePath, callback) {
   });
 };
 
+// TODO: Change api to v0.5
 var updateFileContent = function(token, fileContent, filePath, callback) {
-  var payload = encryptPayload(fileContent, true);
-  var query = encryptPayload('offset=' + 0, true);
+  var query ='?offset=' + 0;
   request({
     method: 'PUT',
-    uri: SERVER_URL + '/nfs/file/' + encodeURIComponent(filePath) + '/false?' + query,
+    url: SERVER_URL + '/nfs/file/APP/' + filePath + query,
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'text/plain',
       'authorization': token
     },
-    body: payload
+    body: fileContent
+  }, function(err, res, body) {
+    if (err) {
+      return process.exit(0);
+    }
+    console.log(body);
+    callback(res.statusCode);
+  });
+};
+
+var moveOrCopyFile = function(token, srcPath, destPath, toMove, callback) {
+  var action = toMove ?  'MOVE' : 'COPY'
+  var payload = {
+    srcPath: srcPath,
+    srcRootPath: 'APP',
+    destPath: destPath,
+    destRootPath: 'APP',
+    action: action
+  };
+  request({
+    method: 'POST',
+    url: SERVER_URL + '/nfs/movefile',
+    headers: {
+      'Content-Type': 'application/json',
+      'authorization': token
+    },
+    body: JSON.stringify(payload)
   }, function(err, res, body) {
     if (err) {
       return process.exit(0);
@@ -356,55 +364,6 @@ var updateFileContent = function(token, fileContent, filePath, callback) {
   });
 };
 
-var moveFile = function(token, srcPath, destPath, callback) {
-  var payload = {
-    srcPath: srcPath,
-    isSrcPathShared: false,
-    destPath: destPath,
-    isDestPathShared: false,
-    retainSource: false
-  };
-  payload = encryptPayload(payload);
-  request({
-    method: 'POST',
-    uri: SERVER_URL + '/nfs/movefile',
-    headers: {
-      'content-type': 'text/plain',
-      'authorization': token
-    },
-    body: payload
-  }, function(err, res, body) {
-    if (err) {
-      return process.exit(0);
-    }
-    callback(res.statusCode);
-  });
-};
-
-var moveDir = function(token, srcPath, destPath, callback) {
-  var payload = {
-    srcPath: srcPath,
-    isSrcPathShared: false,
-    destPath: destPath,
-    isDestPathShared: false,
-    retainSource: false
-  };
-  payload = encryptPayload(payload);
-  request({
-    method: 'POST',
-    uri: SERVER_URL + '/nfs/movedir',
-    headers: {
-      'content-type': 'text/plain',
-      'authorization': token
-    },
-    body: payload
-  }, function(err, res, body) {
-    if (err) {
-      return process.exit(0);
-    }
-    callback(res.statusCode);
-  });
-};
 
 // DNS
 var registerDns = function(token, longName, serviceName, dirPath, callback) {
@@ -414,19 +373,20 @@ var registerDns = function(token, longName, serviceName, dirPath, callback) {
     serviceHomeDirPath: dirPath,
     isPathShared: false
   };
-  payload = encryptPayload(payload);
+  console.log(longName, serviceName, dirPath);
   request({
     method: 'POST',
-    uri: SERVER_URL + '/dns',
+    url: SERVER_URL + '/dns',
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'application/json',
       'authorization': token
     },
-    body: payload
+    body: JSON.stringify(payload)
   }, function(err, res, body) {
     if (err) {
       return process.exit(0);
     }
+    console.log(body);
     callback(res.statusCode);
   });
 };
@@ -434,9 +394,9 @@ var registerDns = function(token, longName, serviceName, dirPath, callback) {
 var deleteDns = function(token, longName, callback) {
   request({
     method: 'DELETE',
-    uri: SERVER_URL + '/dns/' + encodeURIComponent(longName),
+    url: SERVER_URL + '/dns/' + encodeURIComponent(longName),
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'text/plain',
       'authorization': token
     }
   }, function(err, res, body) {
@@ -450,9 +410,9 @@ var deleteDns = function(token, longName, callback) {
 var createPublicId = function(token, longName, callback) {
   request({
     method: 'POST',
-    uri: SERVER_URL + '/dns/' + encodeURIComponent(longName),
+    url: SERVER_URL + '/dns/' + encodeURIComponent(longName),
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'text/plain',
       'authorization': token
     }
   }, function(err, res, body) {
@@ -470,15 +430,14 @@ var addService = function(token, longName, serviceName, dirPath, callback) {
     serviceHomeDirPath: dirPath,
     isPathShared: false
   };
-  payload = encryptPayload(payload);
   request({
     method: 'PUT',
-    uri: SERVER_URL + '/dns',
+    url: SERVER_URL + '/dns',
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'application/json',
       'authorization': token
     },
-    body: payload
+    body: JSON.stringify(payload)
   }, function(err, res, body) {
     if (err) {
       return process.exit(0);
@@ -490,9 +449,9 @@ var addService = function(token, longName, serviceName, dirPath, callback) {
 var deleteService = function(token, longName, serviceName, callback) {
   request({
     method: 'DELETE',
-    uri: SERVER_URL + '/dns/' + encodeURIComponent(serviceName) + '/' + encodeURIComponent(longName),
+    url: SERVER_URL + '/dns/' + encodeURIComponent(serviceName) + '/' + encodeURIComponent(longName),
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'text/plain',
       'authorization': token
     }
   }, function(err, res, body) {
@@ -506,9 +465,9 @@ var deleteService = function(token, longName, serviceName, callback) {
 var getHomeDir = function(token, longName, serviceName, callback) {
   request({
     method: 'GET',
-    uri: SERVER_URL + '/dns/' + encodeURIComponent(serviceName) + '/' + encodeURIComponent(longName),
+    url: SERVER_URL + '/dns/' + encodeURIComponent(serviceName) + '/' + encodeURIComponent(longName),
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'text/plain',
       'authorization': token
     }
   }, function(err, res, body) {
@@ -523,9 +482,9 @@ var getFilePath = function(token, longName, serviceName, filePath, callback) {
   var url = SERVER_URL + '/dns/' + encodeURIComponent(serviceName) + '/' + encodeURIComponent(longName) + '/' + encodeURIComponent(filePath);
   request({
     method: 'GET',
-    uri: url,
+    url: url,
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'text/plain',
       'authorization': token
     }
   }, function(err, res, body) {
@@ -539,9 +498,9 @@ var getFilePath = function(token, longName, serviceName, filePath, callback) {
 var getLongNames = function(token, callback) {
   request({
     method: 'GET',
-    uri: SERVER_URL + '/dns',
+    url: SERVER_URL + '/dns',
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'text/plain',
       'authorization': token
     }
   }, function(err, res, body) {
@@ -555,9 +514,9 @@ var getLongNames = function(token, callback) {
 var getServices = function(token, longName, callback) {
   request({
     method: 'GET',
-    uri: SERVER_URL + '/dns/' + encodeURIComponent(longName),
+    url: SERVER_URL + '/dns/' + encodeURIComponent(longName),
     headers: {
-      'content-type': 'text/plain',
+      'Content-Type': 'text/plain',
       'authorization': token
     }
   }, function(err, res, body) {
@@ -588,8 +547,8 @@ module.exports = {
   getFile: getFile,
   updateFileMeta: updateFileMeta,
   updateFileContent: updateFileContent,
-  moveFile: moveFile,
-  moveDir: moveDir,
+  moveOrCopyFile: moveOrCopyFile,
+  moveOrCopyDir: moveOrCopyDir,
   registerDns: registerDns,
   deleteDns: deleteDns,
   createPublicId: createPublicId,

@@ -173,6 +173,21 @@ export default class NFS {
       }, callback);
     }
 
+    getFileMetadata(filePath, isPathShared, hasSafeDriveAccess, appDirKey, callback) {
+      log.debug('Invoking API NFS::getFileMetadata - FFI::' + this.MODULE + '::get-file');
+      this.send({
+        module: this.MODULE,
+        action: 'get-file-metadata',
+        isAuthorised: true,
+        appDirKey: appDirKey,
+        hasSafeDriveAccess: hasSafeDriveAccess,
+        params: {
+          filePath: filePath,
+          isPathShared: isPathShared
+        }
+      }, callback);
+    }
+
     moveDir(srcPath, isSrcPathShared, destPath, isDestPathShared, retainSource,
       hasSafeDriveAccess, appDirKey, callback) {
       this.send({

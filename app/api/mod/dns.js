@@ -77,6 +77,23 @@ export default class DNS {
     }, callback);
   }
 
+
+  getFileMetadata(longName, serviceName, filePath, hasSafeDriveAccess, appDirKey, callback) {
+    log.debug('Invoking API DNS::getFile - FFI::' + this.MODULE + '::get-file');
+    this.send({
+      module: this.MODULE,
+      action: 'get-file-metadata',
+      isAuthorised: (appDirKey ? true : false),
+      hasSafeDriveAccess: hasSafeDriveAccess || false,
+      appDirKey: appDirKey,
+      params: {
+        longName: longName,
+        serviceName: serviceName,
+        filePath: filePath
+      }
+    }, callback);
+  }
+
   deleteDns(longName, hasSafeDriveAccess, appDirKey, callback) {
     log.debug('Invoking API DNS::deleteDns - FFI::' + this.MODULE + '::delete-dns');
     this.send({

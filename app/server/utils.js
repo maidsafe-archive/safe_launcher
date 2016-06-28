@@ -35,7 +35,7 @@ export var getSessionIdFromRequest = function(req) {
   }
 }
 
-export var decryptRequest = function(req, res, next) {
+export var setSessionHeaderAndParseBody = function(req, res, next) {
   if (!req.get('Authorization')) {
     log.debug('Unauthorised Request ::' + req.path);
     return next();
@@ -47,43 +47,15 @@ export var decryptRequest = function(req, res, next) {
     log.warn('Session Id not found');
     return res.sendStatus(401);
   }
-  let sessionInfo = sessionManager.get(sessionId);
-  let parseQueryString = function(string) {
-    string = string.split('&');
-    var json = {};
-    string.forEach(function(val) {
-      val = val.split('=');
-      json[val[0]] = val[1];
-    });
-    return json;
-  };
-  try {
-    // var path = new Uint8Array(new Buffer(req.path.substr(1), 'base64'));
-    // req.url = new Buffer(sodium.crypto_secretbox_open_easy(path, sessionInfo.nonce, sessionInfo.secretKey)).toString();
-    if (req.body && Object.keys(req.body).length > 0) {
-      log.debug('Decrypting Request Body');
-      let reqBodyUIntArray = new Uint8Array(new Buffer(req.body, 'base64'));
-      let reqBody = sodium.crypto_secretbox_open_easy(reqBodyUIntArray, sessionInfo.nonce, sessionInfo.secretKey);
-      req.body = new Buffer(reqBody);
-      log.debug('Decrypted Request Body');
+  req.headers['sessionId'] = sessionId;
+  if (req.body && req.body.length > 0) {
+    req.body = ((req.body instanceof Buffer) ? JSON.parse(req.body.toString()) : req.body);
+    if (typeof req.body !== 'object') {
+      return res.status(400).send('Invalid Request Body');
     }
-    if (Object.keys(req.query).length > 0) {
-      log.debug('Decrypting Request Query Parameters');
-      var query = Object.keys(req.query)[0];
-      let queryUIntArray = new Uint8Array(new Buffer(query, 'base64'));
-      let reqQuery = sodium.crypto_secretbox_open_easy(queryUIntArray, sessionInfo.nonce, sessionInfo.secretKey);
-      reqQuery = new Buffer(reqQuery).toString();
-      log.debug('Decrypted Request Query Params :: ' + reqQuery);
-      reqQuery = parseQueryString(reqQuery);
-      req.query = reqQuery;
-    }
-    req.headers['sessionId'] = sessionId;
-    next();
-  } catch (e) {
-    log.error('Decryption Error - Authorised Request - ' + e.message);
-    return res.sendStatus(401);
   }
-}
+  next();
+};
 
 export var formatResponse = function(data) {
   if (typeof data === 'string') {
@@ -157,37 +129,10 @@ export var formatResponse = function(data) {
   return format(data);
 }
 
-export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
+export var ResponseHandler = function(res, sessionInfo) {
   let self = this;
   self.res = res;
-  self.sessionInfo = sessionInfo;
-  self.isFileResponse = isFileResponse || false;
-
-  var encrypt = function(msg) {
-    if (!self.sessionInfo) {
-      return msg;
-    }
-    return self.sessionInfo.encryptResponse(msg);
-  };
-
-  var generalResponse = function(err, data) {
-    let status = 200;
-    if (err) {
-      if (err.hasOwnProperty('errorCode')) {
-        err.description = errorCodeLookup(err.errorCode);
-      }
-      if (err.description && err.description.toLowerCase().indexOf('notfound') > -1) {
-        status = 404;
-      }
-      err = encrypt(err);
-      return self.res.status(400).send(err);
-    }
-    if (data) {
-      self.res.status(status).send(encrypt(formatResponse(data)));
-    } else {
-      self.res.sendStatus(status);
-    }
-  };
+  self.sessionInfo = sessionInfo;    
 
   var fileResponse = function(err, data) {
     var status = 200;
@@ -199,28 +144,44 @@ export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
       if (err.description && err.description.toLowerCase().indexOf('notfound') > -1) {
         status = 404;
       }
-      err = encrypt(err);
       return self.res.status(status).send(err);
     }
     data = formatResponse(data);
     var content = new Buffer(data.content, 'base64');
     if (sessionInfo) {
-      content = sessionInfo.encryptBuffer(content);
       self.res.set('Content-Type', 'text/plain');
     } else {
       self.res.set('Content-Type', mime.lookup(data.metadata.name));
     }
-    self.res.set('file-name', data.metadata.name);
-    self.res.set('file-size', data.metadata.size);
-    self.res.set('file-created-time', data.metadata.createdOn);
-    self.res.set('file-modified-time', data.metadata.modifiedOn);
+    self.res.set('Accept-Ranges', 'bytes');
+    self.res.set('Content-Length', data.metadata.size);
+    // TODO: Set Content-Range
+    // self.res.set('Content-Range', 'bytes');
+    self.res.set('Last-Modified', data.metadata.modifiedOn);
+    self.res.set('Created-On', data.metadata.createdOn);
     if (data.metadata.userMetadata) {
-      self.res.set('file-metadata', data.metadata.userMetadata);
+      self.res.set('Metadata', data.metadata.userMetadata);
     }
     res.status(status).send(content);
   };
 
-  self.onResponse = self.isFileResponse ? fileResponse : generalResponse;
+  self.onResponse = function(err, data) {
+    let status = 200;
+    if (err) {
+      if (err.hasOwnProperty('errorCode')) {
+        err.description = errorCodeLookup(err.errorCode);
+      }
+      if (err.description && err.description.toLowerCase().indexOf('notfound') > -1) {
+        status = 404;
+      }
+      return self.res.status(400).send(err);
+    }
+    if (data) {
+      self.res.status(status).send(formatResponse(data));
+    } else {
+      self.res.sendStatus(status);
+    }
+  };
 
   return self;
 };

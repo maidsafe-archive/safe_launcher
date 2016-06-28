@@ -57,6 +57,10 @@ export default class UIUtils {
     });
   }
 
+  dropUnregisteredClient(callback) {    
+    this.api.auth.dropUnregisteredClient(callback);
+  }
+
   // close browser window
   closeWindow() {
     this.remote.getCurrentWindow().close();

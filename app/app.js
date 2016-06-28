@@ -11,11 +11,9 @@ import childProcess from 'child_process';
 import { formatResponse } from './server/utils';
 import { log } from './logger/log';
 
-// log.init();
 log.debug('Application starting');
 
-// console.log(remote.global);
-// env.log = log;
+let ignoreUnRegisteredObserver = false;
 
 let restServer = new RESTServer(api, env.serverPort);
 let proxyServer = {
@@ -83,21 +81,18 @@ var onFfiProcessTerminated = function(title, msg) {
   });
 };
 
-var onConnectionLost = function() {
-  // TODO change from window prompt to app prompt
-  require('remote').dialog.showMessageBox({
-    type: 'error',
-    buttons: [ 'Ok' ],
-    title: 'Connection Drop',
-    message: 'Connection lost with the Network. Log in again to continue'
-  }, function() {
-    api.restart();
-    window.location.hash = 'login';
-  });
-};
-
-api.setNetworkStateListener(function(state) {
-  log.debug('Network state change event recieved :: ' + state);
+api.setNetworkStateListener(function(state, isRegisteredClient) {
+  log.debug('Network state change event recieved :: ' + state + ' :: ' + isRegisteredClient);
+  if (ignoreUnRegisteredObserver && !isRegisteredClient) {
+    log.debug('Ignoring Network state change event for unregistered client');
+    return;
+  }
+  if (state === 0 && isRegisteredClient) {
+    ignoreUnRegisteredObserver = true;
+    log.debug('Dropping unregistered client');
+    window.msl.dropUnregisteredClient(function() {});
+    log.debug('Dropped unregistered client');
+  }
   switch (state) {
     case -1:
       log.info('Network state change event :: FFI ERROR');
@@ -114,13 +109,11 @@ api.setNetworkStateListener(function(state) {
     case 1:
       log.info('Network connection lost');
       window.msl.networkStateChange(NETWORK_STATE.DISCONNECTED);
-      onConnectionLost();
       break;
 
     case 2:
       log.info('Network connection lost');
       window.msl.networkStateChange(NETWORK_STATE.DISCONNECTED);
-      onConnectionLost();
       break;
 
     default:
