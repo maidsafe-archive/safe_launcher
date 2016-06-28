@@ -107,7 +107,7 @@ describe('NFS File', function() {
 
     it('should be able to get file', function(done) {
       utils.getFile(utils.getToken(), filePath, function(status) {
-        (status).should.be.equal(200);
+        (status).should.be.equal(206);
         done();
       });
     });

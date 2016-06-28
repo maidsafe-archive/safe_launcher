@@ -39,11 +39,19 @@ var server = http.createServer(function(req, res) {
      '. Origin can only be from sites with .safenet TLD');
     return res.end();
   }
-  // Setting CSP Headers
-  res.setHeader('Content-Security-Policy', 'default-src self *.safenet; object-src none; base-uri self;\
-  form-action http://api.safenet; frame-ancestors self;X-Frame-Options : SAMEORIGIN');
+  try {
+    // Setting CSP Headers
+    res.setHeader('Content-Security-Policy', 'default-src self *.safenet; object-src none; base-uri self;\
+    form-action http://api.safenet; frame-ancestors self;X-Frame-Options : SAMEORIGIN');
+  } catch(e) {}
 
   if (safenetApiPath.test(urlServe.host)) {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,DELETE");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers,\
+      Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method,\
+      Access-Control-Request-Headers");
     return proxy.web(req, res, {
       target: 'http://localhost:' + args.serverPort + '/'
     });

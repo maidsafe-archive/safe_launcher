@@ -58,6 +58,11 @@ export var authorise = function(req, res) {
     log.debug('Authorisation request - fields missing');
     return res.status(400).send('Fields are missing');
   }
+  if (!(/[^\s]/.test(authReq.app.name) && /[^\s]/.test(authReq.app.id) && /[^\s]/.test(authReq.app.vendor) &&
+  /[^\s]/.test(authReq.app.version))) {
+    log.debug('Authorisation request - fields invalid');
+    return res.status(400).send('Fields are invalid');
+  }
   if (!authReq.hasOwnProperty('permissions')) {
     log.debug('Authorisation request - permissions field missing');
     return res.status(400).send('permissions are missing');

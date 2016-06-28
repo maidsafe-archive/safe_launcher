@@ -5,6 +5,7 @@ import { ResponseHandler, formatResponse } from '../utils';
 import { log } from './../../logger/log';
 import { NfsWriter } from '../stream/nfs_writer';
 import { NfsReader } from '../stream/nfs_reader';
+import { errorCodeLookup } from './../error_code_lookup';
 
 const ROOT_PATH = {
   app: false,
@@ -46,9 +47,9 @@ let move = function(req, res, isFile) {
   let responseHandler = new ResponseHandler(res, sessionInfo);
   let reqBody = req.body;
   if (!(reqBody.srcPath && reqBody.hasOwnProperty('srcRootPath') &&
-    reqBody.destPath && reqBody.hasOwnProperty('destRootPath'))) {
+      reqBody.destPath && reqBody.hasOwnProperty('destRootPath'))) {
     return responseHandler.onResponse('Invalid request. Manadatory parameters are missing');
-}
+  }
   let srcRootPath = ROOT_PATH[reqBody.srcRootPath.toLowerCase()];
   if (typeof srcRootPath === 'undefined') {
     return responseHandler.onResponse('Invalid request. \'srcRootPath\' mismatch');
@@ -216,11 +217,20 @@ export var getFile = function(req, res, next) {
   }
 
   let onFileMetadataRecieved = function(err, fileStats) {
-    log.debug('NFS - File metatda for reading - ' + fileStats);
+    log.debug('NFS - File metadata for reading - ' + (fileStats || JSON.stringify(err)));
     if (err) {
-      return res.status(400).send(err);
+      let status = 400;
+      if (err.errorCode) {
+        err.description = errorCodeLookup(err.errorCode);
+      }
+      log.error(err);
+      if (err.description && (err.description.toLowerCase().indexOf('invalidpath') > -1 ||
+          err.description.toLowerCase().indexOf('pathnotfound') > -1)) {
+        status = 404;
+      }
+      return res.status(status).send(err);
     }
-    fileStats = formatResponse(JSON.parse(fileStats));
+    fileStats = formatResponse(fileStats);
     let range = req.get('range');
     let positions = [0];
     if (range) {
@@ -236,31 +246,34 @@ export var getFile = function(req, res, next) {
       }
     }
     let start = parseInt(positions[0]);
-    let total = fileStats.metadata.size;
-    let end = positions[1] ? parseInt(positions[1]) : total;
+    let total = fileStats.size;
+    let end = (positions[1] && total) ? parseInt(positions[1]) : total;
     let chunksize = end - start;
-    if (chunksize <= 0 || end > total) {
+    if (chunksize < 0 || end > total) {
       return res.sendStatus(416);
     }
     log.debug('NFS - Ready to stream file for range' + start + "-" + end + "/" + total);
     var headers = {
-       "Content-Range": "bytes " + start + "-" + end + "/" + total,
-       "Accept-Ranges": "bytes",
-       "Content-Length": chunksize,
-       "Created-On": new Date(fileStats.metadata.createdOn).toUTCString(),
-       "Last-Modified": new Date(fileStats.metadata.modifiedOn).toUTCString(),
-       "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
+      "Content-Range": "bytes " + start + "-" + end + "/" + total,
+      "Accept-Ranges": "bytes",
+      "Content-Length": chunksize,
+      "Created-On": new Date(fileStats.createdOn).toUTCString(),
+      "Last-Modified": new Date(fileStats.modifiedOn).toUTCString(),
+      "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
     };
-    if (fileStats.metadata.metadata) {
-      headers.metadata = fileStats.metadata.metadata;
+    if (fileStats.metadata) {
+      headers.metadata = fileStats.metadata;
     }
     res.writeHead(range ? 206 : 200, headers);
-     let nfsReader = new NfsReader(req, filePath, rootPath, start, end,
-        sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey);
-     nfsReader.pipe(res);
+    if (chunksize === 0) {
+      return res.end();
+    }
+    let nfsReader = new NfsReader(req, filePath, rootPath, start, end,
+      sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey);
+    nfsReader.pipe(res);
   };
   log.debug('NFS - Invoking Get file request');
-  req.app.get('api').nfs.getFile(filePath, rootPath, 0, 1,
+  req.app.get('api').nfs.getFileMetadata(filePath, rootPath,
     sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, onFileMetadataRecieved);
 };
 
@@ -276,18 +289,18 @@ export var getFileMetadata = function(req, res) {
     if (err) {
       return res.status(400).send(err);
     }
-    fileStats = formatResponse(JSON.parse(fileStats));
-    res.writeHead(range ? 206 : 200, {
-       "Accept-Ranges": "bytes",
-       "Created-On": new Date(fileStats.metadata.createdOn).toUTCString(),
-       "Last-Modified": new Date(fileStats.metadata.modifiedOn).toUTCString(),
-       "Metadata": fileStats.metadata.metadata,
-       "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
-     });
-     res.end();
-  };
-  log.debug('NFS - Invoking Get file Metadata request');
-  req.app.get('api').nfs.getFile(filePath, rootPath, 0, 1,
+    res.writeHead(200, {
+      "Accept-Ranges": "bytes",
+      "Created-On": new Date(fileStats.createdOn).toUTCString(),
+      "Last-Modified": new Date(fileStats.modifiedOn).toUTCString(),
+      "Metadata": fileStats.metadata,
+      "Content-Type": mime.lookup(filePath) || 'application/octet-stream',
+      "Content-Length": fileStats.size
+    });
+    res.end();
+    };
+    log.debug('NFS - Invoking Get file Metadata request');
+    req.app.get('api').nfs.getFileMetadata(filePath, rootPath,
     sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, onFileMetadataRecieved);
 };
 

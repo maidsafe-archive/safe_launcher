@@ -1,8 +1,20 @@
 import mime from 'mime';
 import sessionManager from '../session_manager';
-import { ResponseHandler, formatResponse } from '../utils';
-import { log } from './../../logger/log';
-import { DnsReader } from '../stream/dns_reader';
+import {
+  ResponseHandler,
+  formatResponse
+} from '../utils';
+import {
+  log
+} from './../../logger/log';
+import {
+  DnsReader
+} from '../stream/dns_reader';
+import {
+  errorCodeLookup
+} from './../error_code_lookup';
+
+var domainCheck = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$/;
 
 var registerOrAddService = function(req, res, isRegister) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -20,10 +32,10 @@ var registerOrAddService = function(req, res, isRegister) {
   if (!reqBody.serviceHomeDirPath) {
     return responseHandler.onResponse('Invalid request. serviceHomeDirPath can not be empty');
   }
-  if (!/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:)+$/.test(reqBody.longName)) {
+  if (!domainCheck.test(reqBody.longName)) {
     return responseHandler.onResponse('Invalid request. longName is not valid');
   }
-  if (!/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:)+$/.test(reqBody.serviceName)) {
+  if (!domainCheck.test(reqBody.serviceName)) {
     return responseHandler.onResponse('Invalid request. serviceName is not valid');
   }
   reqBody.isPathShared = reqBody.isPathShared || false;
@@ -63,11 +75,19 @@ export var getFile = function(req, res) {
     return responseHandler.onResponse('Invalid request. Required parameters are not found');
   }
   let onFileMetadataRecieved = function(err, fileStats) {
-    log.debug('NFS - File metatda for reading - ' + fileStats);
+    log.debug('DNS - File metadata for reading - ' + (fileStats || JSON.stringify(err)));
     if (err) {
-      return res.status(400).send(err);
+      let status = 400;
+      if (err.errorCode) {
+        err.description = errorCodeLookup(err.errorCode);
+      }
+      log.error(err);
+      if (err.description && (err.description.toLowerCase().indexOf('invalidpath') > -1 ||
+          err.description.toLowerCase().indexOf('pathnotfound') > -1)) {
+            return res.status(status).send(err);
+      }
     }
-    fileStats = formatResponse(JSON.parse(fileStats));
+    fileStats = formatResponse(fileStats);
     let range = req.get('range');
     let positions = [0];
     if (range) {
@@ -83,31 +103,34 @@ export var getFile = function(req, res) {
       }
     }
     let start = parseInt(positions[0]);
-    let total = fileStats.metadata.size;
-    let end = positions[1] ? parseInt(positions[1]) : total;
+    let total = fileStats.size;
+    let end = (positions[1] && total) ? parseInt(positions[1]) : total;
     let chunksize = end - start;
-    if (chunksize <= 0 || end > total) {
+    if (chunksize < 0 || end > total) {
       return res.sendStatus(416);
     }
-    log.debug('DNS - Ready to stream file ' + filePath + ' for range' + start + "-" + end + "/" + total);
+    log.debug('DNS - Ready to stream file for range' + start + "-" + end + "/" + total);
     var headers = {
-       "Content-Range": "bytes " + start + "-" + end + "/" + total,
-       "Accept-Ranges": "bytes",
-       "Content-Length": chunksize,
-       "Created-On": new Date(fileStats.metadata.createdOn).toUTCString(),
-       "Last-Modified": new Date(fileStats.metadata.modifiedOn).toUTCString(),
-       "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
+      "Content-Range": "bytes " + start + "-" + end + "/" + total,
+      "Accept-Ranges": "bytes",
+      "Content-Length": chunksize,
+      "Created-On": new Date(fileStats.createdOn).toUTCString(),
+      "Last-Modified": new Date(fileStats.modifiedOn).toUTCString(),
+      "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
     };
-    if (fileStats.metadata.metadata) {
-      headers.metadata = fileStats.metadata.metadata;
+    if (fileStats.metadata) {
+      headers.metadata = fileStats.metadata;
     }
     res.writeHead(range ? 206 : 200, headers);
-     let dnsReader = new DnsReader(req, longName, serviceName, filePath, start, end,
-        hasSafeDriveAccess, appDirKey);
-     dnsReader.pipe(res);
+    if (chunksize === 0) {
+      return res.end();
+    }
+    let dnsReader = new DnsReader(req, longName, serviceName, filePath, start, end,
+      hasSafeDriveAccess, appDirKey);
+    dnsReader.pipe(res);
   };
   log.debug('DNS - Invoking getFile API for ' + longName + ', ' + serviceName + ', ' + filePath);
-  req.app.get('api').dns.getFile(longName, serviceName, filePath, 0, 1, hasSafeDriveAccess, appDirKey,
+  req.app.get('api').dns.getFileMetadata(longName, serviceName, filePath, hasSafeDriveAccess, appDirKey,
     onFileMetadataRecieved);
 };
 
@@ -178,7 +201,7 @@ export var createPublicId = function(req, res) {
     return res.sendStatus(401);
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  if (!/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:)+$/.test(req.params.longName)) {
+  if (!domainCheck.test(req.params.longName)) {
     return responseHandler.onResponse('Invalid request. longName is not valid');
   }
   log.debug('DNS - Invoking createPublicId API for ' + req.params.longName);
