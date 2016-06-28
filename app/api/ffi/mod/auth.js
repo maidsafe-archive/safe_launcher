@@ -42,6 +42,7 @@ var unregisteredClient = function(lib, observer) {
   }
   unregisteredClientHandle = unregisteredClient.deref();
   registerObserver(lib, unregisteredClientHandle, observer);
+  observer(0);
   return true;
 };
 
@@ -92,6 +93,7 @@ var register = function(lib, request, observer) {
     return util.sendError(request.id, 999, safeDriveError.toString());
   }
   util.send(request.id);
+  observer(0);
 };
 
 var login = function(lib, request, observer) {
@@ -116,6 +118,7 @@ var login = function(lib, request, observer) {
     return util.sendError(request.id, 999, safeDriveError.toString());
   }
   util.send(request.id);
+  observer(0);
 };
 
 exports.getRegisteredClient = function() {

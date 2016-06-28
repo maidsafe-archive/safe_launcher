@@ -99,9 +99,7 @@ module.exports = function(libPath) {
           break;
 
         case 'connect':
-          if (auth.getUnregisteredClient(lib, unRegisteredClientObserver)) {
-            unRegisteredClientObserver(0);
-          }
+          auth.getUnregisteredClient(lib, unRegisteredClientObserver);
           break;
 
         default:
