@@ -7,7 +7,7 @@ import sessionManager from '../session_manager';
 import SessionInfo from '../model/session_info';
 import Permission from '../model/permission';
 import {
-  getSessionIdFromRequest
+  getSessionIdFromRequest, ResponseHandler
 } from '../utils'
 import { log } from './../../logger/log';
 
@@ -53,24 +53,25 @@ export let CreateSession = function(data) {
 export var authorise = function(req, res) {
   log.debug('Authorisation request recieved');
   let authReq = req.body;
+  let responseHandler = new ResponseHandler(res);
   if (!(authReq.app && authReq.app.name && authReq.app.id && authReq.app.vendor &&
       authReq.app.version)) {
     log.debug('Authorisation request - fields missing');
-    return res.status(400).send('Fields are missing');
+    return responseHandler.onResponse('Fields are missing');
   }
   if (!(/[^\s]/.test(authReq.app.name) && /[^\s]/.test(authReq.app.id) && /[^\s]/.test(authReq.app.vendor) &&
   /[^\s]/.test(authReq.app.version))) {
     log.debug('Authorisation request - fields invalid');
-    return res.status(400).send('Fields are invalid');
+    return responseHandler.onResponse('Fields are invalid');
   }
   if (!authReq.hasOwnProperty('permissions')) {
     log.debug('Authorisation request - permissions field missing');
-    return res.status(400).send('permissions are missing');
+    return responseHandler.onResponse('permissions are missing');
   }
   let permissions = new Permission(authReq.permissions);
   if (!permissions.isValid()) {
     log.debug('Authorisation request - Invalid permissions requested');
-    return res.status(400).send('Invalid permissions');
+    return responseHandler.onResponse('Invalid permissions');
   }
 
   let payload = {

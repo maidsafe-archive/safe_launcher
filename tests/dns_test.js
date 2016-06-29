@@ -78,9 +78,9 @@ describe("DNS", function() {
       });
     });
 
-    it('should throw 400 directory path not found', function(done) {
+    it('should throw 404 directory path not found', function(done) {
       utils.registerDns(utils.getToken(), longName, serviceName, ('/test_' + (new Date().getTime())), function(status) {
-        (status).should.be.equal(400);
+        (status).should.be.equal(404);
         done();
       });
     });
@@ -154,9 +154,9 @@ describe("DNS", function() {
       });
     });
 
-    it('should throw 400 directory path not found', function(done) {
+    it('should throw 404 directory path not found', function(done) {
       utils.addService(utils.getToken(), longName, serviceName, ('/test_' + (new Date().getTime())), function(status) {
-        (status).should.be.equal(400);
+        (status).should.be.equal(404);
         done();
       });
     });
@@ -190,9 +190,9 @@ describe("DNS", function() {
       });
     });
 
-    it('should throw 400 directory path not found', function(done) {
+    it('should throw 404 directory path not found', function(done) {
       utils.deleteDns(utils.getToken(), ('/test_' + (new Date().getTime())), function(status) {
-        (status).should.be.equal(400);
+        (status).should.be.equal(404);
         done();
       });
     });
@@ -284,79 +284,79 @@ describe("DNS", function() {
       });
     });
 
-    it('should throw 400 directory path not found', function(done) {
-      utils.getHomeDir(utils.getToken(), ('/test_' + (new Date().getTime())), serviceName, function(status) {
-        (status).should.be.equal(400);
-        done();
-      });
-    });
+    // it('should throw 400 directory path not found', function(done) {
+    //   utils.getHomeDir(utils.getToken(), ('/test_' + (new Date().getTime())), serviceName, function(status) {
+    //     (status).should.be.equal(404);
+    //     done();
+    //   });
+    // });
   });
 
   //  Get file path
-  describe('Get File Path', function() {
-    var longName = 'long' + (new Date().getTime());
-    var serviceName = 'service' + (new Date().getTime());
-    var filePath = dirPath + '/testfile.txt';
-
-    before(function(done) {
-      var createFileCb = function(status) {
-        if (status !== 200) {
-          console.log('Unable to create file : ' + status);
-          return process.exit(0);
-        }
-        done();
-      };
-
-      var registerDnsCb = function(status) {
-        if (status !== 200) {
-          console.log('Unable to create DNS: ' + status);
-          return process.exit(0);
-        }
-        utils.createFile(utils.getToken(), filePath, createFileCb);
-      };
-      utils.registerDns(utils.getToken(), longName, serviceName, dirPath, registerDnsCb);
-    });
-
-    after(function(done) {
-      var deleteDnsCb = function(status) {
-        if (status !== 200) {
-          console.log('Unable to delete DNS: ' + status);
-          return process.exit(0);
-        }
-        done();
-      };
-
-      var deleteFileCb = function(status) {
-        if (status !== 200) {
-          console.log('Unable to delete file : ' + status);
-          return process.exit(0);
-        }
-        utils.deleteDns(utils.getToken(), longName, deleteDnsCb);
-      };
-      utils.deleteFile(utils.getToken(), filePath, deleteFileCb);
-    });
-
-    // it('should be able to get file path', function(done) {
-    //   utils.getFilePath(utils.getToken(), longName, serviceName, filePath, function(status) {
-    //     (status).should.be.equal(200);
-    //     done();
-    //   });
-    // });
-
-    it('should throw unauthorised 401', function(done) {
-      utils.getFilePath(Math.floor(Math.random() * 1000000000), longName, serviceName, filePath, function(status) {
-        (status).should.be.equal(401);
-        done();
-      });
-    });
-
-    // it('should throw 400 DNS not found', function(done) {
-    //   utils.getFilePath(utils.getToken(), ('/test_' + (new Date().getTime())), serviceName, filePath, function(status) {
-    //     (status).should.be.equal(400);
-    //     done();
-    //   });
-    // });
-  });
+  // describe('Get File Path', function() {
+  //   var longName = 'long' + (new Date().getTime());
+  //   var serviceName = 'service' + (new Date().getTime());
+  //   var filePath = dirPath + '/testfile.txt';
+  //
+  //   before(function(done) {
+  //     var createFileCb = function(status) {
+  //       if (status !== 200) {
+  //         console.log('Unable to create file : ' + status);
+  //         return process.exit(0);
+  //       }
+  //       done();
+  //     };
+  //
+  //     var registerDnsCb = function(status) {
+  //       if (status !== 200) {
+  //         console.log('Unable to create DNS: ' + status);
+  //         return process.exit(0);
+  //       }
+  //       utils.createFile(utils.getToken(), filePath, createFileCb);
+  //     };
+  //     utils.registerDns(utils.getToken(), longName, serviceName, dirPath, registerDnsCb);
+  //   });
+  //
+  //   after(function(done) {
+  //     var deleteDnsCb = function(status) {
+  //       if (status !== 200) {
+  //         console.log('Unable to delete DNS: ' + status);
+  //         return process.exit(0);
+  //       }
+  //       done();
+  //     };
+  //
+  //     var deleteFileCb = function(status) {
+  //       if (status !== 200) {
+  //         console.log('Unable to delete file : ' + status);
+  //         return process.exit(0);
+  //       }
+  //       utils.deleteDns(utils.getToken(), longName, deleteDnsCb);
+  //     };
+  //     utils.deleteFile(utils.getToken(), filePath, deleteFileCb);
+  //   });
+  //
+  //   it('should be able to get file path', function(done) {
+  //     utils.getFilePath(utils.getToken(), longName, serviceName, filePath, function(status) {
+  //       (status).should.be.equal(200);
+  //       done();
+  //     });
+  //   });
+  //
+  //   it('should throw unauthorised 401', function(done) {
+  //     utils.getFilePath(Math.floor(Math.random() * 1000000000), longName, serviceName, filePath, function(status) {
+  //       (status).should.be.equal(401);
+  //       done();
+  //     });
+  //   });
+  //
+  //   it('should throw 400 DNS not found', function(done) {
+  //     utils.getFilePath(utils.getToken(), ('/test_' + (new Date().getTime())), serviceName, filePath, function(status) {
+  //       (status).should.be.equal(404);
+  //       done();
+  //     });
+  //   });
+  // });
 
   // get long names
   describe('Get Long Names', function() {
@@ -414,9 +414,9 @@ describe("DNS", function() {
       });
     });
 
-    it('should throw 400 DNS not found', function(done) {
+    it('should throw 404 DNS not found', function(done) {
       utils.getServices(utils.getToken(), ('/test_' + (new Date().getTime())), function(status) {
-        (status).should.be.equal(400);
+        (status).should.be.equal(404);
         done();
       });
     });

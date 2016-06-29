@@ -22,7 +22,7 @@ let deleteOrGetDirectory = function(req, res, isDelete) {
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
-  let responseHandler = new ResponseHandler(res, sessionInfo);
+  let responseHandler = new ResponseHandler(res);
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
     return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
@@ -44,7 +44,7 @@ let move = function(req, res, isFile) {
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
-  let responseHandler = new ResponseHandler(res, sessionInfo);
+  let responseHandler = new ResponseHandler(res);
   let reqBody = req.body;
   if (!(reqBody.srcPath && reqBody.hasOwnProperty('srcRootPath') &&
       reqBody.destPath && reqBody.hasOwnProperty('destRootPath'))) {
@@ -79,7 +79,7 @@ export var createDirectory = function(req, res) {
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
-  let responseHandler = new ResponseHandler(res, sessionInfo);;
+  let responseHandler = new ResponseHandler(res);
   let reqBody = req.body;
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
@@ -114,7 +114,7 @@ export var modifyDirectory = function(req, res) {
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
-  let responseHandler = new ResponseHandler(res, sessionInfo);
+  let responseHandler = new ResponseHandler(res);
   let reqBody = req.body;
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
@@ -147,7 +147,7 @@ export var createFile = function(req, res) {
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
-  let responseHandler = new ResponseHandler(res, sessionInfo);;
+  let responseHandler = new ResponseHandler(res);
   let reqBody = req.body;
   let filePath = req.params['0'];
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
@@ -168,7 +168,7 @@ export var deleteFile = function(req, res) {
   if (!sessionInfo) {
     return res.sensStatus(401);
   }
-  let responseHandler = new ResponseHandler(res, sessionInfo);;
+  let responseHandler = new ResponseHandler(res);
   let filePath = req.params['0'];
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
@@ -184,7 +184,7 @@ export var modifyFileMeta = function(req, res) {
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
-  let responseHandler = new ResponseHandler(res, sessionInfo);;
+  let responseHandler = new ResponseHandler(res);
   let reqBody = req.body;
   let filePath = req.params['0'];
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
@@ -209,7 +209,7 @@ export var getFile = function(req, res, next) {
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
-  let responseHandler = new ResponseHandler(res, sessionInfo, true);
+  let responseHandler = new ResponseHandler(res);
   let filePath = req.params['0'];
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
@@ -268,7 +268,7 @@ export var getFile = function(req, res, next) {
     if (chunksize === 0) {
       return res.end();
     }
-    let nfsReader = new NfsReader(req, filePath, rootPath, start, end,
+    let nfsReader = new NfsReader(req, res, filePath, rootPath, start, end,
       sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey);
     nfsReader.pipe(res);
   };
@@ -278,7 +278,7 @@ export var getFile = function(req, res, next) {
 };
 
 export var getFileMetadata = function(req, res) {
-  let responseHandler = new ResponseHandler(res, sessionInfo, true);
+  let responseHandler = new ResponseHandler(res);
   let filePath = req.params['0'];
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
@@ -310,7 +310,7 @@ export var modifyFileContent = function(req, res) {
     return res.sendStatus(401);
   }
   let offset = 0;
-  let responseHandler = new ResponseHandler(res, sessionInfo);
+  let responseHandler = new ResponseHandler(res);
   let filePath = req.params['0'];
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {

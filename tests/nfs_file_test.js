@@ -74,9 +74,9 @@ describe('NFS File', function() {
       });
     });
 
-    it('should throw 400 file path not found', function(done) {
+    it('should throw 404 file path not found', function(done) {
       utils.createFile(utils.getToken(), '/test_' + (new Date().getTime()) + '/test.txt', function(status) {
-        (status).should.be.equal(400);
+        (status).should.be.equal(404);
         done();
       });
     });
@@ -154,9 +154,9 @@ describe('NFS File', function() {
       });
     });
 
-    it('should throw 400 file path not found', function(done) {
+    it('should throw 404 file path not found', function(done) {
       utils.deleteFile(utils.getToken(), ('/test_' + (new Date().getTime()) + '/test.txt'), function(status) {
-        (status).should.be.equal(400);
+        (status).should.be.equal(404);
         done();
       });
     });
@@ -200,9 +200,9 @@ describe('NFS File', function() {
       });
     });
 
-    it('should throw 400 file path not found', function(done) {
+    it('should throw 404 file path not found', function(done) {
       utils.updateFileMeta(utils.getToken(), newFileName, ('/test_' + (new Date().getTime()) + '/test.txt'), function(status) {
-        (status).should.be.equal(400);
+        (status).should.be.equal(404);
         done();
       });
     });
@@ -246,9 +246,9 @@ describe('NFS File', function() {
       });
     });
 
-    it('should throw 400 file path not found', function(done) {
+    it('should throw 404 file path not found', function(done) {
       utils.updateFileContent(utils.getToken(), fileContent, ('/test_' + (new Date().getTime()) + '/test.txt'), function(status) {
-        (status).should.be.equal(400);
+        (status).should.be.equal(404);
         done();
       });
     });
@@ -303,9 +303,9 @@ describe('NFS File', function() {
       });
     });
 
-    it('should throw 400 path not found', function(done) {
+    it('should throw 404 path not found', function(done) {
       utils.moveOrCopyFile(utils.getToken(), ('/test_' + (new Date().getTime()) + '/test.txt'), destDirPath, true, function(status) {
-        (status).should.be.equal(400);
+        (status).should.be.equal(404);
         done();
       });
     });
@@ -361,9 +361,9 @@ describe('NFS File', function() {
       });
     });
 
-    it('should throw 400 path not found', function(done) {
+    it('should throw 404 path not found', function(done) {
       utils.moveOrCopyFile(utils.getToken(), ('/test_' + (new Date().getTime()) + '/test.txt'), destDirPath, false, function(status) {
-        (status).should.be.equal(400);
+        (status).should.be.equal(404);
         done();
       });
     });
