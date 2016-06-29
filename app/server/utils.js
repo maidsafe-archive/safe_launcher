@@ -136,14 +136,17 @@ export var ResponseHandler = function(res) {
   self.onResponse = function(err, data) {
     let status = 200;
     if (err) {
+      status = 400;
       if (err.hasOwnProperty('errorCode') && !err.hasOwnProperty('description')) {
         err.description = errorCodeLookup(err.errorCode);
       }
       if (typeof err === 'string') {
         err = { errorCode: status, description: err };
       }
-      if (err.description && err.description.toLowerCase().indexOf('notfound') > -1) {
-        status = 404;
+      if (err.description &&
+         (err.description.toLowerCase().indexOf('notfound') > -1 ||
+         err.description.toLowerCase().indexOf('pathnotfound') > -1)) {
+          status = 404;
       }
       return self.res.status(status).send(err);
     }

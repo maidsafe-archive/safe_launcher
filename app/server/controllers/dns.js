@@ -77,16 +77,8 @@ export var getFile = function(req, res) {
   let onFileMetadataRecieved = function(err, fileStats) {
     log.debug('DNS - File metadata for reading - ' + (fileStats || JSON.stringify(err)));
     if (err) {
-      let status = 400;
-      if (err.errorCode) {
-        err.description = errorCodeLookup(err.errorCode);
-      }
       log.error(err);
-      if (err.description && (err.description.toLowerCase().indexOf('invalidpath') > -1 ||
-          err.description.toLowerCase().indexOf('pathnotfound') > -1)) {
-            status = 404;
-      }
-      return res.status(status).send(err);
+      return responseHandler.onResponse(err);
     }
     fileStats = formatResponse(fileStats);
     let range = req.get('range');
@@ -94,7 +86,7 @@ export var getFile = function(req, res) {
     if (range) {
       range = range.toLowerCase();
       if (!/^bytes=/.test(range)) {
-        return res.status(400).send('Invalid range header specification.');
+        return responseHandler.onResponse('Invalid range header specification.');
       }
       positions = range.toLowerCase().replace(/bytes=/g, '').split('-');
       for (var i in positions) {
