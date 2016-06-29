@@ -103,9 +103,9 @@ describe('NFS Directory', function() {
       });
     });
 
-    it('should throw 400 directory not found', function(done) {
+    it('should throw 404 directory not found', function(done) {
       utils.getDir(utils.getToken(), ('/test_' + (new Date().getTime())), function(status) {
-        (status).should.be.equal(400);
+        (status).should.be.equal(404);
         done();
       });
     });
@@ -149,9 +149,9 @@ describe('NFS Directory', function() {
       });
     });
 
-    it('should throw 400 directory not found', function(done) {
+    it('should throw 404 directory not found', function(done) {
       utils.updateDir(utils.getToken(), ('/test_' + (new Date().getTime())), newdirName, function(status) {
-        (status).should.be.equal(400);
+        (status).should.be.equal(404);
         done();
       });
     });
@@ -184,9 +184,9 @@ describe('NFS Directory', function() {
       });
     });
 
-    it('should throw 400 directory not found', function(done) {
+    it('should throw 404 directory not found', function(done) {
       utils.deleteDir(utils.getToken(), dirPath, function(status) {
-        (status).should.be.equal(400);
+        (status).should.be.equal(404);
         done();
       });
     });
@@ -240,9 +240,9 @@ describe('NFS Directory', function() {
       });
     });
 
-    it('should throw 400 unauthorised', function(done) {
+    it('should throw 404 unauthorised', function(done) {
       utils.moveOrCopyDir(utils.getToken(), '/test_new_' + (new Date().getTime()), destPath, true, function(status) {
-        (status).should.be.equal(400);
+        (status).should.be.equal(404);
         done();
       });
     });
@@ -297,9 +297,9 @@ describe('NFS Directory', function() {
       });
     });
 
-    it('should throw 400 unauthorised', function(done) {
+    it('should throw 404 unauthorised', function(done) {
       utils.moveOrCopyDir(utils.getToken(), '/test_new_' + (new Date().getTime()), destPath, false, function(status) {
-        (status).should.be.equal(400);
+        (status).should.be.equal(404);
         done();
       });
     });
