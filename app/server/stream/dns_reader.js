@@ -3,9 +3,11 @@ import { log } from './../../logger/log';
 var Readable = require('stream').Readable;
 var util = require('util');
 
-export var DnsReader = function (req, longName, serviceName, filePath, start, end, hasSafeDriveAccess, appDirKey) {
+export var DnsReader = function (req, res,
+  longName, serviceName, filePath, start, end, hasSafeDriveAccess, appDirKey) {
   Readable.call(this);
   this.req = req;
+  this.res = res;
   this.longName = longName;
   this.serviceName = serviceName;
   this.filePath = filePath;
@@ -31,8 +33,10 @@ DnsReader.prototype._read = function() {
   this.req.app.get('api').dns.getFile(this.longName, this.serviceName, this.filePath, this.curOffset,
     this.sizeToRead, this.hasSafeDriveAccess, this.appDirKey,
     function(err, data) {
-      if (err) {                
-        return log.error(err);
+      if (err) {
+        self.push(null);
+        log.error(err);
+        return self.res.end();
       }
       self.curOffset += self.sizeToRead;
       self.push(new Buffer(JSON.parse(data).content, 'base64'));

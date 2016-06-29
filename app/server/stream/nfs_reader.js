@@ -3,9 +3,11 @@ import { log } from './../../logger/log';
 var Readable = require('stream').Readable;
 var util = require('util');
 
-export var NfsReader = function (req, filePath, isPathShared, start, end, hasSafeDriveAccess, appDirKey) {
+export var NfsReader = function (req, res,
+  filePath, isPathShared, start, end, hasSafeDriveAccess, appDirKey) {
   Readable.call(this);
   this.req = req;
+  this.res = res;
   this.filePath = filePath;
   this.isPathShared = isPathShared;
   this.start = start;
@@ -31,7 +33,9 @@ NfsReader.prototype._read = function() {
     this.curOffset, this.sizeToRead, this.hasSafeDriveAccess, this.appDirKey,
     function(err, data) {
       if (err) {
-        return log.error(err);
+        self.push(null);
+        log.error(err);
+        return self.res.end();
       }
       self.curOffset += self.sizeToRead;
       self.push(new Buffer(JSON.parse(data).content, 'base64'));

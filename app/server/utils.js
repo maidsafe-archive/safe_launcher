@@ -129,52 +129,23 @@ export var formatResponse = function(data) {
   return format(data);
 }
 
-export var ResponseHandler = function(res, sessionInfo) {
+export var ResponseHandler = function(res) {
   let self = this;
   self.res = res;
-  self.sessionInfo = sessionInfo;    
 
-  var fileResponse = function(err, data) {
-    var status = 200;
+  self.onResponse = function(err, data) {
+    let status = 200;
     if (err) {
-      status = 400;
-      if (err.hasOwnProperty('errorCode')) {
+      if (err.hasOwnProperty('errorCode') && !err.hasOwnProperty('description')) {
         err.description = errorCodeLookup(err.errorCode);
+      }
+      if (typeof err === 'string') {
+        err = { errorCode: status, description: err };
       }
       if (err.description && err.description.toLowerCase().indexOf('notfound') > -1) {
         status = 404;
       }
       return self.res.status(status).send(err);
-    }
-    data = formatResponse(data);
-    var content = new Buffer(data.content, 'base64');
-    if (sessionInfo) {
-      self.res.set('Content-Type', 'text/plain');
-    } else {
-      self.res.set('Content-Type', mime.lookup(data.metadata.name));
-    }
-    self.res.set('Accept-Ranges', 'bytes');
-    self.res.set('Content-Length', data.metadata.size);
-    // TODO: Set Content-Range
-    // self.res.set('Content-Range', 'bytes');
-    self.res.set('Last-Modified', data.metadata.modifiedOn);
-    self.res.set('Created-On', data.metadata.createdOn);
-    if (data.metadata.userMetadata) {
-      self.res.set('Metadata', data.metadata.userMetadata);
-    }
-    res.status(status).send(content);
-  };
-
-  self.onResponse = function(err, data) {
-    let status = 200;
-    if (err) {
-      if (err.hasOwnProperty('errorCode')) {
-        err.description = errorCodeLookup(err.errorCode);
-      }
-      if (err.description && err.description.toLowerCase().indexOf('notfound') > -1) {
-        status = 404;
-      }
-      return self.res.status(400).send(err);
     }
     if (data) {
       self.res.status(status).send(formatResponse(data));
