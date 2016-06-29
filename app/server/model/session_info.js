@@ -1,4 +1,4 @@
-import * as sodium from 'libsodium-wrappers';
+import crypto from 'crypto';
 
 export default class SessionInfo {
   constructor(appId, appName, appVersion, vendor, permissions, appDirKey) {
@@ -7,7 +7,7 @@ export default class SessionInfo {
     this.appVersion = appVersion;
     this.vendor = vendor;
     this.permissions = permissions || [];
-    this.signingKey = sodium.randombytes_buf(sodium.crypto_box_SECRETKEYBYTES);
+    this.signingKey = crypto.randomBytes(32);
     this.appDirKey = appDirKey;
   }
 

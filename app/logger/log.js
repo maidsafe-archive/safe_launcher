@@ -34,7 +34,7 @@ class Logger {
     let logFilePath = path.resolve(executableDirPath, path.basename(executablePath).split('.')[0] + '_ui.log');
 
     let transports = [];
-    var logLevel = env && env.log ? (env.log.level ? env.log.level : 'debug') : 'debug';
+    var logLevel = (env && env.log) ? (env.log.level ? env.log.level : 'warn') : 'warn';    
     try {
       process.stdout.write('\n');
       transports.push(new (winston.transports.Console)({

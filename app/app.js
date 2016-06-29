@@ -103,7 +103,9 @@ api.setNetworkStateListener(function(state, isRegisteredClient) {
 
     case 0:
       log.info('Connected with Network');
-      window.msl.networkStateChange(NETWORK_STATE.CONNECTED);
+      if (!isRegisteredClient) {
+        window.msl.networkStateChange(NETWORK_STATE.CONNECTED);
+      }
       break;
 
     case 1:

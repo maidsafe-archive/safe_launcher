@@ -2,7 +2,7 @@
 
 import util from 'util';
 import jwt from 'jsonwebtoken';
-import * as sodium from 'libsodium-wrappers';
+import crypto from 'crypto';
 import sessionManager from '../session_manager';
 import SessionInfo from '../model/session_info';
 import Permission from '../model/permission';
@@ -26,7 +26,7 @@ export let CreateSession = function(data) {
     let app = authReq.app;
     try {
       log.debug('Creating session');
-      let sessionId = new Buffer(sodium.randombytes_buf(32)).toString('base64');
+      let sessionId = crypto.randomBytes(32).toString('base64');
       let sessionInfo = new SessionInfo(app.id, app.name, app.version, app.vendor, data.permissions, dirKey);
       let payload = JSON.stringify({
         id: sessionId

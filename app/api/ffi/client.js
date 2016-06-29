@@ -1,6 +1,6 @@
 import childProcess from 'child_process';
-import * as libSodium from 'libsodium-wrappers';
 import { log } from './../../logger/log';
+import uuid from 'uuid';
 
 var workerProcess;
 var workerPath = __dirname;
@@ -13,7 +13,7 @@ var addToCallbackPool = function(id, callback) {
   if (!callbackPool[id]) {
     callbackPool[id] = [];
   }
-  callbackPool[id].push(callback);  
+  callbackPool[id].push(callback);
 };
 
 var startWorker = function() {
@@ -46,6 +46,7 @@ var startWorker = function() {
       log.warn('callback not found :: ' + msg.id);
       return;
     }
+    log.debug('FFI Response code ' + (msg.errorCode || 0) + ' for id - ' + msg.id);
     let isError = msg.errorCode !== 0;
     let id = msg.id;
     let callbacks = callbackPool[id];
@@ -69,12 +70,9 @@ var startWorker = function() {
 
 export var send = function(message, callback) {
   let strMessage = JSON.stringify(message);
-  log.debug('Sending message to FFI - ' + message.module + ' - ' + (message.action || ''));
-  log.verbose('Sending message to FFI ' + strMessage);
-  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  let id = new Buffer(libSodium.crypto_hash(strMessage)).toString('base64');
-  log.verbose('Message callback ID' + id + ' ' + strMessage);
-  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+  let id = uuid.v4();
+  log.debug('Sending message to FFI - ' + id + ' - ' + message.module + ' - ' +
+    (message.action || ''));
   if (callback) {
     addToCallbackPool(id, callback);
   }
