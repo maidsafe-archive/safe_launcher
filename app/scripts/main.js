@@ -78,6 +78,7 @@ window.safeLauncher = angular
     $rootScope.network.show = true;
     $rootScope.network.status = state;
     if (state === window.NETWORK_STATE.DISCONNECTED) {
+      $rootScope.$state.go('login');
       $rootScope.$msAlert.show('Network Disconnected', $rootScope.network.messages.DISCONNECTED, function() {});
     }
     $rootScope.$applyAsync();

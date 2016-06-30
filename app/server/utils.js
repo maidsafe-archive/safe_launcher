@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 import mime from 'mime';
-import * as sodium from 'libsodium-wrappers';
 import sessionManager from './session_manager';
 import { errorCodeLookup } from './error_code_lookup';
 import { log } from './../logger/log';

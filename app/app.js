@@ -83,7 +83,7 @@ var onFfiProcessTerminated = function(title, msg) {
 
 api.setNetworkStateListener(function(state, isRegisteredClient) {
   log.debug('Network state change event recieved :: ' + state + ' :: ' + isRegisteredClient);
-  if (ignoreUnRegisteredObserver && !isRegisteredClient) {
+  if (ignoreUnRegisteredObserver && isRegisteredClient === false) {
     log.debug('Ignoring Network state change event for unregistered client');
     return;
   }
@@ -103,11 +103,16 @@ api.setNetworkStateListener(function(state, isRegisteredClient) {
 
     case 0:
       log.info('Connected with Network');
-      window.msl.networkStateChange(NETWORK_STATE.CONNECTED);
+      if (!isRegisteredClient) {
+        window.msl.networkStateChange(NETWORK_STATE.CONNECTED);
+      }
       break;
 
     case 1:
       log.info('Network connection lost');
+      if (isRegisteredClient) {
+        ignoreUnRegisteredObserver = false;
+      }
       window.msl.networkStateChange(NETWORK_STATE.DISCONNECTED);
       break;
 
