@@ -1,20 +1,11 @@
 import mime from 'mime';
 import sessionManager from '../session_manager';
-import {
-  ResponseHandler,
-  formatResponse
-} from '../utils';
-import {
-  log
-} from './../../logger/log';
-import {
-  DnsReader
-} from '../stream/dns_reader';
-import {
-  errorCodeLookup
-} from './../error_code_lookup';
+import { ResponseHandler, formatResponse } from '../utils';
+import { log } from './../../logger/log';
+import { DnsReader } from '../stream/dns_reader';
+import { errorCodeLookup } from './../error_code_lookup';
 
-var domainCheck = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$/;
+var domainCheck = /^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/;
 
 var registerOrAddService = function(req, res, isRegister) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);

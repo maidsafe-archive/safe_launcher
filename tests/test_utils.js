@@ -1,6 +1,4 @@
 var request = require('request');
-var sodium = require('../app/node_modules/libsodium-wrappers/dist/modules/libsodium-wrappers.js');
-
 var server = require('./server_utils');
 var config = require('../config/env_development.json');
 
