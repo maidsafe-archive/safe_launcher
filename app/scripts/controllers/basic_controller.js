@@ -6,20 +6,20 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     // handle server error
     server.onServerError(function(err) {
       $rootScope.$loader.hide();
-      $rootScope.$msAlert.show('Server Error', err.message, function() {
+      $rootScope.$msAlert.show('Server error', err.message, function() {
         server.closeWindow();
       });
     });
 
     // handle server start
     server.onServerStarted(function() {
-      console.log('Server Started');
+      console.log('Server started');
     });
 
     // handle server shutdown
     server.onServerShutdown(function() {
       $rootScope.$loader.hide();
-      console.log('Server Stopped');
+      console.log('Server stopped');
     });
 
     // handle proxy start
@@ -38,7 +38,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     // handle proxy error
     server.onProxyError(function(err) {
       $rootScope.$loader.hide();
-      $rootScope.$msAlert.show('Proxy Server Error', err.message, function() {
+      $rootScope.$msAlert.show('Proxy server error', err.message, function() {
         server.closeWindow();
       });
     });

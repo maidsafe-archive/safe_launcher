@@ -32,10 +32,10 @@ let proxyServer = {
     ]);
     this.process.on('exit', function() {
       log.info('Proxy server stopped');
-      proxyListener.onExit('Proxy Server Closed');
+      proxyListener.onExit('Proxy server closed');
     });
     this.process.on('message', function(msg) {
-      log.debug('Proxy Server - onMessage event - recieved - ' + msg);
+      log.debug('Proxy Server - onMessage event - received - ' + msg);
       msg = JSON.parse(msg);
       if (msg.status) {
         log.info('Proxy server started');
@@ -82,9 +82,9 @@ var onFfiProcessTerminated = function(title, msg) {
 };
 
 api.setNetworkStateListener(function(state, isRegisteredClient) {
-  log.debug('Network state change event recieved :: ' + state + ' :: ' + isRegisteredClient);
+  log.debug('Network state change event received :: ' + state + ' :: ' + isRegisteredClient);
   if (ignoreUnRegisteredObserver && isRegisteredClient === false) {
-    log.debug('Ignoring Network state change event for unregistered client');
+    log.debug('Ignoring network state change event for unregistered client');
     return;
   }
   if (state === 0 && isRegisteredClient) {
@@ -102,7 +102,7 @@ api.setNetworkStateListener(function(state, isRegisteredClient) {
       break;
 
     case 0:
-      log.info('Connected with Network');
+      log.info('Connected with network');
       if (!isRegisteredClient) {
         window.msl.networkStateChange(NETWORK_STATE.CONNECTED);
       }

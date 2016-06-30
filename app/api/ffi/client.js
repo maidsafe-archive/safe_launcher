@@ -43,10 +43,10 @@ var startWorker = function() {
     } else if (msg.id === 0 && networkStateListener) {
       return networkStateListener(msg.data.state, msg.data.registeredClient);
     } else if (!callbackPool[msg.id]) {
-      log.warn('callback not found :: ' + msg.id);
+      log.warn('Callback not found :: ' + msg.id);
       return;
     }
-    log.debug('FFI Response code ' + (msg.errorCode || 0) + ' for id - ' + msg.id);
+    log.debug('FFI response code ' + (msg.errorCode || 0) + ' for id - ' + msg.id);
     let isError = msg.errorCode !== 0;
     let id = msg.id;
     let callbacks = callbackPool[id];
@@ -54,10 +54,10 @@ var startWorker = function() {
     delete callbackPool[id];
     for (let i in callbacks) {
       if (isError) {
-        log.verbose('invoking Error Response callback :: callback id - ' + id);
+        log.verbose('Invoking error response callback :: callback id - ' + id);
         callbacks[i](msg);
       } else {
-        log.verbose('invoking Response callback :: callback id - ' + id);
+        log.verbose('Invoking response callback :: callback id - ' + id);
         callbacks[i](null, msg.data);
       }
     }
