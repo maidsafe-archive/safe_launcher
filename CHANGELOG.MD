@@ -1,5 +1,11 @@
 # SAFE Launcher Change Log
 
+##[0.5.1]
+ - Fix for DNS get file error
+ - Hide status banner after log in
+ - Low balance error handling
+ - Log improvements
+
 ##[0.5.0]
  - NFS API updated with streaming
  - CORS and CSP moved to proxy
