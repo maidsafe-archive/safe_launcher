@@ -55,26 +55,6 @@ export default class RESTServer {
     let EVENT_TYPE = this.app.get('EVENT_TYPE');
     let eventEmitter = this.app.get('eventEmitter');
 
-    // var corsValidator = function(req, callback) {
-    //   try {
-    //     var origin = req.get('Origin');
-    //     callback(null, {
-    //       origin: (origin ? /\.safenet$/.test(origin) : true)
-    //     });
-    //   } catch (e) {
-    //     callback(e);
-    //   }
-    // };
-    //
-    // app.options('*', cors(corsValidator));
-    // app.use(cors(corsValidator));
-    // app.use(function(req, res, next) {
-    //   res.header("Access-Control-Allow-Origin", "*");
-    //   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    //   res.header("Access-Control-Allow-Methods", "DELETE, GET, OPTIONS, POST, PUT");
-    //   next();
-    // });
-
     app.use(bodyParser.json({strict: false}));
 
     app.use(setSessionHeaderAndParseBody);
@@ -96,7 +76,7 @@ export default class RESTServer {
       next(err);
     });
 
-    // no stacktraces leaked to user
+    // no stack traces leaked to user
     app.use(function(err, req, res, next) {
       res.status(err.status || 500);
       res.send('Server Error');

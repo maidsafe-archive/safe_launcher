@@ -67,7 +67,7 @@ module.exports = function(libPath) {
       return lib.init_logging() === 0;
       /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     } catch (e) {
-      console.log('Ffi load error', e);
+      console.log('FFI load error', e);
     }
     return false;
   };

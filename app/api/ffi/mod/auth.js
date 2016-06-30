@@ -196,7 +196,7 @@ exports.execute = function(lib, request, observer) {
     case 'app-dir-key':
       getAppDirectoryKey(lib, request);
       break;
-    case 'drop-unregisterd-client':
+    case 'drop-unregistered-client':
       dropUnregisteredClient(lib);
       util.send(request.id, 'client dropped');
       break;
