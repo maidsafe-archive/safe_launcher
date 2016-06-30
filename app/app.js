@@ -83,7 +83,7 @@ var onFfiProcessTerminated = function(title, msg) {
 
 api.setNetworkStateListener(function(state, isRegisteredClient) {
   log.debug('Network state change event recieved :: ' + state + ' :: ' + isRegisteredClient);
-  if (ignoreUnRegisteredObserver && !isRegisteredClient) {
+  if (ignoreUnRegisteredObserver && isRegisteredClient === false) {
     log.debug('Ignoring Network state change event for unregistered client');
     return;
   }
