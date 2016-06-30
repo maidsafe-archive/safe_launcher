@@ -42,6 +42,7 @@ install:
 build: off
 
 test_script:
+  - npm config set msvs_version=2013
   - npm install --progress false --depth 0
   - npm test
 
