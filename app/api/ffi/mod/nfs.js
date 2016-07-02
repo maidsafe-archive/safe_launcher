@@ -207,6 +207,6 @@ exports.execute = function(lib, request) {
       move(lib, request, 'move-file');
       break;
     default:
-      util.sendError(request.id, 999, 'Invalid Action');
+      util.sendError(request.id, 999, 'Invalid action');
   }
 };

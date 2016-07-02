@@ -29,11 +29,11 @@ let deleteOrGetDirectory = function(req, res, isDelete) {
   }
   let dirPath = req.params['0'];
   if (isDelete) {
-    log.debug('NFS - Invoking Delete directory request');
+    log.debug('NFS - Invoking delete directory request');
     req.app.get('api').nfs.deleteDirectory(dirPath, rootPath,
       sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
   } else {
-    log.debug('NFS  - Invoking Get directory request');
+    log.debug('NFS  - Invoking get directory request');
     req.app.get('api').nfs.getDirectory(dirPath, rootPath,
       sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
   }
@@ -48,7 +48,7 @@ let move = function(req, res, isFile) {
   let reqBody = req.body;
   if (!(reqBody.srcPath && reqBody.hasOwnProperty('srcRootPath') &&
       reqBody.destPath && reqBody.hasOwnProperty('destRootPath'))) {
-    return responseHandler.onResponse('Invalid request. Manadatory parameters are missing');
+    return responseHandler.onResponse('Invalid request. Mandatory parameters are missing');
   }
   let srcRootPath = ROOT_PATH[reqBody.srcRootPath.toLowerCase()];
   if (typeof srcRootPath === 'undefined') {
@@ -125,7 +125,7 @@ export var modifyDirectory = function(req, res) {
   reqBody.metadata = reqBody.metadata || '';
 
   if (!reqBody.name && !reqBody.metadata) {
-    return responseHandler.onResponse('Invalid request. Name or metadata should be present in the request');
+    return responseHandler.onResponse('Invalid request. \'name\' or \'metadata\' should be present in the request');
   }
   if (typeof reqBody.metadata !== 'string') {
     return responseHandler.onResponse('Invalid request. \'metadata\' should be a string value');
@@ -174,7 +174,7 @@ export var deleteFile = function(req, res) {
   if (typeof rootPath === 'undefined') {
     return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
   }
-  log.debug('NFS - Invoking Delete file request');
+  log.debug('NFS - Invoking delete file request');
   req.app.get('api').nfs.deleteFile(filePath, rootPath, sessionInfo.appDirKey,
     sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
 };
@@ -272,7 +272,7 @@ export var getFile = function(req, res, next) {
       sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey);
     nfsReader.pipe(res);
   };
-  log.debug('NFS - Invoking Get file request');
+  log.debug('NFS - Invoking get file request');
   req.app.get('api').nfs.getFileMetadata(filePath, rootPath,
     sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, onFileMetadataRecieved);
 };
@@ -299,7 +299,7 @@ export var getFileMetadata = function(req, res) {
     });
     res.end();
     };
-    log.debug('NFS - Invoking Get file Metadata request');
+    log.debug('NFS - Invoking get file metadata request');
     req.app.get('api').nfs.getFileMetadata(filePath, rootPath,
     sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, onFileMetadataRecieved);
 };
@@ -325,9 +325,9 @@ export var modifyFileContent = function(req, res) {
     offset = positions[0];
   }
   if (isNaN(offset)) {
-    return responseHandler.onResponse('Invalid request. offset should be a number');
+    return responseHandler.onResponse('Invalid request. \'offset\' should be a number');
   }
-  log.debug('NFS - Invoking Modify file content request');
+  log.debug('NFS - Invoking modify file content request');
   var writer = new NfsWriter(req, filePath, offset, rootPath, sessionInfo, responseHandler);
   req.on('end', function() {
     writer.onClose();
