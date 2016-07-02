@@ -4,54 +4,51 @@ module.exports = function(libPath) {
   var ref = require('ref');
   var int = ref.types.int;
   var ArrayType = require('ref-array');
-  var util = require('./util.js');
-
   var intPtr = ref.refType(int);
-  var IntArray = ArrayType(int);
   var clientHandle = ref.types.void;
   var clientHandlePtr = ref.refType(clientHandle);
   var clientHandlePtrPtr = ref.refType(clientHandlePtr);
-  var notifyFuncPtr = ffi.Function('void', [ 'int' ]);
 
-  var lib;
   var auth = require('./auth.js');
   var nfs = require('./nfs.js');
   var dns = require('./dns.js');
+  var util = require('./util.js');
 
-  var LIB_LOAD_ERROR = 9999;
+  var lib;
   var self = this;
+  var LIB_LOAD_ERROR = 9999;
 
   var methodsToRegister = function() {
     return {
-      'init_logging': [ 'int', [] ],
-      'create_unregistered_client': [ 'int', [ clientHandlePtrPtr ] ],
-      'create_account': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
-      'log_in': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
+      'init_logging': [ int, [] ],
+      'create_unregistered_client': [ int, [ clientHandlePtrPtr ] ],
+      'create_account': [ int, [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
+      'log_in': [ int, [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
       'get_safe_drive_key': [ 'pointer', [ intPtr, intPtr, intPtr, clientHandlePtrPtr ] ],
       'get_app_dir_key': [ 'pointer', [ 'string', 'string', 'string', intPtr, intPtr, intPtr, clientHandlePtrPtr ] ],
       'execute': [ 'int', [ 'string', clientHandlePtrPtr ] ],
       'execute_for_content': [ 'pointer', [ 'string', intPtr, intPtr, intPtr, clientHandlePtrPtr ] ],
       'drop_client': [ 'void', [ clientHandlePtrPtr ] ],
       'drop_vector': [ 'void', [ 'pointer', int, int ] ],
-      'register_network_event_observer': [ 'void', [ clientHandlePtrPtr, notifyFuncPtr ] ]
+      'register_network_event_observer': [ 'void', [ clientHandlePtrPtr, 'pointer' ] ]
     };
   };
 
-  var unRegisteredClientObserver = function(state) {
+  var unRegisteredClientObserver = ffi.Callback('void', [ int ], function(state) {
     util.send(0, {
       type: 'status',
       state: state,
       registeredClient: false
     });
-  };
+  });
 
-  var registeredClientObserver = function(state) {
+  var registeredClientObserver = ffi.Callback('void', [ int ], function(state) {
     util.send(0, {
       type: 'status',
       state: state,
       registeredClient: true
     });
-  };
+  });
 
   var getClientHandle = function(message) {
     if (!lib) {

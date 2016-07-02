@@ -13,6 +13,14 @@ var safeDriveKey;
 var registeredClientHandle;
 var unregisteredClientHandle;
 
+var sendConnectedMessage = function(isRegisteredClient) {
+  util.send(0, {
+    type: 'status',
+    state: 0,
+    registeredClient: isRegisteredClient
+  });
+};
+
 var registerObserver = function(lib, clientHandle, callback) {
   util.send('log', { level: 'DEBUG', msg: 'FFI/mod/auth.js - Registering observer' });
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
@@ -42,7 +50,7 @@ var unregisteredClient = function(lib, observer) {
   }
   unregisteredClientHandle = unregisteredClient.deref();
   registerObserver(lib, unregisteredClientHandle, observer);
-  observer(0);
+  sendConnectedMessage(false);
   return true;
 };
 
@@ -93,7 +101,7 @@ var register = function(lib, request, observer) {
     return util.sendError(request.id, 999, safeDriveError.toString());
   }
   util.send(request.id);
-  observer(0);
+  sendConnectedMessage(true);
 };
 
 var login = function(lib, request, observer) {
@@ -118,7 +126,7 @@ var login = function(lib, request, observer) {
     return util.sendError(request.id, 999, safeDriveError.toString());
   }
   util.send(request.id);
-  observer(0);
+  sendConnectedMessage(true);
 };
 
 exports.getRegisteredClient = function() {
