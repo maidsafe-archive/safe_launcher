@@ -1,4 +1,12 @@
+var ref = require('ref');
+var uuid = require('uuid');
 var util = require('./util.js');
+var ArrayType = require('ref-array');
+var IntArray = ArrayType(ref.types.int);
+var VoidHandle = ref.types.void;
+var voidHandlePtr = ref.refType(VoidHandle);
+var voidHandlePtrPtr = ref.refType(voidHandlePtr);
+var writerHandlePool = {};
 
 var createPayload = function(action, request) {
   var payload = {
@@ -168,6 +176,67 @@ var move = function(lib, request, action) {
   }
 };
 
+var getWriter = function(lib, request) {
+  try {
+    var payload = createPayload(request.action, request);
+    var writerHandle = ref.alloc(voidHandlePtrPtr);
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    var result = lib.get_nfs_writer(JSON.stringify(payload), request.client, writerHandle);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    if (result !== 0) {
+      return util.sendError(request.id, result);
+    }
+    var writerId = uuid.v4();
+    writerHandlePool[writerId] = writerHandle;
+    util.send(request.id, writerId);
+  } catch (e) {
+    util.sendError(request.id, 999, e.message);
+  }
+};
+
+var write = function(lib, request) {
+  try {
+    util.send('log', '');
+    var writerId = request.params.writerId;
+    util.send('log', { level: 'DEBUG', msg: ('FFI/mod/nfs.js - ' + writerId) });
+    if (!writerHandlePool.hasOwnProperty(writerId)) {
+      return util.sendError(request.id, 999, 'Writer not found');
+    }
+    util.send('log', { level: 'DEBUG', msg: 'FFI/mod/nfs.js - write found' });
+    var offset = request.params.offset || 0;
+    util.send('log', { level: 'DEBUG', msg: ('FFI/mod/nfs.js - going to write ' + offset) });
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    var result = lib.nfs_stream_write(writerHandlePool[writerId], offset, IntArray.untilZeros(new Buffer(request.params.data, 'base64')));
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    util.send('log', { level: 'DEBUG', msg: ('FFI/mod/nfs.js - Write res ' + result) });
+    if (result === 0) {
+      return util.send(request.id);
+    }
+    util.sendError(request.id, result);
+  } catch (e) {
+    util.send('log', { level: 'DEBUG', msg: ('FFI/mod/nfs.js - ERR ' + e.toString()) });
+    util.sendError(request.id, 999, e.toString());
+  }
+};
+
+var closeWriter = function(lib, request) {
+  try {
+    var writerId = request.params.writerId;
+    if (!writerHandlePool.hasOwnProperty(writerId)) {
+      return util.sendError(request.id, 999, 'Writer not found');
+    }
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    var result = lib.nfs_stream_close(writerHandlePool[writerId]);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    if (result === 0) {
+      return util.send(request.id);
+    }
+    util.sendError(request.id, result);
+  } catch (e) {
+    util.sendError(request.id, 999, e.toString());
+  }
+};
+
 exports.execute = function(lib, request) {
   switch (request.action) {
     case 'create-dir':
@@ -205,6 +274,15 @@ exports.execute = function(lib, request) {
       break;
     case 'move-file':
       move(lib, request, 'move-file');
+      break;
+    case 'get-writer':
+      getWriter(lib, request);
+      break;
+    case 'write':
+      write(lib, request);
+      break;
+    case 'close-writer':
+      closeWriter(lib, request);
       break;
     default:
       util.sendError(request.id, 999, 'Invalid action');

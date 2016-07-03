@@ -27,4 +27,4 @@ NfsWriter.prototype.onClose = function() {
                                                 this.startOffset, this.filePath, this.isPathShared,
                                                 this.sessionInfo.appDirKey, this.sessionInfo.hasSafeDriveAccess(),
                                                 this.responseHandler.onResponse);
-}
+};

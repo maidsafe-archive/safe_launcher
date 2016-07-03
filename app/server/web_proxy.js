@@ -102,5 +102,5 @@ server.on('error', function(err) {
       status: false,
       msg: err
     }
-  }))
+  }));
 });
