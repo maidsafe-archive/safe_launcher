@@ -34,15 +34,23 @@ let proxyServer = {
       log.info('Proxy server stopped');
       proxyListener.onExit('Proxy server closed');
     });
-    this.process.on('message', function(msg) {
-      log.debug('Proxy Server - onMessage event - received - ' + msg);
-      msg = JSON.parse(msg);
-      if (msg.status) {
-        log.info('Proxy server started');
-        return proxyListener.onStart(msg.data);
+    this.process.on('message', function(event) {
+      log.debug('Proxy Server - onMessage event - received - ' + event);
+      event = JSON.parse(event);
+      switch (event.type) {
+        case 'connection':
+          if (event.msg.status) {
+            log.info('Proxy server started');
+            return proxyListener.onStart(event.msg.data);
+          }
+          proxyListener.onError(event.msg.data);
+          break;
+        case 'log':
+          log.error(event.msg.log);
+          break;
+        default:
+          log.warn('Invalid event type from proxy');
       }
-      log.error('Proxy server error :: ' + msg.data);
-      proxyListener.onError(msg.data);
     });
   },
   stop: function() {
