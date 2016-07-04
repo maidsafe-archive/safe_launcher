@@ -5,7 +5,7 @@ import { log } from './../../logger/log';
 import { DnsReader } from '../stream/dns_reader';
 import { errorCodeLookup } from './../error_code_lookup';
 
-var domainCheck = /^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/;
+var domainCheck = /^[a-z0-9][a-z0-9-]{1,60}[a-z0-9](?:)+$/;
 
 var registerOrAddService = function(req, res, isRegister) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
