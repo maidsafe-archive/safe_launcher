@@ -3,14 +3,16 @@ module.exports = function(libPath) {
   var path = require('path');
   var ref = require('ref');
   var int = ref.types.int;
-  // var ArrayType = require('ref-array');
-  // var IntArray = ArrayType(int);
+  var ArrayType = require('ref-array');
   var STRING_TYPE = 'string';
   var intPtr = ref.refType(int);
   var Void = ref.types.void;
   var voidPtr = ref.refType(Void);
   var voidPtrPtr = ref.refType(voidPtr);
-
+  var size_t = ref.types.size_t;
+  var uint8 = ref.types.uint8;
+  var Uint8Array = ArrayType(uint8);
+  var refUin8Array = ref.refType(Uint8Array);
   var auth = require('./auth.js');
   var nfs = require('./nfs.js');
   var dns = require('./dns.js');
@@ -32,10 +34,10 @@ module.exports = function(libPath) {
       'execute_for_content': [ 'pointer', [ STRING_TYPE, intPtr, intPtr, intPtr, voidPtrPtr ] ],
       'drop_client': [ 'void', [ voidPtrPtr ] ],
       'drop_vector': [ 'void', [ 'pointer', int, int ] ],
-      'register_network_event_observer': [ 'void', [ voidPtrPtr, 'pointer' ] ]
-      // 'get_nfs_writer': [ int, [ STRING_TYPE, voidPtrPtr, voidPtrPtr ] ],
-      // 'nfs_stream_write': [ int, [ voidPtrPtr, int, IntArray ] ],
-      // 'nfs_stream_close': [ int, [ voidPtrPtr ] ]
+      'register_network_event_observer': [ 'void', [ voidPtrPtr, 'pointer' ] ],
+      'get_nfs_writer': [ int, [ STRING_TYPE, voidPtrPtr, voidPtrPtr ] ],
+      'nfs_stream_write': [ int, [ voidPtrPtr, int, refUin8Array, size_t ] ],
+      'nfs_stream_close': [ int, [ voidPtrPtr ] ]
     };
   };
 

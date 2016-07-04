@@ -332,7 +332,9 @@ export var modifyFileContent = function(req, res) {
   req.on('end', function() {
     writer.onClose();
   });
-  req.pipe(writer);
+  writer.on('open', function() {
+    req.pipe(writer);
+  });
 };
 
 export var moveFile = function(req, res) {
