@@ -1,0 +1,39 @@
+<div class="tab">
+  <!-- Tab Base -->
+  <div class="tab-b">
+    <!-- Tab Navigation -->
+    <div class="tab-nav">
+      <ul>
+        <li ng-class="{active: $state.current.name === 'app.account' || $state.current.name === 'app'}">
+          <a ui-sref="app.account">
+            <span class="icn manage"></span>
+            <span class="txt">Account</span>
+          </a>
+        </li>
+        <li ng-class="{active: $state.current.name === 'app.dashboard'}">
+          <a ui-sref="app.dashboard">
+            <span class="icn manage"></span>
+            <span class="txt">Dashboard</span>
+          </a>
+        </li>
+        <li ng-class="{active: $state.current.name === 'app.settings'}">
+          <a ui-sref="app.settings">
+            <span class="icn manage"></span>
+            <span class="txt">Settings</span>
+          </a>
+        </li>
+        <li ng-class="{active: $state.current.name === 'app.help'}">
+          <a ui-sref="app.help">
+            <span class="icn manage"></span>
+            <span class="txt">Help</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <!-- /Tab Navigation -->
+    <!-- Tab Container -->
+    <div class="tab-cnt" ui-view="tab"></div>
+    <!-- /Tab Container -->
+  </div>
+  <!-- /Tab Base -->
+</div>
