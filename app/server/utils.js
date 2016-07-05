@@ -32,25 +32,25 @@ export var getSessionIdFromRequest = function(req) {
   } catch (e) {
     return;
   }
-}
+};
 
 export var setSessionHeaderAndParseBody = function(req, res, next) {
   if (!req.get('Authorization')) {
-    log.debug('Unauthorised Request ::' + req.path);
+    log.debug('Unauthorised request ::' + req.path);
     return next();
   }
-  log.debug('Authorised Request ::' + req.path);
+  log.debug('Authorised request ::' + req.path);
   let sessionId = getSessionIdFromRequest(req);
   log.debug('Decrypted session id :: ' + sessionId);
   if (!sessionId) {
-    log.warn('Session Id not found');
+    log.warn('Session ID not found');
     return res.sendStatus(401);
   }
   req.headers['sessionId'] = sessionId;
   if (req.body && req.body.length > 0) {
     req.body = ((req.body instanceof Buffer) ? JSON.parse(req.body.toString()) : req.body);
     if (typeof req.body !== 'object') {
-      return res.status(400).send('Invalid Request Body');
+      return res.status(400).send('Invalid request body');
     }
   }
   next();
@@ -126,7 +126,7 @@ export var formatResponse = function(data) {
   };
 
   return format(data);
-}
+};
 
 export var ResponseHandler = function(res) {
   let self = this;

@@ -51,7 +51,7 @@ export let CreateSession = function(data) {
 }
 
 export var authorise = function(req, res) {
-  log.debug('Authorisation request recieved');
+  log.debug('Authorisation request received');
   let authReq = req.body;
   let responseHandler = new ResponseHandler(res);
   if (!(authReq.app && authReq.app.name && authReq.app.id && authReq.app.vendor &&
@@ -81,19 +81,19 @@ export var authorise = function(req, res) {
     permissions: permissions
   };
   let eventType = req.app.get('EVENT_TYPE').AUTH_REQUEST;
-  log.debug('Emitting event for Auth Request Recieved');
+  log.debug('Emitting event for auth request received');
   req.app.get('eventEmitter').emit(eventType, payload);
 }
 
 export var revoke = function(req, res) {
-  log.debug('Revoke Authorisation request recieved');
+  log.debug('Revoke authorisation request received');
   let sessionId = getSessionIdFromRequest(req);
   if (!sessionId) {
-    log.debug('Revoke Authorisation request - Session not found - ' + sessionId);
+    log.debug('Revoke authorisation request - Session not found - ' + sessionId);
     return res.sendStatus(401);
   }
   sessionManager.remove(sessionId);
-  log.debug('Revoke Authorisation request - Session Removed - ' + sessionId);
+  log.debug('Revoke authorisation request - Session removed - ' + sessionId);
   let eventType = req.app.get('EVENT_TYPE').SESSION_REMOVED;
   req.app.get('eventEmitter').emit(eventType, sessionId);
   res.sendStatus(200);

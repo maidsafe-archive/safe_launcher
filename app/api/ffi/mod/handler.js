@@ -4,60 +4,71 @@ module.exports = function(libPath) {
   var ref = require('ref');
   var int = ref.types.int;
   var ArrayType = require('ref-array');
-  var util = require('./util.js');
-
+  var STRING_TYPE = 'string';
   var intPtr = ref.refType(int);
-  var IntArray = ArrayType(int);
-  var clientHandle = ref.types.void;
-  var clientHandlePtr = ref.refType(clientHandle);
-  var clientHandlePtrPtr = ref.refType(clientHandlePtr);
-  var notifyFuncPtr = ffi.Function('void', [ 'int' ]);
-
-  var lib;
+  var Void = ref.types.void;
+  var voidPtr = ref.refType(Void);
+  var voidPtrPtr = ref.refType(voidPtr);
+  var size_t = ref.types.size_t;
+  var uint8 = ref.types.uint8;
+  var Uint8Array = ArrayType(uint8);
+  var refUin8Array = ref.refType(Uint8Array);
   var auth = require('./auth.js');
   var nfs = require('./nfs.js');
   var dns = require('./dns.js');
+  var util = require('./util.js');
 
-  var LIB_LOAD_ERROR = 9999;
+  var lib;
   var self = this;
+  var LIB_LOAD_ERROR = 9999;
 
   var methodsToRegister = function() {
     return {
-      'init_logging': [ 'int', [] ],
-      'create_unregistered_client': [ 'int', [ clientHandlePtrPtr ] ],
-      'create_account': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
-      'log_in': [ 'int', [ 'string', 'string', 'string', clientHandlePtrPtr ] ],
-      'get_safe_drive_key': [ 'pointer', [ intPtr, intPtr, intPtr, clientHandlePtrPtr ] ],
-      'get_app_dir_key': [ 'pointer', [ 'string', 'string', 'string', intPtr, intPtr, intPtr, clientHandlePtrPtr ] ],
-      'execute': [ 'int', [ 'string', clientHandlePtrPtr ] ],
-      'execute_for_content': [ 'pointer', [ 'string', intPtr, intPtr, intPtr, clientHandlePtrPtr ] ],
-      'drop_client': [ 'void', [ clientHandlePtrPtr ] ],
+      'init_logging': [ int, [] ],
+      'create_unregistered_client': [ int, [ voidPtrPtr ] ],
+      'create_account': [ int, [ STRING_TYPE, STRING_TYPE, STRING_TYPE, voidPtrPtr ] ],
+      'log_in': [ int, [ STRING_TYPE, STRING_TYPE, STRING_TYPE, voidPtrPtr ] ],
+      'get_safe_drive_key': [ 'pointer', [ intPtr, intPtr, intPtr, voidPtrPtr ] ],
+      'get_app_dir_key': [ 'pointer', [ STRING_TYPE, STRING_TYPE, STRING_TYPE, intPtr, intPtr, intPtr, voidPtrPtr ] ],
+      'execute': [ int, [ STRING_TYPE, voidPtrPtr ] ],
+      'execute_for_content': [ 'pointer', [ STRING_TYPE, intPtr, intPtr, intPtr, voidPtrPtr ] ],
+      'drop_client': [ 'void', [ voidPtrPtr ] ],
       'drop_vector': [ 'void', [ 'pointer', int, int ] ],
-      'register_network_event_observer': [ 'void', [ clientHandlePtrPtr, notifyFuncPtr ] ]
+      'register_network_event_observer': [ 'void', [ voidPtrPtr, 'pointer' ] ],
+      'get_nfs_writer': [ int, [ STRING_TYPE, voidPtrPtr, voidPtrPtr ] ],
+      'nfs_stream_write': [ int, [ voidPtrPtr, int, refUin8Array, size_t ] ],
+      'nfs_stream_close': [ int, [ voidPtrPtr ] ]
     };
   };
 
-  var unRegisteredClientObserver = function(state) {
-    util.send(0, {
-      type: 'status',
-      state: state,
-      registeredClient: false
-    });
-  };
+  var unRegisteredClientObserver = ffi.Callback('void', [ int ], function(state) {
+    util.sendConnectionStatus(state, false);
+  });
 
-  var registeredClientObserver = function(state) {
-    util.send(0, {
-      type: 'status',
-      state: state,
-      registeredClient: true
-    });
-  };
+  var registeredClientObserver = ffi.Callback('void', [ int ], function(state) {
+    util.sendConnectionStatus(state, true);
+  });
 
   var getClientHandle = function(message) {
     if (!lib) {
       throw new Error('FFI library not yet initialised');
     }
-    return auth.getRegisteredClient() ? auth.getRegisteredClient() : auth.getUnregisteredClient(lib, unRegisteredClientObserver);
+    return auth.getRegisteredClient() ? auth.getRegisteredClient() :
+        auth.getUnregisteredClient(lib, unRegisteredClientObserver);
+  };
+
+  var dropClient = function() {
+    dispatcher({
+      module: 'auth',
+      action: 'clean'
+    });
+  };
+
+  var dropWriterHandles = function() {
+    dispatcher({
+      module: 'nfs',
+      action: 'clean'
+    });
   };
 
   var loadLibrary = function() {
@@ -67,12 +78,12 @@ module.exports = function(libPath) {
       return lib.init_logging() === 0;
       /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     } catch (e) {
-      console.log('Ffi load error', e);
+      console.log('FFI load error', e);
     }
     return false;
   };
 
-  self.dispatcher = function(message) {
+  var dispatcher = function(message) {
     try {
       if (!lib && !loadLibrary()) {
         return unRegisteredClientObserver(LIB_LOAD_ERROR);
@@ -108,5 +119,12 @@ module.exports = function(libPath) {
     } catch (e) {
       util.sendError(message.id, 999, e.message);
     }
+  };
+
+  self.dispatcher = dispatcher;
+
+  self.cleanUp = function() {
+    dropWriterHandles();
+    dropClient();
   };
 };

@@ -157,6 +157,6 @@ exports.execute = function(lib, request) {
       listServices(lib, request);
       break;
     default:
-      util.sendError(request.id, 999, 'Invalid Action');
+      util.sendError(request.id, 999, 'Invalid action');
   }
 };

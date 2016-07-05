@@ -5,7 +5,7 @@ import { log } from './../../logger/log';
 import { DnsReader } from '../stream/dns_reader';
 import { errorCodeLookup } from './../error_code_lookup';
 
-var domainCheck = /^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/;
+var domainCheck = /^[a-z0-9][a-z0-9-]{1,60}[a-z0-9](?:)+$/;
 
 var registerOrAddService = function(req, res, isRegister) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -15,19 +15,19 @@ var registerOrAddService = function(req, res, isRegister) {
   let responseHandler = new ResponseHandler(res);
   let reqBody = req.body;
   if (!reqBody.longName) {
-    return responseHandler.onResponse('Invalid request. longName can not be empty');
+    return responseHandler.onResponse('Invalid request. \'longName\' can not be empty');
   }
   if (!reqBody.serviceName) {
-    return responseHandler.onResponse('Invalid request. serviceName can not be empty');
+    return responseHandler.onResponse('Invalid request. \'serviceName\' can not be empty');
   }
   if (!reqBody.serviceHomeDirPath) {
-    return responseHandler.onResponse('Invalid request. serviceHomeDirPath can not be empty');
+    return responseHandler.onResponse('Invalid request. \'serviceHomeDirPath\' can not be empty');
   }
   if (!domainCheck.test(reqBody.longName)) {
-    return responseHandler.onResponse('Invalid request. longName is not valid');
+    return responseHandler.onResponse('Invalid request. \'longName\' is not valid');
   }
   if (!domainCheck.test(reqBody.serviceName)) {
-    return responseHandler.onResponse('Invalid request. serviceName is not valid');
+    return responseHandler.onResponse('Invalid request. \'serviceName\' is not valid');
   }
   reqBody.isPathShared = reqBody.isPathShared || false;
   if (isRegister) {
@@ -35,7 +35,7 @@ var registerOrAddService = function(req, res, isRegister) {
     req.app.get('api').dns.register(reqBody.longName, reqBody.serviceName, reqBody.serviceHomeDirPath,
       reqBody.isPathShared, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
   } else {
-    log.debug('DNS - Invoking Add service API for ' + JSON.stringify(reqBody));
+    log.debug('DNS - Invoking add service API for ' + JSON.stringify(reqBody));
     req.app.get('api').dns.addService(reqBody.longName, reqBody.serviceName, reqBody.serviceHomeDirPath,
       reqBody.isPathShared, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
   }
@@ -65,7 +65,7 @@ export var getFile = function(req, res) {
   if (!(longName && serviceName && filePath)) {
     return responseHandler.onResponse('Invalid request. Required parameters are not found');
   }
-  let onFileMetadataRecieved = function(err, fileStats) {
+  let onFileMetadataReceived = function(err, fileStats) {
     log.debug('DNS - File metadata for reading - ' + (fileStats || JSON.stringify(err)));
     if (err) {
       log.error(err);
@@ -115,7 +115,7 @@ export var getFile = function(req, res) {
   };
   log.debug('DNS - Invoking getFile API for ' + longName + ', ' + serviceName + ', ' + filePath);
   req.app.get('api').dns.getFileMetadata(longName, serviceName, filePath, hasSafeDriveAccess, appDirKey,
-    onFileMetadataRecieved);
+    onFileMetadataReceived);
 };
 
 export var register = function(req, res) {
@@ -134,7 +134,7 @@ export var deleteDns = function(req, res) {
   let params = req.params;
   let responseHandler = new ResponseHandler(res);
   if (!(typeof params.longName === 'string')) {
-    return responseHandler.onResponse('Invalid request. longName is not valid');
+    return responseHandler.onResponse('Invalid request. \'longName\' is not valid');
   }
   log.debug('DNS - Invoking deleteDns API for ' + params.longName);
   req.app.get('api').dns.deleteDns(params.longName, sessionInfo.hasSafeDriveAccess(),
@@ -149,10 +149,10 @@ export var deleteService = function(req, res) {
   let params = req.params;
   let responseHandler = new ResponseHandler(res);
   if (!(typeof params.serviceName === 'string')) {
-    return responseHandler.onResponse('Invalid request. serviceName is not valid');
+    return responseHandler.onResponse('Invalid request. \'serviceName\' is not valid');
   }
   if (!(typeof params.longName === 'string')) {
-    return responseHandler.onResponse('Invalid request. longName is not valid');
+    return responseHandler.onResponse('Invalid request. \'longName\' is not valid');
   }
   log.debug('DNS - Invoking deleteService API for ' + params.longName + ', ' + params.serviceName);
   req.app.get('api').dns.deleteService(params.longName, params.serviceName,
@@ -186,7 +186,7 @@ export var createPublicId = function(req, res) {
   }
   let responseHandler = new ResponseHandler(res);
   if (!domainCheck.test(req.params.longName)) {
-    return responseHandler.onResponse('Invalid request. longName is not valid');
+    return responseHandler.onResponse('Invalid request. \'longName\' is not valid');
   }
   log.debug('DNS - Invoking createPublicId API for ' + req.params.longName);
   req.app.get('api').dns.createPublicId(req.params.longName, sessionInfo.appDirKey, responseHandler.onResponse);
