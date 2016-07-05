@@ -35,6 +35,7 @@ var unregisteredClient = function(lib, observer) {
   var result = lib.create_unregistered_client(unregisteredClient);
   /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   if (result !== 0) {
+    util.sendConnectionStatus(1, false);
     return false;
   }
   unregisteredClientHandle = unregisteredClient.deref();
@@ -80,6 +81,7 @@ var register = function(lib, request, observer) {
     return util.sendError(request.id, 999, e.message());
   }
   if (res !== 0) {
+    util.sendConnectionStatus(1, true);
     return util.sendError(request.id, res);
   }
   registeredClientHandle = regClient.deref();
@@ -105,6 +107,7 @@ var login = function(lib, request, observer) {
     return util.sendError(request.id, 999, e.toString());
   }
   if (res !== 0) {
+    util.sendConnectionStatus(1, true);
     return util.sendError(request.id, res);
   }
   registeredClientHandle = regClient.deref();

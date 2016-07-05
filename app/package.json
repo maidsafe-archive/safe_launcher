@@ -1,10 +1,10 @@
 {
   "name": "safe-launcher",
-  "productName": "SAFELauncher",
-  "identifier": "com.maidsafe.safe_launcher",
-  "description": "SAFE Launcher - Gateway to the SAFE Network",
+  "productName": "SAFE Launcher",
+  "identifier": "com.maidsafe.safelauncher",
+  "description": "SAFE Launcher Application",
   "version": "0.5.1",
-  "author": "Maidsafe",
+  "author": "MaidSafe",
   "copyright": "",
   "main": "background.js",
   "dependencies": {

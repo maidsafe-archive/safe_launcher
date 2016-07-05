@@ -17,7 +17,7 @@ var executeForContent = function(lib, client, requestId, payload) {
   var pointer = lib.execute_for_content(JSON.stringify(payload), sizePtr, capacityPtr, resultPtr, client);
   /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   var result = resultPtr.deref();
-  if (result !== 0) {
+  if (pointer.isNull() || result !== 0) {
     return sendError(requestId, result);
   }
   var size = sizePtr.deref();

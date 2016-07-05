@@ -224,6 +224,7 @@ var closeWriter = function(lib, request) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     var result = lib.nfs_stream_close(writerHandlePool[writerId]);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    delete writerHandlePool[writerId];
     if (result === 0) {
       return util.send(request.id);
     }
