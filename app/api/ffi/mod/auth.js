@@ -169,8 +169,11 @@ var getAppDirectoryKey = function(lib, request) {
   }
 };
 
-exports.drop = function(lib) {
-  dropUnregisteredClient(lib);
+var cleanUp = function(lib) {
+  if (unregisteredClientHandle) {
+    dropUnregisteredClient(lib);
+    unregisteredClientHandle = null;
+  }
   if (registeredClientHandle) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     lib.drop_client(registeredClientHandle);
@@ -193,6 +196,9 @@ exports.execute = function(lib, request, observer) {
     case 'drop-unregistered-client':
       dropUnregisteredClient(lib);
       util.send(request.id, 'client dropped');
+      break;
+    case 'clean':
+      cleanUp(lib);
       break;
     default:
       util.sendError(request.id, 999, 'Invalid Action');

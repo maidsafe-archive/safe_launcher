@@ -233,6 +233,14 @@ var closeWriter = function(lib, request) {
   }
 };
 
+var cleanUp = function(lib) {
+  for (var id in writerHandlePool) {
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    lib.nfs_stream_close(writerHandlePool[writerId]);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+  }
+};
+
 exports.execute = function(lib, request) {
   switch (request.action) {
     case 'create-dir':
@@ -279,6 +287,9 @@ exports.execute = function(lib, request) {
       break;
     case 'close-writer':
       closeWriter(lib, request);
+      break;
+    case 'clean':
+      cleanUp(lib);
       break;
     default:
       util.sendError(request.id, 999, 'Invalid action');

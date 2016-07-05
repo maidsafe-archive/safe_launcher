@@ -57,6 +57,20 @@ module.exports = function(libPath) {
         auth.getUnregisteredClient(lib, unRegisteredClientObserver);
   };
 
+  var dropClient = function() {
+    dispatcher({
+      module: 'auth',
+      action: 'clean'
+    });
+  };
+
+  var dropWriterHandles = function() {
+    dispatcher({
+      module: 'nfs',
+      action: 'clean'
+    });
+  };
+
   var loadLibrary = function() {
     try {
       lib = ffi.Library(libPath, methodsToRegister());
@@ -69,7 +83,7 @@ module.exports = function(libPath) {
     return false;
   };
 
-  self.dispatcher = function(message) {
+  var dispatcher = function(message) {
     try {
       if (!lib && !loadLibrary()) {
         return unRegisteredClientObserver(LIB_LOAD_ERROR);
@@ -105,5 +119,12 @@ module.exports = function(libPath) {
     } catch (e) {
       util.sendError(message.id, 999, e.message);
     }
+  };
+
+  self.dispatcher = dispatcher;
+
+  self.cleanUp = function() {
+    dropWriterHandles();
+    dropClient();
   };
 };
