@@ -204,38 +204,42 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       return true;
     };
 
+    var validateAuthFields = function(form) {
+      var formEle = null;
+      var inputEle = null;
+      var inputParent = null;
+      var msgEle = null;
+      var value = null;
+      var set = function(target) {
+        formEle = $('form[name=' + form.$name + ']');
+        inputEle = formEle.find('input[name=' + form[target].$name + ']');
+        inputParent = inputEle.parent();
+        msgEle = inputEle.siblings('.msg').children('.txt');
+        value = form[target].$viewValue;
+        inputParent.removeClass('warn error');
+      };
+      set('pin');
+      if (isNaN(value) || value.length < CONSTANTS.PIN_MIN_LEN) {
+        inputParent.addClass('error').removeClass('warn');
+        msgEle.text(MESSAGES.PIN_MUST_BE_FOUR_CHAR_LONG_AND_NUM);
+      }
+      set('keyword');
+      if (value.length < CONSTANTS.KEYWORD_MIN_LEN) {
+        inputParent.addClass('error').removeClass('warn');
+        msgEle.text(MESSAGES.KEYWORD_MUST_BE_SIX_CHAR_LONG);
+      }
+      set('password');
+      if (value.length < CONSTANTS.PASSWORD_MIN_LEN) {
+        inputParent.addClass('error').removeClass('warn');
+        msgEle.text(MESSAGES.PASSWORD_MUST_BE_SIX_CHAR_LONG);
+      }
+    };
+
     // user login
     $scope.login = function() {
       var inputParent = null;
       if (!$scope.loginForm.$valid) {
-        var formEle = $('form[name=' + $scope.loginForm.$name + ']');
-        var inputEle = formEle.find('input[name=' + $scope.loginForm.pin.$name + ']');
-        inputParent = inputEle.parent();
-        var msgEle = inputEle.siblings('.msg').children('.txt');
-        var value = $scope.loginForm.pin.$viewValue;
-        if (isNaN(value) || value.length < CONSTANTS.PIN_MIN_LEN) {
-          inputParent.addClass('error').removeClass('warn');
-          return msgEle.text(MESSAGES.PIN_MUST_BE_FOUR_CHAR_LONG_AND_NUM);
-        }
-        inputParent.removeClass('warn error');
-        inputEle = formEle.find('input[name=' + $scope.loginForm.keyword.$name + ']');
-        inputParent = inputEle.parent();
-        msgEle = inputEle.siblings('.msg').children('.txt');
-        value = $scope.loginForm.keyword.$viewValue;
-        if (value.length < CONSTANTS.KEYWORD_MIN_LEN) {
-          inputParent.addClass('error').removeClass('warn');
-          return msgEle.text(MESSAGES.KEYWORD_MUST_BE_SIX_CHAR_LONG);
-        }
-        inputParent.removeClass('warn error');
-        inputEle = formEle.find('input[name=' + $scope.loginForm.password.$name + ']');
-        inputParent = inputEle.parent();
-        msgEle = inputEle.siblings('.msg').children('.txt');
-        value = $scope.loginForm.password.$viewValue;
-        if (value.length < CONSTANTS.PASSWORD_MIN_LEN) {
-          inputParent.addClass('error').removeClass('warn');
-          return msgEle.text(MESSAGES.PASSWORD_MUST_BE_SIX_CHAR_LONG);
-        }
-        return;
+          return validateAuthFields($scope.loginForm);
       }
       inputParent.removeClass('error warn');
       console.log('login');

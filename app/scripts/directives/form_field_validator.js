@@ -7,7 +7,7 @@ window.safeLauncher.directive('fieldValidator', [ 'CONSTANTS', 'MESSAGES',
       var parent = $(ele).parent();
       var value = '';
       var resetField = function() {
-        parent.removeClass('warn');
+        parent.removeClass('warn error');
         ctrl.$setValidity('fieldValidator', true);
         return msgEle.text('');
       }
