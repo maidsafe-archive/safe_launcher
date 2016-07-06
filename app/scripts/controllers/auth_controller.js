@@ -206,6 +206,11 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
 
     // user login
     $scope.login = function() {
+      if (!$scope.loginForm.$valid) {
+        return;
+      }
+      console.log('login');
+      return;
       var errMsg = null;
       var fieldName = null;
       var formFields = [

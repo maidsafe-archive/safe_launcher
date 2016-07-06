@@ -1,1 +1,6 @@
-Account
+<div class="auth" ng-if="!isAuthenticated">
+  <div class="auth-b">
+    <ng-include src="'views/auth/login.html'" ng-show="!$state.params.currentPage || $state.params.currentPage === 'login'"></ng-include>
+    <ng-include src="'views/auth/register.html'" ng-show="$state.params.currentPage === 'register'"></ng-include>
+  </div>
+</div>

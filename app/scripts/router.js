@@ -24,7 +24,7 @@ window.safeLauncher.config(function($stateProvider, $urlRouterProvider) {
     }
   })
   .state('app.account', {
-    'url': '/account',
+    'url': '/account?:currentPage',
     'views': {
       'tab': {
         'templateUrl': 'views/tab/account.html'
@@ -55,12 +55,4 @@ window.safeLauncher.config(function($stateProvider, $urlRouterProvider) {
       }
     }
   })
-  // .state('register', {
-  //   url: '/register',
-  //   templateUrl: 'views/auth/register.html'
-  // })
-  // .state('user', {
-  //   url: '/user',
-  //   templateUrl: 'views/user/base.html'
-  // });
 });

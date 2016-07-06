@@ -1,0 +1,96 @@
+// auth
+.auth {
+  width: 100%;
+  height: @app-ht - @header-ht - @title-ht;
+  display: table;
+  .auth-b {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    .form-b {
+      width: 300px;
+      margin: 0 auto;
+    }
+  }
+}
+
+.form {
+  width: 100%;
+  margin-bottom: 40px;
+  .inp-grp {
+    margin-top: 20px;
+    text-align: left;
+    position: relative;
+    label {
+      width: 100%;
+      display: block;
+      font-size: 16px;
+      line-height: 24px;
+      color: #DDD;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      transition: top 0.1s ease;
+    }
+    input {
+      width: 100%;
+      font-size: 16px;
+      line-height: 24px;
+      border-width: 0 0 2px;
+      border-color: #DDD;
+      border-style: solid;
+      outline: none;
+      background-color: transparent;
+      position: relative;
+      z-index: 0;
+    }
+    input:focus + label, input:valid + label {
+      top: -18px;
+      font-size: 14px;
+      line-height: 18px;
+    }
+    .msg {
+      margin-top: 3px;
+      height: 20px;
+      position: relative;
+      .txt {
+        font-size: 14px;
+        line-height: 20px;
+      }
+      .icn {
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+    }
+    &.warn {
+      input {
+        border-color: @primary-blue;
+      }
+      .msg {
+        color: @primary-blue;
+      }
+      .icn {
+        background-image: url(../images/status.svg);
+      }
+    }
+    &.error {
+      input {
+        border-color: @error-red;
+      }
+      .msg {
+        color: @error-red;
+      }
+      .icn {
+        background-image: url(../images/cross.svg);
+      }
+    }
+  }
+  .inp-btn {
+    margin-top: 20px;
+  }
+}

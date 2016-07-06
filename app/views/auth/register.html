@@ -1,0 +1,32 @@
+<div class="form-b">
+  <form class="form" name="register">
+    <div class="inp-grp">
+      <input id="pin" type="text" name="pin" required="true" field-validator/>
+      <label for="pin">PIN</label>
+      <div class="msg">
+        <span class="txt"></span>
+        <span class="icn"></span>
+      </div>
+    </div>
+    <div class="inp-grp">
+      <input id="keyword" type="text" name="keyword" required="true" field-validator/>
+      <label for="keyword">Keyword</label>
+      <div class="msg">
+        <span class="txt"></span>
+        <span class="icn"></span>
+      </div>
+    </div>
+    <div class="inp-grp">
+      <input id="password" type="text" name="password" required="true" field-validator/>
+      <label for="password">Password</label>
+      <div class="msg">
+        <span class="txt"></span>
+        <span class="icn"></span>
+      </div>
+    </div>
+    <div class="inp-btn">
+      <button type="submit" class="btn primary" name="register">Register</button>
+    </div>
+  </form>
+  <a ui-sref="app.account({currentPage: 'login'})">Login</a>
+</div>

@@ -4,9 +4,9 @@
 
 // Messages
 window.safeLauncher.constant('MESSAGES', {
-  'MUST_BE_FOUR_CHAR_LONG_AND_NUM': 'Must be at least 4 digits long and numeric.',
-  'MUST_BE_SIX_CHAR_LONG': 'Must be at least 6 characters long.',
-  'ENTRIES_DONT_MATCH': 'Entries don\'t match.',
+  'PLEAUSE_USE_NUMBERS': 'Please use numbers only.',
+  'PLEAUSE_USE_ATLEAST_FOUR_DIGITS': 'Please use atleast 4 digits.',
+  'PLEAUSE_USE_ATLEAST_SIX_CHAR': 'Please use atleast 6 characters.',
   'NETWORK_NOT_CONNECTED': 'Waiting for establishing connection with SAFE Network'
 });
 

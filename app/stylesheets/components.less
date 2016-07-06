@@ -4,6 +4,7 @@
   .tab-b {
     .tab-nav {
       width: 100%;
+      height: @header-ht;
       background-color: @primary-blue;
       ul {
         padding: 0;
@@ -70,5 +71,24 @@
         .clearfix();
       }
     }
+  }
+}
+
+.btn {
+  width: auto;
+  min-width: 100px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 18px;
+  color: #aaa;
+  background-color: #DDD;
+  border: 0;
+  outline: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  &.primary {
+    background-color: @primary-blue;
+    color: #FFF;
   }
 }
