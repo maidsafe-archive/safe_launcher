@@ -2,8 +2,8 @@
  * Authentication Controller
  */
 window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootScope', '$timeout',
-  'authFactory', 'fieldValidator', 'MESSAGES',
-  function($scope, $state, $rootScope, $timeout, auth, validator, MESSAGES) {
+  'authFactory', 'fieldValidator', 'CONSTANTS', 'MESSAGES',
+  function($scope, $state, $rootScope, $timeout, auth, validator, CONSTANTS, MESSAGES) {
     var REQUEST_TIMEOUT = 90 * 1000;
     var FIELD_FOCUS_DELAY = 100;
 
@@ -206,9 +206,38 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
 
     // user login
     $scope.login = function() {
+      var inputParent = null;
       if (!$scope.loginForm.$valid) {
+        var formEle = $('form[name=' + $scope.loginForm.$name + ']');
+        var inputEle = formEle.find('input[name=' + $scope.loginForm.pin.$name + ']');
+        inputParent = inputEle.parent();
+        var msgEle = inputEle.siblings('.msg').children('.txt');
+        var value = $scope.loginForm.pin.$viewValue;
+        if (isNaN(value) || value.length < CONSTANTS.PIN_MIN_LEN) {
+          inputParent.addClass('error').removeClass('warn');
+          return msgEle.text(MESSAGES.PIN_MUST_BE_FOUR_CHAR_LONG_AND_NUM);
+        }
+        inputParent.removeClass('warn error');
+        inputEle = formEle.find('input[name=' + $scope.loginForm.keyword.$name + ']');
+        inputParent = inputEle.parent();
+        msgEle = inputEle.siblings('.msg').children('.txt');
+        value = $scope.loginForm.keyword.$viewValue;
+        if (value.length < CONSTANTS.KEYWORD_MIN_LEN) {
+          inputParent.addClass('error').removeClass('warn');
+          return msgEle.text(MESSAGES.KEYWORD_MUST_BE_SIX_CHAR_LONG);
+        }
+        inputParent.removeClass('warn error');
+        inputEle = formEle.find('input[name=' + $scope.loginForm.password.$name + ']');
+        inputParent = inputEle.parent();
+        msgEle = inputEle.siblings('.msg').children('.txt');
+        value = $scope.loginForm.password.$viewValue;
+        if (value.length < CONSTANTS.PASSWORD_MIN_LEN) {
+          inputParent.addClass('error').removeClass('warn');
+          return msgEle.text(MESSAGES.PASSWORD_MUST_BE_SIX_CHAR_LONG);
+        }
         return;
       }
+      inputParent.removeClass('error warn');
       console.log('login');
       return;
       var errMsg = null;
