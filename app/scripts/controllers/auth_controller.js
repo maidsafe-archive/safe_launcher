@@ -26,7 +26,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
           return;
         }
         alive = false;
-        $scope.authLoader.hide();
         callback(err);
         $timeout.cancel(timer);
       };
@@ -37,7 +36,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       };
 
       self.execute = function(func) {
-        $scope.authLoader.show();
         timer = $timeout(function() {
           onResponse(new Error('Operation timed out'));
           alive = false;
@@ -49,12 +47,11 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     var onAuthResponse = function(err) {
       $scope.user = {};
       if (err) {
-        $scope.authLoader.error = true;
-        $scope.authLoader.show();
-        return $scope.$applyAsync();
+        return console.error(err);
       }
-      $rootScope.network.hide();
-      $state.go('user');
+      $rootScope.isAuthenticated = true;
+      $rootScope.$applyAsync();
+      console.log('Authorised successfully!');
     };
 
     var validateAuthFields = function(form) {
@@ -88,7 +85,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       }
     };
 
-    // register user
+    // user register
     $scope.register = function() {
       if (!$scope.registerForm.$valid) {
           return validateAuthFields($scope.registerForm);
@@ -103,7 +100,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       request.execute(function(done) {
         auth.register(payload, done);
       });
-      $scope.tabs.init();
     };
 
     // user login

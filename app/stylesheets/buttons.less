@@ -1,0 +1,24 @@
+.btn {
+  width: auto;
+  padding: 8px;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 18px;
+  text-transform: uppercase;
+  color: #aaa;
+  background-color: #DDD;
+  border: 0;
+  outline: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  &.primary {
+    background-color: @primary-blue;
+    color: #FFF;
+  }
+  &.flat {
+    background-color: transparent;
+    &.danger {
+      color: @error-red;
+    }
+  }
+}

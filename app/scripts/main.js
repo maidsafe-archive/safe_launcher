@@ -14,7 +14,7 @@ window.safeLauncher = angular
 ])
 .run([ '$rootScope', '$state', '$stateParams', function($rootScope, $state, $stateParams) {
   $rootScope.$state = $state;
-  $rootScope.isAuthenticated = false;
+  $rootScope.isAuthenticated = true;
   // $rootScope.$stateParams = $stateParams;
   // $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams, options) {
   //   event.preventDefault();
