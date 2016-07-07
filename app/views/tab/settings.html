@@ -1,1 +1,19 @@
-Settings
+<!-- settings -->
+<div class="settings">
+  <div class="settings-b">
+    <h3 class="title">Proxy Settings</h3>
+    <p class="desc">
+      The proxy server allows you to view websites and content from SAFE Network
+      in your browser of choice. (<a href="#">read more &amp; setup instructions</a>)
+    </p>
+    <div class="settings-i" ng-click="toggleProxyServer()">
+      <div class="settings-i-ctn">
+        <h3 class="settings-i-name">Proxy</h3>
+        <h3 class="settings-i-desc">Is {{ $proxyServer ? 'enabled' : 'disabled' }}</h3>
+      </div>
+      <div class="opt">
+        <span class="switch" ng-class="{active: $proxyServer}"></span>
+      </div>
+    </div>
+  </div>
+</div>

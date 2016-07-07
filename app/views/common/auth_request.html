@@ -1,0 +1,35 @@
+<!-- Authorisation request popup -->
+<div class="auth-req">
+  <div class="auth-req-b">
+    <div class="auth-req-ctn">
+      <h3 class="title">Authorise Request:</h3>
+      <div class="details">
+        <div class="avatar">
+
+        </div>
+        <div class="desc">
+          <div class="desc-i">
+            <span class="desc-i-h">App Name:</span>
+            <span class="desc-i-ctx">{{ authRequest.data.payload.app.name }}</span>
+          </div>
+          <div class="desc-i">
+            <span class="desc-i-h">Vendor:</span>
+            <span class="desc-i-ctx">{{ authRequest.data.payload.app.vendor }}</span>
+          </div>
+          <div class="desc-i">
+            <span class="desc-i-h">Version:</span>
+            <span class="desc-i-ctx">{{ authRequest.data.payload.app.version }}</span>
+          </div>
+        </div>
+        <div class="auth-req-f">
+          <div class="auth-req-f-i">
+            <button type="button" class="btn flat" name="deny" ng-click="authRequest.confirm(false)">Deny</button>
+          </div>
+          <div class="auth-req-f-i">
+            <button type="button" class="btn flat primary" name="allow" ng-click="authRequest.confirm(true)">Allow</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

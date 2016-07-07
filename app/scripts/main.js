@@ -6,7 +6,7 @@
  * Main module of the application.
  */
 window.safeLauncher = angular
-  .module('safeLauncher', [ 'ui.router' ])
+  .module('safeLauncher', [ 'ui.router', 'react' ])
   .config([ '$httpProvider', function($httpProvider) {
     $httpProvider.defaults.useXDomain = true;
     delete $httpProvider.defaults.headers.common['X-Requested-With'];
@@ -14,7 +14,39 @@ window.safeLauncher = angular
 ])
 .run([ '$rootScope', '$state', '$stateParams', function($rootScope, $state, $stateParams) {
   $rootScope.$state = $state;
-  $rootScope.isAuthenticated = true;
+  $rootScope.isAuthenticated = false;
+  $rootScope.authRequest = {
+    status: false,
+    data: {},
+    confirm: function() {},
+    show: function(data) {
+      this.status = true;
+      this.data = data;
+    },
+    hide: function() {
+      this.status = false;
+    }
+  };
+  $rootScope.$proxyServer = false;
+  $rootScope.$networkStatus = {
+    status: window.NETWORK_STATE.CONNECTING,
+    retry: function() {
+      this.status = window.NETWORK_STATE.RETRY;
+      window.msl.reconnect();
+    }
+  };
+
+  window.msl.setNetworkStateChangeListener(function(state) {
+    $rootScope.$networkStatus.show = true;
+    $rootScope.$networkStatus.status = state;
+    // if (state === window.NETWORK_STATE.DISCONNECTED) {
+    //   $rootScope.$state.go('login');
+    //   $rootScope.$msAlert.show('Network Disconnected', $rootScope.network.messages.DISCONNECTED, function() {});
+    // }
+    console.log('Network status :: ' + state);
+    $rootScope.$applyAsync();
+  });
+
   // $rootScope.$stateParams = $stateParams;
   // $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams, options) {
   //   event.preventDefault();
@@ -57,23 +89,7 @@ window.safeLauncher = angular
   //   var shell = require('electron').shell;
   //   shell.openExternal(link.toString());
   // };
-  // $rootScope.network = {
-  //   status: window.NETWORK_STATE.CONNECTING,
-  //   show: true,
-  //   messages: {
-  //     'CONNECTED': 'Connected to the SAFE Network',
-  //     'CONNECTING': 'Trying to connect with SAFE Network',
-  //     'DISCONNECTED': 'Can\'t reach the SAFE Network',
-  //     'RETRY': 'Retrying connection...'
-  //   },
-  //   hide: function() {
-  //     this.show = false;
-  //   },
-  //   retry: function() {
-  //     this.status = window.NETWORK_STATE.RETRY;
-  //     window.msl.reconnect();
-  //   }
-  // };
+
   // window.msl.setNetworkStateChangeListener(function(state) {
   //   $rootScope.network.show = true;
   //   $rootScope.network.status = state;
