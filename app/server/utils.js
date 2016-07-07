@@ -3,6 +3,7 @@ import mime from 'mime';
 import sessionManager from './session_manager';
 import { errorCodeLookup } from './error_code_lookup';
 import { log } from './../logger/log';
+import { MSG_CONSTANTS } from './message_constants';
 
 export var getSessionIdFromRequest = function(req) {
   let authHeader = req.get('Authorization');
@@ -32,6 +33,50 @@ export var getSessionIdFromRequest = function(req) {
   } catch (e) {
     return;
   }
+};
+
+export class ResponseError {
+  constructor(status, message) {
+    message = message || MSG_CONSTANTS.ERROR_CODE[status];
+    if (typeof message === 'object' && message.hasOwnProperty('errorCode')) {
+      message.description = errorCodeLookup(message.errorCode);
+      if (message.description.toLowerCase().indexOf('notfound') > -1 ||
+          message.description.toLowerCase().indexOf('pathnotfound') > -1) {
+        status = 404;
+      }
+    } else {
+      message = {
+        errorCode: 400,
+        description: message
+      };
+    }
+    this['errStatus'] = status;
+    this['msg'] = message;
+  }
+
+  get status() {
+    return this['errStatus'];
+  };
+  get message() {
+    return this['msg'];
+  };
+}
+
+export let ResponseHandler = function (req, res) {
+
+  this.onResponse = function(err, data) {
+    if (err) {
+      return req.next(new ResponseError(400, err));
+    }
+    let successStatus = 200;
+    if (data) {
+      res.status(successStatus).send(formatResponse(data));
+    } else {
+      res.sendStatus(successStatus);
+    }
+  };
+
+  return this.onResponse;
 };
 
 export var setSessionHeaderAndParseBody = function(req, res, next) {
@@ -128,33 +173,11 @@ export var formatResponse = function(data) {
   return format(data);
 };
 
-export var ResponseHandler = function(res) {
-  let self = this;
-  self.res = res;
-
-  self.onResponse = function(err, data) {
-    let status = 200;
-    if (err) {
-      status = 400;
-      if (err.hasOwnProperty('errorCode') && !err.hasOwnProperty('description')) {
-        err.description = errorCodeLookup(err.errorCode);
-      }
-      if (typeof err === 'string') {
-        err = { errorCode: status, description: err };
-      }
-      if (err.description &&
-         (err.description.toLowerCase().indexOf('notfound') > -1 ||
-         err.description.toLowerCase().indexOf('pathnotfound') > -1)) {
-          status = 404;
-      }
-      return self.res.status(status).send(err);
-    }
-    if (data) {
-      self.res.status(status).send(formatResponse(data));
-    } else {
-      self.res.sendStatus(status);
-    }
-  };
-
-  return self;
+export let sendResponseData = function(res, data, status) {
+  let successStatus = status || 200;
+  if (data) {
+    res.status(successStatus).send(formatResponse(data));
+  } else {
+    res.sendStatus(successStatus);
+  }
 };

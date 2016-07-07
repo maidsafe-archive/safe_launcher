@@ -1,5 +1,5 @@
-var Writable = require('stream').Writable;
-var util = require('util');
+import util from 'util';
+import { Writable } from 'stream';
 
 export var NfsWriter = function (req, filePath, startOffset, isPathShared, sessionInfo, responseHandler) {
   Writable.call(this);
@@ -14,7 +14,7 @@ export var NfsWriter = function (req, filePath, startOffset, isPathShared, sessi
   this.req.app.get('api').nfs.getWriter(filePath, isPathShared, 
       sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, function (err, writerId) {
         if (err) {
-          return responseHandler.onResponse(err);
+          return self.responseHandler(err);
         }
         self.writerId = writerId;
         self.emit('open');
@@ -28,12 +28,11 @@ NfsWriter.prototype._write = function(data, enc, next) {
   var self = this;
   this.req.app.get('api').nfs.write(this.writerId, this.curOffset, data, function(err) {
     if (err) {
-      self.responseHandler.onResponse(err);
-      return next(err);
+      return self.callback(err);
     }
     self.curOffset += data.length;
     if (self.isReadStreamClosed) {
-      return self.req.app.get('api').nfs.closeWriter(self.writerId, self.responseHandler.onResponse);
+      return self.req.app.get('api').nfs.closeWriter(self.writerId, self.responseHandler);
     }
     next();
   });

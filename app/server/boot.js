@@ -6,7 +6,8 @@ import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
 import { router_0_5 } from './routes/version_0_5';
 import { CreateSession } from './controllers/auth';
-import { setSessionHeaderAndParseBody } from './utils';
+import { formatResponse, setSessionHeaderAndParseBody, ResponseError } from './utils';
+import { log } from './../logger/log';
 
 class ServerEventEmitter extends EventEmitter {};
 
@@ -69,18 +70,20 @@ export default class RESTServer {
     app.use('/', router_0_5);
     app.use('/0.5', router_0_5);
 
-    // catch 404 and forward to error handler
-    app.use(function(req, res, next) {
-      var err = new Error('Not Found');
-      err.status = 404;
-      next(err);
+    // API Error handling
+    app.use(function(err, req, res, next) {
+      if (!(err instanceof ResponseError)) {
+        return next();
+      }
+      log.warn('Err ' + err.status + ' - Msg :: ' + err.msg);
+      res.status(err.status).send(err.msg);
     });
 
-    // no stack traces leaked to user
-    app.use(function(err, req, res, next) {
-      res.status(err.status || 500);
-      res.send('Server Error');
+    // catch 404
+    app.use(function(req, res) {
+      res.status(404).send('Not Found');
     });
+
     app.set('port', this.port);
     this.server = http.createServer(app);
     this.server.listen(this.port, this.callback);
