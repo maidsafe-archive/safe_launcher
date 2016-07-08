@@ -2,6 +2,7 @@
  * Tab directive
  */
 window.safeLauncher.directive('mslTabs', function() {
+  'use strict';
   return {
     scope: true,
     replace: true,
@@ -20,6 +21,7 @@ window.safeLauncher.directive('mslTabs', function() {
 });
 
 window.safeLauncher.directive('mslTab', function() {
+  'use strict';
   var link = function(scope, element, attrs, mslTabs) {
     var tabId = mslTabs.tabs.length;
     scope.showTab = function() {

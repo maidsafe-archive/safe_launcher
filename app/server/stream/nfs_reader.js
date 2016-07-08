@@ -28,6 +28,8 @@ NfsReader.prototype._read = function() {
   }
   let MAX_SIZE_TO_READ = 1048576; // 1 MB
   let diff = this.end - this.curOffset;
+  let eventEmitter = self.req.app.get('eventEmitter');
+  let eventType = self.req.app.get('EVENT_TYPE').DATA_DOWNLOADED;
   this.sizeToRead = diff > MAX_SIZE_TO_READ ? MAX_SIZE_TO_READ : diff;
   this.req.app.get('api').nfs.getFile(this.filePath, this.isPathShared,
     this.curOffset, this.sizeToRead, this.hasSafeDriveAccess, this.appDirKey,
@@ -39,5 +41,6 @@ NfsReader.prototype._read = function() {
       }
       self.curOffset += self.sizeToRead;
       self.push(new Buffer(JSON.parse(data).content, 'base64'));
+      eventEmitter.emit(eventType, data.length);
     });
 };

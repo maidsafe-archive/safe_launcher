@@ -29,13 +29,6 @@ app.on('ready', function() {
   }
 
   mainWindow.setMenuBarVisibility(false);
-  //
-  // mainWindow.on('blur', function(d) {
-  //   if (env.name !== 'production') {
-  //     return;
-  //   }
-  //   mainWindow.minimize();
-  // });
 });
 
 app.on('window-all-closed', function() {

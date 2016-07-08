@@ -1,11 +1,13 @@
-import fs from 'fs';
 import mime from 'mime';
 import sessionManager from '../session_manager';
-import { ResponseHandler, formatResponse } from '../utils';
+import { formatResponse, ResponseError, ResponseHandler } from '../utils';
 import { log } from './../../logger/log';
 import { NfsWriter } from '../stream/nfs_writer';
 import { NfsReader } from '../stream/nfs_reader';
 import { errorCodeLookup } from './../error_code_lookup';
+import util from 'util';
+import { MSG_CONSTANTS } from './../message_constants';
+
 
 const ROOT_PATH = {
   app: false,
@@ -17,218 +19,212 @@ const FILE_OR_DIR_ACTION = {
   move: false
 };
 
-let deleteOrGetDirectory = function(req, res, isDelete) {
+let deleteOrGetDirectory = function(req, res, isDelete, next) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
-    return res.sendStatus(401);
+    return next(new ResponseError(401));
   }
-  let responseHandler = new ResponseHandler(res);
+
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
-    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
   }
   let dirPath = req.params['0'];
+  let responseHandler = new ResponseHandler(req, res);
   if (isDelete) {
-    log.debug('NFS - Invoking Delete directory request');
+    log.debug('NFS - Invoking delete directory request');
     req.app.get('api').nfs.deleteDirectory(dirPath, rootPath,
-      sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
+      sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler);
   } else {
-    log.debug('NFS  - Invoking Get directory request');
+    log.debug('NFS  - Invoking get directory request');
     req.app.get('api').nfs.getDirectory(dirPath, rootPath,
-      sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
+      sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler);
   }
-}
+};
 
-let move = function(req, res, isFile) {
+let move = function(req, res, isFile, next) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
-    return res.sendStatus(401);
+    return next(new ResponseError(401));
   }
-  let responseHandler = new ResponseHandler(res);
+
   let reqBody = req.body;
   if (!(reqBody.srcPath && reqBody.hasOwnProperty('srcRootPath') &&
       reqBody.destPath && reqBody.hasOwnProperty('destRootPath'))) {
-    return responseHandler.onResponse('Invalid request. Manadatory parameters are missing');
+    return next(new ResponseError(400, MSG_CONSTANTS.FAILURE.REQUIRED_PARAMS_MISSING));
   }
   let srcRootPath = ROOT_PATH[reqBody.srcRootPath.toLowerCase()];
   if (typeof srcRootPath === 'undefined') {
-    return responseHandler.onResponse('Invalid request. \'srcRootPath\' mismatch');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'srcRootPath')));
   }
   let destRootPath = ROOT_PATH[reqBody.destRootPath.toLowerCase()];
   if (typeof destRootPath === 'undefined') {
-    return responseHandler.onResponse('Invalid request. \'destRootPath\' mismatch');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'destRootPath')));
   }
   reqBody.action = reqBody.action || 'MOVE';
   let action = FILE_OR_DIR_ACTION[reqBody.action.toLowerCase()];
   if (typeof action === 'undefined') {
-    return responseHandler.onResponse('Invalid request. \'action\' mismatch');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'action')));
   }
+  let responseHandler = new ResponseHandler(req, res);
   if (isFile) {
     log.debug('NFS - Invoking move file request');
     req.app.get('api').nfs.moveFile(reqBody.srcPath, srcRootPath, reqBody.destPath, destRootPath,
-      action, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
+      action, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler);
   } else {
     log.debug('NFS - Invoking move directory request');
     req.app.get('api').nfs.moveDir(reqBody.srcPath, srcRootPath, reqBody.destPath, destRootPath,
-      action, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
+      action, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler);
   }
-}
+};
 
-export var createDirectory = function(req, res) {
+export var createDirectory = function(req, res, next) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
-    return res.sendStatus(401);
+    return next(new ResponseError(401));
   }
-  let responseHandler = new ResponseHandler(res);
   let reqBody = req.body;
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
-    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
   }
   let dirPath = req.params['0'];
   reqBody.metadata = reqBody.metadata || '';
   reqBody.isPrivate = reqBody.isPrivate || false;
   if (typeof reqBody.metadata !== 'string') {
-    return responseHandler.onResponse('Invalid request. \'metadata\' should be a string value');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'metadata')));
   }
   if (typeof reqBody.isPrivate !== 'boolean') {
-    return responseHandler.onResponse('Invalid request. \'isPrivate\' should be a boolean value');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'isPrivate')));
   }
   let appDirKey = sessionInfo.appDirKey;
   log.debug('NFS - Invoking create directory request');
+  let responseHandler = new ResponseHandler(req, res);
   req.app.get('api').nfs.createDirectory(dirPath, reqBody.isPrivate, false,
     reqBody.metadata, rootPath, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey,
-    responseHandler.onResponse);
-}
-
-export var deleteDirectory = function(req, res) {
-  deleteOrGetDirectory(req, res, true);
-}
-
-export var getDirectory = function(req, res) {
-  deleteOrGetDirectory(req, res, false);
+    responseHandler);
 };
 
-export var modifyDirectory = function(req, res) {
+export var deleteDirectory = function(req, res, next) {
+  deleteOrGetDirectory(req, res, true, next);
+};
+
+export var getDirectory = function(req, res, next) {
+  deleteOrGetDirectory(req, res, false, next);
+};
+
+export var modifyDirectory = function(req, res, next) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
-    return res.sendStatus(401);
+    return next(new ResponseError(401));
   }
-  let responseHandler = new ResponseHandler(res);
+
   let reqBody = req.body;
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
-    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
   }
   let dirPath = req.params['0'];
   reqBody.name = reqBody.name || '';
   reqBody.metadata = reqBody.metadata || '';
 
   if (!reqBody.name && !reqBody.metadata) {
-    return responseHandler.onResponse('Invalid request. Name or metadata should be present in the request');
+    return next(new ResponseError(400, MSG_CONSTANTS.FAILURE.REQUIRED_PARAMS_MISSING));
   }
   if (typeof reqBody.metadata !== 'string') {
-    return responseHandler.onResponse('Invalid request. \'metadata\' should be a string value');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'metadata')));
   }
   if (typeof reqBody.name !== 'string') {
-    return responseHandler.onResponse('Invalid request. \'name\' should be a string value');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'name')));
   }
+  let responseHandler = new ResponseHandler(req, res);
   log.debug('NFS - Invoking modify directory request');
   req.app.get('api').nfs.modifyDirectory(reqBody.name, reqBody.metadata, dirPath, rootPath,
-    sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
+    sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler);
 };
 
-export var moveDirectory = function(req, res) {
-  move(req, res, false);
-}
+export var moveDirectory = function(req, res, next) {
+  move(req, res, false, next);
+};
 
-export var createFile = function(req, res) {
+export var createFile = function(req, res, next) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
-    return res.sendStatus(401);
+    return next(new ResponseError(401));
   }
-  let responseHandler = new ResponseHandler(res);
+
   let reqBody = req.body;
   let filePath = req.params['0'];
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
-    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
   }
   reqBody.metadata = reqBody.metadata || '';
   if (typeof reqBody.metadata !== 'string') {
-    return responseHandler.onResponse('Invalid request. \'metadata\' should be a string value');
+    return next(new ResponseError(400, MSG_CONSTANTS.FAILURE.REQUIRED_PARAMS_MISSING));
   }
   log.debug('NFS - Invoking create file request');
+  let responseHandler = new ResponseHandler(req, res);
   req.app.get('api').nfs.createFile(filePath, reqBody.metadata, rootPath,
-    sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
+    sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler);
 };
 
-export var deleteFile = function(req, res) {
+export var deleteFile = function(req, res, next) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
-    return res.sensStatus(401);
+    return next(new ResponseError(401));
   }
-  let responseHandler = new ResponseHandler(res);
   let filePath = req.params['0'];
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
-    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
   }
-  log.debug('NFS - Invoking Delete file request');
+  let responseHandler = new ResponseHandler(req, res);
+  log.debug('NFS - Invoking delete file request');
   req.app.get('api').nfs.deleteFile(filePath, rootPath, sessionInfo.appDirKey,
-    sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
+    sessionInfo.hasSafeDriveAccess(), responseHandler);
 };
 
-export var modifyFileMeta = function(req, res) {
+export var modifyFileMeta = function(req, res, next) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
-    return res.sendStatus(401);
+    return next(new ResponseError(401));
   }
-  let responseHandler = new ResponseHandler(res);
   let reqBody = req.body;
   let filePath = req.params['0'];
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
-    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
   }
   reqBody.metadata = reqBody.metadata || '';
   reqBody.name = reqBody.name || '';
   if (typeof reqBody.metadata !== 'string') {
-    return responseHandler.onResponse('Invalid request. \'metadata\' should be a string value');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'metadata')));
   }
   if (typeof reqBody.name !== 'string') {
-    return responseHandler.onResponse('Invalid request. \'name\' should be a string value');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'name')));
   }
+  let responseHandler = new ResponseHandler(req, res);
   log.debug('NFS - Invoking modify file metadata request');
   req.app.get('api').nfs.modifyFileMeta(reqBody.name, reqBody.metadata, filePath, rootPath,
-    sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
+    sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler);
 };
 
 export var getFile = function(req, res, next) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
-    return res.sendStatus(401);
+    return next(new ResponseError(401));
   }
-  let responseHandler = new ResponseHandler(res);
   let filePath = req.params['0'];
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
-    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
   }
 
-  let onFileMetadataRecieved = function(err, fileStats) {
+  let onFileMetadataReceived = function(err, fileStats) {
     log.debug('NFS - File metadata for reading - ' + (fileStats || JSON.stringify(err)));
     if (err) {
-      let status = 400;
-      if (err.errorCode) {
-        err.description = errorCodeLookup(err.errorCode);
-      }
-      log.error(err);
-      if (err.description && (err.description.toLowerCase().indexOf('invalidpath') > -1 ||
-          err.description.toLowerCase().indexOf('pathnotfound') > -1)) {
-        status = 404;
-      }
-      return res.status(status).send(err);
+      return next(new ResponseError(400, err));
     }
     fileStats = formatResponse(fileStats);
     let range = req.get('range');
@@ -236,12 +232,12 @@ export var getFile = function(req, res, next) {
     if (range) {
       range = range.toLowerCase();
       if (!/^bytes=/.test(range)) {
-        return res.status(400).send('Invalid range header specification.');
+        return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'range')));
       }
       positions = range.toLowerCase().replace(/bytes=/g, '').split('-');
       for (var i in positions) {
         if (isNaN(positions[i])) {
-          return res.sendStatus(416);
+          return next(new ResponseError(416));
         }
       }
     }
@@ -250,7 +246,7 @@ export var getFile = function(req, res, next) {
     let end = (positions[1] && total) ? parseInt(positions[1]) : total;
     let chunksize = end - start;
     if (chunksize < 0 || end > total) {
-      return res.sendStatus(416);
+      return next(new ResponseError(416));
     }
     log.debug('NFS - Ready to stream file for range' + start + "-" + end + "/" + total);
     var headers = {
@@ -272,69 +268,73 @@ export var getFile = function(req, res, next) {
       sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey);
     nfsReader.pipe(res);
   };
-  log.debug('NFS - Invoking Get file request');
+  log.debug('NFS - Invoking get file request');
   req.app.get('api').nfs.getFileMetadata(filePath, rootPath,
-    sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, onFileMetadataRecieved);
+    sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, onFileMetadataReceived);
 };
 
-export var getFileMetadata = function(req, res) {
-  let responseHandler = new ResponseHandler(res);
-  let filePath = req.params['0'];
-  let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
-  if (typeof rootPath === 'undefined') {
-    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
-  }
-  let onFileMetadataRecieved = function(err, fileStats) {
-    log.debug('NFS - File metatda for reading - ' + fileStats);
-    if (err) {
-      return res.status(400).send(err);
-    }
-    res.writeHead(200, {
-      "Accept-Ranges": "bytes",
-      "Created-On": new Date(fileStats.createdOn).toUTCString(),
-      "Last-Modified": new Date(fileStats.modifiedOn).toUTCString(),
-      "Metadata": fileStats.metadata,
-      "Content-Type": mime.lookup(filePath) || 'application/octet-stream',
-      "Content-Length": fileStats.size
-    });
-    res.end();
-    };
-    log.debug('NFS - Invoking Get file Metadata request');
-    req.app.get('api').nfs.getFileMetadata(filePath, rootPath,
-    sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, onFileMetadataRecieved);
-};
-
-export var modifyFileContent = function(req, res) {
+export var getFileMetadata = function(req, res, next) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
-    return res.sendStatus(401);
+    return next(new ResponseError(401));
   }
-  let offset = 0;
-  let responseHandler = new ResponseHandler(res);
   let filePath = req.params['0'];
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
-    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
+  }
+  let onFileMetadataReceived = function(err, fileStats) {
+    log.debug('NFS - File metatda for reading - ' + fileStats);
+      if (err) {
+        return next(new ResponseError(400, err));
+      }
+      res.writeHead(200, {
+        "Accept-Ranges": "bytes",
+        "Created-On": new Date(fileStats.createdOn).toUTCString(),
+        "Last-Modified": new Date(fileStats.modifiedOn).toUTCString(),
+        "Metadata": fileStats.metadata,
+        "Content-Type": mime.lookup(filePath) || 'application/octet-stream',
+        "Content-Length": fileStats.size
+      });
+      res.end();
+    };
+    log.debug('NFS - Invoking get file metadata request');
+    req.app.get('api').nfs.getFileMetadata(filePath, rootPath,
+    sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, onFileMetadataReceived);
+};
+
+export var modifyFileContent = function(req, res, next) {
+  let sessionInfo = sessionManager.get(req.headers.sessionId);
+  if (!sessionInfo) {
+    return next(new ResponseError(401));
+  }
+  let offset = 0;
+  let filePath = req.params['0'];
+  let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
+  if (typeof rootPath === 'undefined') {
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
   }
   if (req.get('range')) {
     var range = req.get('range').toLowerCase();
     if (!/^bytes=/.test(range)) {
-      return res.status(400).send('Invalid range header specification.');
+      return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'range')));
     }
     var positions = range.toLowerCase().replace(/bytes=/g, '').split('-');
     offset = positions[0];
   }
   if (isNaN(offset)) {
-    return responseHandler.onResponse('Invalid request. offset should be a number');
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'offset')));
   }
-  log.debug('NFS - Invoking Modify file content request');
-  var writer = new NfsWriter(req, filePath, offset, rootPath, sessionInfo, responseHandler);
+  log.debug('NFS - Invoking modify file content request');
+  var writer = new NfsWriter(req, filePath, offset, rootPath, sessionInfo, new ResponseHandler(req, res));
   req.on('end', function() {
     writer.onClose();
   });
-  req.pipe(writer);
+  writer.on('open', function() {
+    req.pipe(writer);
+  });
 };
 
-export var moveFile = function(req, res) {
-  move(req, res, true);
-}
+export var moveFile = function(req, res, next) {
+  move(req, res, true, next);
+};

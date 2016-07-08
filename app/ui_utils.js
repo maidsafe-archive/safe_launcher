@@ -163,4 +163,39 @@ export default class UIUtils {
   reconnect() {
     this.api.restart();
   }
+  
+  fetchGetsCount(callback) {
+   this.api.clientStats.fetchGetsCount(callback);
+  }
+
+  fetchDeletesCount(callback) {
+    this.api.clientStats.fetchDeletesCount(callback);
+  }
+
+  fetchPotsCount(callback) {
+    this.api.clientStats.fetchPotsCount(callback);
+  }
+
+  fetchPutsCount(callback) {
+    this.api.clientStats.fetchPutsCount(callback);
+  }
+
+  onUploadEvent(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.DATA_UPLOADED, function(s) {
+      console.log('D', s);
+    });
+  }
+
+  onDownloadEvent(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.DATA_DOWNLOADED, callback);
+  }
+
+  onNewAppActivity(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.ACTIVITY_NEW, callback);
+  }
+
+  onUpdatedAppActivity(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.ACTIVITY_UPDATE, callback);
+  }
+
 }

@@ -1,8 +1,11 @@
 import jwt from 'jsonwebtoken';
 import mime from 'mime';
+import uuid from 'uuid';
 import sessionManager from './session_manager';
 import { errorCodeLookup } from './error_code_lookup';
 import { log } from './../logger/log';
+import { MSG_CONSTANTS } from './message_constants';
+import { Activity, ActivityStatus } from './model/activity';
 
 export var getSessionIdFromRequest = function(req) {
   let authHeader = req.get('Authorization');
@@ -32,25 +35,74 @@ export var getSessionIdFromRequest = function(req) {
   } catch (e) {
     return;
   }
+};
+
+export class ResponseError {
+  constructor(status, message) {
+    message = message || MSG_CONSTANTS.ERROR_CODE[status];
+    if (typeof message === 'object' && message.hasOwnProperty('errorCode')) {
+      message.description = errorCodeLookup(message.errorCode);
+      if (message.description.toLowerCase().indexOf('notfound') > -1 ||
+          message.description.toLowerCase().indexOf('pathnotfound') > -1) {
+        status = 404;
+      }
+    } else {
+      message = {
+        errorCode: 400,
+        description: message
+      };
+    }
+    this['errStatus'] = status;
+    this['msg'] = message;
+  }
+
+  get status() {
+    return this['errStatus'];
+  };
+  get message() {
+    return this['msg'];
+  };
 }
 
+export let ResponseHandler = function (req, res) {
+
+  this.onResponse = function(err, data) {
+    if (err) {
+      return req.next(new ResponseError(400, err));
+    }
+    updateAppActivity(req, res, true);
+    let successStatus = 200;
+    if (data) {
+      res.status(successStatus).send(formatResponse(data));
+      req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').DATA_DOWNLOADED, data.length);
+    } else {
+      res.sendStatus(successStatus);
+    }
+  };
+
+  return this.onResponse;
+};
+
 export var setSessionHeaderAndParseBody = function(req, res, next) {
+  req.id = uuid.v4();
+  req.time = Date.now();
+  res.id = req.id;
   if (!req.get('Authorization')) {
-    log.debug('Unauthorised Request ::' + req.path);
+    log.debug('Unauthorised request ::' + req.path);
     return next();
   }
-  log.debug('Authorised Request ::' + req.path);
+  log.debug('Authorised request ::' + req.path);
   let sessionId = getSessionIdFromRequest(req);
   log.debug('Decrypted session id :: ' + sessionId);
   if (!sessionId) {
-    log.warn('Session Id not found');
+    log.warn('Session ID not found');
     return res.sendStatus(401);
   }
   req.headers['sessionId'] = sessionId;
   if (req.body && req.body.length > 0) {
     req.body = ((req.body instanceof Buffer) ? JSON.parse(req.body.toString()) : req.body);
     if (typeof req.body !== 'object') {
-      return res.status(400).send('Invalid Request Body');
+      return res.status(400).send('Invalid request body');
     }
   }
   next();
@@ -126,35 +178,29 @@ export var formatResponse = function(data) {
   };
 
   return format(data);
-}
+};
 
-export var ResponseHandler = function(res) {
-  let self = this;
-  self.res = res;
+export let addAppActivity = function(req, activityName) {
+  let activity = new Activity(req.id, activityName, Date.now());
+  req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').ACTIVITY_NEW, {
+    app: req.headers.sessionId,
+    activity: activity
+  });
+  if (req.headers.sessionId) {
+    sessionManager.get(req.headers.sessionId).addActivity(activity);
+  }
+  req.activity = activity;
+};
 
-  self.onResponse = function(err, data) {
-    let status = 200;
-    if (err) {
-      status = 400;
-      if (err.hasOwnProperty('errorCode') && !err.hasOwnProperty('description')) {
-        err.description = errorCodeLookup(err.errorCode);
-      }
-      if (typeof err === 'string') {
-        err = { errorCode: status, description: err };
-      }
-      if (err.description &&
-         (err.description.toLowerCase().indexOf('notfound') > -1 ||
-         err.description.toLowerCase().indexOf('pathnotfound') > -1)) {
-          status = 404;
-      }
-      return self.res.status(status).send(err);
-    }
-    if (data) {
-      self.res.status(status).send(formatResponse(data));
-    } else {
-      self.res.sendStatus(status);
-    }
-  };
-
-  return self;
+export let updateAppActivity = function(req, res, isSuccess) {
+  let activity = req.activity;
+  activity.endTime = Date.now();
+  activity.activityStatus = isSuccess ? ActivityStatus.SUCCESS : ActivityStatus.FAILURE;
+  req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').ACTIVITY_UPDATE, {
+    app: req.headers.sessionId,
+    activity: activity
+  });
+  if (req.headers.sessionId) {
+    sessionManager.get(req.headers.sessionId).updateActivity(activity);
+  }
 };

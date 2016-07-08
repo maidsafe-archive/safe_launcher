@@ -38,7 +38,7 @@ var register = function(lib, request) {
     var payload = createPayload('register-dns', request);
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -47,7 +47,7 @@ var addService = function(lib, request) {
     var payload = createPayload('add-service', request);
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -62,7 +62,7 @@ var getFile = function(lib, request) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.executeForContent(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -75,7 +75,7 @@ var getFileMetadata = function(lib, request) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.executeForContent(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -84,7 +84,7 @@ var deleteDns = function(lib, request) {
     var payload = createPayload('delete-dns', request);
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -93,7 +93,7 @@ var deleteService = function(lib, request) {
     var payload = createPayload('delete-service', request);
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -102,7 +102,7 @@ var listLongNames = function(lib, request) {
     var payload = createPayload('get-long-names', request);
     util.executeForContent(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -111,7 +111,7 @@ var listServices = function(lib, request) {
     var payload = createPayload('get-services', request);
     util.executeForContent(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -120,7 +120,7 @@ var createPublicId = function(lib, request) {
     var payload = createPayload('register-public-id', request);
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -157,6 +157,6 @@ exports.execute = function(lib, request) {
       listServices(lib, request);
       break;
     default:
-      util.sendError(request.id, 999, 'Invalid Action');
+      util.sendException(request.id, new Error('Invalid action'));
   }
 };

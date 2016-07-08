@@ -8,7 +8,7 @@ export default class Auth {
   }
 
   register(pin, keyword, password, callback) {
-    log.debug('Invoking Auth::resgister API');
+    log.debug('Invoking Auth::register API');
     this.send({
       module: this.MODULE,
       action: 'register',
@@ -50,7 +50,7 @@ export default class Auth {
     log.debug('Invoking Auth::dropUnregisteredClient API');
     this.send({
       module: this.MODULE,
-      action: 'drop-unregisterd-client',
+      action: 'drop-unregistered-client',
       params: {}
     }, callback);
   }

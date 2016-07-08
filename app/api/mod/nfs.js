@@ -223,4 +223,46 @@ export default class NFS {
         }
       }, callback);
     }
+
+    getWriter(filePath, isPathShared, hasSafeDriveAccess, appDirKey, callback) {
+      this.send({
+        module: this.MODULE,
+        action: 'get-writer',
+        isAuthorised: true,
+        appDirKey: appDirKey,
+        hasSafeDriveAccess: hasSafeDriveAccess,
+        params: {
+          filePath: filePath,
+          isPathShared: isPathShared
+        }
+      }, callback);
+    }
+
+    write(writerId, offset, data, callback) {
+      this.send({
+        module: this.MODULE,
+        action: 'write',
+        isAuthorised: true,
+        appDirKey: '',
+        hasSafeDriveAccess: false,
+        params: {
+          writerId: writerId,
+          offset: offset,
+          data: data.toString('base64')
+        }
+      }, callback);
+    }
+
+    closeWriter(writerId, callback) {
+      this.send({
+        module: this.MODULE,
+        action: 'close-writer',
+        isAuthorised: true,
+        appDirKey: '',
+        hasSafeDriveAccess: false,
+        params: {
+          writerId: writerId
+        }
+      }, callback);
+    }
 }

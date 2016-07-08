@@ -29,7 +29,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
 
     // handle server start
     server.onServerStarted(function() {
-      console.log('Server Started');
+      console.log('Server started');
     });
 
     // handle server shutdown
@@ -69,6 +69,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         isError: true
       }, function(err, data) {
         console.log(data);
+        server.closeWindow();
       });
       console.log(err);
     });

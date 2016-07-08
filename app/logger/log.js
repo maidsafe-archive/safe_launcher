@@ -26,8 +26,14 @@ class Logger {
     // TODO pass log id that can used for the log visualiser
     // let id = 'uid_' + 1001;
     let winston = require('winston');
-    let consoleFormatter = function(log) {
-      return util.format('%s: %s', log.level, log.message);
+    let pad = function(value) {
+      return ('0' + value).slice(-2);
+    };
+    let logFormatter = function(log) {
+      let date = new Date();
+      let timeStamp = util.format('%d:%d:%d.%d', pad(date.getHours()), pad(date.getMinutes()), pad(date.getSeconds()),
+          date.getMilliseconds());
+      return util.format('%s %s - %s', log.level.toUpperCase(), timeStamp, log.message);
     };
     let executablePath = require('remote').app.getPath('exe');
     let executableDirPath = path.dirname(executablePath);
@@ -40,7 +46,7 @@ class Logger {
       transports.push(new (winston.transports.Console)({
         level: logLevel,
         handleExceptions: true,
-        formatter: consoleFormatter
+        formatter: logFormatter
       }));
     } catch (e) {
       console.log('Console Logger initialisation failed');
@@ -52,10 +58,12 @@ class Logger {
         maxsize: env.log.file.maxFileSize,
         maxFiles: env.log.file.maxFiles,
         tailable: true,
+        json: false,
         options: {
           flags: 'w'
         },
-        level: logLevel
+        level: logLevel,
+        formatter: logFormatter
       }));
     } catch (e) {
       console.log('File logger could not be added ', e.message);

@@ -1,4 +1,10 @@
+var ref = require('ref');
+var uuid = require('uuid');
 var util = require('./util.js');
+var VoidHandle = ref.types.void;
+var voidHandlePtr = ref.refType(VoidHandle);
+var voidHandlePtrPtr = ref.refType(voidHandlePtr);
+var writerHandlePool = {};
 
 var createPayload = function(action, request) {
   var payload = {
@@ -53,7 +59,7 @@ var createDirectory = function(lib, request) {
     var payload = createPayload('create-dir', request);
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -62,7 +68,7 @@ var getDirectory = function(lib, request) {
     var payload = createPayload('get-dir', request);
     util.executeForContent(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -71,7 +77,7 @@ var deleteDirectory = function(lib, request) {
     var payload = createPayload('delete-dir', request);
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -83,7 +89,7 @@ var modifyDirectory = function(lib, request) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -92,7 +98,7 @@ var createFile = function(lib, request) {
     var payload = createPayload('create-file', request);
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -101,7 +107,7 @@ var deleteFile = function(lib, request) {
     var payload = createPayload('delete-file', request);
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -113,7 +119,7 @@ var modifyFileMeta = function(lib, request) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -125,7 +131,7 @@ var modifyFileContent = function(lib, request) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -139,7 +145,7 @@ var getFile = function(lib, request) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.executeForContent(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -148,7 +154,7 @@ var getFileMetadata = function(lib, request) {
     var payload = createPayload('get-file-metadata', request);
     util.executeForContent(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -164,7 +170,75 @@ var move = function(lib, request, action) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
+  }
+};
+
+var getWriter = function(lib, request) {
+  try {
+    var payload = createPayload(request.action, request);
+    delete payload.module;
+    delete payload.action;
+    var writerHandle = ref.alloc(voidHandlePtrPtr);
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    var result = lib.get_nfs_writer(JSON.stringify(payload), request.client, writerHandle);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    if (result !== 0) {
+      return util.sendError(request.id, result);
+    }
+    var writerId = uuid.v4();
+
+    writerHandlePool[writerId] = writerHandle.deref();
+    util.send(request.id, writerId);
+  } catch (e) {
+    util.sendException(request.id, e);
+  }
+};
+
+var write = function(lib, request) {
+  try {
+    var writerId = request.params.writerId;
+    if (!writerHandlePool.hasOwnProperty(writerId)) {
+      return util.sendError(request.id, 999, 'Writer not found');
+    }
+    var offset = request.params.offset || 0;
+    var data = new Buffer(request.params.data, 'base64');
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    var result = lib.nfs_stream_write(writerHandlePool[writerId], offset, data, data.length);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    if (result === 0) {
+      return util.send(request.id);
+    }
+    util.sendError(request.id, result);
+  } catch (e) {
+    util.sendException(request.id, e);
+  }
+};
+
+var closeWriter = function(lib, request) {
+  try {
+    var writerId = request.params.writerId;
+    if (!writerHandlePool.hasOwnProperty(writerId)) {
+      return util.sendError(request.id, 999, 'Writer not found');
+    }
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    var result = lib.nfs_stream_close(writerHandlePool[writerId]);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    delete writerHandlePool[writerId];
+    if (result === 0) {
+      return util.send(request.id);
+    }
+    util.sendError(request.id, result);
+  } catch (e) {
+    util.sendException(request.id, e);
+  }
+};
+
+var cleanUp = function(lib) {
+  for (var id in writerHandlePool) {
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    lib.nfs_stream_close(writerHandlePool[writerId]);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   }
 };
 
@@ -206,7 +280,19 @@ exports.execute = function(lib, request) {
     case 'move-file':
       move(lib, request, 'move-file');
       break;
+    case 'get-writer':
+      getWriter(lib, request);
+      break;
+    case 'write':
+      write(lib, request);
+      break;
+    case 'close-writer':
+      closeWriter(lib, request);
+      break;
+    case 'clean':
+      cleanUp(lib);
+      break;
     default:
-      util.sendError(request.id, 999, 'Invalid Action');
+      util.sendException(request.id, new Error('Invalid action'));
   }
 };

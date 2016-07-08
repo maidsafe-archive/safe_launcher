@@ -1,11 +1,13 @@
 import NFS from './mod/nfs';
 import DNS from './mod/dns';
 import Auth from './mod/auth';
+import ClientStats from './mod/client_stats';
 import * as client from './ffi/client.js';
 
-export var setNetworkStateListener = client.setNetworkStateListener;
-export var close = client.close;
-export var restart = client.restart;
-export var nfs = new NFS(client.send);
-export var dns = new DNS(client.send);
 export var auth = new Auth(client.send);
+export var clientStats = new ClientStats(client.send);
+export var close = client.close;
+export var dns = new DNS(client.send);
+export var nfs = new NFS(client.send);
+export var restart = client.restart;
+export var setNetworkStateListener = client.setNetworkStateListener;

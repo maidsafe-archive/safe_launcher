@@ -32,17 +32,25 @@ let proxyServer = {
     ]);
     this.process.on('exit', function() {
       log.info('Proxy server stopped');
-      proxyListener.onExit('Proxy Server Closed');
+      proxyListener.onExit('Proxy server closed');
     });
-    this.process.on('message', function(msg) {
-      log.debug('Proxy Server - onMessage event - recieved - ' + msg);
-      msg = JSON.parse(msg);
-      if (msg.status) {
-        log.info('Proxy server started');
-        return proxyListener.onStart(msg.data);
+    this.process.on('message', function(event) {
+      log.debug('Proxy Server - onMessage event - received - ' + event);
+      event = JSON.parse(event);
+      switch (event.type) {
+        case 'connection':
+          if (event.msg.status) {
+            log.info('Proxy server started');
+            return proxyListener.onStart(event.msg.data);
+          }
+          proxyListener.onError(event.msg.data);
+          break;
+        case 'log':
+          log.error(event.msg.log);
+          break;
+        default:
+          log.warn('Invalid event type from proxy');
       }
-      log.error('Proxy server error :: ' + msg.data);
-      proxyListener.onError(msg.data);
     });
   },
   stop: function() {
@@ -82,9 +90,9 @@ var onFfiProcessTerminated = function(title, msg) {
 };
 
 api.setNetworkStateListener(function(state, isRegisteredClient) {
-  log.debug('Network state change event recieved :: ' + state + ' :: ' + isRegisteredClient);
+  log.debug('Network state change event received :: ' + state + ' :: ' + isRegisteredClient);
   if (ignoreUnRegisteredObserver && isRegisteredClient === false) {
-    log.debug('Ignoring Network state change event for unregistered client');
+    log.debug('Ignoring network state change event for unregistered client');
     return;
   }
   if (state === 0 && isRegisteredClient) {
@@ -102,7 +110,7 @@ api.setNetworkStateListener(function(state, isRegisteredClient) {
       break;
 
     case 0:
-      log.info('Connected with Network');
+      log.info('Connected with network');
       if (!isRegisteredClient) {
         window.msl.networkStateChange(NETWORK_STATE.CONNECTED);
       }

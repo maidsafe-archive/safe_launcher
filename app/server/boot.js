@@ -6,7 +6,8 @@ import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
 import { router_0_5 } from './routes/version_0_5';
 import { CreateSession } from './controllers/auth';
-import { setSessionHeaderAndParseBody } from './utils';
+import { formatResponse, ResponseError, setSessionHeaderAndParseBody, updateAppActivity } from './utils';
+import { log } from './../logger/log';
 
 class ServerEventEmitter extends EventEmitter {};
 
@@ -21,8 +22,12 @@ export default class RESTServer {
       STARTED: 'started',
       STOPPED: 'stopped',
       AUTH_REQUEST: 'auth-request',
+      ACTIVITY_NEW: 'activity-new',
+      ACTIVITY_UPDATE: 'activity-update',
       SESSION_CREATED: 'sesssion_created',
-      SESSION_REMOVED: 'session_removed'
+      SESSION_REMOVED: 'session_removed',
+      DATA_UPLOADED: 'data_uploaded',
+      DATA_DOWNLOADED: 'data_downloaded'
     };
     this.app.set('api', api);
     this.app.set('eventEmitter', new ServerEventEmitter());
@@ -55,26 +60,6 @@ export default class RESTServer {
     let EVENT_TYPE = this.app.get('EVENT_TYPE');
     let eventEmitter = this.app.get('eventEmitter');
 
-    // var corsValidator = function(req, callback) {
-    //   try {
-    //     var origin = req.get('Origin');
-    //     callback(null, {
-    //       origin: (origin ? /\.safenet$/.test(origin) : true)
-    //     });
-    //   } catch (e) {
-    //     callback(e);
-    //   }
-    // };
-    //
-    // app.options('*', cors(corsValidator));
-    // app.use(cors(corsValidator));
-    // app.use(function(req, res, next) {
-    //   res.header("Access-Control-Allow-Origin", "*");
-    //   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    //   res.header("Access-Control-Allow-Methods", "DELETE, GET, OPTIONS, POST, PUT");
-    //   next();
-    // });
-
     app.use(bodyParser.json({strict: false}));
 
     app.use(setSessionHeaderAndParseBody);
@@ -89,18 +74,21 @@ export default class RESTServer {
     app.use('/', router_0_5);
     app.use('/0.5', router_0_5);
 
-    // catch 404 and forward to error handler
-    app.use(function(req, res, next) {
-      var err = new Error('Not Found');
-      err.status = 404;
-      next(err);
+    // API Error handling
+    app.use(function(err, req, res, next) {
+      if (!(err instanceof ResponseError)) {
+        return next();
+      }
+      updateAppActivity(req, res);
+      log.warn('Err ' + err.status + ' - Msg :: ' + err.msg);
+      res.status(err.status).send(err.msg);
     });
 
-    // no stacktraces leaked to user
-    app.use(function(err, req, res, next) {
-      res.status(err.status || 500);
-      res.send('Server Error');
+    // catch 404
+    app.use(function(req, res) {
+      res.status(404).send('Not Found');
     });
+
     app.set('port', this.port);
     this.server = http.createServer(app);
     this.server.listen(this.port, this.callback);

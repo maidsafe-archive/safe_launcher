@@ -112,7 +112,7 @@ export default class DNS {
     log.debug('Invoking API DNS::deleteService - FFI::' + this.MODULE + '::delete-dns');
     this.send({
       module: this.MODULE,
-      action: 'delete-dns',
+      action: 'delete-service',
       isAuthorised: true,
       appDirKey: appDirKey,
       hasSafeDriveAccess: hasSafeDriveAccess,
