@@ -175,14 +175,16 @@ var move = function(lib, request, action) {
 };
 
 var getWriter = function(lib, request) {
-  try {
-    var payload = createPayload(request.action, request);
-    delete payload.module;
-    delete payload.action;
-    var writerHandle = ref.alloc(voidHandlePtrPtr);
-    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    var result = lib.get_nfs_writer(JSON.stringify(payload), request.client, writerHandle);
+  var payload = createPayload(request.action, request);
+  delete payload.module;
+  delete payload.action;
+  var writerHandle = ref.alloc(voidHandlePtrPtr);
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+  lib.get_nfs_writer.async(JSON.stringify(payload), request.client, writerHandle, function(err, result) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    if (err) {
+      return util.sendException(request.id, e);
+    }
     if (result !== 0) {
       return util.sendError(request.id, result);
     }
@@ -190,54 +192,52 @@ var getWriter = function(lib, request) {
 
     writerHandlePool[writerId] = writerHandle.deref();
     util.send(request.id, writerId);
-  } catch (e) {
-    util.sendException(request.id, e);
-  }
+  });
 };
 
 var write = function(lib, request) {
-  try {
-    var writerId = request.params.writerId;
-    if (!writerHandlePool.hasOwnProperty(writerId)) {
-      return util.sendError(request.id, 999, 'Writer not found');
-    }
-    var offset = request.params.offset || 0;
-    var data = new Buffer(request.params.data, 'base64');
-    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    var result = lib.nfs_stream_write(writerHandlePool[writerId], offset, data, data.length);
+  var writerId = request.params.writerId;
+  if (!writerHandlePool.hasOwnProperty(writerId)) {
+    return util.sendError(request.id, 999, 'Writer not found');
+  }
+  var offset = request.params.offset || 0;
+  var data = new Buffer(request.params.data, 'base64');
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+  lib.nfs_stream_write.async(writerHandlePool[writerId], offset, data, data.length, function(err, result) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    if (err) {
+     return util.sendException(request.id, e);
+    }
     if (result === 0) {
       return util.send(request.id);
     }
     util.sendError(request.id, result);
-  } catch (e) {
-    util.sendException(request.id, e);
-  }
+  });
 };
 
 var closeWriter = function(lib, request) {
-  try {
-    var writerId = request.params.writerId;
-    if (!writerHandlePool.hasOwnProperty(writerId)) {
-      return util.sendError(request.id, 999, 'Writer not found');
-    }
-    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    var result = lib.nfs_stream_close(writerHandlePool[writerId]);
+  var writerId = request.params.writerId;
+  if (!writerHandlePool.hasOwnProperty(writerId)) {
+    return util.sendError(request.id, 999, 'Writer not found');
+  }
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+  lib.nfs_stream_close.async(writerHandlePool[writerId], function(err, result) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    if (err) {
+      return util.sendException(request.id, e);
+    }
     delete writerHandlePool[writerId];
     if (result === 0) {
       return util.send(request.id);
     }
     util.sendError(request.id, result);
-  } catch (e) {
-    util.sendException(request.id, e);
-  }
+  });
 };
 
 var cleanUp = function(lib) {
   for (var id in writerHandlePool) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    lib.nfs_stream_close(writerHandlePool[writerId]);
+    lib.nfs_stream_close.async(writerHandlePool[writerId], function() {});
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   }
 };
