@@ -13,17 +13,24 @@ var unregisteredClientHandle;
 var registerObserver = function(lib, clientHandle, callback) {
   util.sendLog('DEBUG', 'FFI/mod/auth.js - Registering observer');
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  lib.register_network_event_observer(clientHandle, callback);
-  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+  lib.register_network_event_observer.async(clientHandle, callback, function(err) {
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    if (err) {
+      util.sendException(request.id, err.message);
+    }
+  });
 };
 
 var dropUnregisteredClient = function(lib) {
   if (unregisteredClientHandle) {
     util.sendLog('DEBUG', 'FFI/mod/auth.js - Dropping unregisteredClientHandle');
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    lib.drop_client(unregisteredClientHandle);
-    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    util.sendLog('DEBUG', 'FFI/mod/auth.js - Dropped unregisteredClientHandle');
+    lib.drop_client.async(unregisteredClientHandle, function(err) {
+      /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+      if (err) {
+        util.sendException(request.id, err.message);
+      }
+    });
     unregisteredClientHandle = null;
   }
 };
@@ -32,16 +39,16 @@ var unregisteredClient = function(lib, observer) {
   var unregisteredClient = ref.alloc(clientHandlePtrPtr);
   util.sendLog('DEBUG', 'FFI/mod/auth.js - Create Unregistered Client Handle');
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  var result = lib.create_unregistered_client(unregisteredClient);
-  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-  if (result !== 0) {
-    util.sendConnectionStatus(1, false);
-    return false;
-  }
-  unregisteredClientHandle = unregisteredClient.deref();
-  registerObserver(lib, unregisteredClientHandle, observer);
-  util.sendConnectionStatus(0, false);
-  return true;
+  lib.create_unregistered_client.async(unregisteredClient, function(e, result) {
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    if (e || result !== 0) {
+      util.sendConnectionStatus(1, false);
+      return false;
+    }
+    unregisteredClientHandle = unregisteredClient.deref();
+    registerObserver(lib, unregisteredClientHandle, observer);
+    util.sendConnectionStatus(0, false);
+  });
 };
 
 var setSafeDriveKey = function(lib) {
@@ -50,73 +57,69 @@ var setSafeDriveKey = function(lib) {
   var resultPtr = ref.alloc(int);
   util.sendLog('DEBUG', 'FFI/mod/auth.js - get SafeDrive Dir Key');
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  var pointer = lib.get_safe_drive_key(sizePtr, capacityPtr, resultPtr, registeredClientHandle);
-  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-  var result = resultPtr.deref();
-  if (result !== 0) {
-    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    lib.drop_null_ptr(pointer);
-    util.sendLog('ERROR', 'FFI/mod/auth.js - get SafeDrive Dir Key with code ' + result);
+  lib.get_safe_drive_key.async(sizePtr, capacityPtr, resultPtr, registeredClientHandle, function(err, pointer) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    return new Error('Failed with error code ' + result);
-  }
-  var size = sizePtr.deref();
-  var capacity = capacityPtr.deref();
-  safeDriveKey = ref.reinterpret(pointer, size).toString('base64');
-  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  lib.drop_vector(pointer, size, capacity);
-  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-  return;
+    var result = resultPtr.deref();
+    if (result !== 0) {
+      util.sendLog('ERROR', 'FFI/mod/auth.js - get SafeDrive Dir Key with code ' + result);
+      return new Error('Failed with error code ' + result);
+    }
+    var size = sizePtr.deref();
+    var capacity = capacityPtr.deref();
+    safeDriveKey = ref.reinterpret(pointer, size).toString('base64');
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    lib.drop_vector.async(pointer, size, capacity, function() {});
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+  });
 };
 
 var register = function(lib, request, observer) {
   var params = request.params;
   var regClient = ref.alloc(clientHandlePtrPtr);
-  var res;
-  try {
-    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    res = lib.create_account(params.keyword, params.pin, params.password, regClient);
+
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+  lib.create_account.async(params.keyword, params.pin, params.password, regClient, function(err, res) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-  } catch (e) {
-    return util.sendError(request.id, 999, e.message());
-  }
-  if (res !== 0) {
-    return util.sendError(request.id, res);
-  }
-  registeredClientHandle = regClient.deref();
-  // dropUnregisteredClient(lib);
-  registerObserver(lib, registeredClientHandle, observer);
-  var safeDriveError = setSafeDriveKey(lib);
-  if (safeDriveError) {
-    return util.sendError(request.id, 999, safeDriveError.toString());
-  }
-  util.send(request.id);
-  util.sendConnectionStatus(0, true);
+    if (err) {
+      return util.sendError(request.id, 999, err.message);
+    }
+    if (res !== 0) {
+      return util.sendError(request.id, res);
+    }
+    registeredClientHandle = regClient.deref();
+    // dropUnregisteredClient(lib);
+    registerObserver(lib, registeredClientHandle, observer);
+    var safeDriveError = setSafeDriveKey(lib);
+    if (safeDriveError) {
+      return util.sendError(request.id, 999, safeDriveError.toString());
+    }
+    util.send(request.id);
+    util.sendConnectionStatus(0, true);
+  });
 };
 
 var login = function(lib, request, observer) {
   var params = request.params;
   var regClient = ref.alloc(clientHandlePtrPtr);
-  var res;
-  try {
-    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    res = lib.log_in(params.keyword, params.pin, params.password, regClient);
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+  lib.log_in.async(params.keyword, params.pin, params.password, regClient, function(err, res) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-  } catch (e) {
-    util.sendException(request.id, e);
-  }
-  if (res !== 0) {
-    return util.sendError(request.id, res);
-  }
-  registeredClientHandle = regClient.deref();
-  // dropUnregisteredClient(lib);
-  registerObserver(lib, registeredClientHandle, observer);
-  var safeDriveError = setSafeDriveKey(lib);
-  if (safeDriveError) {
-    return util.sendError(request.id, 999, safeDriveError.toString());
-  }
-  util.send(request.id);
-  util.sendConnectionStatus(0, true);
+    if(err) {
+      return util.sendException(request.id, err.message);
+    }
+    if (res !== 0) {
+      return util.sendError(request.id, res);
+    }
+    registeredClientHandle = regClient.deref();
+    // dropUnregisteredClient(lib);
+    registerObserver(lib, registeredClientHandle, observer);
+    var safeDriveError = setSafeDriveKey(lib);
+    if (safeDriveError) {
+      return util.sendError(request.id, 999, safeDriveError.toString());
+    }
+    util.send(request.id);
+    util.sendConnectionStatus(0, true);
+  });
 };
 
 exports.getRegisteredClient = function() {
@@ -135,39 +138,38 @@ exports.getUnregisteredClient = function(lib, observer) {
 };
 
 var getAppDirectoryKey = function(lib, request) {
-  try {
-    if (!registeredClientHandle) {
-      return util.sendError(request.id, 999, 'Client Handle not available');
-    }
-    var appName = request.params.appName;
-    var appId = request.params.appId;
-    var vendor = request.params.vendor;
 
-    var sizePtr = ref.alloc(int);
-    var capacityPtr = ref.alloc(int);
-    var resultPtr = ref.alloc(int);
-    util.sendLog('DEBUG', 'FFI/mod/auth.js - Getting App Root Dir Key');
-    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    var pointer = lib.get_app_dir_key(appName, appId, vendor, sizePtr, capacityPtr, resultPtr, registeredClientHandle);
-    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    var result = resultPtr.deref();
-    if (result !== 0) {
-      /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-      lib.drop_null_ptr(pointer);
-      util.sendLog('ERROR', 'FFI/mod/auth.js - Getting App Root Dir Key failed with code ' + result);
-      /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-      return util.sendError(request.id, 999, 'Failed with error code ' + result);
-    }
-    var size = sizePtr.deref();
-    var capacity = capacityPtr.deref();
-    var appDirKey = ref.reinterpret(pointer, size).toString('base64');
-    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    lib.drop_vector(pointer, size, capacity);
-    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    util.send(request.id, appDirKey);
-  } catch (e) {
-    util.sendException(request.id, e);
+  if (!registeredClientHandle) {
+    return util.sendError(request.id, 999, 'Client Handle not available');
   }
+  var appName = request.params.appName;
+  var appId = request.params.appId;
+  var vendor = request.params.vendor;
+
+  var sizePtr = ref.alloc(int);
+  var capacityPtr = ref.alloc(int);
+  var resultPtr = ref.alloc(int);
+  util.sendLog('DEBUG', 'FFI/mod/auth.js - Getting App Root Dir Key');
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+  lib.get_app_dir_key.async(appName, appId, vendor, sizePtr, capacityPtr, resultPtr,
+      registeredClientHandle, function (err, pointer) {
+        /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+        if (err) {
+          util.sendException(request.id, err);
+        }
+        var result = resultPtr.deref();
+        if (result !== 0) {
+          util.sendLog('ERROR', 'FFI/mod/auth.js - Getting App Root Dir Key failed with code ' + result);
+          return util.sendError(request.id, 999, 'Failed with error code ' + result);
+        }
+        var size = sizePtr.deref();
+        var capacity = capacityPtr.deref();
+        var appDirKey = ref.reinterpret(pointer, size).toString('base64');
+        /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+        lib.drop_vector.async(pointer, size, capacity, function() {});
+        /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+        util.send(request.id, appDirKey);
+      });
 };
 
 var cleanUp = function(lib) {
@@ -177,7 +179,7 @@ var cleanUp = function(lib) {
   }
   if (registeredClientHandle) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    lib.drop_client(registeredClientHandle);
+    lib.drop_client.async(registeredClientHandle, function() {});
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     registeredClientHandle = null;
   }

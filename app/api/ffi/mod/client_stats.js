@@ -1,32 +1,39 @@
 var util = require('./util.js');
 
+var Handler = function(reqId) {
+    this.handle = function(err, count) {
+        if (err) {
+            return util.sendException(reqId, err.message);
+        }
+        util.send(reqId, count);
+    };
+
+    return this.handle;
+};
+
 var fetchGetsCount = function(reqId, lib, clientHandle) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    var count = lib.client_issued_gets(clientHandle);
+    lib.client_issued_gets.async(clientHandle, new Handler(reqId));
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    util.send(reqId, count);
 };
 
 var fetchDeletesCount = function(reqId, lib, clientHandle) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    var count = lib.client_issued_deletes(clientHandle);
+    lib.client_issued_deletes(clientHandle, new Handler(reqId));
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    util.send(reqId, count);
 };
 
 
 var fetchPostsCount = function(reqId, lib, clientHandle) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    var count = lib.client_issued_posts(clientHandle);
+    var count = lib.client_issued_posts(clientHandle, new Handler(reqId));
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    util.send(reqId, count);
 };
 
 var fetchPutsCount = function(reqId, lib, clientHandle) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    var count = lib.client_issued_puts(clientHandle);
+    var count = lib.client_issued_puts(clientHandle, new Handler(reqId));
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    util.send(reqId, count);
 };
 
 exports.execute = function(lib, request) {
