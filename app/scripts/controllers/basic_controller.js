@@ -3,6 +3,18 @@
  */
 window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootScope', 'serverFactory',
   function($scope, $state, $rootScope, server) {
+
+    // handle proxy localy
+    var setProxy = function(status) {
+      window.localStorage.setItem('proxy', JSON.stringify({status: Boolean(status)}));
+    };
+    var getProxy = function() {
+      return JSON.parse(window.localStorage.getItem('proxy'));
+    };
+    var clearProxy = function() {
+      window.localStorage.clear();
+    };
+
     // handle server error
     server.onServerError(function(err) {
       console.log(err);
@@ -29,6 +41,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     // handle proxy start
     server.onProxyStart(function(msg) {
       $rootScope.$proxyServer = true;
+      setProxy(true);
       $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
         msg: msg,
         hasOption: false,
@@ -41,13 +54,17 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     // handle proxy stop
     server.onProxyExit(function(msg) {
       // $rootScope.$loader.hide();
+      $rootScope.$proxyServer = false;
+      setProxy(false);
       console.log(msg);
     });
 
     // handle proxy error
     server.onProxyError(function(err) {
+      setProxy(false);
+      $rootScope.$proxyServer = false;
       $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
-        msg: err,
+        msg: err.message,
         hasOption: false,
         isError: true
       }, function(err, data) {
@@ -98,8 +115,21 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       server.startProxyServer(proxyListener);
     };
 
+    $scope.enableProxySetting = function(status) {
+      setProxy(status);
+      $rootScope.$proxyServer = Boolean(status);
+      $state.go('app');
+    };
+
+    $scope.checkProxy = function() {
+      var proxy = getProxy();
+      if (proxy.hasOwnProperty('status')) {
+        $rootScope.$proxyServer = proxy.status;
+        $state.go('app');
+      }
+    }
     // initialize application
     server.start();
-    server.startProxyServer();
+    // server.startProxyServer();
   }
 ]);

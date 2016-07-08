@@ -8,6 +8,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     var FIELD_FOCUS_DELAY = 100;
 
     $scope.user = {};
+    $scope.isLoading = false;
 
     // handle authorisation before user logged-in
     auth.onAuthorisationReq(function(payload) {
@@ -45,9 +46,14 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     };
 
     var onAuthResponse = function(err) {
+      $scope.isLoading = false;
+      $scope.$applyAsync();
       $scope.user = {};
       if (err) {
-        return console.error(err);
+        return $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
+          msg: 'Invalid PIN, Keyword or Password.',
+          isError: true
+        }, function() {});
       }
       $rootScope.isAuthenticated = true;
       $rootScope.$applyAsync();
@@ -87,6 +93,13 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
 
     // user register
     $scope.register = function() {
+      if ($rootScope.$networkStatus.status !== window.NETWORK_STATE.CONNECTED) {
+         return $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
+          msg: 'Network not yet conneted',
+          hasOption: false,
+          isError: true
+        }, function() {});
+      }
       if (!$scope.registerForm.$valid) {
           return validateAuthFields($scope.registerForm);
       }
@@ -97,6 +110,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       };
       var request = new Request(onAuthResponse);
       $scope.cancelRequest = request.cancel;
+      $scope.isLoading = true;
       request.execute(function(done) {
         auth.register(payload, done);
       });
@@ -104,11 +118,19 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
 
     // user login
     $scope.login = function() {
+      if ($rootScope.$networkStatus.status !== window.NETWORK_STATE.CONNECTED) {
+        return $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
+          msg: 'Network not yet conneted',
+          hasOption: false,
+          isError: true
+        }, function() {});
+      }
       if (!$scope.loginForm.$valid) {
           return validateAuthFields($scope.loginForm);
       }
       var request = new Request(onAuthResponse);
       $scope.cancelRequest = request.cancel;
+      $scope.isLoading = true;
       request.execute(function(done) {
         auth.login($scope.user, done);
       });

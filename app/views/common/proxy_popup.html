@@ -1,4 +1,4 @@
-<div class="settings-popup">
+<div class="settings-popup" ng-init="checkProxy()">
   <div class="settings-popup-b">
     <div class="settings-popup-cnt">
       <!-- settings -->
@@ -12,13 +12,13 @@
           <p class="desc last">
             If you would like to disable this proxy, please use the toggle below.
           </p>
-          <div class="settings-i" ng-click="toggleProxyServer()">
+          <div class="settings-i" ng-init="proxy = false" ng-click="proxy = !proxy">
             <div class="settings-i-ctn">
               <h3 class="settings-i-name">Proxy</h3>
-              <h3 class="settings-i-desc">Is {{ $proxyServer ? 'enabled' : 'disabled' }}</h3>
+              <h3 class="settings-i-desc">Is {{ proxy ? 'enabled' : 'disabled' }}</h3>
             </div>
             <div class="opt">
-              <span class="switch" ng-class="{active: $proxyServer}"></span>
+              <span class="switch" ng-class="{active: proxy}"></span>
             </div>
           </div>
         </div>
@@ -26,7 +26,7 @@
       <!-- /settings -->
       <div class="settings-popup-opt">
         <div class="settings-popup-opt-i">
-          <button type="button" class="btn flat primary" name="continue" ng-click="$state.go('app')">Continue</button>
+          <button type="button" class="btn flat primary" name="continue" ng-click="enableProxySetting(proxy)">Continue</button>
         </div>
       </div>
     </div>

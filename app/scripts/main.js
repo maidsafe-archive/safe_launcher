@@ -14,7 +14,7 @@ window.safeLauncher = angular
 ])
 .run([ '$rootScope', '$state', '$stateParams', '$timeout', function($rootScope, $state, $stateParams, $timeout) {
   $rootScope.$state = $state;
-  $rootScope.isAuthenticated = false;
+  $rootScope.isAuthenticated = true;
   $rootScope.ALERT_TYPE = {
     AUTH_REQ: 'auth_request',
     TOASTER: 'toaster',
@@ -72,58 +72,4 @@ window.safeLauncher = angular
       window.msl.reconnect();
     }
   };
-
-  // $rootScope.$stateParams = $stateParams;
-  // $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams, options) {
-  //   event.preventDefault();
-  //   if (toState.name !== 'login' && toState.name !== 'register') {
-  //     $rootScope.isAuthenticated = true;
-  //   }
-  // });
-  // $rootScope.$loader = {
-  //   isLoading: false,
-  //   show: function() {
-  //     this.isLoading = true;
-  //   },
-  //   hide: function() {
-  //     this.isLoading = false;
-  //     if (!$rootScope.$$phase) {
-  //       $rootScope.$apply();
-  //     }
-  //   }
-  // };
-  // $rootScope.$msAlert = {
-  //   status: false,
-  //   callback: function() {},
-  //   title: null,
-  //   body: null,
-  //   show: function(title, body, callback) {
-  //     this.status = true;
-  //     this.title = title;
-  //     this.body = body;
-  //     this.callback = callback;
-  //   },
-  //   hide: function() {
-  //     this.status = false;
-  //     this.title = null;
-  //     this.body = null;
-  //     this.callback();
-  //   }
-  // };
-  // $rootScope.$proxyServer = false;
-  // $rootScope.openExternal = function(link) {
-  //   var shell = require('electron').shell;
-  //   shell.openExternal(link.toString());
-  // };
-
-  // window.msl.setNetworkStateChangeListener(function(state) {
-  //   $rootScope.network.show = true;
-  //   $rootScope.network.status = state;
-  //   if (state === window.NETWORK_STATE.DISCONNECTED) {
-  //     $rootScope.$state.go('login');
-  //     $rootScope.$msAlert.show('Network Disconnected', $rootScope.network.messages.DISCONNECTED, function() {});
-  //   }
-  //   $rootScope.$applyAsync();
-  //   console.log($rootScope.network);
-  // });
 } ]);

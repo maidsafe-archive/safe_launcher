@@ -82,6 +82,15 @@
   .app-li-b {
     padding: 21px 16px 16px;
   }
+  .default {
+    width: 100%;
+    background-color: #FFF;
+    padding: 0 18px;
+    margin-top: 12px;
+    font-size: 15px;
+    line-height: 44px;
+    color: #212121;
+  }
   .app-li-h {
     .app-li-h-lt {
       float: left;
@@ -93,29 +102,6 @@
       display: inline-block;
     }
     .clearfix();
-  }
-  .filter-by {
-    width: auto;
-    .filter-by-i {
-      float: left;
-      border-width: 0 1px 0 0;
-      border-color: #DDD;
-      border-style: solid;
-      button {
-        background-color: transparent;
-      }
-      &:last-child {
-        border: 0;
-        button {
-          padding-right: 0;
-        }
-      }
-      &.active {
-        button {
-          color: @primary-blue;
-        }
-      }
-    }
   }
   .app-li-cnt {
     width: 100%;
@@ -150,6 +136,7 @@
       position: absolute;
       top: 8px;
       right: 8px;
+      z-index: 99;
     }
     .status-bar {
       padding: 0 8px;
@@ -178,6 +165,92 @@
     }
     &:hover {
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.26);
+    }
+  }
+}
+
+// app_details
+.app-details {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #FFF;
+  z-index: 99;
+  .app-details-h {
+    width: 100%;
+    background-color: @primary-blue;
+    padding: 11px 16px;
+    .back {
+      button {
+        width: 24px;
+        height: 24px;
+        background-color: transparent;
+        border: 0;
+        outline: 0;
+        color: #FFF;
+        background-image: url(../images/back.svg);
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+      }
+    }
+  }
+  .app-details-cnt {
+    padding: 16px;
+    .title {
+      font-size: 24px;
+      line-height: 36px;
+      font-weight: 600;
+      color: #212121;
+      margin: 0;
+      padding: 0;
+      .version {
+        font-size: 15px;
+        opacity: 0.4;
+      }
+    }
+    .permissions {
+      margin-bottom: 30px;
+      .permissions-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #212121;
+        margin: 16px 0;
+        padding: 0;
+      }
+      ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        li {
+          font-size: 15px;
+          font-weight: normal;
+          color: #212121;
+          position: relative;
+          &:after {
+            content: '';
+            width: 24px;
+            height: 24px;
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+          }
+          &.icn {
+            padding-left: 30px;
+            &:after {
+              display: block;
+              background-image: url(../images/manage_blue.svg);
+            }
+          }
+        }
+      }
     }
   }
 }

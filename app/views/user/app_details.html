@@ -1,0 +1,34 @@
+<div class="app-details">
+  <div class="app-details-h">
+    <div class="back">
+      <button type="button" name="back" ng-click="toggleAppDetails()"></button>
+    </div>
+  </div>
+  <div class="app-details-cnt">
+    <h3 class="title">{{currentAppDetails.name}} - <span class="version">v {{currentAppDetails.version}}</span></h3>
+    <div class="permissions">
+      <h4 class="permissions-title">Permissions:</h4>
+      <ul>
+        <li ng-show="!currentAppDetails.permissions || currentAppDetails.permissions.length === 0">None</li>
+        <li ng-repeat="permission in currentAppDetails.permissions">{{ permission }}</li>
+      </ul>
+    </div>
+    <div class="table-view">
+      <div class="table-filter">
+        <div class="table-filter-i in-progress">
+          <input id="inProgress" type="checkbox" name="inProgress" value="" ng-model="filterInProgress">
+          <label for="inProgress">In Progress</label>
+        </div>
+        <div class="table-filter-i completed">
+          <input id="completed" type="checkbox" name="completed" value="" ng-model="filterComplete">
+          <label for="completed">Completed</label>
+        </div>
+        <div class="table-filter-i error">
+          <input id="error" type="checkbox" name="error" value="" ng-model="filterError">
+          <label for="error">Error</label>
+        </div>
+      </div>
+      <react-component name="AppLogs" props="{list: logList, filter: logFilter}"></react-component>
+    </div>
+  </div>
+</div>

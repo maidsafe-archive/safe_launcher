@@ -1,34 +1,37 @@
 <div class="form-b" ng-controller="authController">
-  <form class="form" name="registerForm" ng-submit="register()">
-    <div class="inp-grp">
-      <input id="pin" type="password" name="pin" required="true" ng-model="user.pin" field-validator />
-      <label for="pin">PIN</label>
-      <div class="msg">
-        <span class="txt"></span>
-        <span class="icn"></span>
+  <div ng-show="!isLoading">
+    <form class="form" name="registerForm" ng-submit="register()">
+      <div class="inp-grp">
+        <input id="pin" type="password" name="pin" required="true" ng-model="user.pin" field-validator />
+        <label for="pin">PIN</label>
+        <div class="msg">
+          <span class="txt"></span>
+          <span class="icn"></span>
+        </div>
       </div>
-    </div>
-    <div class="inp-grp">
-      <input id="keyword" type="password" name="keyword" required="true" ng-model="user.keyword" field-validator />
-      <label for="keyword">Keyword</label>
-      <div class="msg">
-        <span class="txt"></span>
-        <span class="icn"></span>
+      <div class="inp-grp">
+        <input id="keyword" type="password" name="keyword" required="true" ng-model="user.keyword" field-validator />
+        <label for="keyword">Keyword</label>
+        <div class="msg">
+          <span class="txt"></span>
+          <span class="icn"></span>
+        </div>
       </div>
-    </div>
-    <div class="inp-grp">
-      <input id="password" type="password" name="password" required="true" ng-model="user.password" field-validator />
-      <label for="password">Password</label>
-      <div class="msg">
-        <span class="txt"></span>
-        <span class="icn"></span>
+      <div class="inp-grp">
+        <input id="password" type="password" name="password" required="true" ng-model="user.password" field-validator />
+        <label for="password">Password</label>
+        <div class="msg">
+          <span class="txt"></span>
+          <span class="icn"></span>
+        </div>
       </div>
+      <div class="inp-btn">
+        <button type="submit" class="btn primary" name="register">Register</button>
+      </div>
+    </form>
+    <div class="form-f">
+      <a ui-sref="app.account({currentPage: 'login'})">Login</a>
     </div>
-    <div class="inp-btn">
-      <button type="submit" class="btn primary" name="register">Register</button>
-    </div>
-  </form>
-  <div class="form-f">
-    <a ui-sref="app.account({currentPage: 'login'})">Login</a>
   </div>
+  <ng-include src="'views/auth/loader.html'" ng-show="isLoading"></ng-include>
 </div>

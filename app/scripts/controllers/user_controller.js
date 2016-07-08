@@ -8,7 +8,15 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
       LAST_ACTIVE: 'last_active'
     };
     $scope.listOrderBy = $scope.LIST_ORDER_BY.NAME;
-    $scope.appList = [] ;
+    $scope.appList = [
+      {
+        name: 'test',
+        vendor: 'test',
+        version: '0.01',
+        id: 'test.com'
+      }
+    ];
+    $scope.currentAppDetails = {};
     var requestQueue = [];
     var isAuthReqProcessing = false;
 
@@ -25,6 +33,7 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
         if (status) {
           // $rootScope.$loader.show();
         }
+        console.log(requestQueue[0]);
         server.confirmResponse(requestQueue.shift(), status);
         checkRequestQueue();
       });
@@ -74,6 +83,19 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
 
     $scope.changeListOrder = function(order) {
       $scope.listOrderBy = order;
+    };
+
+    $scope.toggleAppDetails = function(id) {
+      if (!id) {
+        return $scope.currentAppDetails = null;
+      }
+      for(var i in $scope.appList) {
+        if ($scope.appList[i].id === id) {
+          $scope.currentAppDetails = $scope.appList[i];
+          break;
+        }
+      }
+
     };
   }
 ]);
