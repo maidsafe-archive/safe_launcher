@@ -1,9 +1,11 @@
 import jwt from 'jsonwebtoken';
 import mime from 'mime';
+import uuid from 'uuid';
 import sessionManager from './session_manager';
 import { errorCodeLookup } from './error_code_lookup';
 import { log } from './../logger/log';
 import { MSG_CONSTANTS } from './message_constants';
+import { Activity, ActivityStatus } from './model/activity';
 
 export var getSessionIdFromRequest = function(req) {
   let authHeader = req.get('Authorization');
@@ -68,6 +70,7 @@ export let ResponseHandler = function (req, res) {
     if (err) {
       return req.next(new ResponseError(400, err));
     }
+    updateAppActivity(req, res, true);
     let successStatus = 200;
     if (data) {
       res.status(successStatus).send(formatResponse(data));
@@ -81,6 +84,9 @@ export let ResponseHandler = function (req, res) {
 };
 
 export var setSessionHeaderAndParseBody = function(req, res, next) {
+  req.id = uuid.v4();
+  req.time = Date.now();
+  res.id = req.id;
   if (!req.get('Authorization')) {
     log.debug('Unauthorised request ::' + req.path);
     return next();
@@ -174,11 +180,27 @@ export var formatResponse = function(data) {
   return format(data);
 };
 
-export let sendResponseData = function(res, data, status) {
-  let successStatus = status || 200;
-  if (data) {
-    res.status(successStatus).send(formatResponse(data));
-  } else {
-    res.sendStatus(successStatus);
+export let addAppActivity = function(req, activityName) {
+  let activity = new Activity(req.id, activityName, Date.now());
+  req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').ACTIVITY_NEW, {
+    app: req.headers.sessionId,
+    activity: activity
+  });
+  if (req.headers.sessionId) {
+    sessionManager.get(req.headers.sessionId).addActivity(activity);
+  }
+  req.activity = activity;
+};
+
+export let updateAppActivity = function(req, res, isSuccess) {
+  let activity = req.activity;
+  activity.endTime = Date.now();
+  activity.activityStatus = isSuccess ? ActivityStatus.SUCCESS : ActivityStatus.FAILURE;
+  req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').ACTIVITY_UPDATE, {
+    app: req.headers.sessionId,
+    activity: activity
+  });
+  if (req.headers.sessionId) {
+    sessionManager.get(req.headers.sessionId).updateActivity(activity);
   }
 };

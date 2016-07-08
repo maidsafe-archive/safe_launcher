@@ -189,4 +189,13 @@ export default class UIUtils {
   onDownloadEvent(callback) {
     this.restServer.addEventListener(this.restServer.EVENT_TYPE.DATA_DOWNLOADED, callback);
   }
+
+  onNewAppActivity(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.ACTIVITY_NEW, callback);
+  }
+
+  onUpdatedAppActivity(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.ACTIVITY_UPDATE, callback);
+  }
+
 }

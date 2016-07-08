@@ -20,7 +20,7 @@ export let CreateSession = function(data) {
   this.onDirKey = function(err, dirKey) {
     let authReq = req.body;
     if (err) {
-      log.error('Creating session :: ' + err);
+      log.error('Creating session :: ' + JSON.stringify(err));
       return next(new ResponseError(500, err));
     }
     log.debug('Directory key for creating an session obtained');
@@ -104,4 +104,8 @@ export var isTokenValid = function(req, res, next) {
     return next(new ResponseError(401));
   }
   return new ResponseHandler(req, res)();
+};
+
+export let getAuthActivityName = function(req) {
+  addAppActivity(req, 'Application requesting for approval');
 };

@@ -9,6 +9,20 @@ export default class SessionInfo {
     this['appPermissions'] = permissions || [];
     this['appSigningKey'] = crypto.randomBytes(32);
     this['appRootDirKey'] = appDirKey;
+    this['activities'] = [];
+  }
+
+  addActivity(activity) {
+    this['activities'].push(activity);
+    this['activities'] = this['activities'].slice(0, 500)
+  }
+
+  updateActivity(activity) {
+    let index = this['activities'].indexOf(activity);
+    if (index < 0) {
+      return;
+    }
+    this['activities'][index] = activity;
   }
 
   hasSafeDriveAccess() {

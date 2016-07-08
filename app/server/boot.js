@@ -6,7 +6,7 @@ import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
 import { router_0_5 } from './routes/version_0_5';
 import { CreateSession } from './controllers/auth';
-import { formatResponse, setSessionHeaderAndParseBody, ResponseError } from './utils';
+import { formatResponse, ResponseError, setSessionHeaderAndParseBody, updateAppActivity } from './utils';
 import { log } from './../logger/log';
 
 class ServerEventEmitter extends EventEmitter {};
@@ -22,6 +22,8 @@ export default class RESTServer {
       STARTED: 'started',
       STOPPED: 'stopped',
       AUTH_REQUEST: 'auth-request',
+      ACTIVITY_NEW: 'activity-new',
+      ACTIVITY_UPDATE: 'activity-update',
       SESSION_CREATED: 'sesssion_created',
       SESSION_REMOVED: 'session_removed',
       DATA_UPLOADED: 'data_uploaded',
@@ -77,6 +79,7 @@ export default class RESTServer {
       if (!(err instanceof ResponseError)) {
         return next();
       }
+      updateAppActivity(req, res);
       log.warn('Err ' + err.status + ' - Msg :: ' + err.msg);
       res.status(err.status).send(err.msg);
     });
