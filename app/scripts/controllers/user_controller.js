@@ -1,21 +1,12 @@
 /**
  * User Controller
  */
-window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootScope', 'serverFactory',
-  function($scope, $state, $rootScope, server) {
+window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootScope', '$interval', 'serverFactory',
+  function($scope, $state, $rootScope, $interval, server) {
     $scope.LIST_ORDER_BY = {
       NAME: 'name',
       LAST_ACTIVE: 'last_active'
     };
-    $scope.listOrderBy = $scope.LIST_ORDER_BY.NAME;
-    $scope.appList = [
-      {
-        name: 'test',
-        vendor: 'test',
-        version: '0.01',
-        id: 'test.com'
-      }
-    ];
     $scope.currentAppDetails = {};
     var requestQueue = [];
     var isAuthReqProcessing = false;
@@ -41,9 +32,9 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
     };
 
     var removeApplication = function(id) {
-      $scope.appList.forEach(function(list, index) {
+      $rootScope.appList.forEach(function(list, index) {
         if (list.id === id) {
-          $scope.appList.splice(index, 1);
+          $rootScope.appList.splice(index, 1);
           $scope.$applyAsync();
         }
       });
@@ -60,7 +51,7 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
     // handle session creation
     server.onSessionCreated(function(session) {
       console.log('Session created :: ');
-      $scope.appList.push({
+      $rootScope.appList.push({
         id: session.id,
         name: session.info.appName,
         version: session.info.appVersion,
@@ -89,13 +80,12 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
       if (!id) {
         return $scope.currentAppDetails = null;
       }
-      for(var i in $scope.appList) {
-        if ($scope.appList[i].id === id) {
-          $scope.currentAppDetails = $scope.appList[i];
+      for(var i in $rootScope.appList) {
+        if ($rootScope.appList[i].id === id) {
+          $scope.currentAppDetails = $rootScope.appList[i];
           break;
         }
       }
-
     };
   }
 ]);

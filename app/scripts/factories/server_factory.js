@@ -119,6 +119,17 @@ window.safeLauncher.factory('serverFactory', [
       window.msl.reconnect();
     };
 
+    self.fetchGetsCount = function(callback) {
+      window.msl.fetchGetsCount(callback);
+    }
+
+    self.fetchDeletesCount = function(callback) {
+      window.msl.fetchDeletesCount(callback);
+    }
+
+    self.fetchPostsCount = function(callback) {
+      window.msl.fetchPostsCount(callback);
+    }
     return self;
   }
 ]);

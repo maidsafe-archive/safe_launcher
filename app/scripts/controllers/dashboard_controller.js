@@ -1,32 +1,31 @@
 /**
  * Dashboard Controller
  */
-
-window.safeLauncher.controller('dashboardController', [ '$scope', '$state', '$rootScope', 'serverFactory',
-  function($scope, $state, $rootScope, server) {
-    $scope.logList = [
-      {
-        id: 'test.com',
-        name: 'Demo App',
-        req: 'Updating Dir',
-        status: 'In_Progress',
-        time: '00:05:02'
-      },
-      {
-        id: 'test1.com',
-        name: 'Demo App',
-        req: 'Updating Dir',
-        status: 'completed',
-        time: '00:05:02'
-      },
-      {
-        id: 'test2.com',
-        name: 'Demo App',
-        req: 'Updating Dir',
-        status: 'error',
-        time: '00:05:02'
-      }
-    ]
+window.safeLauncher.controller('dashboardController', [ '$scope', '$state', '$rootScope', '$interval', 'serverFactory',
+  function($scope, $state, $rootScope, $interval, server) {
     $scope.logFilter = [];
+    $scope.dashData = {
+      getsCount: 0,
+      deletesCount: 0,
+      postsCount: 0,
+    };
+    var FETCH_DELAY = 2000;
+    $interval(function() {
+       server.fetchGetsCount(function(err, data) {
+         if (data) {
+           $scope.dashData.getsCount = data;
+         }
+       });
+       server.fetchDeletesCount(function(err, data) {
+         if (data) {
+           $scope.dashData.deletesCount = data;
+         }
+       });
+       server.fetchPostsCount(function(err, data) {
+         if (data) {
+           $scope.dashData.postsCount = data;
+         }
+       });
+    }, FETCH_DELAY);
   }
 ]);

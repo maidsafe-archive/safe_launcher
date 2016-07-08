@@ -124,7 +124,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
 
     $scope.checkProxy = function() {
       var proxy = getProxy();
-      if (proxy.hasOwnProperty('status')) {
+      if (proxy && proxy.hasOwnProperty('status')) {
         $rootScope.$proxyServer = proxy.status;
         $state.go('app');
       }

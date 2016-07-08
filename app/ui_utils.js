@@ -57,7 +57,7 @@ export default class UIUtils {
     });
   }
 
-  dropUnregisteredClient(callback) {    
+  dropUnregisteredClient(callback) {
     this.api.auth.dropUnregisteredClient(callback);
   }
 
@@ -163,7 +163,7 @@ export default class UIUtils {
   reconnect() {
     this.api.restart();
   }
-  
+
   fetchGetsCount(callback) {
    this.api.clientStats.fetchGetsCount(callback);
   }
@@ -172,8 +172,8 @@ export default class UIUtils {
     this.api.clientStats.fetchDeletesCount(callback);
   }
 
-  fetchPotsCount(callback) {
-    this.api.clientStats.fetchPotsCount(callback);
+  fetchPostsCount(callback) {
+    this.api.clientStats.fetchPostsCount(callback);
   }
 
   fetchPutsCount(callback) {
