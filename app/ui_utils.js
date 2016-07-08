@@ -179,4 +179,14 @@ export default class UIUtils {
   fetchPutsCount(callback) {
     this.api.clientStats.fetchPutsCount(callback);
   }
+
+  onUploadEvent(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.DATA_UPLOADED, function(s) {
+      console.log('D', s);
+    });
+  }
+
+  onDownloadEvent(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.DATA_DOWNLOADED, callback);
+  }
 }

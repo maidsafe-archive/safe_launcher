@@ -71,6 +71,7 @@ export let ResponseHandler = function (req, res) {
     let successStatus = 200;
     if (data) {
       res.status(successStatus).send(formatResponse(data));
+      req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').DATA_DOWNLOADED, data.length);
     } else {
       res.sendStatus(successStatus);
     }

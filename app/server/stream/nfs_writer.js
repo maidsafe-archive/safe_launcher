@@ -26,10 +26,13 @@ util.inherits(NfsWriter, Writable);
 
 NfsWriter.prototype._write = function(data, enc, next) {
   var self = this;
+  var eventEmitter = self.req.app.get('eventEmitter');
+  var uploadEvent = self.req.app.get('EVENT_TYPE').DATA_UPLOADED;
   this.req.app.get('api').nfs.write(this.writerId, this.curOffset, data, function(err) {
     if (err) {
       return self.callback(err);
     }
+    eventEmitter.emit(uploadEvent, data.length);
     self.curOffset += data.length;
     if (self.isReadStreamClosed) {
       return self.req.app.get('api').nfs.closeWriter(self.writerId, self.responseHandler);

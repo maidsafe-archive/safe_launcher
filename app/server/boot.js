@@ -23,7 +23,9 @@ export default class RESTServer {
       STOPPED: 'stopped',
       AUTH_REQUEST: 'auth-request',
       SESSION_CREATED: 'sesssion_created',
-      SESSION_REMOVED: 'session_removed'
+      SESSION_REMOVED: 'session_removed',
+      DATA_UPLOADED: 'data_uploaded',
+      DATA_DOWNLOADED: 'data_downloaded'
     };
     this.app.set('api', api);
     this.app.set('eventEmitter', new ServerEventEmitter());
