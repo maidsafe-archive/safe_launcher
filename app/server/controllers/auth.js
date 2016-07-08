@@ -7,7 +7,7 @@ import sessionManager from '../session_manager';
 import SessionInfo from '../model/session_info';
 import Permission from '../model/permission';
 import {
-  getSessionIdFromRequest, ResponseError, ResponseHandler
+  ResponseError, ResponseHandler
 } from '../utils'
 import { log } from './../../logger/log';
 import { MSG_CONSTANTS } from './../message_constants';
@@ -87,7 +87,7 @@ export var authorise = function(req, res, next) {
 
 export var revoke = function(req, res, next) {
   log.debug('Revoke authorisation request received');
-  let sessionId = getSessionIdFromRequest(req);
+  let sessionId = req.headers['sessionId'];
   if (!sessionId) {
     log.debug('Revoke authorisation request - Session not found - ' + sessionId);
     return next(new ResponseError(401));
@@ -96,7 +96,7 @@ export var revoke = function(req, res, next) {
   log.debug('Revoke authorisation request - Session removed - ' + sessionId);
   let eventType = req.app.get('EVENT_TYPE').SESSION_REMOVED;
   req.app.get('eventEmitter').emit(eventType, sessionId);
-  return new ResponseHandler(req, res)();
+  new ResponseHandler(req, res)();
 };
 
 export var isTokenValid = function(req, res, next) {
@@ -104,8 +104,4 @@ export var isTokenValid = function(req, res, next) {
     return next(new ResponseError(401));
   }
   return new ResponseHandler(req, res)();
-};
-
-export let getAuthActivityName = function(req) {
-  addAppActivity(req, 'Application requesting for approval');
 };
