@@ -12,19 +12,56 @@ window.safeLauncher = angular
     delete $httpProvider.defaults.headers.common['X-Requested-With'];
   }
 ])
-.run([ '$rootScope', '$state', '$stateParams', function($rootScope, $state, $stateParams) {
+.run([ '$rootScope', '$state', '$stateParams', '$timeout', function($rootScope, $state, $stateParams, $timeout) {
   $rootScope.$state = $state;
   $rootScope.isAuthenticated = false;
-  $rootScope.authRequest = {
-    status: false,
-    data: {},
-    confirm: function() {},
-    show: function(data) {
-      this.status = true;
-      this.data = data;
+  $rootScope.ALERT_TYPE = {
+    AUTH_REQ: 'auth_request',
+    TOASTER: 'toaster',
+    PROMPT: 'prompt'
+  };
+  $rootScope.$alert = {
+    queue: [],
+    isProcessing: false,
+    currentAlert: null,
+    type: null,
+    payload: {},
+    timer: null,
+    callback: function(err, data) {
+      this.currentAlert.callback(err, data);
+      this.type = null;
+      this.payload = {};
+      this.isProcessing = false;
+      this.currentAlert = null;
+      this.process();
     },
-    hide: function() {
-      this.status = false;
+    show: function(type, payload, callback) {
+      this.queue.push({
+        type: type,
+        payload: payload,
+        callback: callback
+      });
+      this.process();
+    },
+    process: function() {
+      var self = this;
+      if (this.isProcessing) {
+        return;
+      }
+      this.currentAlert = this.queue.shift();
+      if (!this.currentAlert) {
+        return;
+      }
+      this.isProcessing = true;
+      this.type = this.currentAlert.type;
+      this.payload = this.currentAlert.payload;
+      if (this.currentAlert.type === $rootScope.ALERT_TYPE.TOASTER && !this.currentAlert.payload.hasOption) {
+        this.timer = $timeout(function() {
+          $timeout.cancel(this.timer);
+          self.callback(null, true);
+        }, 2000);
+      }
+
     }
   };
   $rootScope.$proxyServer = false;
@@ -35,17 +72,6 @@ window.safeLauncher = angular
       window.msl.reconnect();
     }
   };
-
-  window.msl.setNetworkStateChangeListener(function(state) {
-    $rootScope.$networkStatus.show = true;
-    $rootScope.$networkStatus.status = state;
-    // if (state === window.NETWORK_STATE.DISCONNECTED) {
-    //   $rootScope.$state.go('login');
-    //   $rootScope.$msAlert.show('Network Disconnected', $rootScope.network.messages.DISCONNECTED, function() {});
-    // }
-    console.log('Network status :: ' + state);
-    $rootScope.$applyAsync();
-  });
 
   // $rootScope.$stateParams = $stateParams;
   // $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams, options) {

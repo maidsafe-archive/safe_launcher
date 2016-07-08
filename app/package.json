@@ -10,6 +10,7 @@
   "dependencies": {
     "angular": "^1.5.7",
     "body-parser": "~1.13.2",
+    "chart.js": "^1.1.1",
     "express": "^4.13.4",
     "ffi": "^2.0.0",
     "fs-extra": "^0.30.0",
@@ -19,6 +20,7 @@
     "mime": "^1.3.4",
     "ngreact": "^0.3.0",
     "react": "^15.2.0",
+    "react-chartjs": "^0.7.3",
     "react-dom": "^15.2.0",
     "ref": "^1.3.2",
     "ref-array": "^1.1.2",

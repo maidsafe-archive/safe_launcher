@@ -11,7 +11,12 @@
 <body ng-app="safeLauncher">
   <div class="root" ui-view="root" ng-controller="basicController">
   </div>
-  <ng-include src="'views/common/auth_request.html'" ng-show="authRequest.status"></ng-include>
+  <span class="network-status" ng-class="{
+    error: $networkStatus.status === -1 || $networkStatus.status === 2,
+    connecting: $networkStatus.status === 0,
+    connected: $networkStatus.status === 1
+  }"></span>
+  <alert type="$alert.type" payload="$alert.payload" callback="$alert.callback(err, data)"></alert>
   <script>
     window.$ = window.jQuery = require('./bower_components/jquery/dist/jquery.min.js');
   </script>
@@ -20,6 +25,8 @@
   <script src="./node_modules/react/dist/react.js"></script>
   <script src="./node_modules/react-dom/dist/react-dom.js"></script>
   <script src="./node_modules/ngreact/ngReact.js"></script>
+  <script src="./node_modules/chart.js/Chart.min.js" charset="utf-8"></script>
+  <script src="./node_modules/react-chartjs/dist/react-chartjs.js" charset="utf-8"></script>
 
   <script src="./app.js"></script>
   <script src="./scripts/main.js"></script>
@@ -31,6 +38,7 @@
   <script src="./scripts/directives/tabs.js" charset="utf-8"></script>
   <script src="scripts/directives/switch.js" charset="utf-8"></script>
   <script src="scripts/directives/form_field_validator.js" charset="utf-8"></script>
+  <script src="scripts/directives/alert.js" charset="utf-8"></script>
 
   <!-- factories -->
   <script src="./scripts/factories/auth_factory.js" charset="utf-8"></script>
@@ -41,9 +49,11 @@
   <script src="./scripts/controllers/basic_controller.js" charset="utf-8"></script>
   <script src="./scripts/controllers/auth_controller.js" charset="utf-8"></script>
   <script src="./scripts/controllers/user_controller.js" charset="utf-8"></script>
+  <script src="./scripts/controllers/dashboard_controller.js" charset="utf-8"></script>
 
   <!-- components -->
   <script src="./scripts/components/app_list.js"></script>
+  <script src="./scripts/components/app_logs.js"></script>
 </body>
 
 </html>

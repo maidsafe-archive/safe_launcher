@@ -8,32 +8,27 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
       LAST_ACTIVE: 'last_active'
     };
     $scope.listOrderBy = $scope.LIST_ORDER_BY.NAME;
-    $scope.appList = [
-      {
-        name: 'Demo app',
-        id: 'test.com'
-      }
-    ] ;
+    $scope.appList = [] ;
     var requestQueue = [];
     var isAuthReqProcessing = false;
 
     var showConfirmation = function() {
+      var checkRequestQueue = function() {
+        isAuthReqProcessing = false;
+        showConfirmation();
+      };
       if (isAuthReqProcessing || requestQueue.length === 0) {
         return;
       }
       isAuthReqProcessing = true;
-      $rootScope.authRequest.show(requestQueue[0]);
+      $rootScope.$alert.show($rootScope.ALERT_TYPE.AUTH_REQ, requestQueue[0], function(err, status) {
+        if (status) {
+          // $rootScope.$loader.show();
+        }
+        server.confirmResponse(requestQueue.shift(), status);
+        checkRequestQueue();
+      });
       $rootScope.$applyAsync();
-    };
-
-    var hideConfirmation = function() {
-      $rootScope.authRequest.hide();
-      $rootScope.$applyAsync();
-    };
-
-    var checkRequestQueue = function() {
-      isAuthReqProcessing = false;
-      showConfirmation();
     };
 
     var removeApplication = function(id) {
@@ -43,15 +38,6 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
           $scope.$applyAsync();
         }
       });
-    };
-
-    $rootScope.authRequest.confirm = function(status) {
-      hideConfirmation();
-      if (status) {
-        // $rootScope.$loader.show();
-      }
-      server.confirmResponse(requestQueue.shift(), status);
-      checkRequestQueue();
     };
 
     // handle auth request

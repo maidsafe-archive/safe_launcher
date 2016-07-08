@@ -1,1 +1,91 @@
-Dashboard
+<div class="dash" ng-controller="dashboardController">
+  <div class="dash-b">
+    <div class="dash-cnt">
+      <div class="sec-1">
+        <div class="card" id="requestChart">
+
+        </div>
+      </div>
+    </div>
+    <div class="dash-cnt">
+      <div class="sec-2">
+        <div class="card">
+
+        </div>
+      </div>
+      <div class="sec-2">
+        <div class="card">
+          <div class="dash-progress-bar">
+            <div class="dash-progress-bar-b">
+              <h3 class="count"><span class="value">301</span>/500</h3>
+              <h4 class="title">Total Puts</h4>
+              <div class="progress">
+                <span class="progress-value" style="width:50%"></span>
+              </div>
+              <div class="desc">
+                Each account is currently limited to 100 PUTs on the Network. (<a href="#">read more here.</a>)
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dash-cnt">
+      <div class="sec-3">
+        <div class="card">
+          <div class="count">
+            <div class="count-val">121</div>
+            <div class="count-title">Total GETs</div>
+          </div>
+        </div>
+      </div>
+      <div class="sec-3">
+        <div class="card">
+          <div class="count">
+            <div class="count-val">134</div>
+            <div class="count-title">Total POSTs</div>
+          </div>
+        </div>
+      </div>
+      <div class="sec-3">
+        <div class="card">
+          <div class="count">
+            <div class="count-val">84</div>
+            <div class="count-title">Total DELETEs</div>
+          </div>
+        </div>
+      </div>
+      <div class="sec-3">
+        <div class="card">
+          <div class="count">
+            <div class="count-val">5</div>
+            <div class="count-title">Connected Apps</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dash-cnt">
+      <div class="sec-1">
+        <div class="card">
+          <div class="table-view">
+            <div class="table-filter">
+              <div class="table-filter-i in-progress">
+                <input id="inProgress" type="checkbox" name="inProgress" value="" ng-model="filterInProgress">
+                <label for="inProgress">In Progress</label>
+              </div>
+              <div class="table-filter-i completed">
+                <input id="completed" type="checkbox" name="completed" value="" ng-model="filterComplete">
+                <label for="completed">Completed</label>
+              </div>
+              <div class="table-filter-i error">
+                <input id="error" type="checkbox" name="error" value="" ng-model="filterError">
+                <label for="error">Error</label>
+              </div>
+            </div>
+            <react-component name="AppLogs" props="{list: logList, filter: logFilter}"></react-component>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
