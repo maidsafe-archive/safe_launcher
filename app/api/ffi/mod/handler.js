@@ -4,7 +4,7 @@ module.exports = function(libPath) {
   var ref = require('ref');
   var int = ref.types.int;
   var ArrayType = require('ref-array');
-  var STRING_TYPE = 'string';
+  var cString = ref.types.CString;
   var intPtr = ref.refType(int);
   var Void = ref.types.void;
   var voidPtr = ref.refType(Void);
@@ -16,28 +16,33 @@ module.exports = function(libPath) {
   var auth = require('./auth.js');
   var nfs = require('./nfs.js');
   var dns = require('./dns.js');
+  var clientStats = require('./client_stats.js');
   var util = require('./util.js');
 
   var lib;
   var self = this;
-  var LIB_LOAD_ERROR = 9999;
+  var LIB_LOAD_ERROR = -2;
 
   var methodsToRegister = function() {
     return {
-      'init_logging': [ int, [] ],
+      'client_issued_deletes': [ int, [ voidPtrPtr ] ],
+      'client_issued_gets': [ int, [ voidPtrPtr ] ],
+      'client_issued_posts': [ int, [ voidPtrPtr ] ],
+      'client_issued_puts': [ int, [ voidPtrPtr ] ],
+      'create_account': [ int, [ cString, cString, cString, voidPtrPtr ] ],
       'create_unregistered_client': [ int, [ voidPtrPtr ] ],
-      'create_account': [ int, [ STRING_TYPE, STRING_TYPE, STRING_TYPE, voidPtrPtr ] ],
-      'log_in': [ int, [ STRING_TYPE, STRING_TYPE, STRING_TYPE, voidPtrPtr ] ],
-      'get_safe_drive_key': [ 'pointer', [ intPtr, intPtr, intPtr, voidPtrPtr ] ],
-      'get_app_dir_key': [ 'pointer', [ STRING_TYPE, STRING_TYPE, STRING_TYPE, intPtr, intPtr, intPtr, voidPtrPtr ] ],
-      'execute': [ int, [ STRING_TYPE, voidPtrPtr ] ],
-      'execute_for_content': [ 'pointer', [ STRING_TYPE, intPtr, intPtr, intPtr, voidPtrPtr ] ],
       'drop_client': [ 'void', [ voidPtrPtr ] ],
       'drop_vector': [ 'void', [ 'pointer', int, int ] ],
-      'register_network_event_observer': [ 'void', [ voidPtrPtr, 'pointer' ] ],
-      'get_nfs_writer': [ int, [ STRING_TYPE, voidPtrPtr, voidPtrPtr ] ],
+      'execute': [ int, [ cString, voidPtrPtr ] ],
+      'execute_for_content': [ 'pointer', [ cString, intPtr, intPtr, intPtr, voidPtrPtr ] ],
+      'get_app_dir_key': [ 'pointer', [ cString, cString, cString, intPtr, intPtr, intPtr, voidPtrPtr ] ],
+      'get_nfs_writer': [ int, [ cString, voidPtrPtr, voidPtrPtr ] ],
+      'get_safe_drive_key': [ 'pointer', [ intPtr, intPtr, intPtr, voidPtrPtr ] ],
+      'init_logging': [ int, [] ],
+      'log_in': [ int, [ cString, cString, cString, voidPtrPtr ] ],
+      'nfs_stream_close': [ int, [ voidPtrPtr ] ],
       'nfs_stream_write': [ int, [ voidPtrPtr, int, refUin8Array, size_t ] ],
-      'nfs_stream_close': [ int, [ voidPtrPtr ] ]
+      'register_network_event_observer': [ 'void', [ voidPtrPtr, 'pointer' ] ]
     };
   };
 
@@ -78,7 +83,7 @@ module.exports = function(libPath) {
       return lib.init_logging() === 0;
       /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     } catch (e) {
-      console.log('FFI load error', e);
+      util.sendLog('ERROR', 'FFI load error' + e.message);
     }
     return false;
   };
@@ -93,12 +98,8 @@ module.exports = function(libPath) {
           auth.execute(lib, message, registeredClientObserver);
           break;
 
-        case 'nfs':
-          message.client = getClientHandle(message);
-          if (message.isAuthorised) {
-            message.safeDriveKey = auth.getSafeDriveKey();
-          }
-          nfs.execute(lib, message);
+        case 'connect':
+          auth.getUnregisteredClient(lib, unRegisteredClientObserver);
           break;
 
         case 'dns':
@@ -109,15 +110,23 @@ module.exports = function(libPath) {
           dns.execute(lib, message);
           break;
 
-        case 'connect':
-          auth.getUnregisteredClient(lib, unRegisteredClientObserver);
+        case 'nfs':
+          message.client = getClientHandle(message);
+          if (message.isAuthorised) {
+            message.safeDriveKey = auth.getSafeDriveKey();
+          }
+          nfs.execute(lib, message);
           break;
 
+        case 'client-stats':
+          message.client = getClientHandle(message);
+          clientStats.execute(lib, message);
+          break;
         default:
-          util.sendError(message.id, 999, 'Module not found');
+          util.sendException(message.id, 'Module not found');
       }
     } catch (e) {
-      util.sendError(message.id, 999, e.message);
+      util.sendException(message.id, e.message);
     }
   };
 

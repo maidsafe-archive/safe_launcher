@@ -103,7 +103,7 @@ var login = function(lib, request, observer) {
     res = lib.log_in(params.keyword, params.pin, params.password, regClient);
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   } catch (e) {
-    return util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
   if (res !== 0) {
     return util.sendError(request.id, res);
@@ -166,7 +166,7 @@ var getAppDirectoryKey = function(lib, request) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.send(request.id, appDirKey);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -202,6 +202,6 @@ exports.execute = function(lib, request, observer) {
       cleanUp(lib);
       break;
     default:
-      util.sendError(request.id, 999, 'Invalid Action');
+      util.sendException(request.id, new Error('Invalid action'));
   }
 };

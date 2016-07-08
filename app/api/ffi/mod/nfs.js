@@ -59,7 +59,7 @@ var createDirectory = function(lib, request) {
     var payload = createPayload('create-dir', request);
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -68,7 +68,7 @@ var getDirectory = function(lib, request) {
     var payload = createPayload('get-dir', request);
     util.executeForContent(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -77,7 +77,7 @@ var deleteDirectory = function(lib, request) {
     var payload = createPayload('delete-dir', request);
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -89,7 +89,7 @@ var modifyDirectory = function(lib, request) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -98,7 +98,7 @@ var createFile = function(lib, request) {
     var payload = createPayload('create-file', request);
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -107,7 +107,7 @@ var deleteFile = function(lib, request) {
     var payload = createPayload('delete-file', request);
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -119,7 +119,7 @@ var modifyFileMeta = function(lib, request) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -131,7 +131,7 @@ var modifyFileContent = function(lib, request) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -145,7 +145,7 @@ var getFile = function(lib, request) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.executeForContent(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -154,7 +154,7 @@ var getFileMetadata = function(lib, request) {
     var payload = createPayload('get-file-metadata', request);
     util.executeForContent(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -170,7 +170,7 @@ var move = function(lib, request, action) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -191,7 +191,7 @@ var getWriter = function(lib, request) {
     writerHandlePool[writerId] = writerHandle.deref();
     util.send(request.id, writerId);
   } catch (e) {
-    util.sendError(request.id, 999, e.message);
+    util.sendException(request.id, e);
   }
 };
 
@@ -211,7 +211,7 @@ var write = function(lib, request) {
     }
     util.sendError(request.id, result);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -230,7 +230,7 @@ var closeWriter = function(lib, request) {
     }
     util.sendError(request.id, result);
   } catch (e) {
-    util.sendError(request.id, 999, e.toString());
+    util.sendException(request.id, e);
   }
 };
 
@@ -293,6 +293,6 @@ exports.execute = function(lib, request) {
       cleanUp(lib);
       break;
     default:
-      util.sendError(request.id, 999, 'Invalid action');
+      util.sendException(request.id, new Error('Invalid action'));
   }
 };

@@ -163,4 +163,20 @@ export default class UIUtils {
   reconnect() {
     this.api.restart();
   }
+  
+  fetchGetsCount(callback) {
+   this.api.clientStats.fetchGetsCount(callback);
+  }
+
+  fetchDeletesCount(callback) {
+    this.api.clientStats.fetchDeletesCount(callback);
+  }
+
+  fetchPotsCount(callback) {
+    this.api.clientStats.fetchPotsCount(callback);
+  }
+
+  fetchPutsCount(callback) {
+    this.api.clientStats.fetchPutsCount(callback);
+  }
 }

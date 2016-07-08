@@ -53,6 +53,14 @@ var sendError = function(id, errorCode, msg) {
   });
 };
 
+var sendException = function(id, ex) {
+  process.send({
+    id: id,
+    errorCode: 999,
+    errorMsg: ex.message
+  });
+};
+
 var sendLog = function(level, logMsg) {
   process.send({
     id: 'log',
@@ -67,5 +75,6 @@ exports.execute = execute;
 exports.executeForContent = executeForContent;
 exports.send = send;
 exports.sendConnectionStatus = sendConnectionStatus;
+exports.sendException = sendException;
 exports.sendError = sendError;
 exports.sendLog = sendLog;
