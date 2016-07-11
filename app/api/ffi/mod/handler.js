@@ -35,11 +35,13 @@ module.exports = function(libPath) {
       'drop_vector': [ 'void', [ 'pointer', int, int ] ],
       'execute': [ int, [ cString, voidPtrPtr ] ],
       'execute_for_content': [ 'pointer', [ cString, intPtr, intPtr, intPtr, voidPtrPtr ] ],
+      'get_account_info': [ int, [ voidPtrPtr, intPtr, intPtr ] ],
       'get_app_dir_key': [ 'pointer', [ cString, cString, cString, intPtr, intPtr, intPtr, voidPtrPtr ] ],
       'get_nfs_writer': [ int, [ cString, voidPtrPtr, voidPtrPtr ] ],
       'get_safe_drive_key': [ 'pointer', [ intPtr, intPtr, intPtr, voidPtrPtr ] ],
       'init_logging': [ int, [] ],
       'log_in': [ int, [ cString, cString, cString, voidPtrPtr ] ],
+      'nfs_create_file': [ int, [ cString, voidPtrPtr, voidPtrPtr ] ],
       'nfs_stream_close': [ int, [ voidPtrPtr ] ],
       'nfs_stream_write': [ int, [ voidPtrPtr, int, refUin8Array, size_t ] ],
       'register_network_event_observer': [ 'void', [ voidPtrPtr, 'pointer' ] ]
@@ -76,6 +78,11 @@ module.exports = function(libPath) {
     });
   };
 
+  var cleanUp = function() {
+    dropWriterHandles();
+    dropClient();
+  };
+
   var loadLibrary = function() {
     try {
       lib = ffi.Library(libPath, methodsToRegister());
@@ -99,6 +106,11 @@ module.exports = function(libPath) {
           break;
 
         case 'connect':
+          auth.getUnregisteredClient(lib, unRegisteredClientObserver);
+          break;
+
+        case 'reset':
+          cleanUp();
           auth.getUnregisteredClient(lib, unRegisteredClientObserver);
           break;
 
@@ -132,8 +144,5 @@ module.exports = function(libPath) {
 
   self.dispatcher = dispatcher;
 
-  self.cleanUp = function() {
-    dropWriterHandles();
-    dropClient();
-  };
+  self.cleanUp = cleanUp;
 };

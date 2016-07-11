@@ -9,5 +9,5 @@ export var clientStats = new ClientStats(client.send);
 export var close = client.close;
 export var dns = new DNS(client.send);
 export var nfs = new NFS(client.send);
-export var restart = client.restart;
+export var reset = client.reset;
 export var setNetworkStateListener = client.setNetworkStateListener;

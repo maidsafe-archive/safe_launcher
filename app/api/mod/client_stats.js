@@ -38,4 +38,12 @@ export default class ClientStats {
             action: 'puts'
         }, callback);
     }
+
+    getAccountInfo(callback) {
+      log.debug('Invoking CLIENT STATS API:: Account Info ::' + this.MODULE );
+      this.send({
+          module: this.MODULE,
+          action: 'acc-info'
+      }, callback);
+    }
 }

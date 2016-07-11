@@ -28,7 +28,7 @@ var executeForContent = function(lib, client, requestId, payload) {
     var capacity = capacityPtr.deref();
     var response = ref.reinterpret(pointer, size).toString();
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    lib.drop_vector(pointer, size, capacity);
+    lib.drop_vector.async(pointer, size, capacity. function() {});
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     send(requestId, response);
   });

@@ -19,21 +19,40 @@ var fetchGetsCount = function(reqId, lib, clientHandle) {
 
 var fetchDeletesCount = function(reqId, lib, clientHandle) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    lib.client_issued_deletes(clientHandle, new Handler(reqId));
+    lib.client_issued_deletes.async(clientHandle, new Handler(reqId));
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
 };
 
 
 var fetchPostsCount = function(reqId, lib, clientHandle) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    var count = lib.client_issued_posts(clientHandle, new Handler(reqId));
+    lib.client_issued_posts.async(clientHandle, new Handler(reqId));
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
 };
 
 var fetchPutsCount = function(reqId, lib, clientHandle) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    var count = lib.client_issued_puts(clientHandle, new Handler(reqId));
+    lib.client_issued_puts.async(clientHandle, new Handler(reqId));
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+};
+
+var getAccountInfo = function(reqId, lib, clientHandle) {
+  var userPtr = ref.alloc(int);
+  var availablePtr = ref.alloc(int);
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+  lib.get_account_info.async(clientHandle, usedPtr, availablePtr, function(err, resultCode) {
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    if (err) {
+      return util.sendException(reqId, err.message);
+    }
+    if (resultCode !== 0) {
+      return util.sendError(reqId, resultCode);
+    }
+    util.send(reqId, {
+      used: usedPtr.deref(),
+      available: availablePtr.deref()
+    });
+  });
 };
 
 exports.execute = function(lib, request) {
@@ -50,6 +69,8 @@ exports.execute = function(lib, request) {
         case 'posts':
             fetchPostsCount(request.id, lib, request.client);
             break;
+        case 'acc-info':
+            getAccountInfo(request.id, lib, request.client);
         default:
             util.sendException(request.id, new Error('Invalid action'));
     }

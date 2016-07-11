@@ -161,7 +161,7 @@ export default class UIUtils {
   }
 
   reconnect() {
-    this.api.restart();
+    this.api.reset();
   }
 
   fetchGetsCount(callback) {
@@ -178,6 +178,10 @@ export default class UIUtils {
 
   fetchPutsCount(callback) {
     this.api.clientStats.fetchPutsCount(callback);
+  }
+
+  getAccountInfo(callback) {
+    this.api.clientStats.getAccountInfo(callback);
   }
 
   onUploadEvent(callback) {

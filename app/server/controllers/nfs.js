@@ -153,20 +153,29 @@ export var createFile = function(req, res, next) {
     return next(new ResponseError(401));
   }
 
-  let reqBody = req.body;
   let filePath = req.params['0'];
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
   }
-  reqBody.metadata = reqBody.metadata || '';
-  if (typeof reqBody.metadata !== 'string') {
+  let metadata = req.headers['metadata'] || '';
+  if (typeof metadata !== 'string') {
     return next(new ResponseError(400, MSG_CONSTANTS.FAILURE.REQUIRED_PARAMS_MISSING));
   }
   log.debug('NFS - Invoking create file request');
-  let responseHandler = new ResponseHandler(req, res);
-  req.app.get('api').nfs.createFile(filePath, reqBody.metadata, rootPath,
-    sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler);
+  var onWriterObtained = function(err, writerId) {
+    var responseHandler = new ResponseHandler(req, res);
+    if (err) {
+      return responseHandler(err);
+    }
+    var writer = new NfsWriter(req, writerId, responseHandler);
+    req.on('end', function() {
+      writer.onClose();
+    });
+    req.pipe(writer);
+  };
+  req.app.get('api').nfs.createFile(filePath, metadata, rootPath,
+    sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), onWriterObtained);
 };
 
 export var deleteFile = function(req, res, next) {
@@ -326,13 +335,19 @@ export var modifyFileContent = function(req, res, next) {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'offset')));
   }
   log.debug('NFS - Invoking modify file content request');
-  var writer = new NfsWriter(req, filePath, offset, rootPath, sessionInfo, new ResponseHandler(req, res));
-  req.on('end', function() {
-    writer.onClose();
+  req.app.get('api').nfs.getWriter(filePath, isPathShared,
+      sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, function (err, writerId) {
+      var responseHandler = new ResponseHandler(req, res);
+      if (err) {
+        return responseHandler(err);
+      }
+      var writer = new NfsWriter(req, writerId, responseHandler, offset);
+      req.on('end', function() {
+        writer.onClose();
+      });
+      req.pipe(writer);
   });
-  writer.on('open', function() {
-    req.pipe(writer);
-  });
+
 };
 
 export var moveFile = function(req, res, next) {
