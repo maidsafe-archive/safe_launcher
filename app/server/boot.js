@@ -21,9 +21,9 @@ export default class RESTServer {
       ERROR: 'error',
       STARTED: 'started',
       STOPPED: 'stopped',
-      AUTH_REQUEST: 'auth-request',
-      ACTIVITY_NEW: 'activity-new',
-      ACTIVITY_UPDATE: 'activity-update',
+      AUTH_REQUEST: 'auth_request',
+      ACTIVITY_NEW: 'activity_new',
+      ACTIVITY_UPDATE: 'activity_update',
       SESSION_CREATED: 'sesssion_created',
       SESSION_REMOVED: 'session_removed',
       DATA_UPLOADED: 'data_uploaded',
@@ -120,6 +120,11 @@ export default class RESTServer {
   authApproved(data) {
     var app = data.payload.app;
     this.app.get('api').auth.getAppDirectoryKey(app.id, app.name, app.vendor, new CreateSession(data));
+  }
+
+  getAppActivityList(sessionId) {
+    let sessionInfo = sessionManager.get(sessionId);
+    return sessionInfo ? sessionInfo.activityList : null;
   }
 
   authRejected(payload) {

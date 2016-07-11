@@ -200,7 +200,8 @@ export let updateAppActivity = function(req, res, isSuccess) {
     app: req.headers.sessionId,
     activity: activity
   });
-  if (req.headers.sessionId) {
+  let sessionInfo = sessionManager.get(req.headers.sessionId);
+  if (req.headers.sessionId && sessionInfo) {
     sessionManager.get(req.headers.sessionId).updateActivity(activity);
   }
 };
