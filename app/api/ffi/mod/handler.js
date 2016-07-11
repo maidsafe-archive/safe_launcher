@@ -78,6 +78,11 @@ module.exports = function(libPath) {
     });
   };
 
+  var cleanUp = function() {
+    dropWriterHandles();
+    dropClient();
+  };
+
   var loadLibrary = function() {
     try {
       lib = ffi.Library(libPath, methodsToRegister());
@@ -101,6 +106,11 @@ module.exports = function(libPath) {
           break;
 
         case 'connect':
+          auth.getUnregisteredClient(lib, unRegisteredClientObserver);
+          break;
+
+        case 'reset':
+          cleanUp();
           auth.getUnregisteredClient(lib, unRegisteredClientObserver);
           break;
 
@@ -134,8 +144,5 @@ module.exports = function(libPath) {
 
   self.dispatcher = dispatcher;
 
-  self.cleanUp = function() {
-    dropWriterHandles();
-    dropClient();
-  };
+  self.cleanUp = cleanUp;
 };

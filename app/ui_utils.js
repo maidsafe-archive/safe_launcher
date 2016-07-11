@@ -161,7 +161,7 @@ export default class UIUtils {
   }
 
   reconnect() {
-    this.api.restart();
+    this.api.reset();
   }
 
   fetchGetsCount(callback) {

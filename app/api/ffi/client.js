@@ -96,10 +96,11 @@ export var setNetworkStateListener = function(callback) {
   networkStateListener = callback;
 };
 
-export var restart = function() {
+export var reset = function() {
   log.debug('Restarting FFI client worker');
-  close();
-  startWorker();
+  send({
+    module: 'reset'
+  })
 };
 
 startWorker();
