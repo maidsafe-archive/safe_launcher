@@ -1,6 +1,7 @@
 var React = window.React;
 var ReactDOM = window.ReactDOM;
 var d3 = window.d3;
+var Math = window.Math;
 var UploadDownloadPieChart = React.createClass({
   propTypes: {
     upload: React.PropTypes.number,
@@ -12,16 +13,34 @@ var UploadDownloadPieChart = React.createClass({
   componentWillReceiveProps: function (nextProps) {
       this.update([nextProps.download, nextProps.upload]);
   },
+  bytesToSize: function(bytes) {
+      var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+      if (bytes == 0) return '0 ' + sizes[0];
+      var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+      if (i == 0) return bytes + ' ' + sizes[i];
+      return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
+  },
   render: function() {
-    return React.DOM.span(null, null);
+    return React.DOM.span(null, [
+      React.DOM.div({className: 'legends'}, [
+        React.DOM.div({className: 'legends-i download'}, [
+          React.DOM.div({className: 'legends-i-name'}, 'Download'),
+          React.DOM.div({className: 'legends-i-val'}, this.bytesToSize(this.props.download))
+        ]),
+        React.DOM.div({className: 'legends-i upload'}, [
+          React.DOM.div({className: 'legends-i-name'}, 'Upload'),
+          React.DOM.div({className: 'legends-i-val'}, this.bytesToSize(this.props.upload))
+        ])
+      ])
+    ]);
   },
   initD3: function() {
-    var width = 340;
-    var height = 200;
+    var width = 105;
+    var height = 105;
     var radius = Math.min(width, height) / 2;
-    this.colours = ["#98abc5", "#8a89a6"];
+    this.colours = ["#5592d7", "#f7b558"];
     this.arc = d3.arc()
-    .outerRadius(radius - 10)
+    .outerRadius(radius)
     .innerRadius(0);
     this.pie = d3.pie()
     .sort(null)
@@ -30,7 +49,7 @@ var UploadDownloadPieChart = React.createClass({
             .attr("width", width)
             .attr("height", height)
             .append("g")
-            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+            .attr("transform", "translate(" + height / 2 + "," + height / 2 + ")");
     this.update([this.props.download, this.props.upload]);
   },
   update: function(data) {

@@ -3,7 +3,7 @@
  */
 window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootScope', '$interval', 'serverFactory', 'CONSTANTS',
   function($scope, $state, $rootScope, $interval, server, CONSTANTS) {
-
+    var isAfterAuth = false;
     // handle proxy localy
     var setProxy = function(status) {
       window.localStorage.setItem('proxy', JSON.stringify({status: Boolean(status)}));
@@ -43,7 +43,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       $rootScope.$proxyServer = true;
       setProxy(true);
       $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
-        msg: msg,
+        msg: 'Proxy Server started',
         hasOption: false,
         isError: false
       }, function(err, data) {
@@ -91,39 +91,54 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       $rootScope.appList[data.app].status = data.activity;
     };
 
-    server.onNewAppActivity(function(data) {
-      if (!data) {
-        return;
-      }
-      console.log(data);
-      updateActivity(data);
-    });
+    var afterAuth = function() {
+      server.onNewAppActivity(function(data) {
+        if (!data) {
+          return;
+        }
+        console.log(data);
+        updateActivity(data);
+      });
 
-    server.onUploadEvent(function(data) {
-      if (!data) {
-        return;
-      }
-      console.log(data);
-      $rootScope.dashData.upload = data;
-    });
+      server.onUploadEvent(function(data) {
+        if (!data) {
+          return;
+        }
+        console.log(data);
+        $rootScope.dashData.upload += data;
+      });
 
-    server.onDownloadEvent(function(data) {
-      if (!data) {
-        return;
-      }
-      console.log(data);
-      $rootScope.dashData.download = data;
-    });
+      server.onDownloadEvent(function(data) {
+        if (!data) {
+          return;
+        }
+        console.log(data);
+        $rootScope.dashData.download += data;
+      });
 
-    server.onUpdatedAppActivity(function(data) {
-      if (!data) {
-        return;
-      }
-      console.log(data);
-      updateActivity(data);
-    });
+      server.onUpdatedAppActivity(function(data) {
+        if (!data) {
+          return;
+        }
+        console.log(data);
+        updateActivity(data);
+      });
+    };
 
     $interval(function() {
+      if (!$rootScope.isAuthenticated) {
+        return server.fetchGetsCount(function(err, data) {
+          if (!data) {
+            return;
+          }
+          $rootScope.dashData.unAuthGET = data - $rootScope.dashData.getsCount;
+          $rootScope.dashData.getsCount = data;
+        });
+      }
+      if (!isAfterAuth) {
+        afterAuth();
+        isAfterAuth = true;
+      }
       var completeCount = 0;
       var collectedData = {
         GET: {
@@ -158,12 +173,8 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         if (!data) {
           return;
         }
-        if ($rootScope.isAuthenticated) {
-          $rootScope.dashData.unAuthGET = data - $rootScope.dashData.getsCount;
-        } else {
-          completeCount++;
-          onComplete('GET', $rootScope.dashData.getsCount, data);
-        }
+        completeCount++;
+        onComplete('GET', $rootScope.dashData.getsCount, data);
         $rootScope.dashData.getsCount = data;
       });
       server.fetchDeletesCount(function(err, data) {
@@ -180,10 +191,8 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         if (!data) {
           return;
         }
-        if ($rootScope.isAuthenticated) {
-          completeCount++;
-          onComplete('POST', $rootScope.dashData.postsCount, data);
-        }
+        completeCount++;
+        onComplete('POST', $rootScope.dashData.postsCount, data);
         $rootScope.dashData.postsCount = data;
       });
       for (var i in $rootScope.appList) {
@@ -248,8 +257,8 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       }
       $state.go('splash');
     }
+
     // initialize application
     server.start();
-    // server.startProxyServer();
   }
 ]);

@@ -77,7 +77,7 @@ window.safeLauncher = angular
         this.timer = $timeout(function() {
           $timeout.cancel(this.timer);
           self.callback(null, true);
-        }, 2000);
+        }, 5000);
       }
     }
   };

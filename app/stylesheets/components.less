@@ -437,7 +437,7 @@
     }
     .opt {
       position: absolute;
-      top: 25px;
+      top: 28px;
       right: 20px;
     }
   }
@@ -469,26 +469,31 @@
 
 // switch
 .switch {
-  width: 50px;
-  height: 20px;
+  width: 34px;
+  height: 14px;
   display: block;
   border-radius: 10px;
-  background-color: @app-status-in-progress;
+  background-color: rgba(0, 0, 0, 0.25);
   position: relative;
   cursor: pointer;
   &:after {
     content: '';
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     position: absolute;
-    top: -5px;
+    top: -3px;
     left: 0;
     border-radius: 50%;
-    background-color: @primary-blue;
+    background-color: #fafafa;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.26);
   }
-  &.active:after {
-    left: auto;
-    right: 0;
+  &.active {
+    background-color: @app-status-in-progress;
+    &:after {
+      left: auto;
+      right: 0;
+      background-color: @primary-blue;
+    }
   }
 }
 
@@ -607,6 +612,51 @@
       padding-right: 12px;
     }
     .clearfix();
+  }
+}
+
+.pie-chart {
+  padding: 24px;
+  position: relative;
+  .legends {
+    width: 100%;
+    padding-left: 127px;
+    .legends-i {
+      padding-left: 25px;
+      margin-bottom: 8px;
+      .legends-i-name {
+        position: relative;
+        font-size: 14px;
+        margin: 0;
+        padding: 0;
+        color: #212121;
+        &:after {
+          content: '';
+          display: block;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background-color: #EEE;
+          position: absolute;
+          top: 0;
+          left: -25px;
+        }
+      }
+      .legends-i-val {
+        font-size: 14px;
+        color: #212121;
+        opacity: 0.5;
+      }
+      &.upload .legends-i-name:after {
+        background-color: @upload;
+      }
+      &.download .legends-i-name:after {
+        background-color: @primary-blue;
+      }
+    }
+  }
+  svg {
+    margin-top: -105px;
   }
 }
 
