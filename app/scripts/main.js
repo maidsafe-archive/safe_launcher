@@ -17,7 +17,7 @@ window.safeLauncher = angular
   $rootScope.keys = Object.keys;
   $rootScope.isAuthenticated = false;
   $rootScope.appList = {};
-  $rootScope.logList = [];
+  $rootScope.logList = {};
   $rootScope.dashData = {
     getsCount: 0,
     deletesCount: 0,

@@ -75,8 +75,10 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     });
 
     var updateActivity = function(data) {
-      if ($rootScope.logList.length >= CONSTANTS.LOG_LIST_LIMIT) {
-        $rootScope.logList.pop();
+      var logKeys = Object.keys($rootScope.logList);
+      if (logKeys.length >= CONSTANTS.LOG_LIST_LIMIT) {
+        var lastkey = logKeys.pop();
+        delete $rootScope.logList[lastkey];
       }
       if (!data.app) {
         return;
@@ -86,15 +88,13 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         1: 'SUCCESS',
         '-1': 'FAILURE'
       };
-      $rootScope.logList.push({
+      $rootScope.logList[data.activity.activityId] = {
         name: $rootScope.appList[data.app].name,
         req: data.activity.activityName,
         time: data.activity.beginTime,
         status: ACTIVITY_STATUS[data.activity.activityStatus]
-      });
-      if ($rootScope.appList[data.app]) {
-        $rootScope.appList[data.app].status = data.activity;
-      }
+      };
+      $rootScope.appList[data.app].status = data.activity;
     };
 
     server.onNewAppActivity(function(data) {

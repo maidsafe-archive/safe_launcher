@@ -1,13 +1,15 @@
 /**
  * Dashboard Controller
  */
-window.safeLauncher.controller('dashboardController', [ '$scope', '$state', '$rootScope', 'serverFactory',
-  function($scope, $state, $rootScope, server) {
+window.safeLauncher.controller('dashboardController', [ '$scope', '$state', '$rootScope', '$interval', 'serverFactory',
+  function($scope, $state, $rootScope, $interval, server) {
+    window.Dashboard = $scope;
     $scope.logFilter = [
       'IN_PROGRESS',
       'SUCCESS',
       'FAILURE'
     ];
+    $scope.nextVal = 0;
     $scope.toggleFilter = function(name) {
       var index = $scope.logFilter.indexOf(name);
       if ( index !== -1) {

@@ -598,6 +598,18 @@
   }
 }
 
+.bar-chart {
+  padding: 24px;
+  .filters {
+    padding: 0 16px;
+    margin-bottom: 12px;
+    .filters-i {
+      padding-right: 12px;
+    }
+    .clearfix();
+  }
+}
+
 .dash-progress-bar {
   display: table;
   .dash-progress-bar-b {
@@ -656,6 +668,62 @@
   }
 }
 
+.checkbox {
+  display: inline-block;
+  float: left;
+  input[type=checkbox] {
+    display: none;
+  }
+  label {
+    position: relative;
+    font-size: 14px;
+    font-weight: normal;
+    padding-left: 20px;
+    &:before {
+      content: '';
+      width: 15px;
+      height: 15px;
+      margin: 3px 0;
+      background-color: #EEE;
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: 3px;
+    }
+  }
+  &.in-progress {
+    label {
+      &:before {
+        background-color: @app-status-in-progress;
+      }
+    }
+  }
+  &.completed {
+    label {
+      &:before {
+        background-color: @app-status-complete;
+      }
+    }
+  }
+  &.error {
+    label {
+      &:before {
+        background-color: @app-status-error;
+      }
+    }
+  }
+  &.get {
+    label {
+      &:before {
+        background-color: @get
+      }
+    }
+  }
+  input:checked + label:before {
+    background-image: url(../images/tick.svg);
+  }
+}
+
 // table view
 .table-view {
   padding: 24px;
@@ -664,52 +732,7 @@
     margin-bottom: 16px;
     .table-filter-i {
       display: inline-block;
-      float: left;
       margin-right: 8px;
-      input[type=checkbox] {
-        display: none;
-      }
-      label {
-        position: relative;
-        font-size: 14px;
-        font-weight: normal;
-        padding-left: 20px;
-        &:before {
-          content: '';
-          width: 15px;
-          height: 15px;
-          margin: 3px 0;
-          background-color: #EEE;
-          position: absolute;
-          top: 0;
-          left: 0;
-          border-radius: 3px;
-        }
-      }
-      &.in-progress {
-        label {
-          &:before {
-            background-color: @app-status-in-progress;
-          }
-        }
-      }
-      &.completed {
-        label {
-          &:before {
-            background-color: @app-status-complete;
-          }
-        }
-      }
-      &.error {
-        label {
-          &:before {
-            background-color: @app-status-error;
-          }
-        }
-      }
-      input:checked + label:before {
-        background-image: url(../images/tick.svg);
-      }
     }
     .clearfix();
   }

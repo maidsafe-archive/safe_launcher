@@ -2,8 +2,14 @@
   <div class="dash-b">
     <div class="dash-cnt">
       <div class="sec-1">
-        <div class="card" id="requestChart">
-
+        <div class="card bar-chart">
+          <div class="filters">
+            <div class="filters-i checkbox get" ng-init="barChartGETFilter = true">
+              <input id="GET" type="checkbox" name="GET" value="" ng-model="barChartGETFilter" checked="{{barChartGETFilter}}">
+              <label for="GET">GET</label>
+            </div>
+          </div>
+          <react-component name="BarChart" props="{add: nextVal}"></react-component>
         </div>
       </div>
     </div>
@@ -69,15 +75,15 @@
         <div class="card">
           <div class="table-view">
             <div class="table-filter">
-              <div class="table-filter-i in-progress" ng-init="logFilterInProgress = logFilterComplete = logFilterError = true;">
+              <div class="table-filter-i checkbox in-progress" ng-init="logFilterInProgress = logFilterComplete = logFilterError = true;">
                 <input id="inProgress" type="checkbox" name="inProgress" value="" ng-model="logFilterInProgress" ng-change="toggleFilter('IN_PROGRESS')" checked="{{logFilterInProgress}}">
                 <label for="inProgress">In Progress</label>
               </div>
-              <div class="table-filter-i completed">
+              <div class="table-filter-i checkbox completed">
                 <input id="completed" type="checkbox" name="completed" value="" ng-model="logFilterComplete" ng-change="toggleFilter('SUCCESS')" checked="{{logFilterComplete}}">
                 <label for="completed">Completed</label>
               </div>
-              <div class="table-filter-i error">
+              <div class="table-filter-i checkbox error">
                 <input id="error" type="checkbox" name="error" value="" ng-model="logFilterError" ng-change="toggleFilter('FAILURE')" checked="{{logFilterError}}">
                 <label for="error">Error</label>
               </div>

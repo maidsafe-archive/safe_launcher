@@ -2,7 +2,7 @@
 var React = window.React;
 var AppLogs = React.createClass({
   propTypes: {
-    list: React.PropTypes.array,
+    list: React.PropTypes.object,
     filter: React.PropTypes.array
   },
   render: function() {
