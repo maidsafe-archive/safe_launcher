@@ -4,7 +4,7 @@
 	 viewBox="0 0 72 72" enable-background="new 0 0 72 72" xml:space="preserve">
 <g>
 	<g>
-		<circle fill="#493A60" cx="36" cy="36" r="35"/>
+		<!-- <circle fill="#493A60" cx="36" cy="36" r="35"/> -->
 	</g>
 	<polygon fill="#FFFFFF" points="50.1,22.1 31.8,40.5 21.9,30.6 17.6,34.9 27.5,44.8 27.5,44.8 31.8,49 54.4,26.4 	"/>
 </g>

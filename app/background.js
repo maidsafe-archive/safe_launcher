@@ -14,8 +14,8 @@ var mainWindow;
 
 app.on('ready', function() {
   mainWindow = new BrowserWindow({
-    'width': 390,
-    'height': 446,
+    'width': 750,
+    'height': 550,
     'resizable': false
   });
   mainWindow.loadURL('file://' + __dirname + '/app.html');

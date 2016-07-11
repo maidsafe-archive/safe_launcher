@@ -172,8 +172,8 @@ export default class UIUtils {
     this.api.clientStats.fetchDeletesCount(callback);
   }
 
-  fetchPotsCount(callback) {
-    this.api.clientStats.fetchPotsCount(callback);
+  fetchPostsCount(callback) {
+    this.api.clientStats.fetchPostsCount(callback);
   }
 
   fetchPutsCount(callback) {
