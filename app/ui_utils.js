@@ -180,6 +180,10 @@ export default class UIUtils {
     this.api.clientStats.fetchPutsCount(callback);
   }
 
+  getAccountInfo(callback) {
+    this.api.clientStats.getAccountInfo(callback);
+  }
+
   onUploadEvent(callback) {
     this.restServer.addEventListener(this.restServer.EVENT_TYPE.DATA_UPLOADED, callback);
   }

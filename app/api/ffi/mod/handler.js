@@ -35,6 +35,7 @@ module.exports = function(libPath) {
       'drop_vector': [ 'void', [ 'pointer', int, int ] ],
       'execute': [ int, [ cString, voidPtrPtr ] ],
       'execute_for_content': [ 'pointer', [ cString, intPtr, intPtr, intPtr, voidPtrPtr ] ],
+      'get_account_info': [ int, [ voidPtrPtr, intPtr, intPtr ] ],
       'get_app_dir_key': [ 'pointer', [ cString, cString, cString, intPtr, intPtr, intPtr, voidPtrPtr ] ],
       'get_nfs_writer': [ int, [ cString, voidPtrPtr, voidPtrPtr ] ],
       'get_safe_drive_key': [ 'pointer', [ intPtr, intPtr, intPtr, voidPtrPtr ] ],
