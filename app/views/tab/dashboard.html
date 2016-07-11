@@ -2,21 +2,21 @@
   <div class="dash-b">
     <div class="dash-cnt">
       <div class="sec-1">
-        <div class="card bar-chart">
+        <div class="card bar-chart" ng-show="!isAuthenticated">
           <div class="filters">
             <div class="filters-i checkbox get" ng-init="barChartGETFilter = true">
               <input id="GET" type="checkbox" name="GET" value="" ng-model="barChartGETFilter" checked="{{barChartGETFilter}}">
               <label for="GET">GET</label>
             </div>
           </div>
-          <react-component name="BarChart" props="{add: dashData.unAuthGET}"></react-component>
+          <react-component name="UnauthGETChart" props="{add: dashData.unAuthGET}"></react-component>
         </div>
       </div>
     </div>
     <div class="dash-cnt">
       <div class="sec-2">
         <div class="card">
-
+          <react-component name="UploadDownloadPieChart" props="{upload: dashData.upload, download: dashData.download}"></react-component>
         </div>
       </div>
       <div class="sec-2">

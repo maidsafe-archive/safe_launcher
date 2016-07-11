@@ -99,6 +99,22 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       updateActivity(data);
     });
 
+    server.onUploadEvent(function(data) {
+      if (!data) {
+        return;
+      }
+      console.log(data);
+      $rootScope.dashData.upload = data;
+    });
+
+    server.onDownloadEvent(function(data) {
+      if (!data) {
+        return;
+      }
+      console.log(data);
+      $rootScope.dashData.download = data;
+    });
+
     server.onUpdatedAppActivity(function(data) {
       if (!data) {
         return;

@@ -1,7 +1,7 @@
 var React = window.React;
 var ReactDOM = window.ReactDOM;
 var d3 = window.d3;
-var BarChart = React.createClass({
+var UnauthGETChart = React.createClass({
   propTypes: {
     add: React.PropTypes.number
   },
@@ -94,4 +94,4 @@ var BarChart = React.createClass({
       .call(yAxisRight);
   }
 });
-window.safeLauncher.value('BarChart', BarChart);
+window.safeLauncher.value('UnauthGETChart', UnauthGETChart);
