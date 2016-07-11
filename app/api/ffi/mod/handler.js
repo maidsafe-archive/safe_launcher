@@ -40,6 +40,7 @@ module.exports = function(libPath) {
       'get_safe_drive_key': [ 'pointer', [ intPtr, intPtr, intPtr, voidPtrPtr ] ],
       'init_logging': [ int, [] ],
       'log_in': [ int, [ cString, cString, cString, voidPtrPtr ] ],
+      'nfs_create_file': [ int, [ cString, voidPtrPtr, voidPtrPtr ] ],
       'nfs_stream_close': [ int, [ voidPtrPtr ] ],
       'nfs_stream_write': [ int, [ voidPtrPtr, int, refUin8Array, size_t ] ],
       'register_network_event_observer': [ 'void', [ voidPtrPtr, 'pointer' ] ]

@@ -89,17 +89,27 @@ var modifyDirectory = function(lib, request) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     util.execute(lib, request.client, request.id, payload);
   } catch (e) {
-    util.sendException(request.id, e);
+    util.sendException(request.id, e.message);
   }
 };
 
 var createFile = function(lib, request) {
-  try {
-    var payload = createPayload('create-file', request);
-    util.execute(lib, request.client, request.id, payload);
-  } catch (e) {
-    util.sendException(request.id, e);
-  }
+  var payload = createPayload('create-file', request);
+  var writerHandle = ref.alloc(voidHandlePtrPtr);
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+  lib.nfs_create_file.async(JSON.stringify(payload), request.client, writerHandle, function(err, result) {
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    if (err) {
+      return util.sendException(request.id, e.message);
+    }
+    if (result !== 0) {
+      return util.sendError(request.id, result);
+    }
+    var writerId = uuid.v4();
+
+    writerHandlePool[writerId] = writerHandle.deref();
+    util.send(request.id, writerId);
+  });
 };
 
 var deleteFile = function(lib, request) {
