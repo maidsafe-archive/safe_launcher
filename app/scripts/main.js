@@ -23,6 +23,7 @@ window.safeLauncher = angular
     getsCount: 0,
     deletesCount: 0,
     postsCount: 0,
+    putsCoun: 0,
     unAuthGET: 0,
     upload: 0,
     download: 0,
