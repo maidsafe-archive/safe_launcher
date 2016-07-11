@@ -1,31 +1,19 @@
 /**
  * Dashboard Controller
  */
-window.safeLauncher.controller('dashboardController', [ '$scope', '$state', '$rootScope', '$interval', 'serverFactory',
-  function($scope, $state, $rootScope, $interval, server) {
-    $scope.logFilter = [];
-    $scope.dashData = {
-      getsCount: 0,
-      deletesCount: 0,
-      postsCount: 0,
+window.safeLauncher.controller('dashboardController', [ '$scope', '$state', '$rootScope', 'serverFactory',
+  function($scope, $state, $rootScope, server) {
+    $scope.logFilter = [
+      'IN_PROGRESS',
+      'SUCCESS',
+      'FAILURE'
+    ];
+    $scope.toggleFilter = function(name) {
+      var index = $scope.logFilter.indexOf(name);
+      if ( index !== -1) {
+        return $scope.logFilter.splice(index, 1);
+      }
+      $scope.logFilter.unshift(name);
     };
-    var FETCH_DELAY = 2000;
-    $interval(function() {
-       server.fetchGetsCount(function(err, data) {
-         if (data) {
-           $scope.dashData.getsCount = data;
-         }
-       });
-       server.fetchDeletesCount(function(err, data) {
-         if (data) {
-           $scope.dashData.deletesCount = data;
-         }
-       });
-       server.fetchPostsCount(function(err, data) {
-         if (data) {
-           $scope.dashData.postsCount = data;
-         }
-       });
-    }, FETCH_DELAY);
   }
 ]);

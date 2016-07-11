@@ -1,8 +1,8 @@
 /**
  * Basic Controller
  */
-window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootScope', 'serverFactory',
-  function($scope, $state, $rootScope, server) {
+window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootScope', '$interval', 'serverFactory', 'CONSTANTS',
+  function($scope, $state, $rootScope, $interval, server, CONSTANTS) {
 
     // handle proxy localy
     var setProxy = function(status) {
@@ -47,7 +47,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         hasOption: false,
         isError: false
       }, function(err, data) {
-        console.log(data);
+        console.log('Proxy Server started');
       });
     });
 
@@ -73,6 +73,67 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       });
       console.log(err);
     });
+
+    var updateActivity = function(data) {
+      if ($rootScope.logList.length >= CONSTANTS.LOG_LIST_LIMIT) {
+        $rootScope.logList.pop();
+      }
+      if (!data.app) {
+        return;
+      }
+      var ACTIVITY_STATUS = {
+        0: 'IN_PROGRESS',
+        1: 'SUCCESS',
+        '-1': 'FAILURE'
+      };
+      $rootScope.logList.push({
+        name: $rootScope.appList[data.app].name,
+        req: data.activity.activityName,
+        time: data.activity.beginTime,
+        status: ACTIVITY_STATUS[data.activity.activityStatus]
+      });
+      if ($rootScope.appList[data.app]) {
+        $rootScope.appList[data.app].status = data.activity;
+      }
+    };
+
+    server.onNewAppActivity(function(data) {
+      if (!data) {
+        return;
+      }
+      console.log(data);
+      updateActivity(data);
+    });
+
+    server.onUpdatedAppActivity(function(data) {
+      if (!data) {
+        return;
+      }
+      console.log(data);
+      updateActivity(data);
+    });
+
+    $interval(function() {
+      server.fetchGetsCount(function(err, data) {
+        if (data) {
+          $rootScope.dashData.getsCount = data;
+        }
+      });
+      server.fetchDeletesCount(function(err, data) {
+        if (data) {
+          $rootScope.dashData.deletesCount = data;
+        }
+      });
+      server.fetchPostsCount(function(err, data) {
+        if (data) {
+          $rootScope.dashData.postsCount = data;
+        }
+      });
+      for (var i in $rootScope.appList) {
+        var item = $rootScope.appList[i];
+        $rootScope.appList[i].lastActive = window.moment(item.status.endTime || item.status.beginTime).fromNow(true)
+      }
+    }, CONSTANTS.FETCH_DELAY);
 
     window.msl.setNetworkStateChangeListener(function(state) {
       $rootScope.$networkStatus.show = true;
@@ -126,8 +187,9 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       var proxy = getProxy();
       if (proxy && proxy.hasOwnProperty('status')) {
         $rootScope.$proxyServer = proxy.status;
-        $state.go('app');
+        return $state.go('app');
       }
+      $state.go('splash');
     }
     // initialize application
     server.start();

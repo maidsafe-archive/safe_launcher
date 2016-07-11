@@ -17,5 +17,7 @@ window.safeLauncher.constant('MESSAGES', {
 window.safeLauncher.constant('CONSTANTS', {
   'PIN_MIN_LEN': 4,
   'KEYWORD_MIN_LEN': 6,
-  'PASSWORD_MIN_LEN': 6
+  'PASSWORD_MIN_LEN': 6,
+  'FETCH_DELAY': 2000,
+  'LOG_LIST_LIMIT': 500
 });

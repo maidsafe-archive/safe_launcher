@@ -32,12 +32,12 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
     };
 
     var removeApplication = function(id) {
-      $rootScope.appList.forEach(function(list, index) {
-        if (list.id === id) {
-          $rootScope.appList.splice(index, 1);
-          $scope.$applyAsync();
+      for (var i in $rootScope.appList) {
+        if ($rootScope.appList[i].id === id) {
+          delete $rootScope.appList[i];
+          break;
         }
-      });
+      }
     };
 
     // handle auth request
@@ -51,13 +51,15 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
     // handle session creation
     server.onSessionCreated(function(session) {
       console.log('Session created :: ');
-      $rootScope.appList.push({
+      $rootScope.appList[session.id] = {
         id: session.id,
         name: session.info.appName,
         version: session.info.appVersion,
         vendor: session.info.vendor,
-        permissions: session.info.permissions.list
-      });
+        permissions: session.info.permissions.list,
+        status: {},
+        lastActive: null
+      };
       $scope.$apply();
     });
 

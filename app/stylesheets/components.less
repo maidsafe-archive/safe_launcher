@@ -29,11 +29,19 @@
               display: inline-block;
               width: 24px;
               height: 24px;
-              background-color: #EEE;
               float: left;
               border-radius: 50%;
-              &.manage {
-                background-image: url(../images/manage.svg);
+              &.account-icn {
+                background-image: url(../images/account_white.svg);
+              }
+              &.dashboard-icn {
+                background-image: url(../images/dashboard_white.svg);
+              }
+              &.settings-icn {
+                background-image: url(../images/settings_white.svg);
+              }
+              &.help-icn {
+                background-image: url(../images/help_white.svg);
               }
             }
             .txt {
@@ -58,8 +66,17 @@
             a {
               color: @primary-blue;
               .icn {
-                &.manage {
-                  background-image: url(../images/manage_blue.svg);
+                &.account-icn {
+                  background-image: url(../images/account.svg);
+                }
+                &.dashboard-icn {
+                  background-image: url(../images/dashboard.svg);
+                }
+                &.settings-icn {
+                  background-image: url(../images/settings.svg);
+                }
+                &.help-icn {
+                  background-image: url(../images/help.svg);
                 }
               }
             }
@@ -122,6 +139,10 @@
       line-height: 23px;
       font-weight: 600;
       color: #212121;
+      .version {
+        font-size: 22px;
+        opacity: 0.7;
+      }
     }
     .sub-title {
       padding: 0;
@@ -307,6 +328,48 @@
           }
         }
       }
+      .permissions {
+        width: 100%;
+        margin-top: 16px;
+        float: left;
+        .permissions-h {
+          margin: 0 0 8px;
+          padding: 0;
+          font-size: 15px;
+          font-weight: 600;
+          color: #212121;
+        }
+        .permissions-i {
+          margin-bottom: 8px;
+          .permissions-name {
+            width: 100%;
+            margin: 0;
+            padding: 8px;
+            font-size: 14px;
+            font-weight: normal;
+            line-height: 20px;
+            display: block;
+            background-color: #EEE;
+            border-bottom: 1px solid transparent;
+            cursor: pointer;
+          }
+          .permissions-desc {
+            display: none;
+            padding: 8px;
+            font-size: 14px;
+          }
+          input[type=checkbox] {
+            display: none;
+          }
+          input[type=checkbox]:checked ~ .permissions-desc {
+            display: block !important;
+          }
+          input[type=checkbox]:checked ~ .permissions-name {
+            background-color: transparent !important;
+            border-color: #EEE !important;
+          }
+        }
+      }
       .auth-req-f {
         width: 100%;
         float: left;
@@ -466,60 +529,65 @@
 .card {
   width: 100%;
   background-color: #FFF;
-  padding: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.26);
+  &:hover {
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+  }
 }
 
 .count {
   text-align: center;
+  padding: 13px 0;
   .count-val {
-    font-size: 24px;
+    font-size: 28px;
     line-height: 32px;
     font-weight: normal;
     color: @primary-blue;
   }
   .count-title {
-    font-size: 14px;
+    font-size: 15px;
     line-height: 18px;
     margin-top: 8px;
     font-weight: normal;
     color: #212121;
-    opacity: 0.6;
   }
 }
 
 // dash
 .dash {
-  padding: 20px;
+  padding: 16px;
   height: @tab-cnt-ht;
   overflow-y: auto;
   .dash-b {
     .dash-cnt {
       width: 100%;
     }
+    .flex-cnt {
+      display: flex;
+    }
     .sec-1 {
       width: 100%;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
       float: left;
     }
     .sec-2 {
       width: 50%;
       display: inline-block;
       float: left;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
       &:first-child {
-        padding-right: 10px;
+        padding-right: 6px;
       }
       &:last-child {
-        padding-left: 10px;
+        padding-left: 6px;
       }
     }
     .sec-3 {
-      width: 25%;
+      flex: 1;
       display: inline-block;
       float: left;
-      padding: 0 10px;
-      margin-bottom: 20px;
+      padding: 0 6px;
+      margin-bottom: 12px;
       &:first-child {
         padding-left: 0;
       }
@@ -536,12 +604,13 @@
     display: table-cell;
     vertical-align: middle;
     text-align: left;
+    padding: 24px;
   }
   .count {
-    font-size: 24px;
+    font-size: 28px;
     line-height: 32px;
     font-weight: normal;
-    color: #757575;
+    color: #212121;
     display: inline-block;
     width: 50%;
     text-align: left;
@@ -550,6 +619,7 @@
   }
   .value {
     color: @primary-blue;
+    font-weight: 600;
   }
   .title {
     width: 50%;
@@ -561,7 +631,6 @@
     margin: 12px 0 0;
     padding: 0;
     text-align: right;
-    opacity: 0.4;
   }
   .progress {
     width: 100%;
@@ -584,12 +653,12 @@
     line-height: 18px;
     font-weight: normal;
     color: #212121;
-    opacity: 0.4;
   }
 }
 
 // table view
 .table-view {
+  padding: 24px;
   .table-filter {
     width: 100%;
     margin-bottom: 16px;
@@ -686,19 +755,20 @@
   left: 0;
   text-align: center;
   .toaster-b {
-    max-width: 80%;
-    min-width: 50%;
+    min-width: 260px;
+    max-width: 640px;
     display: inline-block;
     margin: 0 auto;
-    padding: 11px;
+    padding: 11px 24px;
     text-align: left;
     background-color: @primary-blue;
     color: #FFF;
+    border-radius: 3px;
     .msg {
       width: 100%;
       display: inline-block;
       float: left;
-      font-size: 16px;
+      font-size: 14px;
       line-height: 18px;
     }
     .opt {
@@ -709,16 +779,15 @@
     }
     &.with-opt {
       position: relative;
+      overflow: hidden;
       .msg {
-        padding-right: 100px;
+        width: auto;
+        padding-right: 48px;
+        padding-top: 3px;
       }
       .opt {
-        height: 100%;
-        position: absolute;
-        top: 0;
-        right: 0;
-        padding: 11px 11px 0 0;
         display: inline-block;
+        float: right;
         button {
           background-color: transparent;
           font-size: 16px;

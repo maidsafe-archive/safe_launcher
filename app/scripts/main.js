@@ -14,31 +14,15 @@ window.safeLauncher = angular
 ])
 .run([ '$rootScope', '$state', '$stateParams', '$timeout', function($rootScope, $state, $stateParams, $timeout) {
   $rootScope.$state = $state;
+  $rootScope.keys = Object.keys;
   $rootScope.isAuthenticated = false;
-  $rootScope.appList = [];
-  $rootScope.logList = [
-    {
-      id: 'test.com',
-      name: 'Demo App',
-      req: 'Updating Dir',
-      status: 'In_Progress',
-      time: '00:05:02'
-    },
-    {
-      id: 'test1.com',
-      name: 'Demo App',
-      req: 'Updating Dir',
-      status: 'completed',
-      time: '00:05:02'
-    },
-    {
-      id: 'test2.com',
-      name: 'Demo App',
-      req: 'Updating Dir',
-      status: 'error',
-      time: '00:05:02'
-    }
-  ];
+  $rootScope.appList = {};
+  $rootScope.logList = [];
+  $rootScope.dashData = {
+    getsCount: 0,
+    deletesCount: 0,
+    postsCount: 0
+  };
   $rootScope.ALERT_TYPE = {
     AUTH_REQ: 'auth_request',
     TOASTER: 'toaster',
@@ -85,7 +69,6 @@ window.safeLauncher = angular
           self.callback(null, true);
         }, 2000);
       }
-
     }
   };
   $rootScope.$proxyServer = false;

@@ -2,7 +2,7 @@
  * Router
  */
 window.safeLauncher.config(function($stateProvider, $urlRouterProvider) {
-  $urlRouterProvider.otherwise('splash');
+  $urlRouterProvider.otherwise('app');
   $stateProvider
   .state('splash', {
     'url': '/splash',
