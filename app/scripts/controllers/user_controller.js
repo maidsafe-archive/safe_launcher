@@ -1,13 +1,17 @@
 /**
  * User Controller
  */
-window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootScope', '$interval', 'serverFactory',
-  function($scope, $state, $rootScope, $interval, server) {
+window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootScope', 'serverFactory',
+  function($scope, $state, $rootScope, server) {
     $scope.LIST_ORDER_BY = {
       NAME: 'name',
       LAST_ACTIVE: 'last_active'
     };
-    $scope.currentAppDetails = {};
+    $scope.logFilter = [
+      'IN_PROGRESS',
+      'SUCCESS',
+      'FAILURE'
+    ];
     var requestQueue = [];
     var isAuthReqProcessing = false;
 
@@ -78,16 +82,34 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
       $scope.listOrderBy = order;
     };
 
+    $scope.toggleFilter = function(name) {
+      var index = $scope.logFilter.indexOf(name);
+      if ( index !== -1) {
+        return $scope.logFilter.splice(index, 1);
+      }
+      $scope.logFilter.unshift(name);
+    };
+
     $scope.toggleAppDetails = function(id) {
       if (!id) {
-        return $scope.currentAppDetails = null;
+        return $rootScope.currentAppDetails = null;
       }
       for(var i in $rootScope.appList) {
         if ($rootScope.appList[i].id === id) {
-          $scope.currentAppDetails = $rootScope.appList[i];
+          $rootScope.currentAppDetails = $rootScope.appList[i];
           break;
         }
       }
+      if ($rootScope.currentAppDetails) {
+        server.getAppActivityList($rootScope.currentAppDetails.id, function(data) {
+          $rootScope.currentAppDetails['logs'] = {};
+          for(var i in data) {
+            $rootScope.currentAppDetails.logs[data[i].activityId] = data[i];
+            $rootScope.currentAppDetails.logs[data[i].activityId]['name'] = $rootScope.currentAppDetails.appName;
+          }
+        });
+      }
     };
+
   }
 ]);

@@ -16,12 +16,20 @@ window.safeLauncher = angular
   $rootScope.$state = $state;
   $rootScope.keys = Object.keys;
   $rootScope.isAuthenticated = false;
+  $rootScope.currentAppDetails = null;
   $rootScope.appList = {};
   $rootScope.logList = {};
   $rootScope.dashData = {
     getsCount: 0,
     deletesCount: 0,
-    postsCount: 0
+    postsCount: 0,
+    unAuthGET: 0,
+    authHTTPMethods: {
+      POST: 0,
+      GET: 0,
+      PUT: 0,
+      DELETE: 0
+    }
   };
   $rootScope.ALERT_TYPE = {
     AUTH_REQ: 'auth_request',

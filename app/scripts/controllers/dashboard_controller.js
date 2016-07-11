@@ -9,7 +9,6 @@ window.safeLauncher.controller('dashboardController', [ '$scope', '$state', '$ro
       'SUCCESS',
       'FAILURE'
     ];
-    $scope.nextVal = 0;
     $scope.toggleFilter = function(name) {
       var index = $scope.logFilter.indexOf(name);
       if ( index !== -1) {

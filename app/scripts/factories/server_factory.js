@@ -136,6 +136,9 @@ window.safeLauncher.factory('serverFactory', [
     self.onUpdatedAppActivity = function(callback) {
       window.msl.onUpdatedAppActivity(callback);
     }
+    self.getAppActivityList = function(id, callback) {
+      callback(window.msl.getAppActivityList(id));
+    }
     return self;
   }
 ]);

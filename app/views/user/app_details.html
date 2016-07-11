@@ -10,25 +10,25 @@
       <h4 class="permissions-title">Permissions:</h4>
       <ul>
         <li ng-show="!currentAppDetails.permissions || currentAppDetails.permissions.length === 0">None</li>
-        <li ng-repeat="permission in currentAppDetails.permissions">{{ permission }}</li>
+        <li ng-show="currentAppDetails.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1">SAFE Drive Access</li>
       </ul>
     </div>
-    <div class="table-view">
+    <div class="table-view without-pad">
       <div class="table-filter">
-        <div class="table-filter-i in-progress">
-          <input id="inProgress" type="checkbox" name="inProgress" value="" ng-model="filterInProgress">
+        <div class="table-filter-i checkbox in-progress" ng-init="logFilterInProgress = logFilterComplete = logFilterError = true;">
+          <input id="inProgress" type="checkbox" name="inProgress" value="" ng-model="logFilterInProgress" ng-change="toggleFilter('IN_PROGRESS')" checked="{{logFilterInProgress}}">
           <label for="inProgress">In Progress</label>
         </div>
-        <div class="table-filter-i completed">
-          <input id="completed" type="checkbox" name="completed" value="" ng-model="filterComplete">
+        <div class="table-filter-i checkbox completed">
+          <input id="completed" type="checkbox" name="completed" value="" ng-model="logFilterComplete" ng-change="toggleFilter('SUCCESS')" checked="{{logFilterComplete}}">
           <label for="completed">Completed</label>
         </div>
-        <div class="table-filter-i error">
-          <input id="error" type="checkbox" name="error" value="" ng-model="filterError">
+        <div class="table-filter-i checkbox error">
+          <input id="error" type="checkbox" name="error" value="" ng-model="logFilterError" ng-change="toggleFilter('FAILURE')" checked="{{logFilterError}}">
           <label for="error">Error</label>
         </div>
       </div>
-      <react-component name="AppLogs" props="{list: logList, filter: logFilter}"></react-component>
+      <react-component name="AppLogs" props="{list: currentAppDetails.logs, filter: logFilter}"></react-component>
     </div>
   </div>
 </div>

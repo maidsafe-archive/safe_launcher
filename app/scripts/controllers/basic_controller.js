@@ -83,17 +83,11 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       if (!data.app) {
         return;
       }
-      var ACTIVITY_STATUS = {
-        0: 'IN_PROGRESS',
-        1: 'SUCCESS',
-        '-1': 'FAILURE'
-      };
-      $rootScope.logList[data.activity.activityId] = {
-        name: $rootScope.appList[data.app].name,
-        req: data.activity.activityName,
-        time: data.activity.beginTime,
-        status: ACTIVITY_STATUS[data.activity.activityStatus]
-      };
+      data.activity['name'] = $rootScope.appList[data.app].name;
+      $rootScope.logList[data.activity.activityId] = data.activity;
+      if ($rootScope.currentAppDetails) {
+        $rootScope.currentAppDetails['logs'][data.activity.activityId] = data.activity;
+      }
       $rootScope.appList[data.app].status = data.activity;
     };
 
@@ -114,20 +108,67 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     });
 
     $interval(function() {
-      server.fetchGetsCount(function(err, data) {
-        if (data) {
-          $rootScope.dashData.getsCount = data;
+      var completeCount = 0;
+      var collectedData = {
+        GET: {
+          oldVal: 0,
+          newVal: 0
+        },
+        POST: {
+          oldVal: 0,
+          newVal: 0
+        },
+        PUT: {
+          oldVal: 0,
+          newVal: 0
+        },
+        DELETE: {
+          oldVal: 0,
+          newVal: 0
         }
+      };
+      var onComplete = function(target, oldVal, newVal) {
+        collectedData[target]['oldVal'] = oldVal;
+        collectedData[target]['newVal'] = newVal;
+        if (completeCount === 4) {
+          $rootScope.dashData.authHTTPMethods.GET = collectedData.GET.newVal - collectedData.GET.oldVal;
+          $rootScope.dashData.authHTTPMethods.POST = collectedData.POST.newVal - collectedData.POST.oldVal;
+          $rootScope.dashData.authHTTPMethods.PUT = collectedData.PUT.newVal - collectedData.PUT.oldVal;
+          $rootScope.dashData.authHTTPMethods.DELETE = collectedData.DELETE.newVal - collectedData.DELETE.oldVal;
+          completeCount = 0;
+        }
+      };
+      server.fetchGetsCount(function(err, data) {
+        if (!data) {
+          return;
+        }
+        if ($rootScope.isAuthenticated) {
+          $rootScope.dashData.unAuthGET = data - $rootScope.dashData.getsCount;
+        } else {
+          completeCount++;
+          onComplete('GET', $rootScope.dashData.getsCount, data);
+        }
+        $rootScope.dashData.getsCount = data;
       });
       server.fetchDeletesCount(function(err, data) {
-        if (data) {
-          $rootScope.dashData.deletesCount = data;
+        if (!data) {
+          return;
         }
+        if ($rootScope.isAuthenticated) {
+          completeCount++;
+          onComplete('DELETE', $rootScope.dashData.deletesCount, data);
+        }
+        $rootScope.dashData.deletesCount = data;
       });
       server.fetchPostsCount(function(err, data) {
-        if (data) {
-          $rootScope.dashData.postsCount = data;
+        if (!data) {
+          return;
         }
+        if ($rootScope.isAuthenticated) {
+          completeCount++;
+          onComplete('POST', $rootScope.dashData.postsCount, data);
+        }
+        $rootScope.dashData.postsCount = data;
       });
       for (var i in $rootScope.appList) {
         var item = $rootScope.appList[i];
