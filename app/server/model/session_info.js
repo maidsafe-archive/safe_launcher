@@ -25,6 +25,10 @@ export default class SessionInfo {
     this['activities'][index] = activity;
   }
 
+  get activityList() {
+    return this['activities'];
+  }
+
   hasSafeDriveAccess() {
     return this.permissions.hasSafeDriveAccess();
   }

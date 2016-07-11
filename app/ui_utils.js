@@ -57,7 +57,7 @@ export default class UIUtils {
     });
   }
 
-  dropUnregisteredClient(callback) {    
+  dropUnregisteredClient(callback) {
     this.api.auth.dropUnregisteredClient(callback);
   }
 
@@ -163,7 +163,7 @@ export default class UIUtils {
   reconnect() {
     this.api.restart();
   }
-  
+
   fetchGetsCount(callback) {
    this.api.clientStats.fetchGetsCount(callback);
   }
@@ -181,9 +181,7 @@ export default class UIUtils {
   }
 
   onUploadEvent(callback) {
-    this.restServer.addEventListener(this.restServer.EVENT_TYPE.DATA_UPLOADED, function(s) {
-      console.log('D', s);
-    });
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.DATA_UPLOADED, callback);
   }
 
   onDownloadEvent(callback) {
@@ -196,6 +194,10 @@ export default class UIUtils {
 
   onUpdatedAppActivity(callback) {
     this.restServer.addEventListener(this.restServer.EVENT_TYPE.ACTIVITY_UPDATE, callback);
+  }
+
+  getAppActivityList(id) {
+    return this.restServer.getAppActivityList(id);
   }
 
 }
