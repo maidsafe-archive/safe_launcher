@@ -1,5 +1,5 @@
 import { log } from './../../logger/log';
-
+import { updateAppActivity } from './../utils.js';
 var Readable = require('stream').Readable;
 var util = require('util');
 
@@ -25,6 +25,7 @@ util.inherits(DnsReader, Readable);
 DnsReader.prototype._read = function() {
   let self = this;
   if (self.curOffset === self.end) {
+    updateAppActivity(self.req, self.res, true);
     return self.push(null);
   }
   let MAX_SIZE_TO_READ = 1048576; // 1 MB
@@ -38,6 +39,7 @@ DnsReader.prototype._read = function() {
       if (err) {
         self.push(null);
         log.error(err);
+        updateAppActivity(self.req, self.res);
         return self.res.end();
       }
       self.curOffset += self.sizeToRead;

@@ -39,15 +39,14 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         var lastkey = logKeys.pop();
         delete $rootScope.logList[lastkey];
       }
-      if (!data.app) {
-        return;
-      }
-      data.activity['appName'] = $rootScope.appList[data.app].name;
+      data.activity['appName'] = data.app ? $rootScope.appList[data.app].name : 'Unauthorised Application';
       $rootScope.logList[data.activity.activityId] = data.activity;
       if ($rootScope.currentAppDetails) {
         $rootScope.currentAppDetails['logs'][data.activity.activityId] = data.activity;
       }
-      $rootScope.appList[data.app].status = data.activity;
+      if (data.app) {
+          $rootScope.appList[data.app].status = data.activity;
+      }
     };
 
     var proxyListener = function(status) {
@@ -246,14 +245,16 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     $scope.enableProxySetting = function(status) {
       setProxy(status);
       $rootScope.$proxyServer = Boolean(status);
+      if (status) {
+        $scope.toggleProxyServer();
+      }
       $state.go('app');
     };
 
     $scope.checkProxy = function() {
       var proxy = getProxy();
-      if (proxy && proxy.hasOwnProperty('status')) {
-        $rootScope.$proxyServer = proxy.status;
-        return $state.go('app');
+      if (proxy && proxy.hasOwnProperty('status')) {                
+        return $scope.enableProxySetting(proxy.status);
       }
       $state.go('splash');
     };

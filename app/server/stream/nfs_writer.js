@@ -8,7 +8,7 @@ export var NfsWriter = function (req, writerId, responseHandler, offset) {
   this.writerId = writerId;
   this.curOffset = parseInt(offset || 0);
   this.responseHandler = responseHandler;
-  this.isReadStreamClosed = false;  
+  this.isReadStreamClosed = false;
   return this;
 };
 
@@ -20,7 +20,7 @@ NfsWriter.prototype._write = function(data, enc, next) {
   var uploadEvent = self.req.app.get('EVENT_TYPE').DATA_UPLOADED;
   this.req.app.get('api').nfs.write(this.writerId, this.curOffset, data, function(err) {
     if (err) {
-      next(err);
+      next(err);      
       return self.responseHandler(err);
     }
     eventEmitter.emit(uploadEvent, data.length);
