@@ -56,9 +56,9 @@
             background-color: #EEE;
             position: absolute;
             top: 11px;
-            right: 0;
+            left: -1px;
           }
-          &:last-child:after {
+          &:first-child:after {
             display: none;
           }
           &.active, &:hover {
@@ -140,7 +140,7 @@
       font-weight: 600;
       color: #212121;
       .version {
-        font-size: 22px;
+        font-weight: normal;
         opacity: 0.7;
       }
     }
@@ -229,8 +229,8 @@
       margin: 0;
       padding: 0;
       .version {
-        font-size: 15px;
-        opacity: 0.4;
+        font-weight: normal;
+        opacity: 0.7;
       }
     }
     .permissions {
@@ -342,7 +342,7 @@
         .permissions-i {
           margin-bottom: 8px;
           &.sade-drive {
-            
+
           }
           .permissions-name {
             width: 100%;
@@ -418,6 +418,7 @@
     padding: 16px;
     margin-top: 20px;
     position: relative;
+    border-radius: 2px;
     cursor: pointer;
     .settings-i-ctn {
       padding-right: 50px;
@@ -537,10 +538,7 @@
 .card {
   width: 100%;
   background-color: #FFF;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.26);
-  &:hover {
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
-  }
+  border-radius: 2px;
 }
 
 .count {
@@ -608,6 +606,9 @@
 
 .bar-chart {
   padding: 24px;
+  &:hover {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.26);
+  }
   .filters {
     padding: 0 16px;
     margin-bottom: 12px;
@@ -772,7 +773,7 @@
       }
     }
   }
-  input:checked + label:before {
+  input:checked + label:before, &.always-checked label:before {
     background-image: url(../images/tick.svg);
   }
 }
