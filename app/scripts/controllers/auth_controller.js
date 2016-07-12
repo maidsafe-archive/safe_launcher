@@ -6,7 +6,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
   function($scope, $state, $rootScope, $timeout, auth, validator, CONSTANTS, MESSAGES) {
     var REQUEST_TIMEOUT = 90 * 1000;
     var FIELD_FOCUS_DELAY = 100;
-
     $scope.user = {};
     $scope.isLoading = false;
 
