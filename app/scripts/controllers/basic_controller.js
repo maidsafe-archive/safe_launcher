@@ -140,29 +140,40 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         newVal: 0
       }
     };
+
     var onComplete = function(target, oldVal, newVal) {
       collectedData[target]['oldVal'] = oldVal;
       collectedData[target]['newVal'] = newVal;
+      var temp = {};
       if (completeCount === 4) {
-        $rootScope.dashData.authHTTPMethods.GET = collectedData.GET.newVal - collectedData.GET.oldVal;
-        $rootScope.dashData.authHTTPMethods.POST = collectedData.POST.newVal - collectedData.POST.oldVal;
-        $rootScope.dashData.authHTTPMethods.PUT = collectedData.PUT.newVal - collectedData.PUT.oldVal;
-        $rootScope.dashData.authHTTPMethods.DELETE = collectedData.DELETE.newVal - collectedData.DELETE.oldVal;
+        temp.GET = collectedData.GET.newVal - collectedData.GET.oldVal;
+        temp.POST = collectedData.POST.newVal - collectedData.POST.oldVal;
+        temp.PUT = collectedData.PUT.newVal - collectedData.PUT.oldVal;
+        temp.DELETE = collectedData.DELETE.newVal - collectedData.DELETE.oldVal;
         completeCount = 0;
+        $rootScope.dashData.authHTTPMethods.push(temp);
+        if ($rootScope.dashData.authHTTPMethods.length > 50) {
+          $rootScope.dashData.authHTTPMethods.splice(0, 1);
+        }
+        $rootScope.$applyAsync();
       }
     };
     $interval(function() {
       if (!$rootScope.isAuthenticated) {
         return server.fetchGetsCount(function(err, data) {
-          if (!data) {
+          if (err) {
             return;
           }
-          $rootScope.dashData.unAuthGET = data - $rootScope.dashData.getsCount;
+          $rootScope.dashData.unAuthGET.push(data - $rootScope.dashData.getsCount);
           $rootScope.dashData.getsCount = data;
+          if ($rootScope.dashData.unAuthGET.length > 50) {
+            $rootScope.dashData.unAuthGET.splice(0, 1);
+          }
+          $rootScope.$applyAsync();
         });
       }
       server.fetchGetsCount(function(err, data) {
-        if (!data) {
+        if (err) {
           return;
         }
         completeCount++;
@@ -170,7 +181,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         $rootScope.dashData.getsCount = data;
       });
       server.fetchDeletesCount(function(err, data) {
-        if (!data) {
+        if (err) {
           return;
         }
         if ($rootScope.isAuthenticated) {
@@ -180,7 +191,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         $rootScope.dashData.deletesCount = data;
       });
       server.fetchPostsCount(function(err, data) {
-        if (!data) {
+        if (err) {
           return;
         }
         completeCount++;
@@ -188,12 +199,12 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         $rootScope.dashData.postsCount = data;
       });
       server.fetchPutsCount(function(err, data) {
-        if (!data) {
+        if (err) {
           return;
         }
-        completeCount++;
+        completeCount++;        
         onComplete('PUT', $rootScope.dashData.putsCount, data);
-        $rootScope.dashData.putsCoun = data;
+        $rootScope.dashData.putsCount = data;
       });
       for (var i in $rootScope.appList) {
         var item = $rootScope.appList[i];

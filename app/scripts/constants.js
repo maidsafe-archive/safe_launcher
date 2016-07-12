@@ -18,7 +18,7 @@ window.safeLauncher.constant('CONSTANTS', {
   'PIN_MIN_LEN': 4,
   'KEYWORD_MIN_LEN': 6,
   'PASSWORD_MIN_LEN': 6,
-  'FETCH_DELAY': 2000,
+  'FETCH_DELAY': 30000,
   'LOG_LIST_LIMIT': 500,
   'TOASTER_TIMEOUT': 5000
 });

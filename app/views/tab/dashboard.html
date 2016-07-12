@@ -9,14 +9,14 @@
               <label for="GET">GET</label>
             </div>
           </div>
-          <react-component name="UnauthGETChart" props="{add: dashData.unAuthGET}"></react-component>
+          <react-component name="UnauthGETChart" props="{data: dashData.unAuthGET}"></react-component>
         </div>
       </div>
     </div>
     <div class="dash-cnt" ng-show="isAuthenticated">
       <div class="sec-1">
         <div class="card bar-chart">
-          <react-component name="GroupBarChart" props="{jsonData: dashData.authHTTPMethods}"></react-component>
+          <react-component name="GroupBarChart" props="{data: dashData.authHTTPMethods}"></react-component>
         </div>
       </div>
     </div>

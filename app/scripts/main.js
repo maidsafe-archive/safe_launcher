@@ -23,16 +23,11 @@ window.safeLauncher = angular
     getsCount: 0,
     deletesCount: 0,
     postsCount: 0,
-    putsCoun: 0,
-    unAuthGET: 0,
+    putsCount: 0,
+    unAuthGET: [],
     upload: 0,
     download: 0,
-    authHTTPMethods: {
-      POST: 0,
-      GET: 0,
-      PUT: 0,
-      DELETE: 0
-    }
+    authHTTPMethods: []
   };
   $rootScope.ALERT_TYPE = {
     AUTH_REQ: 'auth_request',

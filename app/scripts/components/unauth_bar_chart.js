@@ -3,23 +3,14 @@ var ReactDOM = window.ReactDOM;
 var d3 = window.d3;
 var UnauthGETChart = React.createClass({
   propTypes: {
-    add: React.PropTypes.number
+    data: React.PropTypes.array
   },
   componentDidMount: function () {
-      this.initD3();
-  },
-  componentWillReceiveProps: function (nextProps) {
-      this.add(nextProps.add);
-  },
-  render: function() {
-    return React.DOM.span(null, null);
-  },
-  initD3: function() {
     var margin = {
       top: 12,
       left: 12,
       right: 35,
-      bottom: 40
+      bottom: 25
     };
     var padding = 24;
     var containerWidth = 650;
@@ -38,17 +29,34 @@ var UnauthGETChart = React.createClass({
     this.height = containerHeight - margin.top - margin.bottom;
     this.width = containerWidth - margin.right - margin.left;
     this.MAX_BARS = Math.floor(this.width / this.BAR_WIDTH);
-    this.data = [0, 0];
+    this.data = [ 0, 0 ];
     this.actualDataSize = 0;
-    this.add(this.props.add);
+    this.add();
+
+    var tempData = this.props.data;
+    if (this.props.data.length > 0) {
+      var tempData = this.props.data;
+      if (tempData.length > this.MAX_BARS) {
+        tempData = tempData.slice(tempData.length - this.MAX_BARS);
+      }
+      for (var i in tempData) {
+          this.add(tempData[i]);
+      }
+    }    
+  },
+  componentWillReceiveProps: function (nextProps) {
+      this.add(nextProps.data[nextProps.data.length - 1]);
+  },
+  render: function() {
+    return React.DOM.span({id: 'barChart'});
   },
   add: function(entry) {
     var self = this;
-    if (entry) {
+    if (entry !== undefined) {
       this.data.splice(1, 0, entry);
-    }
-    if (this.actualDataSize < this.MAX_BARS) {
-      this.actualDataSize++;
+      if (this.actualDataSize < this.MAX_BARS) {
+        this.actualDataSize++;
+      }
     }
     if (this.data.length > this.MAX_BARS) {
       this.data.splice(this.data.length - 2, 1);
