@@ -3,7 +3,6 @@
  */
 window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootScope', '$interval', 'serverFactory', 'CONSTANTS',
   function($scope, $state, $rootScope, $interval, server, CONSTANTS) {
-    var isAfterAuth = false;
     // handle proxy localy
     var setProxy = function(status) {
       window.localStorage.setItem('proxy', JSON.stringify({status: Boolean(status)}));
@@ -91,40 +90,67 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       $rootScope.appList[data.app].status = data.activity;
     };
 
-    var afterAuth = function() {
-      server.onNewAppActivity(function(data) {
-        if (!data) {
-          return;
-        }
-        console.log(data);
-        updateActivity(data);
-      });
+    server.onNewAppActivity(function(data) {
+      if (!data) {
+        return;
+      }
+      console.log(data);
+      updateActivity(data);
+    });
 
-      server.onUploadEvent(function(data) {
-        if (!data) {
-          return;
-        }
-        console.log(data);
-        $rootScope.dashData.upload += data;
-      });
+    server.onUploadEvent(function(data) {
+      if (!data) {
+        return;
+      }
+      console.log(data);
+      $rootScope.dashData.upload += data;
+    });
 
-      server.onDownloadEvent(function(data) {
-        if (!data) {
-          return;
-        }
-        console.log(data);
-        $rootScope.dashData.download += data;
-      });
+    server.onDownloadEvent(function(data) {
+      if (!data) {
+        return;
+      }
+      console.log(data);
+      $rootScope.dashData.download += data;
+    });
 
-      server.onUpdatedAppActivity(function(data) {
-        if (!data) {
-          return;
-        }
-        console.log(data);
-        updateActivity(data);
-      });
+    server.onUpdatedAppActivity(function(data) {
+      if (!data) {
+        return;
+      }
+      console.log(data);
+      updateActivity(data);
+    });
+    var completeCount = 0;
+    var collectedData = {
+      GET: {
+        oldVal: 0,
+        newVal: 0
+      },
+      POST: {
+        oldVal: 0,
+        newVal: 0
+      },
+      PUT: {
+        oldVal: 0,
+        newVal: 0
+      },
+      DELETE: {
+        oldVal: 0,
+        newVal: 0
+      }
     };
-
+    var onComplete = function(target, oldVal, newVal) {
+      collectedData[target]['oldVal'] = oldVal;
+      collectedData[target]['newVal'] = newVal;
+      if (completeCount === 4) {
+        $rootScope.dashData.authHTTPMethods.GET = collectedData.GET.newVal - collectedData.GET.oldVal;
+        $rootScope.dashData.authHTTPMethods.POST = collectedData.POST.newVal - collectedData.POST.oldVal;
+        $rootScope.dashData.authHTTPMethods.PUT = collectedData.PUT.newVal - collectedData.PUT.oldVal;
+        $rootScope.dashData.authHTTPMethods.DELETE = collectedData.DELETE.newVal - collectedData.DELETE.oldVal;
+        completeCount = 0;
+      }
+    };
     $interval(function() {
       if (!$rootScope.isAuthenticated) {
         return server.fetchGetsCount(function(err, data) {
@@ -135,40 +161,6 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
           $rootScope.dashData.getsCount = data;
         });
       }
-      if (!isAfterAuth) {
-        afterAuth();
-        isAfterAuth = true;
-      }
-      var completeCount = 0;
-      var collectedData = {
-        GET: {
-          oldVal: 0,
-          newVal: 0
-        },
-        POST: {
-          oldVal: 0,
-          newVal: 0
-        },
-        PUT: {
-          oldVal: 0,
-          newVal: 0
-        },
-        DELETE: {
-          oldVal: 0,
-          newVal: 0
-        }
-      };
-      var onComplete = function(target, oldVal, newVal) {
-        collectedData[target]['oldVal'] = oldVal;
-        collectedData[target]['newVal'] = newVal;
-        if (completeCount === 4) {
-          $rootScope.dashData.authHTTPMethods.GET = collectedData.GET.newVal - collectedData.GET.oldVal;
-          $rootScope.dashData.authHTTPMethods.POST = collectedData.POST.newVal - collectedData.POST.oldVal;
-          $rootScope.dashData.authHTTPMethods.PUT = collectedData.PUT.newVal - collectedData.PUT.oldVal;
-          $rootScope.dashData.authHTTPMethods.DELETE = collectedData.DELETE.newVal - collectedData.DELETE.oldVal;
-          completeCount = 0;
-        }
-      };
       server.fetchGetsCount(function(err, data) {
         if (!data) {
           return;
@@ -194,6 +186,14 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         completeCount++;
         onComplete('POST', $rootScope.dashData.postsCount, data);
         $rootScope.dashData.postsCount = data;
+      });
+      server.fetchPutsCount(function(err, data) {
+        if (!data) {
+          return;
+        }
+        completeCount++;
+        onComplete('PUT', $rootScope.dashData.putsCount, data);
+        $rootScope.dashData.putsCoun = data;
       });
       for (var i in $rootScope.appList) {
         var item = $rootScope.appList[i];

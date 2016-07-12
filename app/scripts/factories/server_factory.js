@@ -130,6 +130,9 @@ window.safeLauncher.factory('serverFactory', [
     self.fetchPostsCount = function(callback) {
       window.msl.fetchPostsCount(callback);
     }
+    self.fetchPutsCount = function(callback) {
+      window.msl.fetchPutsCount(callback);
+    }
     self.onNewAppActivity = function(callback) {
       window.msl.onNewAppActivity(callback);
     }
