@@ -14,9 +14,22 @@
   &.primary {
     background-color: @primary-blue;
     color: #FFF;
+    &:hover {
+      background-color: @primary-blue-hover;
+    }
+    &:active {
+      background-color: @primary-blue-action;
+    }
+    &:focus {
+      background-color: @primary-blue-hover;
+      box-shadow: inset 0 0 0px 2px @primary-blue;
+    }
+  }
+  &[disabled='disabled'] {
+    opacity: 0.5;
   }
   &.flat {
-    background-color: transparent;
+    background-color: transparent !important;
     &.danger {
       color: @error-red;
     }

@@ -158,9 +158,10 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         $rootScope.$applyAsync();
       }
     };
-    $interval(function() {
-      if (!$rootScope.isAuthenticated) {
-        return server.fetchGetsCount(function(err, data) {
+
+    $scope.fetchStatsForUnauthorisedClient = function() {
+      $rootScope.intervals.push($interval(function () {
+        server.fetchGetsCount(function(err, data) {
           if (err) {
             return;
           }
@@ -171,51 +172,71 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
           }
           $rootScope.$applyAsync();
         });
-      }
-      server.fetchGetsCount(function(err, data) {
-        if (err) {
-          return;
-        }
-        completeCount++;
-        onComplete('GET', $rootScope.dashData.getsCount, data);
-        $rootScope.dashData.getsCount = data;
-      });
-      server.fetchDeletesCount(function(err, data) {
-        if (err) {
-          return;
-        }
-        if ($rootScope.isAuthenticated) {
+      }, CONSTANTS.FETCH_DELAY));
+    };
+
+    $scope.fetchStatsForAuthorisedClient = function() {
+      $rootScope.intervals.push($interval(function () {
+        server.fetchGetsCount(function(err, data) {
+          if (err) {
+            return;
+          }
           completeCount++;
-          onComplete('DELETE', $rootScope.dashData.deletesCount, data);
+          onComplete('GET', $rootScope.dashData.getsCount, data);
+          $rootScope.dashData.getsCount = data;
+        });
+        server.fetchDeletesCount(function(err, data) {
+          if (err) {
+            return;
+          }
+          if ($rootScope.isAuthenticated) {
+            completeCount++;
+            onComplete('DELETE', $rootScope.dashData.deletesCount, data);
+          }
+          $rootScope.dashData.deletesCount = data;
+        });
+        server.fetchPostsCount(function(err, data) {
+          if (err) {
+            return;
+          }
+          completeCount++;
+          onComplete('POST', $rootScope.dashData.postsCount, data);
+          $rootScope.dashData.postsCount = data;
+        });
+        server.fetchPutsCount(function(err, data) {
+          if (err) {
+            return;
+          }
+          completeCount++;
+          onComplete('PUT', $rootScope.dashData.putsCount, data);
+          $rootScope.dashData.putsCount = data;
+        });
+        for (var i in $rootScope.appList) {
+          var item = $rootScope.appList[i];
+          $rootScope.appList[i].lastActive = window.moment(item.status.endTime || item.status.beginTime).fromNow(true)
         }
-        $rootScope.dashData.deletesCount = data;
-      });
-      server.fetchPostsCount(function(err, data) {
+      }, CONSTANTS.FETCH_DELAY));
+    };
+
+    $scope.updateUserAccount = function () {
+      server.getAccountInfo(function(err, data) {
         if (err) {
           return;
         }
-        completeCount++;
-        onComplete('POST', $rootScope.dashData.postsCount, data);
-        $rootScope.dashData.postsCount = data;
+        $rootScope.dashData.accountInfo = data;
       });
-      server.fetchPutsCount(function(err, data) {
-        if (err) {
-          return;
-        }
-        completeCount++;        
-        onComplete('PUT', $rootScope.dashData.putsCount, data);
-        $rootScope.dashData.putsCount = data;
-      });
-      for (var i in $rootScope.appList) {
-        var item = $rootScope.appList[i];
-        $rootScope.appList[i].lastActive = window.moment(item.status.endTime || item.status.beginTime).fromNow(true)
-      }
-    }, CONSTANTS.FETCH_DELAY);
+    };
+
+    $scope.pollUserAccount = function() {
+      $rootScope.intervals.push($interval($scope.updateUserAccount, CONSTANTS.ACCOUNT_FETCH_INTERVAL));
+    }
 
     window.msl.setNetworkStateChangeListener(function(state) {
       $rootScope.$networkStatus.show = true;
       $rootScope.$networkStatus.status = state;
-      if ($rootScope.$networkStatus.status === 1) {
+      if ($rootScope.$networkStatus.status === window.NETWORK_STATE.CONNECTED
+        && $rootScope.$state.current.name !== 'splash') {
+        $scope.fetchStatsForUnauthorisedClient();        
         $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
           msg: 'Network connected',
           hasOption: false,
@@ -224,7 +245,9 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
           console.log(data);
         });
       }
-      if ($rootScope.$networkStatus.status === window.NETWORK_STATE.DISCONNECTED) {
+      if ($rootScope.$networkStatus.status === window.NETWORK_STATE.DISCONNECTED
+        && $rootScope.$state.current.name !== 'splash') {
+        $rootScope.clearIntervals();
         $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
           msg: 'Network Error',
           hasOption: true,
@@ -267,7 +290,12 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         return $state.go('app');
       }
       $state.go('splash');
-    }
+    };
+
+    $scope.openExternal= function(e, url) {
+      e.preventDefault();
+      server.openExternal(url);
+    };
 
     // initialize application
     server.start();

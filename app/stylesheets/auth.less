@@ -20,9 +20,21 @@
       color: #212121;
       a {
         text-decoration: none;
-        color: #212121;
+        color: @primary-blue;
         font-weight: 600;
         text-transform: uppercase;
+        outline: 0;
+        padding: 5px;
+        &:hover {
+          color: @primary-blue-hover;
+        }
+        &:active {
+          color: @primary-blue-action;
+        }
+        &:focus {
+          color: @primary-blue-hover;
+          text-decoration: underline;
+        }
       }
     }
   }
@@ -61,12 +73,18 @@
       z-index: 0;
     }
     input:focus {
+      & + label {
+        display: block !important;
+      }
       border-color: @primary-blue;
     }
-    input:focus + label, input:valid + label {
+    input:focus + label {
       top: -18px;
       font-size: 12px;
       line-height: 16px;
+    }
+    input:valid + label {
+      display: none;
     }
     .msg {
       margin-top: 6px;

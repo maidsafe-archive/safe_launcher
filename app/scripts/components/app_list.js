@@ -8,6 +8,7 @@ var AppList = React.createClass({
   },
   handleClick: function(e) {
     e.stopPropagation();
+    $(e.currentTarget).attr('disabled', true);
     this.props.revokeApp(this.props.list[e.currentTarget.dataset.id].id);
   },
   showAppDetails: function(e) {

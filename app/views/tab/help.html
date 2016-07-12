@@ -3,25 +3,36 @@
     <h3 class="title">About:</h3>
     <h4 class="def">Safe Launcher: <b>Version 0.5.0</b></h4>
     <p class="p">
-      The SAFE Network and Launcher are still in test phases and may only work if you are using the latest version.
+      The SAFE Network and Launcher are still in test phases and may only work if you are using the lastest version.
     </p>
-    <div class="sub-cnt">
+    <!-- <div class="sub-cnt">
       <h4 class="sub-title">Updates are availabe!</h4>
       <h5 class="sub-def">Version 0.5.2 - <a href="#">Download Update</a></h5>
-    </div>
+    </div> -->
     <h3 class="title">Tutorials:</h3>
     <p class="p">
-      Learn how to get set up on the SAFE Network at <a href="#">maidsafe.readme.io</a>.
-      Here you'll find tutorials on setting up and using Launcher and example apps from MaidSafe.
+      Learn how to get set up on the SAFE Network at
+      <a href="#" ng-click="openExternal($event, 'https://maidsafe.readme.io')">maidsafe.readme.io</a>.
+      Here you'll find tutorials on setting up and using the Launcher and example apps from MaidSafe.
     </p>
     <ul class="list">
-      <li><a href="#">Using Launcher - readme.io</a></li>
-      <li><a href="#">Proxy Setup - readme.io</a></li>
-      <li><a href="#">Install Demo Application - readme.io</a></li>
+      <li><a href="#" ng-click="openExternal($event, 'https://maidsafe.readme.io/docs/install-launcher')">Using Launcher - readme.io</a></li>
+      <li><a href="#" ng-click="openExternal($event, 'https://maidsafe.readme.io/docs/proxy-setup')">Proxy Setup - readme.io</a></li>
+      <li><a href="#" ng-click="openExternal($event, 'https://maidsafe.readme.io/docs/install-demo-app')">Install Demo Application - readme.io</a></li>
     </ul>
     <h3 class="title">Discussions:</h3>
     <p class="p">
-      You can join the discussion on the community forum where the is
+      You can join the discussion on:
     </p>
+    <ul class="list">
+      <li><a href="#" ng-click="openExternal($event, 'https://forum.safenetwork.io')">Community forum</a></li>
+      <li><a href="#" ng-click="openExternal($event, 'https://maidsafe.slack.com')">MaidSafe Team Slack</a></li>
+    </ul>
+    <p class="p">
+      If you'd like to contribute to the code or found any issues, you can find us on github:
+    </p>
+    <ul class="list">
+      <li><a href="#" ng-click="openExternal($event, 'https://github.com/maidsafe')">MaidSafe Github</a></li>
+    </ul>
   </div>
 </div>

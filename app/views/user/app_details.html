@@ -10,7 +10,7 @@
       <h4 class="permissions-title">Permissions:</h4>
       <ul>
         <li ng-show="!currentAppDetails.permissions || currentAppDetails.permissions.length === 0">None</li>
-        <li ng-show="currentAppDetails.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1">SAFE Drive Access</li>
+        <li class="icn safe-drive" ng-show="currentAppDetails.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1">SAFE Drive Access</li>
       </ul>
     </div>
     <div class="table-view without-pad">

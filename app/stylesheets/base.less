@@ -6,12 +6,18 @@
 }
 body {
   font-family: 'Open Sans';
-  background-color: #EEE;
+  background-color: #EAEAEA;
   overflow-y: hidden;
 }
 a {
   color: @primary-blue;
   font-weight: 600;
+  &:hover {
+    color: @primary-blue-hover;
+  }
+  &:active {
+    color: @primary-blue-action;
+  }
 }
 
 .noselect {
@@ -24,6 +30,45 @@ a {
                                   not supported by any browser */
 }
 
+.splash {
+  width: 100%;
+  height: @app-ht - @title-ht;
+  top: 0;
+  left: 0;
+  display: table;
+  .splash-b {
+    width: 100%;
+    height: 100%;
+    display: table-cell;
+    vertical-align: bottom;
+    background-position: center;
+    background-size: cover;
+    padding-bottom: 10%;
+    .splash-i {
+      display: block;
+      width: 60%;
+      margin: 0 auto;
+      font-size: 24px;
+      font-weight: 600;
+      text-align: center;
+      color: #FFF;
+    }
+    .opt {
+      margin-top: 20px;
+      text-align: center;
+      .btn.danger {
+        color: @error-red;
+      }
+    }
+    &.connecting {
+      background-image: url(../images/trying.png);
+    }
+    &.disconnected {
+      background-image: url(../images/not_connected.png);
+    }
+  }
+}
+
 .help {
   height: @tab-cnt-ht;
   overflow-y: auto;
@@ -31,15 +76,15 @@ a {
     color: @primary-blue;
   }
   .help-b {
-    width: 70%;
+    width: 560px;
     margin: 0 auto;
     padding-top: 40px;
   }
   .title {
     margin: 0 0 20px;
     padding: 0;
-    font-size: 24px;
-    color: #212121;
+    font-size: 22px;
+    color: #4d4d4d;
     font-weight: 600;
   }
   .def {
@@ -64,7 +109,7 @@ a {
     margin-bottom: 20px;
   }
   .sub-title {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     color: #212121;
     margin-bottom: 16px;
@@ -80,9 +125,32 @@ a {
     padding: 0;
     li {
       list-style-type: none;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: normal;
       line-height: 20px;
+      a {
+        position: relative;
+        display: inline-block;
+        padding-left: 20px;
+        &:before {
+          content: '';
+          width: 16px;
+          height: 16px;
+          background-image: url(../images/link_chevron.svg);
+          background-position: center;
+          background-repeat: no-repeat;
+          background-size: cover;
+          position: absolute;
+          top: 2px;
+          left: 2px;
+        }
+        &:hover {
+          color: @primary-blue-hover;
+        }
+        &:active {
+          color: @primary-blue-action;
+        }
+      }
     }
   }
 }
