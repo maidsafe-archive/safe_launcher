@@ -140,75 +140,103 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         newVal: 0
       }
     };
+
     var onComplete = function(target, oldVal, newVal) {
       collectedData[target]['oldVal'] = oldVal;
       collectedData[target]['newVal'] = newVal;
+      var temp = {};
       if (completeCount === 4) {
-        $rootScope.dashData.authHTTPMethods.GET = collectedData.GET.newVal - collectedData.GET.oldVal;
-        $rootScope.dashData.authHTTPMethods.POST = collectedData.POST.newVal - collectedData.POST.oldVal;
-        $rootScope.dashData.authHTTPMethods.PUT = collectedData.PUT.newVal - collectedData.PUT.oldVal;
-        $rootScope.dashData.authHTTPMethods.DELETE = collectedData.DELETE.newVal - collectedData.DELETE.oldVal;
+        temp.GET = collectedData.GET.newVal - collectedData.GET.oldVal;
+        temp.POST = collectedData.POST.newVal - collectedData.POST.oldVal;
+        temp.PUT = collectedData.PUT.newVal - collectedData.PUT.oldVal;
+        temp.DELETE = collectedData.DELETE.newVal - collectedData.DELETE.oldVal;
         completeCount = 0;
+        $rootScope.dashData.authHTTPMethods.push(temp);
+        if ($rootScope.dashData.authHTTPMethods.length > 50) {
+          $rootScope.dashData.authHTTPMethods.splice(0, 1);
+        }
+        $rootScope.$applyAsync();
       }
     };
-    $interval(function() {
-      if (!$rootScope.isAuthenticated) {
-        return server.fetchGetsCount(function(err, data) {
-          if (!data) {
+
+    $scope.fetchStatsForUnauthorisedClient = function() {
+      $rootScope.intervals.push($interval(function () {
+        server.fetchGetsCount(function(err, data) {
+          if (err) {
             return;
           }
-          $rootScope.dashData.unAuthGET = data - $rootScope.dashData.getsCount;
+          $rootScope.dashData.unAuthGET.push(data - $rootScope.dashData.getsCount);
+          $rootScope.dashData.getsCount = data;
+          if ($rootScope.dashData.unAuthGET.length > 50) {
+            $rootScope.dashData.unAuthGET.splice(0, 1);
+          }
+          $rootScope.$applyAsync();
+        });
+      }, CONSTANTS.FETCH_DELAY));
+    };
+
+    $scope.fetchStatsForAuthorisedClient = function() {
+      $rootScope.intervals.push($interval(function () {
+        server.fetchGetsCount(function(err, data) {
+          if (err) {
+            return;
+          }
+          completeCount++;
+          onComplete('GET', $rootScope.dashData.getsCount, data);
           $rootScope.dashData.getsCount = data;
         });
-      }
-      server.fetchGetsCount(function(err, data) {
-        if (!data) {
-          return;
-        }
-        completeCount++;
-        onComplete('GET', $rootScope.dashData.getsCount, data);
-        $rootScope.dashData.getsCount = data;
-      });
-      server.fetchDeletesCount(function(err, data) {
-        if (!data) {
-          return;
-        }
-        if ($rootScope.isAuthenticated) {
+        server.fetchDeletesCount(function(err, data) {
+          if (err) {
+            return;
+          }
+          if ($rootScope.isAuthenticated) {
+            completeCount++;
+            onComplete('DELETE', $rootScope.dashData.deletesCount, data);
+          }
+          $rootScope.dashData.deletesCount = data;
+        });
+        server.fetchPostsCount(function(err, data) {
+          if (err) {
+            return;
+          }
           completeCount++;
-          onComplete('DELETE', $rootScope.dashData.deletesCount, data);
+          onComplete('POST', $rootScope.dashData.postsCount, data);
+          $rootScope.dashData.postsCount = data;
+        });
+        server.fetchPutsCount(function(err, data) {
+          if (err) {
+            return;
+          }
+          completeCount++;
+          onComplete('PUT', $rootScope.dashData.putsCount, data);
+          $rootScope.dashData.putsCount = data;
+        });
+        for (var i in $rootScope.appList) {
+          var item = $rootScope.appList[i];
+          $rootScope.appList[i].lastActive = window.moment(item.status.endTime || item.status.beginTime).fromNow(true)
         }
-        $rootScope.dashData.deletesCount = data;
-      });
-      server.fetchPostsCount(function(err, data) {
-        if (!data) {
-          return;
-        }
-        completeCount++;
-        onComplete('POST', $rootScope.dashData.postsCount, data);
-        $rootScope.dashData.postsCount = data;
-      });
-      server.fetchPutsCount(function(err, data) {
-        if (!data) {
-          return;
-        }
-        completeCount++;
-        onComplete('PUT', $rootScope.dashData.putsCount, data);
-        $rootScope.dashData.putsCoun = data;
-      });
+      }, CONSTANTS.FETCH_DELAY));
+    };
+
+    $scope.updateUserAccount = function () {
       server.getAccountInfo(function(err, data) {
+        if (err) {
+          return;
+        }
         $rootScope.dashData.accountInfo = data;
       });
-      for (var i in $rootScope.appList) {
-        var item = $rootScope.appList[i];
-        $rootScope.appList[i].lastActive = window.moment(item.status.endTime || item.status.beginTime).fromNow(true)
-      }
-    }, CONSTANTS.FETCH_DELAY);
+    };
+
+    $scope.pollUserAccount = function() {
+      $rootScope.intervals.push($interval($scope.updateUserAccount, CONSTANTS.ACCOUNT_FETCH_INTERVAL));
+    }
 
     window.msl.setNetworkStateChangeListener(function(state) {
       $rootScope.$networkStatus.show = true;
       $rootScope.$networkStatus.status = state;
       if ($rootScope.$networkStatus.status === window.NETWORK_STATE.CONNECTED
-        && !$rootScope.$state.current.name === 'splash') {
+        && $rootScope.$state.current.name !== 'splash') {
+        $scope.fetchStatsForUnauthorisedClient();        
         $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
           msg: 'Network connected',
           hasOption: false,
@@ -218,7 +246,8 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         });
       }
       if ($rootScope.$networkStatus.status === window.NETWORK_STATE.DISCONNECTED
-        && !$rootScope.$state.current.name === 'splash') {
+        && $rootScope.$state.current.name !== 'splash') {
+        $rootScope.clearIntervals();
         $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
           msg: 'Network Error',
           hasOption: true,

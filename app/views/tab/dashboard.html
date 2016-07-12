@@ -9,14 +9,14 @@
               <label for="GET">GET</label>
             </div>
           </div>
-          <react-component name="UnauthGETChart" props="{add: dashData.unAuthGET}"></react-component>
+          <react-component name="UnauthGETChart" props="{data: dashData.unAuthGET}"></react-component>
         </div>
       </div>
     </div>
     <div class="dash-cnt" ng-show="isAuthenticated">
       <div class="sec-1">
         <div class="card bar-chart">
-          <react-component name="GroupBarChart" props="{jsonData: dashData.authHTTPMethods}"></react-component>
+          <react-component name="GroupBarChart" props="{data: dashData.authHTTPMethods}"></react-component>
         </div>
       </div>
     </div>
@@ -35,7 +35,7 @@
               <div class="progress">
                 <span class="progress-value" style="width:{{(dashData.accountInfo.used / dashData.accountInfo.available) * 100}}%"></span>
               </div>
-              <div class="desc">
+              <div class="desc">                
                 Each account is currently limited to {{dashData.accountInfo.available}} PUTs on the Network. (<a href="#">read more here.</a>)
               </div>
             </div>

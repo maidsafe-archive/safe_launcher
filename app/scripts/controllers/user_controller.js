@@ -118,5 +118,9 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
       }
     };
 
+    $rootScope.clearIntervals();
+    $scope.fetchStatsForAuthorisedClient();
+    $scope.updateUserAccount();
+    $scope.pollUserAccount();
   }
 ]);
