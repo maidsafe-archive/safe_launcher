@@ -324,13 +324,13 @@
         width: 50px;
         height: 50px;
         float: left;
+        margin-right: 16px;
         background-color: @primary-blue;
       }
       .desc {
         width: 210px;
         float: left;
         .desc-i {
-          padding-left: 16px;
           font-size: 14px;
           .desc-i-h {
             font-weight: 600;
@@ -804,7 +804,28 @@
   &.get {
     label {
       &:before {
-        background-color: @get
+        background-color: @get;
+      }
+    }
+  }
+  &.put {
+    label {
+      &:before {
+        background-color: @primary-blue;
+      }
+    }
+  }
+  &.post {
+    label {
+      &:before {
+        background-color: @upload;
+      }
+    }
+  }
+  &.delete {
+    label {
+      &:before {
+        background-color: @app-status-complete;
       }
     }
   }
@@ -967,6 +988,7 @@
   top: 0;
   right: 0;
   z-index: 999;
+  cursor: pointer;
   &.connecting {
     background-image: url(../images/loading.svg);
     animation: loading 0.5s linear infinite;

@@ -16,6 +16,24 @@
     <div class="dash-cnt" ng-show="isAuthenticated">
       <div class="sec-1">
         <div class="card bar-chart">
+          <div class="filters">
+            <div class="filters-i checkbox put always-checked">
+              <!-- <input id="GET" type="checkbox" name="GET" value="" checked="true"> -->
+              <label for="PUT">PUT</label>
+            </div>
+            <div class="filters-i checkbox get always-checked" ng-init="barChartGETFilter = true">
+              <!-- <input id="GET" type="checkbox" name="GET" value="" checked="true"> -->
+              <label for="GET">GET</label>
+            </div>
+            <div class="filters-i checkbox post always-checked">
+              <!-- <input id="GET" type="checkbox" name="GET" value="" checked="true"> -->
+              <label for="POST">POST</label>
+            </div>
+            <div class="filters-i checkbox delete always-checked">
+              <!-- <input id="GET" type="checkbox" name="GET" value="" checked="true"> -->
+              <label for="DELETED">DELETED</label>
+            </div>
+          </div>
           <react-component name="GroupBarChart" props="{data: dashData.authHTTPMethods}"></react-component>
         </div>
       </div>
@@ -35,7 +53,7 @@
               <div class="progress">
                 <span class="progress-value" style="width:{{(dashData.accountInfo.used / dashData.accountInfo.available) * 100}}%"></span>
               </div>
-              <div class="desc">                
+              <div class="desc">
                 Each account is currently limited to {{dashData.accountInfo.available}} PUTs on the Network. (<a href="#">read more here.</a>)
               </div>
             </div>

@@ -15,7 +15,7 @@
     error: $networkStatus.status === -1 || $networkStatus.status === 2,
     connecting: $networkStatus.status === 0,
     connected: $networkStatus.status === 1
-  }"></span>
+  }" ng-click="showNetworkStatus($networkStatus.status)"></span>
   <alert type="$alert.type" payload="$alert.payload" callback="$alert.callback(err, data)"></alert>
   <script>
     window.$ = window.jQuery = require('./bower_components/jquery/dist/jquery.min.js');

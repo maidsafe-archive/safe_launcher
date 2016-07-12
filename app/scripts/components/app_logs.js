@@ -37,7 +37,7 @@ var AppLogs = React.createClass({
         continue;
       }
       row = React.DOM.tr({key: i, className: STATUS_CLASS[list.status]}, [
-        React.DOM.td({key: 'td-name-' + i}, list.name),
+        React.DOM.td({key: 'td-name-' + i}, list.appName),
         React.DOM.td({key: 'td-req-' + i}, list.activityName),
         React.DOM.td({key: 'td-status-' + i}, list.status.replace(/_/g, ' ')),
         React.DOM.td({key: 'td-time-' + i}, window.moment(list.beginTime).format('HH:mm:ss'))

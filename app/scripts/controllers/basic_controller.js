@@ -3,6 +3,25 @@
  */
 window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootScope', '$interval', 'serverFactory', 'CONSTANTS',
   function($scope, $state, $rootScope, $interval, server, CONSTANTS) {
+    var completeCount = 0;
+    var collectedData = {
+      GET: {
+        oldVal: 0,
+        newVal: 0
+      },
+      POST: {
+        oldVal: 0,
+        newVal: 0
+      },
+      PUT: {
+        oldVal: 0,
+        newVal: 0
+      },
+      DELETE: {
+        oldVal: 0,
+        newVal: 0
+      }
+    };
     // handle proxy localy
     var setProxy = function(status) {
       window.localStorage.setItem('proxy', JSON.stringify({status: Boolean(status)}));
@@ -12,6 +31,45 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     };
     var clearProxy = function() {
       window.localStorage.clear();
+    };
+
+    var updateActivity = function(data) {
+      var logKeys = Object.keys($rootScope.logList);
+      if (logKeys.length >= CONSTANTS.LOG_LIST_LIMIT) {
+        var lastkey = logKeys.pop();
+        delete $rootScope.logList[lastkey];
+      }
+      if (!data.app) {
+        return;
+      }
+      data.activity['appName'] = $rootScope.appList[data.app].name;
+      $rootScope.logList[data.activity.activityId] = data.activity;
+      if ($rootScope.currentAppDetails) {
+        $rootScope.currentAppDetails['logs'][data.activity.activityId] = data.activity;
+      }
+      $rootScope.appList[data.app].status = data.activity;
+    };
+
+    var proxyListener = function(status) {
+      $rootScope.$proxyServer = status;
+    };
+
+    var onComplete = function(target, oldVal, newVal) {
+      collectedData[target]['oldVal'] = oldVal;
+      collectedData[target]['newVal'] = newVal;
+      var temp = {};
+      if (completeCount === 4) {
+        temp.GET = collectedData.GET.newVal - collectedData.GET.oldVal;
+        temp.POST = collectedData.POST.newVal - collectedData.POST.oldVal;
+        temp.PUT = collectedData.PUT.newVal - collectedData.PUT.oldVal;
+        temp.DELETE = collectedData.DELETE.newVal - collectedData.DELETE.oldVal;
+        completeCount = 0;
+        $rootScope.dashData.authHTTPMethods.push(temp);
+        if ($rootScope.dashData.authHTTPMethods.length > 50) {
+          $rootScope.dashData.authHTTPMethods.splice(0, 1);
+        }
+        $rootScope.$applyAsync();
+      }
     };
 
     // handle server error
@@ -73,23 +131,6 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       console.log(err);
     });
 
-    var updateActivity = function(data) {
-      var logKeys = Object.keys($rootScope.logList);
-      if (logKeys.length >= CONSTANTS.LOG_LIST_LIMIT) {
-        var lastkey = logKeys.pop();
-        delete $rootScope.logList[lastkey];
-      }
-      if (!data.app) {
-        return;
-      }
-      data.activity['name'] = $rootScope.appList[data.app].name;
-      $rootScope.logList[data.activity.activityId] = data.activity;
-      if ($rootScope.currentAppDetails) {
-        $rootScope.currentAppDetails['logs'][data.activity.activityId] = data.activity;
-      }
-      $rootScope.appList[data.app].status = data.activity;
-    };
-
     server.onNewAppActivity(function(data) {
       if (!data) {
         return;
@@ -121,43 +162,6 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       console.log(data);
       updateActivity(data);
     });
-    var completeCount = 0;
-    var collectedData = {
-      GET: {
-        oldVal: 0,
-        newVal: 0
-      },
-      POST: {
-        oldVal: 0,
-        newVal: 0
-      },
-      PUT: {
-        oldVal: 0,
-        newVal: 0
-      },
-      DELETE: {
-        oldVal: 0,
-        newVal: 0
-      }
-    };
-
-    var onComplete = function(target, oldVal, newVal) {
-      collectedData[target]['oldVal'] = oldVal;
-      collectedData[target]['newVal'] = newVal;
-      var temp = {};
-      if (completeCount === 4) {
-        temp.GET = collectedData.GET.newVal - collectedData.GET.oldVal;
-        temp.POST = collectedData.POST.newVal - collectedData.POST.oldVal;
-        temp.PUT = collectedData.PUT.newVal - collectedData.PUT.oldVal;
-        temp.DELETE = collectedData.DELETE.newVal - collectedData.DELETE.oldVal;
-        completeCount = 0;
-        $rootScope.dashData.authHTTPMethods.push(temp);
-        if ($rootScope.dashData.authHTTPMethods.length > 50) {
-          $rootScope.dashData.authHTTPMethods.splice(0, 1);
-        }
-        $rootScope.$applyAsync();
-      }
-    };
 
     $scope.fetchStatsForUnauthorisedClient = function() {
       $rootScope.intervals.push($interval(function () {
@@ -213,7 +217,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         });
         for (var i in $rootScope.appList) {
           var item = $rootScope.appList[i];
-          $rootScope.appList[i].lastActive = window.moment(item.status.endTime || item.status.beginTime).fromNow(true)
+          $rootScope.appList[i].lastActive = window.moment(item.status.endTime || item.status.beginTime).fromNow()
         }
       }, CONSTANTS.FETCH_DELAY));
     };
@@ -230,44 +234,6 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     $scope.pollUserAccount = function() {
       $rootScope.intervals.push($interval($scope.updateUserAccount, CONSTANTS.ACCOUNT_FETCH_INTERVAL));
     }
-
-    window.msl.setNetworkStateChangeListener(function(state) {
-      $rootScope.$networkStatus.show = true;
-      $rootScope.$networkStatus.status = state;
-      if ($rootScope.$networkStatus.status === window.NETWORK_STATE.CONNECTED
-        && $rootScope.$state.current.name !== 'splash') {
-        $scope.fetchStatsForUnauthorisedClient();        
-        $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
-          msg: 'Network connected',
-          hasOption: false,
-          isError: false
-        }, function(err, data) {
-          console.log(data);
-        });
-      }
-      if ($rootScope.$networkStatus.status === window.NETWORK_STATE.DISCONNECTED
-        && $rootScope.$state.current.name !== 'splash') {
-        $rootScope.clearIntervals();
-        $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
-          msg: 'Network Error',
-          hasOption: true,
-          isError: true,
-          opt: {
-            name: "Retry Now",
-            err: null,
-            data: true
-          }
-        }, function(err, data) {
-          server.reconnectNetwork();
-        });
-      }
-      console.log('Network status :: ' + state);
-      $rootScope.$applyAsync();
-    });
-
-    var proxyListener = function(status) {
-      $rootScope.$proxyServer = status;
-    };
 
     $scope.toggleProxyServer = function() {
       $rootScope.$proxyServer = !$rootScope.$proxyServer;
@@ -296,6 +262,42 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       e.preventDefault();
       server.openExternal(url);
     };
+
+    window.msl.setNetworkStateChangeListener(function(state) {
+      $rootScope.$networkStatus.show = true;
+      $rootScope.$networkStatus.status = state;
+      if ($rootScope.$networkStatus.status === window.NETWORK_STATE.CONNECTED
+        && $rootScope.$state.current.name !== 'splash') {
+        $scope.fetchStatsForUnauthorisedClient();
+        $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
+          msg: 'Network connected',
+          hasOption: false,
+          isError: false
+        }, function(err, data) {
+          console.log(data);
+        });
+      }
+      if ($rootScope.$networkStatus.status === window.NETWORK_STATE.DISCONNECTED
+        && $rootScope.$state.current.name !== 'splash') {
+        $rootScope.clearIntervals();
+        $rootScope.isAuthenticated = false;
+        $state.go('app');
+        $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
+          msg: 'Network Error',
+          hasOption: true,
+          isError: true,
+          opt: {
+            name: "Retry Now",
+            err: null,
+            data: true
+          }
+        }, function(err, data) {
+          server.reconnectNetwork();
+        });
+      }
+      console.log('Network status :: ' + state);
+      $rootScope.$applyAsync();
+    });
 
     // initialize application
     server.start();

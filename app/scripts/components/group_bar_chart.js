@@ -51,7 +51,13 @@ var GroupBarChart = React.createClass({
   },
   add: function(entry) {
     var self = this;
-    var GROUPS = ['GET', 'POST', 'PUT', 'DELETE'];
+    var GROUPS = ['PUT', 'GET', 'POST', 'DELETE'];
+    var GROUPS_CLASS = {
+      'GET': 'svg-get',
+      'POST': 'svg-post',
+      'DELETE': 'svg-delete',
+      'PUT': 'svg-put'
+    };
     var MAX_BARS = Math.floor(this.width / ((this.BAR_WIDTH * GROUPS.length) + self.GUTTER_WIDTH));
     var BAR_POSITION_OFFSET = ((this.BAR_WIDTH * GROUPS.length) + self.GUTTER_WIDTH) / 2;
     if (entry !== undefined) {
@@ -106,6 +112,7 @@ var GroupBarChart = React.createClass({
             }
             return self.BAR_WIDTH - self.SMALL_GUTTER_WIDTH;
         })
+        .attr('class', GROUPS_CLASS[key])
         .attr('transform', 'translate(' + (index * self.BAR_WIDTH) + ', ' + 0 + ')');
     });
     var xAxis = d3.axisBottom().scale(xScale)
