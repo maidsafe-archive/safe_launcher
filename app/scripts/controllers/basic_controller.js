@@ -195,6 +195,9 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         onComplete('PUT', $rootScope.dashData.putsCount, data);
         $rootScope.dashData.putsCoun = data;
       });
+      server.getAccountInfo(function(err, data) {
+        $rootScope.dashData.accountInfo = data;
+      });
       for (var i in $rootScope.appList) {
         var item = $rootScope.appList[i];
         $rootScope.appList[i].lastActive = window.moment(item.status.endTime || item.status.beginTime).fromNow(true)
@@ -204,7 +207,8 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     window.msl.setNetworkStateChangeListener(function(state) {
       $rootScope.$networkStatus.show = true;
       $rootScope.$networkStatus.status = state;
-      if ($rootScope.$networkStatus.status === 1) {
+      if ($rootScope.$networkStatus.status === window.NETWORK_STATE.CONNECTED
+        && !$rootScope.$state.current.name === 'splash') {
         $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
           msg: 'Network connected',
           hasOption: false,
@@ -213,7 +217,8 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
           console.log(data);
         });
       }
-      if ($rootScope.$networkStatus.status === window.NETWORK_STATE.DISCONNECTED) {
+      if ($rootScope.$networkStatus.status === window.NETWORK_STATE.DISCONNECTED
+        && !$rootScope.$state.current.name === 'splash') {
         $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
           msg: 'Network Error',
           hasOption: true,
@@ -256,7 +261,12 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         return $state.go('app');
       }
       $state.go('splash');
-    }
+    };
+
+    $scope.openExternal= function(e, url) {
+      e.preventDefault();
+      server.openExternal(url);
+    };
 
     // initialize application
     server.start();

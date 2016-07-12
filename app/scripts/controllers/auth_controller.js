@@ -77,17 +77,17 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       reset('pin');
       if (isNaN(value) || value.length < CONSTANTS.PIN_MIN_LEN) {
         inputParent.addClass('error').removeClass('warn');
-        msgEle.text(MESSAGES.PIN_MUST_BE_FOUR_CHAR_LONG_AND_NUM);
+        return msgEle.text(MESSAGES.PIN_MUST_BE_FOUR_CHAR_LONG_AND_NUM);
       }
       reset('keyword');
       if (value.length < CONSTANTS.KEYWORD_MIN_LEN) {
         inputParent.addClass('error').removeClass('warn');
-        msgEle.text(MESSAGES.KEYWORD_MUST_BE_SIX_CHAR_LONG);
+        return msgEle.text(MESSAGES.KEYWORD_MUST_BE_SIX_CHAR_LONG);
       }
       reset('password');
       if (value.length < CONSTANTS.PASSWORD_MIN_LEN) {
         inputParent.addClass('error').removeClass('warn');
-        msgEle.text(MESSAGES.PASSWORD_MUST_BE_SIX_CHAR_LONG);
+        return msgEle.text(MESSAGES.PASSWORD_MUST_BE_SIX_CHAR_LONG);
       }
     };
 

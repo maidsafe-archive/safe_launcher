@@ -30,13 +30,13 @@
         <div class="card">
           <div class="dash-progress-bar">
             <div class="dash-progress-bar-b">
-              <h3 class="count"><span class="value">301</span>/500</h3>
-              <h4 class="title">Total Puts</h4>
+              <h3 class="count"><span class="value">{{dashData.accountInfo.used}}</span> / {{dashData.accountInfo.available}}</h3>
+              <h4 class="title">Total PUTs</h4>
               <div class="progress">
-                <span class="progress-value" style="width:50%"></span>
+                <span class="progress-value" style="width:{{(dashData.accountInfo.used / dashData.accountInfo.available) * 100}}%"></span>
               </div>
               <div class="desc">
-                Each account is currently limited to 100 PUTs on the Network. (<a href="#">read more here.</a>)
+                Each account is currently limited to {{dashData.accountInfo.available}} PUTs on the Network. (<a href="#">read more here.</a>)
               </div>
             </div>
           </div>

@@ -204,4 +204,8 @@ export default class UIUtils {
     return this.restServer.getAppActivityList(id);
   }
 
+  openExternal(url) {
+    require("shell").openExternal(url);
+  }
+
 }

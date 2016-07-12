@@ -70,6 +70,13 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
     // handle session removed
     server.onSessionRemoved(function(id) {
       console.log('Session removed :: ' + id);
+      $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
+        msg: 'Revoked application access',
+        hasOption: false,
+        isError: false
+      }, function(err, data) {
+        console.log('Revoked application');
+      });
       removeApplication(id);
     });
 

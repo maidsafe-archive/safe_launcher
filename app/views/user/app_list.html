@@ -11,7 +11,7 @@
       <!-- /app list header -->
       <!-- app list container -->
       <div class="default" ng-show="keys(appList).length === 0">
-        No authorised apps, run a <a href="#">compatible app</a> to get started.
+        No authorised apps, run a <a href="#" ng-click="openExternal($event, 'https://apps.safenetwork.org/')">compatible app</a> to get started.
       </div>
       <react-component name="AppList" props="{list: appList, revokeApp: removeSession, toggleAppDetails: toggleAppDetails}"></react-component>
       <!-- /app list container -->
