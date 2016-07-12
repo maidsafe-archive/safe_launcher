@@ -12,7 +12,7 @@ window.safeLauncher = angular
     delete $httpProvider.defaults.headers.common['X-Requested-With'];
   }
 ])
-.run([ '$rootScope', '$state', '$stateParams', '$timeout', function($rootScope, $state, $stateParams, $timeout) {
+.run([ '$rootScope', '$state', '$stateParams', '$timeout', 'CONSTANTS', function($rootScope, $state, $stateParams, $timeout, CONSTANTS) {
   $rootScope.$state = $state;
   $rootScope.keys = Object.keys;
   $rootScope.isAuthenticated = false;
@@ -78,7 +78,7 @@ window.safeLauncher = angular
         this.timer = $timeout(function() {
           $timeout.cancel(this.timer);
           self.callback(null, true);
-        }, 5000);
+        }, CONSTANTS.TOASTER_TIMEOUT);
       }
     }
   };
