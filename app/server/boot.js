@@ -6,7 +6,8 @@ import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
 import { router_0_5 } from './routes/version_0_5';
 import { CreateSession } from './controllers/auth';
-import { setSessionHeaderAndParseBody } from './utils';
+import { formatResponse, ResponseError, setSessionHeaderAndParseBody, updateAppActivity } from './utils';
+import { log } from './../logger/log';
 
 class ServerEventEmitter extends EventEmitter {};
 
@@ -20,9 +21,13 @@ export default class RESTServer {
       ERROR: 'error',
       STARTED: 'started',
       STOPPED: 'stopped',
-      AUTH_REQUEST: 'auth-request',
+      AUTH_REQUEST: 'auth_request',
+      ACTIVITY_NEW: 'activity_new',
+      ACTIVITY_UPDATE: 'activity_update',
       SESSION_CREATED: 'sesssion_created',
-      SESSION_REMOVED: 'session_removed'
+      SESSION_REMOVED: 'session_removed',
+      DATA_UPLOADED: 'data_uploaded',
+      DATA_DOWNLOADED: 'data_downloaded'
     };
     this.app.set('api', api);
     this.app.set('eventEmitter', new ServerEventEmitter());
@@ -63,24 +68,30 @@ export default class RESTServer {
       extended: false
     }));
 
+    app.use('/health', function(req, res) {
+      res.sendStatus(200);
+    });
     app.get('/pac-file', function(req, res) {
       res.download(path.resolve(__dirname, 'server/web_proxy.pac'));
     });
     app.use('/', router_0_5);
     app.use('/0.5', router_0_5);
 
-    // catch 404 and forward to error handler
-    app.use(function(req, res, next) {
-      var err = new Error('Not Found');
-      err.status = 404;
-      next(err);
+    // API Error handling
+    app.use(function(err, req, res, next) {
+      if (!(err instanceof ResponseError)) {
+        return next();
+      }
+      updateAppActivity(req, res);
+      log.warn('Err ' + err.status + ' - Msg :: ' + err.msg);
+      res.status(err.status).send(err.msg);
     });
 
-    // no stack traces leaked to user
-    app.use(function(err, req, res, next) {
-      res.status(err.status || 500);
-      res.send('Server Error');
+    // catch 404
+    app.use(function(req, res) {
+      res.status(404).send('Not Found');
     });
+
     app.set('port', this.port);
     this.server = http.createServer(app);
     this.server.listen(this.port, this.callback);
@@ -112,6 +123,11 @@ export default class RESTServer {
   authApproved(data) {
     var app = data.payload.app;
     this.app.get('api').auth.getAppDirectoryKey(app.id, app.name, app.vendor, new CreateSession(data));
+  }
+
+  getAppActivityList(sessionId) {
+    let sessionInfo = sessionManager.get(sessionId);
+    return sessionInfo ? sessionInfo.activityList : null;
   }
 
   authRejected(payload) {

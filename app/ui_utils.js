@@ -39,6 +39,7 @@ export default class UIUtils {
     this.proxy = proxy;
     this.proxyListener = new ProxyListener();
     this.onNetworkStateChange = null;
+    this.retryCount = 1;
   }
 
   // login
@@ -57,7 +58,7 @@ export default class UIUtils {
     });
   }
 
-  dropUnregisteredClient(callback) {    
+  dropUnregisteredClient(callback) {
     this.api.auth.dropUnregisteredClient(callback);
   }
 
@@ -160,7 +161,71 @@ export default class UIUtils {
     this.onNetworkStateChange = callback;
   }
 
-  reconnect() {
-    this.api.restart();
+  reconnect(user) {
+    var self = this;
+    this.api.reset();
+    if (user && Object.keys(user).length > 0) {
+      this.api.auth.login(user.pin, user.keyword, user.password, function(err) {
+        if (!self.onNetworkStateChange) {
+          return;
+        }
+        var status;
+        if (err) {
+          self.retryCount++;
+          status = window.NETWORK_STATE.DISCONNECTED;
+        } else {
+          self.retryCount = 1;
+          status = window.NETWORK_STATE.CONNECTED;
+        }
+        self.onNetworkStateChange(status);
+      });
+    } else {
+      this.api.connectWithUnauthorisedClient();
+    }
   }
+
+  fetchGetsCount(callback) {
+   this.api.clientStats.fetchGetsCount(callback);
+  }
+
+  fetchDeletesCount(callback) {
+    this.api.clientStats.fetchDeletesCount(callback);
+  }
+
+  fetchPostsCount(callback) {
+    this.api.clientStats.fetchPostsCount(callback);
+  }
+
+  fetchPutsCount(callback) {
+    this.api.clientStats.fetchPutsCount(callback);
+  }
+
+  getAccountInfo(callback) {
+    this.api.clientStats.getAccountInfo(callback);
+  }
+
+  onUploadEvent(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.DATA_UPLOADED, callback);
+  }
+
+  onDownloadEvent(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.DATA_DOWNLOADED, callback);
+  }
+
+  onNewAppActivity(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.ACTIVITY_NEW, callback);
+  }
+
+  onUpdatedAppActivity(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.ACTIVITY_UPDATE, callback);
+  }
+
+  getAppActivityList(id) {
+    return this.restServer.getAppActivityList(id);
+  }
+
+  openExternal(url) {
+    require("shell").openExternal(url);
+  }
+
 }

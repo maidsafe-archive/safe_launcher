@@ -1,0 +1,21 @@
+<div ng-controller="userController">
+  <!-- Authorised application list -->
+  <div class="app-li">
+    <div class="app-li-b">
+      <!-- app list header -->
+      <div class="app-li-h">
+        <div class="app-li-h-lt">
+          Authorised Apps
+        </div>
+      </div>
+      <!-- /app list header -->
+      <!-- app list container -->
+      <div class="default" ng-show="keys(appList).length === 0">
+        No authorised apps, run a <a href="#" ng-click="openExternal($event, 'https://apps.safenetwork.org/')">compatible app</a> to get started.
+      </div>
+      <react-component name="AppList" props="{list: appList, revokeApp: removeSession, toggleAppDetails: toggleAppDetails}"></react-component>
+      <!-- /app list container -->
+    </div>
+  </div>
+  <ng-include src="'views/user/app_details.html'" ng-show="currentAppDetails.id"></ng-include>
+</div>

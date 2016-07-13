@@ -1,0 +1,131 @@
+<div class="dash" ng-controller="dashboardController">
+  <div class="dash-b">
+    <div class="dash-cnt" ng-show="!isAuthenticated">
+      <div class="sec-1">
+        <div class="card bar-chart">
+          <div class="filters">
+            <div class="filters-i checkbox get always-checked" ng-init="barChartGETFilter = true">
+              <!-- <input id="GET" type="checkbox" name="GET" value="" checked="true"> -->
+              <label for="GET">GET</label>
+            </div>
+          </div>
+          <react-component name="UnauthGETChart" props="{data: dashData.unAuthGET}"></react-component>
+        </div>
+      </div>
+    </div>
+    <div class="dash-cnt" ng-show="isAuthenticated">
+      <div class="sec-1">
+        <div class="card bar-chart">
+          <div class="filters">
+            <div class="filters-i checkbox put always-checked">
+              <!-- <input id="GET" type="checkbox" name="GET" value="" checked="true"> -->
+              <label for="PUT">PUT</label>
+            </div>
+            <div class="filters-i checkbox get always-checked" ng-init="barChartGETFilter = true">
+              <!-- <input id="GET" type="checkbox" name="GET" value="" checked="true"> -->
+              <label for="GET">GET</label>
+            </div>
+            <div class="filters-i checkbox post always-checked">
+              <!-- <input id="GET" type="checkbox" name="GET" value="" checked="true"> -->
+              <label for="POST">POST</label>
+            </div>
+            <div class="filters-i checkbox delete always-checked">
+              <!-- <input id="GET" type="checkbox" name="GET" value="" checked="true"> -->
+              <label for="DELETED">DELETED</label>
+            </div>
+          </div>
+          <react-component name="GroupBarChart" props="{data: dashData.authHTTPMethods}"></react-component>
+        </div>
+      </div>
+    </div>
+    <div class="dash-cnt" ng-show="isAuthenticated">
+      <div class="sec-2">
+        <div class="card pie-chart">
+          <react-component name="UploadDownloadPieChart" props="{upload: dashData.upload, download: dashData.download}"></react-component>
+        </div>
+      </div>
+      <div class="sec-2">
+        <div class="card">
+          <div class="dash-progress-bar">
+            <div class="dash-progress-bar-b">
+              <h3 class="count"><span class="value">{{dashData.accountInfo.used}}</span> / {{dashData.accountInfo.available}}</h3>
+              <h4 class="title">Total PUTs</h4>
+              <div class="progress">
+                <span class="progress-value" style="width:{{(dashData.accountInfo.used / dashData.accountInfo.available) * 100}}%"></span>
+              </div>
+              <div class="desc">
+                Each account is currently limited to {{dashData.accountInfo.available}} PUTs on the Network.
+              </div>
+              <div class="opt">
+                <div class="opt-lt">
+                  <button type="button" class="btn flat" name="update"
+                    ng-disabled="!dashData.accountInfoUpdateEnabled" ng-click="updateUserAccount()">Update</button>
+                </div>
+                <div class="opt-rt">
+                  Last updated: {{dashData.accountInfoTimeString}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dash-cnt flex-cnt" ng-show="isAuthenticated">
+      <div class="sec-3">
+        <div class="card">
+          <div class="count">
+            <div class="count-val">{{dashData.getsCount}}</div>
+            <div class="count-title">Total GETs</div>
+          </div>
+        </div>
+      </div>
+      <div class="sec-3">
+        <div class="card">
+          <div class="count">
+            <div class="count-val">{{dashData.postsCount}}</div>
+            <div class="count-title">Total POSTs</div>
+          </div>
+        </div>
+      </div>
+      <div class="sec-3">
+        <div class="card">
+          <div class="count">
+            <div class="count-val">{{dashData.deletesCount}}</div>
+            <div class="count-title">Total DELETEs</div>
+          </div>
+        </div>
+      </div>
+      <div class="sec-3">
+        <div class="card">
+          <div class="count">
+            <div class="count-val">{{keys(appList).length}}</div>
+            <div class="count-title">Connected Apps</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dash-cnt">
+      <div class="sec-1">
+        <div class="card">
+          <div class="table-view">
+            <div class="table-filter">
+              <div class="table-filter-i checkbox in-progress" ng-init="logFilterInProgress = logFilterComplete = logFilterError = true;">
+                <input id="inProgress" type="checkbox" name="inProgress" value="" ng-model="logFilterInProgress" ng-change="toggleFilter('IN_PROGRESS')" checked="{{logFilterInProgress}}">
+                <label for="inProgress">In Progress</label>
+              </div>
+              <div class="table-filter-i checkbox completed">
+                <input id="completed" type="checkbox" name="completed" value="" ng-model="logFilterComplete" ng-change="toggleFilter('SUCCESS')" checked="{{logFilterComplete}}">
+                <label for="completed">Completed</label>
+              </div>
+              <div class="table-filter-i checkbox error">
+                <input id="error" type="checkbox" name="error" value="" ng-model="logFilterError" ng-change="toggleFilter('FAILURE')" checked="{{logFilterError}}">
+                <label for="error">Error</label>
+              </div>
+            </div>
+            <react-component name="AppLogs" props="{list: logList, filter: logFilter}"></react-component>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

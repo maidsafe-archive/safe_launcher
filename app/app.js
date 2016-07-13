@@ -1,4 +1,3 @@
-// Use new ES6 modules syntax for everything.
 // import os from 'os'; // native node.js module
 import { remote } from 'electron'; // native electron module
 // import jetpack from 'fs-jetpack'; // module loaded from npm
@@ -118,9 +117,6 @@ api.setNetworkStateListener(function(state, isRegisteredClient) {
 
     case 1:
       log.info('Network connection lost');
-      if (isRegisteredClient) {
-        ignoreUnRegisteredObserver = false;
-      }
       window.msl.networkStateChange(NETWORK_STATE.DISCONNECTED);
       break;
 

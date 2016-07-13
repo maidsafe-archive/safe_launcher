@@ -1,48 +1,37 @@
-<div class="msl-auth" ng-controller="authController" ng-init="focusField('mslLogin', 'pin')">
-  <!-- auth banner -->
-  <div class="msl-auth-bnr">
-    <img src="./images/launcher_rocket.svg" alt="Auth banner" />
-  </div>
-  <!-- /auth banner -->
-
-  <div class="msl-auth-b" ng-show="!authLoader.isLoading">
-    <!-- login -->
-    <div class="msl-form msl-layout-1">
-      <form name="mslLogin" ng-submit="login()">
-        <!-- pin -->
-        <div class="msl-form-grp">
-          <input type="password" name="pin" placeholder="Pin" ng-model="user.pin" autofocus/>
-          <span type="button" name="clear-btn" class="clear-btn" ng-show="user.pin"
-            ng-click="resetInputField('pin', $event)"></span>
+<div class="form-b" ng-controller="authController">
+  <div ng-show="!isLoading">
+    <form class="form" name="loginForm" ng-submit="login()">
+      <div class="inp-grp">
+        <input id="pin" type="password" name="pin" required="true" ng-model="user.pin" field-validator focus="true" />
+        <label for="pin">PIN</label>
+        <div class="msg">
+          <span class="txt"></span>
+          <span class="icn"></span>
         </div>
-
-        <!-- keyword -->
-        <div class="msl-form-grp">
-          <input type="password" name="keyword" placeholder="Keyword" ng-model="user.keyword" />
-          <span type="button" name="clear-btn" class="clear-btn" ng-show="user.keyword"
-            ng-click="resetInputField('keyword', $event)"></span>
+      </div>
+      <div class="inp-grp">
+        <input id="keyword" type="password" name="keyword" required="true" ng-model="user.keyword" field-validator />
+        <label for="keyword">Keyword</label>
+        <div class="msg">
+          <span class="txt"></span>
+          <span class="icn"></span>
         </div>
-
-        <!-- password -->
-        <div class="msl-form-grp">
-          <input type="password" name="password" placeholder="Password" ng-model="user.password" />
-          <span type="button" name="clear-btn" class="clear-btn" ng-show="user.password"
-            ng-click="resetInputField('password', $event)"></span>
+      </div>
+      <div class="inp-grp">
+        <input id="password" type="password" name="password" required="true" ng-model="user.password" field-validator />
+        <label for="password">Password</label>
+        <div class="msg">
+          <span class="txt"></span>
+          <span class="icn"></span>
         </div>
-        <div class="form-err" ng-class="{onErr: formError}">{{ formError || '&nbsp;' }}</div>
-        <!-- login btn -->
-        <div class="msl-form-grp act-btn">
-          <button type="submit" name="login" class="msl-btn msl-btn-primary">Login</button>
-        </div>
-      </form>
-    </div>
-    <!-- /login -->
-
-    <!-- footer -->
-    <div class="msl-footer">
-      <span class="msl-footer-split"></span> Don't have an account yet? <a ui-sref="register">Create one</a>
+      </div>
+      <div class="inp-btn">
+        <button type="submit" class="btn primary" name="login">Login</button>
+      </div>
+    </form>
+    <div class="form-f">
+      Don't have a account ? <a ui-sref="app.account({currentPage: 'register'})">Create Account</a>
     </div>
   </div>
-  <!-- auth loading -->
-  <ng-include src="'views/components/auth_loader.html'" ng-show="authLoader.isLoading" />
+  <ng-include src="'views/auth/loader.html'" ng-show="isLoading"></ng-include>
 </div>
