@@ -13,7 +13,7 @@ window.safeLauncher.config(function($stateProvider, $urlRouterProvider) {
     }
   })
   .state('app', {
-    'url': '/app',
+    'url': '/app?:isFirstLogin?',
     'views': {
       'root': {
         'templateUrl': 'views/tab/base.html'

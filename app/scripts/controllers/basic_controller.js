@@ -111,7 +111,6 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     server.onProxyExit(function(msg) {
       // $rootScope.$loader.hide();
       $rootScope.$proxyServer = false;
-      setProxy(false);
       console.log(msg);
     });
 
@@ -244,17 +243,22 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
 
     $scope.enableProxySetting = function(status) {
       setProxy(status);
-      $rootScope.$proxyServer = Boolean(status);
       if (status) {
         $scope.toggleProxyServer();
       }
-      $state.go('app');
+      $state.go('app', {isFirstLogin: true});
     };
 
     $scope.checkProxy = function() {
+      if ($state.params.hasOwnProperty('isFirstLogin') && $state.params.isFirstLogin) {
+        return;
+      }
       var proxy = getProxy();
-      if (proxy && proxy.hasOwnProperty('status')) {                
-        return $scope.enableProxySetting(proxy.status);
+      if (proxy && proxy.hasOwnProperty('status')) {
+        if (proxy.status) {
+          return $scope.toggleProxyServer();
+        }
+        return;
       }
       $state.go('splash');
     };

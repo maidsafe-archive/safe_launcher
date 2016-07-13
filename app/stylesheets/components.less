@@ -48,6 +48,9 @@
               padding-left: 7px;
             }
           }
+          &.bg-white.active {
+            background-color: #FFF !important;
+          }
           &:after {
             content: '';
             display: block;
@@ -214,6 +217,7 @@
     background-color: @primary-blue;
     padding: 11px 16px;
     .back {
+      height: 24px;
       button {
         width: 24px;
         height: 24px;
@@ -230,7 +234,9 @@
     }
   }
   .app-details-cnt {
+    max-height: @tab-cnt-ht;
     padding: 16px;
+    overflow-y: auto;
     .title {
       font-size: 24px;
       line-height: 36px;
@@ -382,9 +388,11 @@
             font-weight: normal;
             line-height: 36px;
             display: block;
-            background-color: #EEE;
             border-bottom: 1px solid transparent;
             cursor: pointer;
+            &:hover {
+              background-color: #EEE;
+            }
           }
           .permissions-desc {
             display: none;
@@ -398,7 +406,6 @@
             display: block !important;
           }
           input[type=checkbox]:checked ~ .permissions-name {
-            background-color: transparent !important;
             border-color: #EEE !important;
           }
         }
@@ -656,9 +663,13 @@
 .pie-chart {
   padding: 24px;
   position: relative;
+  .pie-chart-b {
+    position: relative;
+  }
   .legends {
     width: 100%;
     padding-left: 127px;
+    padding-top: 20px;
     .legends-i {
       padding-left: 25px;
       margin-bottom: 8px;
@@ -695,6 +706,9 @@
   }
   svg {
     margin-top: -105px;
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 }
 
@@ -783,21 +797,21 @@
   &.in-progress {
     label {
       &:before {
-        background-color: @app-status-in-progress;
+        background-color: @checkbox-in-progress;
       }
     }
   }
   &.completed {
     label {
       &:before {
-        background-color: @app-status-complete;
+        background-color: @checkbox-complete;
       }
     }
   }
   &.error {
     label {
       &:before {
-        background-color: @app-status-error;
+        background-color: @checkbox-error;
       }
     }
   }
@@ -825,7 +839,7 @@
   &.delete {
     label {
       &:before {
-        background-color: @app-status-complete;
+        background-color: @checkbox-complete;
       }
     }
   }
@@ -886,16 +900,21 @@
 // toaster
 .toaster {
   width: 100%;
+  height: 48px;
   position: fixed;
-  bottom: 0;
+  bottom: -48px;
   left: 0;
   text-align: center;
+  transition: bottom 0.2s linear 1s;
+  &.active {
+    bottom: 0;
+  }
   .toaster-b {
     min-width: 260px;
     max-width: 640px;
     display: inline-block;
     margin: 0 auto;
-    padding: 11px 24px;
+    padding: 15px 24px;
     text-align: left;
     background-color: @primary-blue;
     color: #FFF;
@@ -981,14 +1000,22 @@
 
 // network status
 .network-status {
-  width: 24px;
-  height: 24px;
-  margin: 11px;
+  width: 46px;
+  height: 46px;
   position: fixed;
   top: 0;
   right: 0;
   z-index: 999;
   cursor: pointer;
+  background-size: 24px;
+  background-repeat: no-repeat;
+  background-position: center;
+  &:hover {
+    background-color: @primary-blue-hover;
+  }
+  &:active {
+    background-color: @primary-blue-action;
+  }
   &.connecting {
     background-image: url(../images/loading.svg);
     animation: loading 0.5s linear infinite;

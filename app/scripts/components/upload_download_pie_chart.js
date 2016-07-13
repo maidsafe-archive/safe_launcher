@@ -21,7 +21,7 @@ var UploadDownloadPieChart = React.createClass({
       return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
   },
   render: function() {
-    return React.DOM.span(null, [
+    return React.DOM.span({className: 'pie-chart-b'}, [
       React.DOM.div({className: 'legends'}, [
         React.DOM.div({className: 'legends-i download'}, [
           React.DOM.div({className: 'legends-i-name'}, 'Download'),

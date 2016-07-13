@@ -7,13 +7,13 @@ var GroupBarChart = React.createClass({
   },
   componentDidMount: function () {
     this.margin = {
-      top: 20,
-      left: 35,
-      right: 0,
-      bottom: 15
+      top: 12,
+      left: 12,
+      right: 35,
+      bottom: 25
     };
-    var containerWidth = 650;
-    var containerHeight = 190;
+    var containerWidth = 670;
+    var containerHeight = 140;
     this.BAR_WIDTH = 10;
     this.SMALL_GUTTER_WIDTH = 2;
     this.GUTTER_WIDTH = 8;

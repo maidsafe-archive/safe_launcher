@@ -13,7 +13,7 @@ var UnauthGETChart = React.createClass({
       bottom: 25
     };
     var padding = 24;
-    var containerWidth = 650;
+    var containerWidth = 670;
     var containerHeight = 140;
     this.BAR_WIDTH = 16;
     this.GUTTER_WIDTH = 2;
@@ -42,7 +42,7 @@ var UnauthGETChart = React.createClass({
       for (var i in tempData) {
           this.add(tempData[i]);
       }
-    }    
+    }
   },
   componentWillReceiveProps: function (nextProps) {
       this.add(nextProps.data[nextProps.data.length - 1]);
