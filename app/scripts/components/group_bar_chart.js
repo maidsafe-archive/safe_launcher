@@ -12,7 +12,7 @@ var GroupBarChart = React.createClass({
       right: 35,
       bottom: 25
     };
-    var containerWidth = 670;
+    var containerWidth = 650;
     var containerHeight = 140;
     this.BAR_WIDTH = 10;
     this.SMALL_GUTTER_WIDTH = 2;

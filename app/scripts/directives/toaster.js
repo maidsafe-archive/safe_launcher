@@ -7,6 +7,7 @@ window.safeLauncher.directive('toaster', [ '$rootScope', '$interval', function($
     scope.rootScope = $rootScope;
     var isMouseOnTost = false;
     var timer  = null;
+    scope.autoCallbackCount = 0;
     ele.bind('mouseenter', function() {
       isMouseOnTost = true;
     });
@@ -14,7 +15,19 @@ window.safeLauncher.directive('toaster', [ '$rootScope', '$interval', function($
     ele.bind('mouseleave', function() {
       isMouseOnTost = false;
     });
-
+    if (scope.payload.hasOption && scope.payload.autoCallbackIn) {
+      scope.autoCallbackCount = scope.payload.autoCallbackIn;
+      timer = $interval(function() {
+        if (!scope.payload) {
+          return;
+        }
+        scope.autoCallbackCount -= 1;
+        scope.$applyAsync();
+        if (scope.autoCallbackCount === 0) {
+          scope.callback();
+        }
+      }, 1000);
+    }
     if (!scope.payload.hasOption) {
       timer = $interval(function() {
         if (!scope.payload || isMouseOnTost) {

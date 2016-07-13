@@ -70,8 +70,8 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
     // handle session removed
     server.onSessionRemoved(function(id) {
       console.log('Session removed :: ' + id);
-      $rootScope.$toaster.show($rootScope.ALERT_TYPE.TOASTER, {
-        msg: 'Revoked access for ' + $rootScope.appList[id].name,
+      $rootScope.$toaster.show({
+        msg: 'Revoked access ' + ($rootScope.appList[id] ? ('for ' + $rootScope.appList[id].name) : ''),
         hasOption: false,
         isError: false
       }, function(err, data) {

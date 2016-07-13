@@ -22,6 +22,9 @@
         </div>
         <div class="permissions">
           <h4 class="permissions-h">Permissions:</h4>
+          <div class="permissions-i" ng-show="payload.permissions.list.length === 0">
+            <label for="safeDrivePermission" class="permissions-name none">None</label>
+          </div>
           <div class="permissions-i icn safe-drive" ng-show="payload.permissions.list.indexOf('SAFE_DRIVE_ACCESS') !== -1">
             <input type="checkbox" name="safeDrivePermission" id="safeDrivePermission" />
             <label for="safeDrivePermission" class="permissions-name">SAFE Drive Access</label>

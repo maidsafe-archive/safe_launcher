@@ -26,6 +26,9 @@ window.safeLauncher = angular
         used: 0,
         available: 0
       },
+      accountInfoTime: '',
+      accountInfoTimeString: '',
+      accountInfoUpdateEnabled: true,
       getsCount: 0,
       deletesCount: 0,
       postsCount: 0,
@@ -48,6 +51,9 @@ window.safeLauncher = angular
     };
     Queuing.prototype.callback = function(err, data) {
       var self = this;
+      if (!this.currentObject) {
+        return;
+      }
       this.currentObject.callback(err, data);
       this.reset();
       $timeout(function() {

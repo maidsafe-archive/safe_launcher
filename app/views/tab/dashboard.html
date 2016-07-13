@@ -54,7 +54,15 @@
                 <span class="progress-value" style="width:{{(dashData.accountInfo.used / dashData.accountInfo.available) * 100}}%"></span>
               </div>
               <div class="desc">
-                Each account is currently limited to {{dashData.accountInfo.available}} PUTs on the Network. (<a href="#">read more here.</a>)
+                Each account is currently limited to {{dashData.accountInfo.available}} PUTs on the Network.
+              </div>
+              <div class="opt">
+                <div class="opt-lt">
+                  <button type="button" class="btn flat" name="update" ng-disabled="!dashData.accountInfoUpdateEnabled">Update</button>
+                </div>
+                <div class="opt-rt">
+                  Last updated: {{dashData.accountInfoTimeString}}
+                </div>
               </div>
             </div>
           </div>

@@ -30,5 +30,10 @@
       </div>
       <react-component name="AppLogs" props="{list: currentAppDetails.logs, filter: logFilter}"></react-component>
     </div>
+    <div class="opt">
+      <div class="opt-i">
+        <button type="button" name="revoke" class="btn flat danger" ng-click="removeSession(currentAppDetails.id)">Revoke App</button>
+      </div>
+    </div>
   </div>
 </div>

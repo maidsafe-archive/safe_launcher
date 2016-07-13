@@ -142,6 +142,7 @@
     padding: 16px;
     margin-bottom: 12px;
     position: relative;
+    cursor: pointer;
     a {
       text-decoration: none;
     }
@@ -170,7 +171,7 @@
       position: absolute;
       top: 8px;
       right: 8px;
-      z-index: 99;
+      z-index: 9;
     }
     .status-bar {
       padding: 0 8px;
@@ -237,6 +238,7 @@
     max-height: @tab-cnt-ht;
     padding: 16px;
     overflow-y: auto;
+    position: relative;
     .title {
       font-size: 24px;
       line-height: 36px;
@@ -250,7 +252,6 @@
       }
     }
     .permissions {
-      margin-bottom: 30px;
       .permissions-title {
         font-size: 16px;
         font-weight: 600;
@@ -291,6 +292,12 @@
           }
         }
       }
+    }
+    .opt {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 9;
     }
   }
 }
@@ -334,13 +341,16 @@
         background-color: @primary-blue;
       }
       .desc {
-        width: 210px;
+        // width: 210px;
+        width: 100%;
         float: left;
         .desc-i {
           font-size: 14px;
+          display: flex;
           .desc-i-h {
             font-weight: 600;
             margin-right: 8px;
+            width: 30%;
           }
           .desc-i-ctx {
 
@@ -393,6 +403,21 @@
             &:hover {
               background-color: #EEE;
             }
+            &.none:hover {
+              background-color: transparent;
+            }
+            &:after {
+              content: '';
+              width: 30px;
+              height: 30px;
+              position: absolute;
+              top: 3px;
+              right: 3px;
+              background-image: url(../images/chevron_permissions.svg);
+              background-position: center;
+              background-repeat: no-repeat;
+              background-size: 20px;
+            }
           }
           .permissions-desc {
             display: none;
@@ -407,6 +432,9 @@
           }
           input[type=checkbox]:checked ~ .permissions-name {
             border-color: #EEE !important;
+          }
+          input[type=checkbox]:checked ~ .permissions-name:after {
+            transform: rotate(180deg);
           }
         }
       }
@@ -665,6 +693,8 @@
   position: relative;
   .pie-chart-b {
     position: relative;
+    display: inline-block;
+    padding: 20px 0;
   }
   .legends {
     width: 100%;
@@ -705,16 +735,15 @@
     }
   }
   svg {
-    margin-top: -105px;
     position: absolute;
-    top: 0;
+    top: 23px;
     left: 0;
   }
 }
 
 .dash-progress-bar {
   display: table;
-  padding: 6px 0;
+  padding: 0;
   .dash-progress-bar-b {
     display: table-cell;
     vertical-align: middle;
@@ -768,6 +797,40 @@
     line-height: 18px;
     font-weight: normal;
     color: #212121;
+  }
+  .opt {
+    margin-top: 16px;
+    .opt-lt {
+      display: inline-block;
+      float: left;
+      button {
+        color: @primary-blue;
+        padding-left: 24px;
+        position: relative;
+        &:before {
+          content: '';
+          width: 16px;
+          height: 16px;
+          display: block;
+          position: absolute;
+          top: 9px;
+          left: 0;
+          background-image: url(../images/refresh_small.svg);
+          background-position: center;
+          background-size: 16px;
+          background-repeat: no-repeat;
+        }
+      }
+    }
+    .opt-rt {
+      display: inline-block;
+      float: right;
+      font-size: 16px;
+      line-height: 32px;
+      font-weight: normal;
+      color: #212121;
+      opacity: 0.7;
+    }
   }
 }
 
@@ -905,7 +968,7 @@
   bottom: -48px;
   left: 0;
   text-align: center;
-  transition: bottom 0.2s linear 1s;
+  transition: bottom 0.2s linear;
   z-index: 97;
   &.active {
     bottom: 0;

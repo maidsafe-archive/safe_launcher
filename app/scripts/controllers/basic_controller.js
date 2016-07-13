@@ -1,8 +1,8 @@
 /**
  * Basic Controller
  */
-window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootScope', '$interval', 'serverFactory', 'CONSTANTS',
-  function($scope, $state, $rootScope, $interval, server, CONSTANTS) {
+window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootScope', '$interval', '$timeout', 'serverFactory', 'CONSTANTS',
+  function($scope, $state, $rootScope, $interval, $timeout, server, CONSTANTS) {
     var completeCount = 0;
     var collectedData = {
       GET: {
@@ -47,6 +47,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       if (data.app) {
           $rootScope.appList[data.app].status = data.activity;
       }
+      $rootScope.$applyAsync();
     };
 
     var proxyListener = function(status) {
@@ -217,6 +218,8 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
           var item = $rootScope.appList[i];
           $rootScope.appList[i].lastActive = window.moment(item.status.endTime || item.status.beginTime).fromNow()
         }
+        $rootScope.dashData.accountInfoTimeString = window.moment($rootScope.dashData.accountInfoTime).fromNow(true);
+        $rootScope.$applyAsync();
       }, CONSTANTS.FETCH_DELAY));
     };
 
@@ -226,6 +229,14 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
           return;
         }
         $rootScope.dashData.accountInfo = data;
+        $rootScope.dashData.accountInfoTime = (new Date()).toLocaleString();
+        $rootScope.dashData.accountInfoTimeString = window.moment().fromNow(true);
+        $rootScope.dashData.accountInfoUpdateEnabled = false;
+        $rootScope.$applyAsync();
+        $timeout(function() {
+          $rootScope.dashData.accountInfoUpdateEnabled = true;
+          $rootScope.$applyAsync();
+        }, CONSTANTS.ACCOUNT_INFO_UPDATE_TIMEOUT)
       });
     };
 
@@ -284,13 +295,12 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       }
       if ($rootScope.$networkStatus.status === window.NETWORK_STATE.DISCONNECTED
         && $rootScope.$state.current.name !== 'splash') {
-        $rootScope.clearIntervals();
-        $rootScope.isAuthenticated = false;
-        $state.go('app');
+        // $rootScope.clearIntervals();
         $rootScope.$toaster.show({
-          msg: 'Network Error',
+          msg: 'Network Disconnected. Retrying in ',
           hasOption: true,
           isError: true,
+          autoCallbackIn: 10,
           opt: {
             name: "Retry Now"
           }

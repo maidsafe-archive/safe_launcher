@@ -27,11 +27,11 @@ var AppList = React.createClass({
     for (var i in this.props.list) {
       statusBar = React.DOM.div({key: 'status-bar-' + i, className: 'status-bar in-progress'}, [
         React.DOM.span({key: 'status-bar-time-' + i, className: 'time'},
-          window.moment(this.props.list[i].status.beginTime).format('HH:mm:ss')
+          (window.moment(this.props.list[i].status.beginTime).format('HH:mm:ss') || '')
         ),
         React.DOM.span({key: 'status-bar-msg-' + i, className: 'msg'}, this.props.list[i].status.activityName),
         React.DOM.span({key: 'status-bar-status-' + i, className: 'status'}, 'Status: ' +
-          ACTIVITY_STATUS[this.props.list[i].status.activityStatus])
+          (ACTIVITY_STATUS[this.props.list[i].status.activityStatus] || 'Unknown')) 
       ]);
       option = React.DOM.div({key: 'option-' + i, className: 'opt'},
         React.DOM.div({key: 'option-item-' + i, className: 'opt-i'},
@@ -44,7 +44,7 @@ var AppList = React.createClass({
           this.props.list[i].name + ' - ',
           React.DOM.span({ kery: 'version-' + i, className: 'version' }, 'v ' + this.props.list[i].version)
         ]),
-        React.DOM.h4({key: 'sub-title-' + i, className: 'sub-title'}, 'Last Active: ' + this.props.list[i].lastActive),
+        React.DOM.h4({key: 'sub-title-' + i, className: 'sub-title'}, 'Last Active: ' + (this.props.list[i].lastActive || '')),
         statusBar,
         option
       ]);

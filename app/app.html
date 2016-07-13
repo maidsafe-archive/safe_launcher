@@ -16,9 +16,9 @@
     connecting: $networkStatus.status === 0,
     connected: $networkStatus.status === 1
   }" ng-click="showNetworkStatus($networkStatus.status)"></span>
-  <alert ng-if="$prompt.isProcessing" payload="$prompt.payload" callback="$prompt.callback()"></alert>
-  <toaster ng-if="$toaster.isProcessing" payload="$toaster.payload" callback="$toaster.callback()"></toaster>
-  <authorise-req ng-if="$authReq.isProcessing" payload="$authReq.payload" callback="$authReq.callback(err, data)"></authorise-req>
+  <alert ng-show="$prompt.isProcessing" payload="$prompt.payload" callback="$prompt.callback()"></alert>
+  <toaster payload="$toaster.payload" callback="$toaster.callback()"></toaster>
+  <authorise-req ng-show="$authReq.isProcessing" payload="$authReq.payload" callback="$authReq.callback(err, data)"></authorise-req>
   <script>
     window.$ = window.jQuery = require('./bower_components/jquery/dist/jquery.min.js');
   </script>
