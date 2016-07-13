@@ -8,8 +8,8 @@ var GroupBarChart = React.createClass({
   componentDidMount: function () {
     this.margin = {
       top: 30,
-      left: 10,
-      right: 15,
+      left: 30,
+      right: 5,
       bottom: 10
     };
     var containerWidth = 650;

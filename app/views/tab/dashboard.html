@@ -58,7 +58,8 @@
               </div>
               <div class="opt">
                 <div class="opt-lt">
-                  <button type="button" class="btn flat" name="update" ng-disabled="!dashData.accountInfoUpdateEnabled">Update</button>
+                  <button type="button" class="btn flat" name="update"
+                    ng-disabled="!dashData.accountInfoUpdateEnabled" ng-click="updateUserAccount()">Update</button>
                 </div>
                 <div class="opt-rt">
                   Last updated: {{dashData.accountInfoTimeString}}

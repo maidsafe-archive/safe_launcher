@@ -115,8 +115,8 @@ window.safeLauncher.factory('serverFactory', [
       window.msl.stopProxyServer();
     };
 
-    self.reconnectNetwork = function() {
-      window.msl.reconnect();
+    self.reconnectNetwork = function(userInfo) {
+      window.msl.reconnect(userInfo);
     };
 
     self.fetchGetsCount = function(callback) {

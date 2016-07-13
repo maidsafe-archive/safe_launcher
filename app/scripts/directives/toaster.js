@@ -15,31 +15,43 @@ window.safeLauncher.directive('toaster', [ '$rootScope', '$interval', function($
     ele.bind('mouseleave', function() {
       isMouseOnTost = false;
     });
-    if (scope.payload.hasOption && scope.payload.autoCallbackIn) {
-      scope.autoCallbackCount = scope.payload.autoCallbackIn;
-      timer = $interval(function() {
-        if (!scope.payload) {
-          return;
-        }
-        scope.autoCallbackCount -= 1;
-        scope.$applyAsync();
-        if (scope.autoCallbackCount === 0) {
+    var process = function() {
+      if (scope.payload.hasOption && (scope.payload.autoCallbackIn > 0)) {
+        scope.autoCallbackCount = scope.payload.autoCallbackIn;
+        timer = $interval(function() {
+          if (!scope.payload) {
+            return;
+          }
+          scope.autoCallbackCount -= 1;
+          scope.$applyAsync();
+          if (scope.autoCallbackCount === 0) {
+            $interval.cancel(timer);
+            scope.callback();
+          }
+        }, 1000);
+      }
+      if (!scope.payload.hasOption) {
+        timer = $interval(function() {
+          if (!scope.payload || isMouseOnTost) {
+            return;
+          }
+          $interval.cancel(timer);
           scope.callback();
-        }
-      }, 1000);
-    }
-    if (!scope.payload.hasOption) {
-      timer = $interval(function() {
-        if (!scope.payload || isMouseOnTost) {
-          return;
-        }
-        scope.callback();
-      }, 2000);
-
-      ele.on('$destroy', function() {
-        $interval.cancel(timer);
-      });
-    }
+        }, 2000);
+      }
+    };
+    // attr.$observe('payload', function() {
+    //   if (!scope.payload) {
+    //     return;
+    //   }
+    //   process();
+    // })
+    scope.$watch('payload', function() {
+      if (!scope.payload) {
+        return;
+      }
+      process();
+    })
   };
 
   return {

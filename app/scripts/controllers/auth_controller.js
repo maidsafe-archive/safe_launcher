@@ -47,6 +47,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     var onAuthResponse = function(err) {
       $scope.isLoading = false;
       $scope.$applyAsync();
+      $rootScope.userInfo = $scope.user;
       $scope.user = {};
       if (err) {
         return $rootScope.$toaster.show({

@@ -236,7 +236,7 @@
   }
   .app-details-cnt {
     max-height: @tab-cnt-ht;
-    padding: 16px;
+    padding: 24px;
     overflow-y: auto;
     position: relative;
     .title {
@@ -244,7 +244,7 @@
       line-height: 36px;
       font-weight: 600;
       color: #212121;
-      margin: 0;
+      margin: 0 0 18px;
       padding: 0;
       .version {
         font-weight: normal;
@@ -256,8 +256,8 @@
         font-size: 16px;
         font-weight: 600;
         color: #212121;
-        margin: 16px 0;
-        padding: 0;
+        margin: 0;
+        padding: 0 0 8px;
       }
       ul {
         list-style-type: none;
@@ -276,7 +276,7 @@
             display: none;
             position: absolute;
             top: 3px;
-            left: 3px;
+            left: 0;
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
@@ -598,6 +598,9 @@
           padding-top: 0;
           padding-bottom: 0;
           line-height: 16px;
+          background-color: transparent !important;
+          color: @primary-blue;
+          box-shadow: 0;
         }
       }
     }
@@ -906,8 +909,11 @@
       }
     }
   }
-  input:checked + label:before, &.always-checked label:before {
+  input:checked + label:before {
     background-image: url(../images/tick.svg);
+  }
+  &.always-checked label:before {
+    border-radius: 50%;
   }
 }
 

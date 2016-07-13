@@ -1,4 +1,4 @@
-<div class="toaster" ng-class="{active: rootScope.$toaster.isProcessing}">
+<div class="toaster" ng-class="{active: payload.msg}">
   <div class="toaster-b" ng-class="{'with-opt': payload.hasOption, error: payload.isError}">
     <div class="msg">
       {{payload.msg + (payload.autoCallbackIn ? ' ' + autoCallbackCount + 's': '')}}

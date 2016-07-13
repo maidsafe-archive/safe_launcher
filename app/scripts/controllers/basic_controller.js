@@ -281,28 +281,38 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       $rootScope.$networkStatus.status = state;
       if ($rootScope.$networkStatus.status === window.NETWORK_STATE.CONNECTED
         && $rootScope.$state.current.name !== 'splash') {
-        $scope.fetchStatsForUnauthorisedClient();
-        $rootScope.$toaster.show({
-          msg: 'Network connected',
-          hasOption: false,
-          isError: false
-        }, function(err, data) {
-          console.log(data);
-        });
+          if (!$rootScope.isAuthenticated) {
+            $scope.fetchStatsForUnauthorisedClient();
+          } else {
+            $scope.fetchStatsForAuthorisedClient();
+          }
+          $rootScope.$toaster.show({
+            msg: 'Network connected',
+            hasOption: false,
+            isError: false
+          }, function(err, data) {
+            console.log(data);
+          });
       }
       if ($rootScope.$networkStatus.status === window.NETWORK_STATE.DISCONNECTED
         && $rootScope.$state.current.name !== 'splash') {
-        // $rootScope.clearIntervals();
+        $rootScope.clearIntervals();
+        var retryCount = CONSTANTS.RETRY_NETWORK_INIT_COUNT * window.msl.retryCount;
         $rootScope.$toaster.show({
           msg: 'Network Disconnected. Retrying in ',
           hasOption: true,
           isError: true,
-          autoCallbackIn: 10,
+          autoCallbackIn: ((CONSTANTS.RETRY_NETWORK_MAX_COUNT >= retryCount) ? retryCount : CONSTANTS.RETRY_NETWORK_MAX_COUNT),
           opt: {
             name: "Retry Now"
           }
         }, function(err, data) {
-          server.reconnectNetwork();
+          $rootScope.$toaster.show({
+            msg: 'Trying to reconnnect to the network',
+            hasOption: false,
+            isError: false
+          }, function(err, data) {});
+          server.reconnectNetwork($rootScope.userInfo);
         });
       }
       console.log('Network status :: ' + state);

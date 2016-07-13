@@ -64,7 +64,7 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
         status: {},
         lastActive: null
       };
-      $scope.$apply();
+      $rootScope.$applyAsync();
     });
 
     // handle session removed

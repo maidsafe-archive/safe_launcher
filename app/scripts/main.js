@@ -15,6 +15,7 @@ window.safeLauncher = angular
 .run([ '$rootScope', '$state', '$stateParams', '$timeout', '$interval', 'CONSTANTS',
   function($rootScope, $state, $stateParams, $timeout, $interval, CONSTANTS) {
     $rootScope.$state = $state;
+    $rootScope.userInfo = {};
     $rootScope.keys = Object.keys;
     $rootScope.isAuthenticated = false;
     $rootScope.currentAppDetails = null;

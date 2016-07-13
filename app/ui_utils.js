@@ -164,20 +164,20 @@ export default class UIUtils {
   reconnect(user) {
     var self = this;
     this.api.reset();
-    if (user) {
+    if (Object.keys(user).length > 0) {
       this.api.auth.login(user.pin, user.keyword, user.password, function(err) {
         if (!self.onNetworkStateChange) {
           return;
         }
         var status;
-        if (err) {
+        if (true) {
           self.retryCount++;
-          status = 2
+          status = window.NETWORK_STATE.DISCONNECTED;
         } else {
           self.retryCount = 1;
-          status = 0;
+          status = window.NETWORK_STATE.CONNECTED;
         }
-        this.onNetworkStateChange(err ? 2 : 0);
+        self.onNetworkStateChange(status);
       });
     } else {
       this.api.connectWithUnauthorisedClient();
