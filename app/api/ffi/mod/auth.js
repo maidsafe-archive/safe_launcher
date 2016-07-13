@@ -27,11 +27,11 @@ var dropUnregisteredClient = function(lib) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     lib.drop_client.async(unregisteredClientHandle, function(err) {
       /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+      unregisteredClientHandle = null;
       if (err) {
         util.sendException(request.id, err.message);
       }
     });
-    unregisteredClientHandle = null;
   }
 };
 
@@ -42,8 +42,7 @@ var unregisteredClient = function(lib, observer) {
   lib.create_unregistered_client.async(unregisteredClient, function(e, result) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     if (e || result !== 0) {
-      util.sendConnectionStatus(1, false);
-      return false;
+      return util.sendConnectionStatus(1, false);       
     }
     unregisteredClientHandle = unregisteredClient.deref();
     registerObserver(lib, unregisteredClientHandle, observer);
@@ -179,9 +178,10 @@ var cleanUp = function(lib) {
   }
   if (registeredClientHandle) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-    lib.drop_client.async(registeredClientHandle, function() {});
-    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    registeredClientHandle = null;
+    lib.drop_client.async(registeredClientHandle, function() {
+      /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+      registeredClientHandle = null;
+    });
   }
 };
 

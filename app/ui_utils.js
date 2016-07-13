@@ -39,6 +39,7 @@ export default class UIUtils {
     this.proxy = proxy;
     this.proxyListener = new ProxyListener();
     this.onNetworkStateChange = null;
+    this.retryCount = 1;
   }
 
   // login
@@ -160,8 +161,27 @@ export default class UIUtils {
     this.onNetworkStateChange = callback;
   }
 
-  reconnect() {
+  reconnect(user) {
+    var self = this;
     this.api.reset();
+    if (user) {
+      this.api.auth.login(user.pin, user.keyword, user.password, function(err) {
+        if (!self.onNetworkStateChange) {
+          return;
+        }
+        var status;
+        if (err) {
+          self.retryCount++;
+          status = 2
+        } else {
+          self.retryCount = 1;
+          status = 0;
+        }
+        this.onNetworkStateChange(err ? 2 : 0);
+      });
+    } else {
+      this.api.connectWithUnauthorisedClient();
+    }
   }
 
   fetchGetsCount(callback) {
