@@ -25,21 +25,32 @@ export let CreateSession = function(data) {
     }
     log.debug('Directory key for creating an session obtained');
     let app = authReq.app;
+    let isNewSession = false;
     try {
-      log.debug('Creating session');
-      let sessionId = crypto.randomBytes(32).toString('base64');
-      let sessionInfo = new SessionInfo(app.id, app.name, app.version, app.vendor, data.permissions, dirKey);
+      let sessionId = sessionManager.hasSessionForApp(app);
+      let sessionInfo;
+      if (sessionId) {
+        log.debug('Usings existing session');
+        sessionInfo = sessionManager.get(sessionId);
+      } else {
+        log.debug('Creating session');
+        sessionId = crypto.randomBytes(32).toString('base64');
+        sessionInfo = new SessionInfo(app.id, app.name, app.version, app.vendor, data.permissions, dirKey);
+        isNewSession = true;
+      }
       let payload = JSON.stringify({
         id: sessionId
       });
       let token = jwt.sign(payload, new Buffer(sessionInfo.signingKey));
       sessionManager.put(sessionId, sessionInfo);
       let eventType = req.app.get('EVENT_TYPE').SESSION_CREATED;
-      req.app.get('eventEmitter').emit(eventType, {
-        id: sessionId,
-        info: sessionInfo
-      });
-      log.debug('Session created :: ' + sessionId);
+      if (isNewSession) {
+        req.app.get('eventEmitter').emit(eventType, {
+          id: sessionId,
+          info: sessionInfo
+        });
+      }
+      log.debug('Session for app created');
       new ResponseHandler(req, res)(null, {
         token: token,
         permissions: authReq.permissions
@@ -60,7 +71,7 @@ export var authorise = function(req, res, next) {
     return next(new ResponseError(400, 'Fields are missing'));
   }
   if (!(/[^\s]/.test(authReq.app.name) && /[^\s]/.test(authReq.app.id) && /[^\s]/.test(authReq.app.vendor) &&
-  /[^\s]/.test(authReq.app.version))) {
+    /[^\s]/.test(authReq.app.version))) {
     log.debug('Authorisation request - fields invalid');
     return next(new ResponseError(400, 'Values cannot be empty'));
   }
