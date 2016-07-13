@@ -35,54 +35,44 @@ window.safeLauncher = angular
       download: 0,
       authHTTPMethods: []
     };
-    $rootScope.ALERT_TYPE = {
-      AUTH_REQ: 'auth_request',
-      TOASTER: 'toaster',
-      PROMPT: 'prompt'
+    var Queuing = function() {
+      this.queue = [];
+      this.isProcessing = false;
+      this.currentObject = null;
+      this.payload = null;
     };
-    $rootScope.$alert = {
-      queue: [],
-      isProcessing: false,
-      currentAlert: null,
-      type: null,
-      payload: {},
-      timer: null,
-      callback: function(err, data) {
-        this.currentAlert.callback(err, data);
-        this.type = null;
-        this.payload = {};
-        this.isProcessing = false;
-        this.currentAlert = null;
-        this.process();
-      },
-      show: function(type, payload, callback) {
-        this.queue.push({
-          type: type,
-          payload: payload,
-          callback: callback
-        });
-        this.process();
-      },
-      process: function() {
-        var self = this;
-        if (this.isProcessing) {
-          return;
-        }
-        this.currentAlert = this.queue.shift();
-        if (!this.currentAlert) {
-          return;
-        }
-        this.isProcessing = true;
-        this.type = this.currentAlert.type;
-        this.payload = this.currentAlert.payload;
-        if (this.currentAlert.type === $rootScope.ALERT_TYPE.TOASTER && !this.currentAlert.payload.hasOption) {
-          this.timer = $timeout(function() {
-            $timeout.cancel(this.timer);
-            self.callback(null, true);
-          }, CONSTANTS.TOASTER_TIMEOUT);
-        }
+    Queuing.prototype.reset = function() {
+      this.isProcessing = false;
+      this.currentObject = null;
+      this.payload = null;
+    };
+    Queuing.prototype.callback = function(err, data) {
+      var self = this;
+      this.currentObject.callback(err, data);
+      this.reset();
+      $timeout(function() {
+        self.process();
+      }, 500);
+    };
+    Queuing.prototype.show = function(payload, callback) {
+      this.queue.push({payload: payload, callback: callback});
+      this.process();
+    };
+    Queuing.prototype.process = function() {
+      if (this.isProcessing) {
+        return;
       }
+      this.currentObject = this.queue.shift();
+      if (!this.currentObject) {
+        return;
+      }
+      this.isProcessing = true;
+      this.payload = this.currentObject.payload;
+      $rootScope.$applyAsync();
     };
+    $rootScope.$toaster = new Queuing();
+    $rootScope.$prompt = new Queuing();
+    $rootScope.$authReq = new Queuing();
     $rootScope.$proxyServer = false;
     $rootScope.clearIntervals = function() {
       for (var i in $rootScope.intervals) {
@@ -104,7 +94,7 @@ window.safeLauncher = angular
         2: 'Connection to SAFE Network Disconnected'
       };
       var isError = (status === window.NETWORK_STATE.DISCONNECTED);
-      $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
+      $rootScope.$toaster.show({
         msg: nwStatusMsg[status],
         hasOption: false,
         isError: isError

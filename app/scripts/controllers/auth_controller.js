@@ -49,7 +49,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       $scope.$applyAsync();
       $scope.user = {};
       if (err) {
-        return $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
+        return $rootScope.$toaster.show({
           msg: 'Invalid PIN, Keyword or Password.',
           isError: true
         }, function() {});
@@ -93,7 +93,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     // user register
     $scope.register = function() {
       if ($rootScope.$networkStatus.status !== window.NETWORK_STATE.CONNECTED) {
-         return $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
+         return $rootScope.$toaster.show({
           msg: 'Network not yet conneted',
           hasOption: false,
           isError: true
@@ -118,7 +118,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     // user login
     $scope.login = function() {
       if ($rootScope.$networkStatus.status !== window.NETWORK_STATE.CONNECTED) {
-        return $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
+        return $rootScope.$toaster.show({
           msg: 'Network not yet conneted',
           hasOption: false,
           isError: true

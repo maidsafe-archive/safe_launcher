@@ -211,7 +211,7 @@
   top: 0;
   left: 0;
   background-color: #FFF;
-  z-index: 99;
+  z-index: 9;
   .app-details-h {
     width: 100%;
     background-color: @primary-blue;
@@ -906,12 +906,14 @@
   left: 0;
   text-align: center;
   transition: bottom 0.2s linear 1s;
+  z-index: 97;
   &.active {
     bottom: 0;
   }
   .toaster-b {
     min-width: 260px;
     max-width: 640px;
+    height: inherit;
     display: inline-block;
     margin: 0 auto;
     padding: 15px 24px;
@@ -967,6 +969,7 @@
   left: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: table;
+  z-index: 98;
   .prompt-b {
     width: 100%;
     display: table-cell;
@@ -1005,7 +1008,7 @@
   position: fixed;
   top: 0;
   right: 0;
-  z-index: 999;
+  z-index: 97;
   cursor: pointer;
   background-size: 24px;
   background-repeat: no-repeat;
