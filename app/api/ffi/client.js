@@ -97,10 +97,16 @@ export var setNetworkStateListener = function(callback) {
 };
 
 export var reset = function() {
-  log.debug('Restarting FFI client worker');
+  log.debug('Restarting FFI client worker handles');
   send({
     module: 'reset'
-  })
+  });
+};
+
+export var connectWithUnauthorisedClient = function() {
+  send({
+    module: 'connect'
+  });
 };
 
 startWorker();

@@ -7,12 +7,12 @@ var GroupBarChart = React.createClass({
   },
   componentDidMount: function () {
     this.margin = {
-      top: 12,
-      left: 12,
-      right: 35,
-      bottom: 25
+      top: 30,
+      left: 10,
+      right: 15,
+      bottom: 10
     };
-    var containerWidth = 670;
+    var containerWidth = 630;
     var containerHeight = 140;
     this.BAR_WIDTH = 10;
     this.SMALL_GUTTER_WIDTH = 2;
@@ -122,7 +122,7 @@ var GroupBarChart = React.createClass({
                                .tickFormat(function(d, i) {
                                  return '-' + d + 'm';
                                });
-    var yAxisLeft = d3.axisLeft().scale(yScale);
+    var yAxisLeft = d3.axisLeft().scale(yScale).ticks(5);
     var yAxisRight = d3.axisRight().scale(yScale).tickValues('');
     this.container.append("g")
       .attr("class", "x-axis")

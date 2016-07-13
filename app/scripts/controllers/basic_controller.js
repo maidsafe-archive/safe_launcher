@@ -122,11 +122,8 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         msg: err.message,
         hasOption: false,
         isError: true
-      }, function(err, data) {
-        console.log(data);
-        server.closeWindow();
-      });
-      console.log(err);
+      }, function() {});
+
     });
 
     server.onNewAppActivity(function(data) {

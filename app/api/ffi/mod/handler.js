@@ -110,8 +110,7 @@ module.exports = function(libPath) {
           break;
 
         case 'reset':
-          cleanUp();
-          auth.getUnregisteredClient(lib, unRegisteredClientObserver);
+          cleanUp();          
           break;
 
         case 'dns':

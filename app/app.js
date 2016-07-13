@@ -117,9 +117,6 @@ api.setNetworkStateListener(function(state, isRegisteredClient) {
 
     case 1:
       log.info('Network connection lost');
-      if (isRegisteredClient) {
-        ignoreUnRegisteredObserver = false;
-      }
       window.msl.networkStateChange(NETWORK_STATE.DISCONNECTED);
       break;
 
