@@ -164,13 +164,13 @@ export default class UIUtils {
   reconnect(user) {
     var self = this;
     this.api.reset();
-    if (Object.keys(user).length > 0) {
+    if (user && Object.keys(user).length > 0) {
       this.api.auth.login(user.pin, user.keyword, user.password, function(err) {
         if (!self.onNetworkStateChange) {
           return;
         }
         var status;
-        if (true) {
+        if (err) {
           self.retryCount++;
           status = window.NETWORK_STATE.DISCONNECTED;
         } else {

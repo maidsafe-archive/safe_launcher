@@ -226,7 +226,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
           return;
         }
         $rootScope.dashData.accountInfo = data;
-        $rootScope.dashData.accountInfoTime = (new Date()).toLocaleString();
+        $rootScope.dashData.accountInfoTime = new Date();
         $rootScope.dashData.accountInfoTimeString = window.moment().fromNow(true);
         $rootScope.dashData.accountInfoUpdateEnabled = false;
         $rootScope.$applyAsync();
@@ -279,8 +279,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     window.msl.setNetworkStateChangeListener(function(state) {
       $rootScope.$networkStatus.show = true;
       $rootScope.$networkStatus.status = state;
-      if ($rootScope.$networkStatus.status === window.NETWORK_STATE.CONNECTED
-        && $rootScope.$state.current.name !== 'splash') {
+      if ($rootScope.$networkStatus.status === window.NETWORK_STATE.CONNECTED) {
           if (!$rootScope.isAuthenticated) {
             $scope.fetchStatsForUnauthorisedClient();
           } else {

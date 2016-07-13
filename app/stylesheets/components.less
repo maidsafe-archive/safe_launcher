@@ -828,8 +828,8 @@
     .opt-rt {
       display: inline-block;
       float: right;
-      font-size: 16px;
-      line-height: 32px;
+      font-size: 14px;
+      line-height: 34px;
       font-weight: normal;
       color: #212121;
       opacity: 0.7;
@@ -1079,23 +1079,32 @@
   right: 0;
   z-index: 97;
   cursor: pointer;
-  background-size: 24px;
-  background-repeat: no-repeat;
-  background-position: center;
+  &:after {
+    content: '';
+    width: 100%;
+    height: 100%;
+    position: relative;
+    top: 0;
+    left: 0;
+    display: block;
+    background-size: 24px;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
   &:hover {
     background-color: @primary-blue-hover;
   }
   &:active {
     background-color: @primary-blue-action;
   }
-  &.connecting {
+  &.connecting:after {
     background-image: url(../images/loading.svg);
     animation: loading 0.5s linear infinite;
   }
-  &.connected {
+  &.connected:after {
     background-image: url(../images/connected.svg);
   }
-  &.error {
+  &.error:after {
     background-image: url(../images/error-red.svg);
   }
 }

@@ -82,6 +82,8 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
 
     // remove session
     $scope.removeSession = function(id) {
+      $rootScope.currentAppDetails = null;
+      $rootScope.$applyAsync();
       server.removeSession(id);
     };
 

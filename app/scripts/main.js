@@ -27,8 +27,8 @@ window.safeLauncher = angular
         used: 0,
         available: 0
       },
-      accountInfoTime: '',
-      accountInfoTimeString: '',
+      accountInfoTime: new Date(),
+      accountInfoTimeString: window.moment().fromNow(true),
       accountInfoUpdateEnabled: true,
       getsCount: 0,
       deletesCount: 0,

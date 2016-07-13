@@ -117,7 +117,7 @@ var GroupBarChart = React.createClass({
     });
     var xAxis = d3.axisBottom().scale(xScale)
                                .tickValues(xScale.domain().filter(function(d) {
-                                 return d !== 0;
+                                 return d !== 0 && d <= self.actualDataSize;
                                }))
                                .tickFormat(function(d, i) {
                                  return '-' + d + 'm';
