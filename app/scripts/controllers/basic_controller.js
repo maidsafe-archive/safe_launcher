@@ -75,7 +75,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     server.onServerError(function(err) {
       console.log(err);
       // TODO show loader
-      $rootScope.$alert.show($rootScope.ALERT_TYPE.PROMPT, {
+      $rootScope.$prompt.show({
         title: 'Server Error',
         msg: err.message
       }, function(err, data) {
@@ -98,7 +98,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     server.onProxyStart(function(msg) {
       $rootScope.$proxyServer = true;
       setProxy(true);
-      $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
+      $rootScope.$toaster.show({
         msg: 'Proxy Server started',
         hasOption: false,
         isError: false
@@ -118,7 +118,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     server.onProxyError(function(err) {
       setProxy(false);
       $rootScope.$proxyServer = false;
-      $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
+      $rootScope.$toaster.show({
         msg: err.message,
         hasOption: false,
         isError: true
@@ -274,7 +274,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       if ($rootScope.$networkStatus.status === window.NETWORK_STATE.CONNECTED
         && $rootScope.$state.current.name !== 'splash') {
         $scope.fetchStatsForUnauthorisedClient();
-        $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
+        $rootScope.$toaster.show({
           msg: 'Network connected',
           hasOption: false,
           isError: false
@@ -287,14 +287,12 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         $rootScope.clearIntervals();
         $rootScope.isAuthenticated = false;
         $state.go('app');
-        $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
+        $rootScope.$toaster.show({
           msg: 'Network Error',
           hasOption: true,
           isError: true,
           opt: {
-            name: "Retry Now",
-            err: null,
-            data: true
+            name: "Retry Now"
           }
         }, function(err, data) {
           server.reconnectNetwork();

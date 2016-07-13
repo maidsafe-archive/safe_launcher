@@ -24,7 +24,7 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
         return;
       }
       isAuthReqProcessing = true;
-      $rootScope.$alert.show($rootScope.ALERT_TYPE.AUTH_REQ, requestQueue[0], function(err, status) {
+      $rootScope.$authReq.show(requestQueue[0], function(err, status) {
         if (status) {
           // $rootScope.$loader.show();
         }
@@ -70,7 +70,7 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
     // handle session removed
     server.onSessionRemoved(function(id) {
       console.log('Session removed :: ' + id);
-      $rootScope.$alert.show($rootScope.ALERT_TYPE.TOASTER, {
+      $rootScope.$toaster.show($rootScope.ALERT_TYPE.TOASTER, {
         msg: 'Revoked access for ' + $rootScope.appList[id].name,
         hasOption: false,
         isError: false
