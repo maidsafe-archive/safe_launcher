@@ -1,9 +1,10 @@
+var ref = require('ref');
 var util = require('./util.js');
 
 var Handler = function(reqId) {
     this.handle = function(err, count) {
         if (err) {
-            return util.sendException(reqId, err.message);
+            return util.sendException(reqId, err);
         }
         util.send(reqId, count);
     };
@@ -23,7 +24,6 @@ var fetchDeletesCount = function(reqId, lib, clientHandle) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
 };
 
-
 var fetchPostsCount = function(reqId, lib, clientHandle) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     lib.client_issued_posts.async(clientHandle, new Handler(reqId));
@@ -37,13 +37,13 @@ var fetchPutsCount = function(reqId, lib, clientHandle) {
 };
 
 var getAccountInfo = function(reqId, lib, clientHandle) {
-  var userPtr = ref.alloc(int);
-  var availablePtr = ref.alloc(int);
+  var usedPtr = ref.alloc(ref.types.int);
+  var availablePtr = ref.alloc(ref.types.int);
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   lib.get_account_info.async(clientHandle, usedPtr, availablePtr, function(err, resultCode) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     if (err) {
-      return util.sendException(reqId, err.message);
+      return util.sendException(reqId, err);
     }
     if (resultCode !== 0) {
       return util.sendError(reqId, resultCode);
@@ -71,6 +71,7 @@ exports.execute = function(lib, request) {
             break;
         case 'acc-info':
             getAccountInfo(request.id, lib, request.client);
+            break;
         default:
             util.sendException(request.id, new Error('Invalid action'));
     }

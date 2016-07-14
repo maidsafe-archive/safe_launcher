@@ -7,12 +7,13 @@
           <h3 class="title">Proxy Settings</h3>
           <p class="desc">
             The proxy server allows you to view websites and content from SAFE Network
-            in your browser of choice. (<a href="#">read more &amp; setup instructions</a>)
+            in your browser of choice.
+            (<a href="#" ng-click="openExternal($event, 'https://maidsafe.readme.io/docs/proxy-setup')">read more &amp; setup instructions</a>)
           </p>
           <p class="desc last">
             If you would like to disable this proxy, please use the toggle below.
           </p>
-          <div class="settings-i" ng-init="proxy = false" ng-click="proxy = !proxy">
+          <div class="settings-i" ng-init="proxy = true" ng-click="proxy = !proxy">
             <div class="settings-i-ctn">
               <h3 class="settings-i-name">Proxy</h3>
               <h3 class="settings-i-desc">Is {{ proxy ? 'enabled' : 'disabled' }}</h3>

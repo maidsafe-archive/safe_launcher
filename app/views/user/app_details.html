@@ -28,11 +28,11 @@
           <label for="error">Error</label>
         </div>
       </div>
-      <react-component name="AppLogs" props="{list: currentAppDetails.logs, filter: logFilter}"></react-component>
+      <react-component name="AppLogs" props="{list: currentAppDetails.logs, filter: logFilter, table: 'three-col'}"></react-component>
     </div>
     <div class="opt">
       <div class="opt-i">
-        <button type="button" name="revoke" class="btn flat danger" ng-click="removeSession(currentAppDetails.id)">Revoke App</button>
+        <button type="button" name="revoke" class="btn flat danger" ng-click="removeSession(currentAppDetails.id)">Revoke Access</button>
       </div>
     </div>
   </div>

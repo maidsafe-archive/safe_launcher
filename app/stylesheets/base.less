@@ -2,7 +2,8 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  .noselect()
+  .noselect();
+  .nodrag();
 }
 body {
   font-family: 'Open Sans';
@@ -26,10 +27,13 @@ a {
   -khtml-user-select: none;    /* Konqueror */
   -moz-user-select: none;      /* Firefox */
   -ms-user-select: none;       /* Internet Explorer/Edge */
-  user-select: none;           /* Non-prefixed version, currently
-                                  not supported by any browser */
+  user-select: none;           /* Non-prefixed version, currently                              not supported by any browser */
 }
 
+.nodrag {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
 .splash {
   width: 100%;
   height: @app-ht - @title-ht;
@@ -38,6 +42,9 @@ a {
   .splash-b {
     width: 100%;
     height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
     .splash-media {
       width: 432px;
       height: 324px;
@@ -72,23 +79,25 @@ a {
 
 .help {
   background-color: #FFF;
-  height: @tab-cnt-ht;
+  height: @tab-cnt-ht + 3;
   overflow-y: auto;
   a {
     color: @primary-blue;
   }
   .help-b {
-    width: 560px;
+    width: 650px;
     margin: 0 auto;
-    padding-top: 40px;
-    padding-bottom: 60px;
+    padding: 50px 0;
   }
   .title {
-    margin: 0 0 20px;
+    margin: 50px 0 0;
     padding: 0;
     font-size: 22px;
     color: #4d4d4d;
     font-weight: 600;
+    &.first {
+      margin-top: 0 !important;
+    }
   }
   .def {
     margin: 0 0 16px;
@@ -101,7 +110,7 @@ a {
     }
   }
   .p {
-    margin: 0 0 20px;
+    margin: 0;
     padding: 0;
     font-size: 16px;
     font-weight: normal;
@@ -124,28 +133,32 @@ a {
     padding: 0;
   }
   .list {
-    margin: 0 0 20px;
+    margin: 20px 0 0;
     padding: 0;
     li {
       list-style-type: none;
       font-size: 14px;
       font-weight: normal;
       line-height: 20px;
+      display: inline-block;
       a {
         position: relative;
         display: inline-block;
         padding-left: 20px;
+        padding-right: 30px;
         &:before {
           content: '';
-          width: 16px;
-          height: 16px;
-          background-image: url(../images/link_chevron.svg);
-          background-position: center;
-          background-repeat: no-repeat;
-          background-size: cover;
+          width: 8px;
+          height: 8px;
+          // background-image: url(../images/link_chevron.svg);
+          background-color: @primary-blue;
+          // background-position: center;
+          // background-repeat: no-repeat;
+          // background-size: cover;
+          border-radius: 50%;
           position: absolute;
-          top: 2px;
-          left: 2px;
+          top: 6px;
+          left: 4px;
         }
         &:hover {
           color: @primary-blue-hover;

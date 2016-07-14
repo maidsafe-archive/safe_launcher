@@ -3,7 +3,8 @@ var React = window.React;
 var AppLogs = React.createClass({
   propTypes: {
     list: React.PropTypes.object,
-    filter: React.PropTypes.array
+    filter: React.PropTypes.array,
+    table: React.PropTypes.string
   },
   render: function() {
     var rows = [];
@@ -44,10 +45,12 @@ var AppLogs = React.createClass({
       ]);
       rows.push(row);
     }
-    return React.DOM.table(null,
-      tableHead,
-      React.DOM.tbody(null, rows)
-    );
+    return React.DOM.div({key: 'inner-b', className: 'table-inner-b'}, [
+      React.DOM.table({key: 'table', className: this.props.table},
+        tableHead,
+        React.DOM.tbody(null, rows)
+      )
+    ]);
   }
 });
 

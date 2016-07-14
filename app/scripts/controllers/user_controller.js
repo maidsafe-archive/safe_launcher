@@ -12,73 +12,6 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
       'SUCCESS',
       'FAILURE'
     ];
-    var requestQueue = [];
-    var isAuthReqProcessing = false;
-
-    var showConfirmation = function() {
-      var checkRequestQueue = function() {
-        isAuthReqProcessing = false;
-        showConfirmation();
-      };
-      if (isAuthReqProcessing || requestQueue.length === 0) {
-        return;
-      }
-      isAuthReqProcessing = true;
-      $rootScope.$authReq.show(requestQueue[0], function(err, status) {
-        if (status) {
-          // $rootScope.$loader.show();
-        }
-        console.log(requestQueue[0]);
-        server.confirmResponse(requestQueue.shift(), status);
-        checkRequestQueue();
-      });
-      $rootScope.$applyAsync();
-    };
-
-    var removeApplication = function(id) {
-      for (var i in $rootScope.appList) {
-        if ($rootScope.appList[i].id === id) {
-          delete $rootScope.appList[i];
-          break;
-        }
-      }
-    };
-
-    // handle auth request
-    server.onAuthRequest(function(data) {
-      console.log(data);
-      server.focusWindow();
-      requestQueue.push(data);
-      showConfirmation();
-    });
-
-    // handle session creation
-    server.onSessionCreated(function(session) {
-      console.log('Session created :: ');
-      $rootScope.appList[session.id] = {
-        id: session.id,
-        name: session.info.appName,
-        version: session.info.appVersion,
-        vendor: session.info.vendor,
-        permissions: session.info.permissions.list,
-        status: {},
-        lastActive: null
-      };
-      $rootScope.$applyAsync();
-    });
-
-    // handle session removed
-    server.onSessionRemoved(function(id) {
-      console.log('Session removed :: ' + id);
-      $rootScope.$toaster.show({
-        msg: 'Revoked access ' + ($rootScope.appList[id] ? ('for ' + $rootScope.appList[id].name) : ''),
-        hasOption: false,
-        isError: false
-      }, function(err, data) {
-        console.log('Revoked application');
-      });
-      removeApplication(id);
-    });
 
     // remove session
     $scope.removeSession = function(id) {
@@ -118,11 +51,6 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
           }
         });
       }
-    };
-
-    $rootScope.clearIntervals();
-    $scope.fetchStatsForAuthorisedClient();
-    $scope.updateUserAccount();
-    $scope.pollUserAccount();
+    };    
   }
 ]);

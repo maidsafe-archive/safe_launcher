@@ -87,7 +87,7 @@ var UnauthGETChart = React.createClass({
     var xAxis = d3.axisBottom().scale(xScale).tickValues(xScale.domain().filter(function(d) {
         return (self.actualDataSize === d) || (self.actualDataSize >= d) && !(d % 4);
       })).tickFormat(function(d) { return d === 0 ? '' : '-' + d + 'm'});
-    var yAxisLeft = d3.axisLeft().scale(yScale);
+    var yAxisLeft = d3.axisLeft().scale(yScale).ticks(5);
     var yAxisRight = d3.axisRight().scale(yScale).tickValues('');
     this.container.append("g")
         .attr("class", "x-axis")

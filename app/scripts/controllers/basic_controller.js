@@ -1,8 +1,9 @@
 /**
  * Basic Controller
  */
-window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootScope', '$interval', '$timeout', 'serverFactory', 'CONSTANTS',
-  function($scope, $state, $rootScope, $interval, $timeout, server, CONSTANTS) {
+window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootScope',
+  '$interval', '$timeout', 'serverFactory', 'CONSTANTS', 'eventRegistrationFactory',
+  function($scope, $state, $rootScope, $interval, $timeout, server, CONSTANTS, eventRegistry) {
     var completeCount = 0;
     var collectedData = {
       GET: {
@@ -22,32 +23,16 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         newVal: 0
       }
     };
+    eventRegistry.init();
     // handle proxy localy
-    var setProxy = function(status) {
+    $rootScope.setProxy = function(status) {
       window.localStorage.setItem('proxy', JSON.stringify({status: Boolean(status)}));
     };
-    var getProxy = function() {
+    $rootScope.getProxy = function() {
       return JSON.parse(window.localStorage.getItem('proxy'));
     };
-    var clearProxy = function() {
+    $rootScope.clearProxy = function() {
       window.localStorage.clear();
-    };
-
-    var updateActivity = function(data) {
-      var logKeys = Object.keys($rootScope.logList);
-      if (logKeys.length >= CONSTANTS.LOG_LIST_LIMIT) {
-        var lastkey = logKeys.pop();
-        delete $rootScope.logList[lastkey];
-      }
-      data.activity['appName'] = data.app ? $rootScope.appList[data.app].name : 'Unauthorised Application';
-      $rootScope.logList[data.activity.activityId] = data.activity;
-      if ($rootScope.currentAppDetails) {
-        $rootScope.currentAppDetails['logs'][data.activity.activityId] = data.activity;
-      }
-      if (data.app) {
-          $rootScope.appList[data.app].status = data.activity;
-      }
-      $rootScope.$applyAsync();
     };
 
     var proxyListener = function(status) {
@@ -71,93 +56,6 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         $rootScope.$applyAsync();
       }
     };
-
-    // handle server error
-    server.onServerError(function(err) {
-      console.log(err);
-      // TODO show loader
-      $rootScope.$prompt.show({
-        title: 'Server Error',
-        msg: err.message
-      }, function(err, data) {
-        server.closeWindow();
-      });
-    });
-
-    // handle server start
-    server.onServerStarted(function() {
-      console.log('Server started');
-    });
-
-    // handle server shutdown
-    server.onServerShutdown(function() {
-      // $rootScope.$loader.hide();
-      console.log('Server Stopped');
-    });
-
-    // handle proxy start
-    server.onProxyStart(function(msg) {
-      $rootScope.$proxyServer = true;
-      setProxy(true);
-      $rootScope.$toaster.show({
-        msg: 'Proxy Server started',
-        hasOption: false,
-        isError: false
-      }, function(err, data) {
-        console.log('Proxy Server started');
-      });
-    });
-
-    // handle proxy stop
-    server.onProxyExit(function(msg) {
-      // $rootScope.$loader.hide();
-      $rootScope.$proxyServer = false;
-      console.log(msg);
-    });
-
-    // handle proxy error
-    server.onProxyError(function(err) {
-      setProxy(false);
-      $rootScope.$proxyServer = false;
-      $rootScope.$toaster.show({
-        msg: err.message,
-        hasOption: false,
-        isError: true
-      }, function() {});
-
-    });
-
-    server.onNewAppActivity(function(data) {
-      if (!data) {
-        return;
-      }
-      console.log(data);
-      updateActivity(data);
-    });
-
-    server.onUploadEvent(function(data) {
-      if (!data) {
-        return;
-      }
-      console.log(data);
-      $rootScope.dashData.upload += data;
-    });
-
-    server.onDownloadEvent(function(data) {
-      if (!data) {
-        return;
-      }
-      console.log(data);
-      $rootScope.dashData.download += data;
-    });
-
-    server.onUpdatedAppActivity(function(data) {
-      if (!data) {
-        return;
-      }
-      console.log(data);
-      updateActivity(data);
-    });
 
     $scope.fetchStatsForUnauthorisedClient = function() {
       $rootScope.intervals.push($interval(function () {
@@ -215,7 +113,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
           var item = $rootScope.appList[i];
           $rootScope.appList[i].lastActive = window.moment(item.status.endTime || item.status.beginTime).fromNow()
         }
-        $rootScope.dashData.accountInfoTimeString = window.moment($rootScope.dashData.accountInfoTime).fromNow(true);
+        $rootScope.dashData.accountInfoTimeString = window.moment($rootScope.dashData.accountInfoTime).fromNow();
         $rootScope.$applyAsync();
       }, CONSTANTS.FETCH_DELAY));
     };
@@ -227,7 +125,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         }
         $rootScope.dashData.accountInfo = data;
         $rootScope.dashData.accountInfoTime = new Date();
-        $rootScope.dashData.accountInfoTimeString = window.moment().fromNow(true);
+        $rootScope.dashData.accountInfoTimeString = window.moment().fromNow();
         $rootScope.dashData.accountInfoUpdateEnabled = false;
         $rootScope.$applyAsync();
         $timeout(function() {
@@ -239,18 +137,19 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
 
     $scope.pollUserAccount = function() {
       $rootScope.intervals.push($interval($scope.updateUserAccount, CONSTANTS.ACCOUNT_FETCH_INTERVAL));
-    }
+    };
 
     $scope.toggleProxyServer = function() {
       $rootScope.$proxyServer = !$rootScope.$proxyServer;
       if (!$rootScope.$proxyServer) {
+        $rootScope.setProxy($rootScope.$proxyServer);
         return server.stopProxyServer();
       }
       server.startProxyServer(proxyListener);
     };
 
     $scope.enableProxySetting = function(status) {
-      setProxy(status);
+      $rootScope.setProxy(status);
       if (status) {
         $scope.toggleProxyServer();
       }
@@ -261,7 +160,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       if ($state.params.hasOwnProperty('isFirstLogin') && $state.params.isFirstLogin) {
         return;
       }
-      var proxy = getProxy();
+      var proxy = $rootScope.getProxy();
       if (proxy && proxy.hasOwnProperty('status')) {
         if (proxy.status) {
           return $scope.toggleProxyServer();
@@ -277,14 +176,16 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     };
 
     window.msl.setNetworkStateChangeListener(function(state) {
-      $rootScope.$networkStatus.show = true;
-      $rootScope.$networkStatus.status = state;
-      if ($rootScope.$networkStatus.status === window.NETWORK_STATE.CONNECTED) {
-          if (!$rootScope.isAuthenticated) {
-            $scope.fetchStatsForUnauthorisedClient();
-          } else {
-            $scope.fetchStatsForAuthorisedClient();
-          }
+      if (state === window.NETWORK_STATE.CONNECTED) {
+        if ($rootScope.isAuthenticated) {
+          $rootScope.clearIntervals();
+          $scope.fetchStatsForAuthorisedClient();
+          $scope.updateUserAccount();
+          $scope.pollUserAccount();
+        } else {
+          $scope.fetchStatsForUnauthorisedClient();
+        }
+        if ($rootScope.$networkStatus.status !== state) {
           $rootScope.$toaster.show({
             msg: 'Network connected',
             hasOption: false,
@@ -292,27 +193,30 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
           }, function(err, data) {
             console.log(data);
           });
-      }
-      if ($rootScope.$networkStatus.status === window.NETWORK_STATE.DISCONNECTED
-        && $rootScope.$state.current.name !== 'splash') {
+        }
+        $rootScope.$networkStatus.status = state;
+      } else if (state === window.NETWORK_STATE.DISCONNECTED) {
+        $rootScope.$networkStatus.status = state;
         $rootScope.clearIntervals();
         var retryCount = CONSTANTS.RETRY_NETWORK_INIT_COUNT * window.msl.retryCount;
-        $rootScope.$toaster.show({
-          msg: 'Network Disconnected. Retrying in ',
-          hasOption: true,
-          isError: true,
-          autoCallbackIn: ((CONSTANTS.RETRY_NETWORK_MAX_COUNT >= retryCount) ? retryCount : CONSTANTS.RETRY_NETWORK_MAX_COUNT),
-          opt: {
-            name: "Retry Now"
-          }
-        }, function(err, data) {
+        if ($rootScope.$state.current.name !== 'splash' && $rootScope.$state.current.name  !== '') {
           $rootScope.$toaster.show({
-            msg: 'Trying to reconnnect to the network',
-            hasOption: false,
-            isError: false
-          }, function(err, data) {});
-          server.reconnectNetwork($rootScope.userInfo);
-        });
+            msg: 'Network Disconnected. Retrying in ',
+            hasOption: true,
+            isError: true,
+            autoCallbackIn: ((CONSTANTS.RETRY_NETWORK_MAX_COUNT >= retryCount) ? retryCount : CONSTANTS.RETRY_NETWORK_MAX_COUNT),
+            opt: {
+              name: "Retry Now"
+            }
+          }, function(err, data) {
+            $rootScope.$toaster.show({
+              msg: 'Trying to reconnnect to the network',
+              hasOption: false,
+              isError: false
+            }, function(err, data) {});
+            server.reconnectNetwork($rootScope.userInfo);
+          });
+        }
       }
       console.log('Network status :: ' + state);
       $rootScope.$applyAsync();
