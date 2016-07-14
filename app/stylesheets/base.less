@@ -2,7 +2,8 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  .noselect()
+  .noselect();
+  .nodrag();
 }
 body {
   font-family: 'Open Sans';
@@ -26,10 +27,13 @@ a {
   -khtml-user-select: none;    /* Konqueror */
   -moz-user-select: none;      /* Firefox */
   -ms-user-select: none;       /* Internet Explorer/Edge */
-  user-select: none;           /* Non-prefixed version, currently
-                                  not supported by any browser */
+  user-select: none;           /* Non-prefixed version, currently                              not supported by any browser */
 }
 
+.nodrag {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
 .splash {
   width: 100%;
   height: @app-ht - @title-ht;
@@ -38,6 +42,9 @@ a {
   .splash-b {
     width: 100%;
     height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
     .splash-media {
       width: 432px;
       height: 324px;

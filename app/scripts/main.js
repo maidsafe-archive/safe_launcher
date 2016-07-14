@@ -90,7 +90,7 @@ window.safeLauncher = angular
     $rootScope.$networkStatus = {
       status: window.NETWORK_STATE.CONNECTING,
       retry: function() {
-        this.status = window.NETWORK_STATE.RETRY;
+        this.status = window.NETWORK_STATE.CONNECTING;
         window.msl.reconnect();
       }
     };
