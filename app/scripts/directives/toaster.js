@@ -1,7 +1,7 @@
 /**
  * Toaster directive
  */
-window.safeLauncher.directive('toaster', [ '$rootScope', '$interval', function($rootScope, $interval) {
+window.safeLauncher.directive('toaster', [ '$rootScope', '$interval', 'CONSTANTS', function($rootScope, $interval, CONSTANTS) {
   'use strict';
   var link = function(scope, ele, attr) {
     scope.rootScope = $rootScope;
@@ -37,15 +37,9 @@ window.safeLauncher.directive('toaster', [ '$rootScope', '$interval', function($
           }
           $interval.cancel(timer);
           scope.callback();
-        }, 2000);
+        }, CONSTANTS.TOASTER_TIMEOUT);
       }
     };
-    // attr.$observe('payload', function() {
-    //   if (!scope.payload) {
-    //     return;
-    //   }
-    //   process();
-    // })
     scope.$watch('payload', function() {
       if (!scope.payload) {
         return;

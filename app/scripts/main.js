@@ -28,8 +28,9 @@ window.safeLauncher = angular
         available: 0
       },
       accountInfoTime: new Date(),
-      accountInfoTimeString: window.moment().fromNow(true),
+      accountInfoTimeString: window.moment().fromNow(),
       accountInfoUpdateEnabled: true,
+      accountInfoUpdateTimeLeft: 0,
       getsCount: 0,
       deletesCount: 0,
       postsCount: 0,
@@ -105,9 +106,7 @@ window.safeLauncher = angular
         msg: nwStatusMsg[status],
         hasOption: false,
         isError: isError
-      }, function(err, data) {
-        // server.reconnectNetwork();
-      });
+      }, function(err, data) {});
     };
   }
 ]);

@@ -21,20 +21,20 @@ window.safeLauncher.directive('fieldValidator', [ 'CONSTANTS', 'MESSAGES',
         switch (attr.name.toLowerCase()) {
           case 'pin':
             if (isNaN(value)) {
-              return msgEle.text($msg.PLEAUSE_USE_NUMBERS);
+              return msgEle.text($msg.PLEASE_USE_NUMBERS);
             }
             if (value.length < $constant.PIN_MIN_LEN) {
-              return msgEle.text($msg.PLEAUSE_USE_ATLEAST_FOUR_DIGITS);
+              return msgEle.text($msg.PLEASE_USE_ATLEAST_FOUR_DIGITS);
             }
             break;
           case 'keyword':
             if (value.length < $constant.KEYWORD_MIN_LEN) {
-              return msgEle.text($msg.PLEAUSE_USE_ATLEAST_SIX_CHAR);
+              return msgEle.text($msg.PLEASE_USE_ATLEAST_SIX_CHAR);
             }
             break;
           case 'password':
             if (value.length < $constant.PASSWORD_MIN_LEN) {
-              return msgEle.text($msg.PLEAUSE_USE_ATLEAST_SIX_CHAR);
+              return msgEle.text($msg.PLEASE_USE_ATLEAST_SIX_CHAR);
             }
             break;
           default:
