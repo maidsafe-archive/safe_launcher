@@ -21,7 +21,7 @@ export let CreateSession = function(data) {
     let authReq = req.body;
     if (err) {
       log.error('Creating session :: ' + JSON.stringify(err));
-      return next(new ResponseError(500, err));
+      return req.next(new ResponseError(500, err));
     }
     log.debug('Directory key for creating an session obtained');
     let app = authReq.app;
