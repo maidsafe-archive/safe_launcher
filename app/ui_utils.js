@@ -103,7 +103,7 @@ export default class UIUtils {
   }
 
   // on auth request
-  onAuthRequest(callback) {
+  onAuthRequest(callback) {    
     this.restServer.addEventListener(this.restServer.EVENT_TYPE.AUTH_REQUEST, callback);
   }
 

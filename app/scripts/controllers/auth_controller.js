@@ -9,13 +9,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     $scope.user = {};
     $scope.isLoading = false;
 
-    // handle authorisation before user logged-in
-    auth.onAuthorisationReq(function(payload) {
-      if (!$rootScope.isAuthenticated) {
-        auth.confirmAuthorisation(payload, false);
-      }
-    });
-
     var Request = function(callback) {
       var self = this;
       var alive = true;
@@ -134,6 +127,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       request.execute(function(done) {
         auth.login($scope.user, done);
       });
-    };
+    };    
   }
 ]);
