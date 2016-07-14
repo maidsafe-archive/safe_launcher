@@ -113,7 +113,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
           var item = $rootScope.appList[i];
           $rootScope.appList[i].lastActive = window.moment(item.status.endTime || item.status.beginTime).fromNow()
         }
-        $rootScope.dashData.accountInfoTimeString = window.moment($rootScope.dashData.accountInfoTime).fromNow(true);
+        $rootScope.dashData.accountInfoTimeString = window.moment($rootScope.dashData.accountInfoTime).fromNow();
         $rootScope.$applyAsync();
       }, CONSTANTS.FETCH_DELAY));
     };
@@ -125,7 +125,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         }
         $rootScope.dashData.accountInfo = data;
         $rootScope.dashData.accountInfoTime = new Date();
-        $rootScope.dashData.accountInfoTimeString = window.moment().fromNow(true);
+        $rootScope.dashData.accountInfoTimeString = window.moment().fromNow();
         $rootScope.dashData.accountInfoUpdateEnabled = false;
         $rootScope.$applyAsync();
         $timeout(function() {

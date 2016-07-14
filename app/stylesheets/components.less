@@ -1,3 +1,24 @@
+.register-nav {
+  width: 300px;
+  margin: 8px auto 0;
+  padding-bottom: 16px;
+  .register-nav-i {
+    padding-right: 16px;
+    float: left;
+    font-size: 16px;
+    font-weight: normal;
+    line-height: 20px;
+    color: #212121;
+    opacity: 0.7;
+    cursor: pointer;
+    &.active {
+      opacity: 1;
+      font-weight: 600;
+    }
+  }
+  .clearfix();
+}
+
 // tab
 .tab {
   width: 100%;
@@ -52,7 +73,7 @@
             background-color: #FFF !important;
           }
           &:after {
-            content: '';
+            // content: '';
             display: block;
             width: 1px;
             height: 28px;
@@ -72,7 +93,7 @@
             background-color: @primary-blue-hover;
           }
           &:active {
-            background-color: @primary-blue-action;
+            // background-color: @primary-blue-action;
           }
           &.active {
             background-color: #EAEAEA;
@@ -847,73 +868,154 @@
     position: relative;
     font-size: 14px;
     font-weight: normal;
-    padding-left: 20px;
+    padding-left: 25px;
+    margin-right: 8px;
     &:before {
       content: '';
-      width: 15px;
-      height: 15px;
-      margin: 3px 0;
-      background-color: #EEE;
+      width: 14px;
+      height: 14px;
+      margin: 1px 2px;
+      background-position: center;
+      background-size: 16px;
+      background-image: url(../images/tick.svg);
+      background-color: transparent;
       position: absolute;
       top: 0;
       left: 0;
+      border-width: 2px;
+      border-style: solid;
+      border-color: transparent;
       border-radius: 3px;
     }
   }
   &.in-progress {
     label {
       &:before {
-        background-color: @checkbox-in-progress;
+        border-color: @checkbox-in-progress;
       }
+    }
+    input:checked + label:before {
+      background-color: @checkbox-in-progress;
     }
   }
   &.completed {
     label {
       &:before {
-        background-color: @checkbox-complete;
+        border-color: @checkbox-complete;
       }
+    }
+    input:checked + label:before {
+      background-color: @checkbox-complete;
     }
   }
   &.error {
     label {
       &:before {
-        background-color: @checkbox-error;
+        border-color: @checkbox-error;
       }
+    }
+    input:checked + label:before {
+      background-color: @checkbox-error;
     }
   }
   &.get {
     label {
       &:before {
-        background-color: @get;
+        border-color: @get;
       }
+    }
+    input:checked + label:before {
+      background-color: @get;
     }
   }
   &.put {
     label {
       &:before {
-        background-color: @primary-blue;
+        border-color: @primary-blue;
       }
+    }
+    input:checked + label:before {
+      background-color: @primary-blue;
     }
   }
   &.post {
     label {
       &:before {
-        background-color: @upload;
+        border-color: @upload;
       }
+    }
+    input:checked + label:before {
+      background-color: @upload;
     }
   }
   &.delete {
     label {
       &:before {
-        background-color: @checkbox-complete;
+        border-color: @checkbox-complete;
       }
     }
+    input:checked + label:before {
+      background-color: @checkbox-complete;
+    }
   }
-  input:checked + label:before {
-    background-image: url(../images/tick.svg);
-  }
-  &.always-checked label:before {
-    border-radius: 50%;
+  // input:checked + label {
+  //   // background-image: url(../images/tick.svg);
+
+  // }
+  &.always-checked {
+    label:before {
+      border-radius: 50%;
+      background-image: none;
+    }
+    &.in-progress {
+      label {
+        &:before {
+          background-color: @checkbox-in-progress;
+        }
+      }
+    }
+    &.completed {
+      label {
+        &:before {
+          background-color: @checkbox-complete;
+        }
+      }
+    }
+    &.error {
+      label {
+        &:before {
+          background-color: @checkbox-error;
+        }
+      }
+    }
+    &.get {
+      label {
+        &:before {
+          background-color: @get;
+        }
+      }
+    }
+    &.put {
+      label {
+        &:before {
+          background-color: @primary-blue;
+        }
+      }
+    }
+    &.post {
+      label {
+        &:before {
+          background-color: @upload;
+        }
+      }
+    }
+    &.delete {
+      label {
+        &:before {
+          background-color: @checkbox-complete;
+        }
+      }
+    }
   }
 }
 
@@ -932,9 +1034,45 @@
     }
     .clearfix();
   }
+  .table-inner-b {
+    height: 360px;
+    overflow-y: auto; 
+  }
   table {
     width: 100%;
     font-size: 14px;
+    &.four-col {
+      tr {
+        th:nth-child(1) {
+          width: 40%;
+        }
+        th:nth-child(2) {
+          width: 30%;
+        }
+        th:nth-child(3) {
+          width: 15%;
+        }
+        th:nth-child(4) {
+          width: 15%;
+        }
+      }
+    }
+    &.three-col {
+      tr {
+        th:nth-child(1), td:first-child {
+          display: none;
+        }
+        th:nth-child(2) {
+          width: 60%;
+        }
+        th:nth-child(3) {
+          width: 20%;
+        }
+        th:nth-child(4) {
+          width: 20%;
+        }
+      }
+    }
     th {
       text-align: left;
       font-weight: 600;

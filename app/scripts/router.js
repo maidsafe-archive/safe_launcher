@@ -47,6 +47,14 @@ window.safeLauncher.config(function($stateProvider, $urlRouterProvider) {
       }
     }
   })
+  .state('app.activity', {
+    'url': '/activity',
+    'views': {
+      'tab': {
+        'templateUrl': 'views/tab/activity.html'
+      }
+    }
+  })
   .state('app.help', {
     'url': '/help',
     'views': {
