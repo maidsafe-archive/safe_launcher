@@ -88,7 +88,8 @@ export default class RESTServer {
     });
 
     // catch 404
-    app.use(function(req, res) {
+    app.use(function(err, req, res) {
+      log.error(err.message);
       res.status(404).send('Not Found');
     });
 
