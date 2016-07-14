@@ -62,7 +62,7 @@ var sendException = function(id, ex) {
   process.send({
     id: id,
     errorCode: 999,
-    errorMsg: ex.message
+    errorMsg: ex.toString()
   });
 };
 
