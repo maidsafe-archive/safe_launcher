@@ -142,6 +142,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     $scope.toggleProxyServer = function() {
       $rootScope.$proxyServer = !$rootScope.$proxyServer;
       if (!$rootScope.$proxyServer) {
+        $rootScope.setProxy($rootScope.$proxyServer);
         return server.stopProxyServer();
       }
       server.startProxyServer(proxyListener);
@@ -194,27 +195,28 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
           });
         }
         $rootScope.$networkStatus.status = state;
-      } else if (state === window.NETWORK_STATE.DISCONNECTED
-        && $rootScope.$state.current.name !== 'splash') {
+      } else if (state === window.NETWORK_STATE.DISCONNECTED) {
         $rootScope.$networkStatus.status = state;
         $rootScope.clearIntervals();
         var retryCount = CONSTANTS.RETRY_NETWORK_INIT_COUNT * window.msl.retryCount;
-        $rootScope.$toaster.show({
-          msg: 'Network Disconnected. Retrying in ',
-          hasOption: true,
-          isError: true,
-          autoCallbackIn: ((CONSTANTS.RETRY_NETWORK_MAX_COUNT >= retryCount) ? retryCount : CONSTANTS.RETRY_NETWORK_MAX_COUNT),
-          opt: {
-            name: "Retry Now"
-          }
-        }, function(err, data) {
+        if ($rootScope.$state.current.name !== 'splash' && $rootScope.$state.current.name  !== '') {
           $rootScope.$toaster.show({
-            msg: 'Trying to reconnnect to the network',
-            hasOption: false,
-            isError: false
-          }, function(err, data) {});
-          server.reconnectNetwork($rootScope.userInfo);
-        });
+            msg: 'Network Disconnected. Retrying in ',
+            hasOption: true,
+            isError: true,
+            autoCallbackIn: ((CONSTANTS.RETRY_NETWORK_MAX_COUNT >= retryCount) ? retryCount : CONSTANTS.RETRY_NETWORK_MAX_COUNT),
+            opt: {
+              name: "Retry Now"
+            }
+          }, function(err, data) {
+            $rootScope.$toaster.show({
+              msg: 'Trying to reconnnect to the network',
+              hasOption: false,
+              isError: false
+            }, function(err, data) {});
+            server.reconnectNetwork($rootScope.userInfo);
+          });
+        }
       }
       console.log('Network status :: ' + state);
       $rootScope.$applyAsync();
