@@ -137,7 +137,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
 
     $scope.pollUserAccount = function() {
       $rootScope.intervals.push($interval($scope.updateUserAccount, CONSTANTS.ACCOUNT_FETCH_INTERVAL));
-    }
+    };
 
     $scope.toggleProxyServer = function() {
       $rootScope.$proxyServer = !$rootScope.$proxyServer;
