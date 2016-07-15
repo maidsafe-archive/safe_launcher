@@ -19,6 +19,7 @@ window.safeLauncher = angular
     $rootScope.keys = Object.keys;
     $rootScope.isAuthenticated = false;
     $rootScope.currentAppDetails = null;
+    $rootScope.appVersion = require('./package.json').version;
     $rootScope.appList = {};
     $rootScope.logList = {};
     $rootScope.intervals = [];
@@ -27,6 +28,7 @@ window.safeLauncher = angular
         used: 0,
         available: 0
       },
+      accountInfoLoading: false,
       accountInfoTime: new Date(),
       accountInfoTimeString: window.moment().fromNow(),
       accountInfoUpdateEnabled: true,

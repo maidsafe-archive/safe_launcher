@@ -58,6 +58,9 @@
               &.dashboard-icn {
                 background-image: url(../images/dashboard_white.svg);
               }
+              &.log-icn {
+                background-image: url(../images/logs_icon_white.svg);
+              }
               &.settings-icn {
                 background-image: url(../images/settings_white.svg);
               }
@@ -105,6 +108,9 @@
                 }
                 &.dashboard-icn {
                   background-image: url(../images/dashboard.svg);
+                }
+                &.log-icn {
+                  background-image: url(../images/logs_icon.svg);
                 }
                 &.settings-icn {
                   background-image: url(../images/settings.svg);
@@ -722,7 +728,7 @@
   }
   .legends {
     width: 100%;
-    padding-left: 127px;
+    padding-left: 110px;
     padding-top: 20px;
     .legends-i {
       padding-left: 25px;
@@ -736,13 +742,13 @@
         &:after {
           content: '';
           display: block;
-          width: 20px;
-          height: 20px;
+          width: 15px;
+          height: 15px;
           border-radius: 50%;
           background-color: #EEE;
           position: absolute;
-          top: 0;
-          left: -25px;
+          top: 3px;
+          left: -20px;
         }
       }
       .legends-i-val {
@@ -760,12 +766,13 @@
   }
   svg {
     position: absolute;
-    top: 23px;
+    top: 25px;
     left: 0;
   }
 }
 
 .dash-progress-bar {
+  width: 100%;
   display: table;
   padding: 0;
   .dash-progress-bar-b {
@@ -824,6 +831,9 @@
   }
   .opt {
     margin-top: 16px;
+    &.onLoading {
+      margin-top: 34px;
+    }
     .opt-lt {
       display: inline-block;
       float: left;
@@ -1036,7 +1046,7 @@
   }
   .table-inner-b {
     height: 360px;
-    overflow-y: auto; 
+    overflow-y: auto;
   }
   table {
     width: 100%;

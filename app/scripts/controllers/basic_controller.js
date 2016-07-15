@@ -119,7 +119,9 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     };
 
     $scope.updateUserAccount = function () {
+      $rootScope.accountInfoLoading = true;
       server.getAccountInfo(function(err, data) {
+        $rootScope.accountInfoLoading = false;
         if (err) {
           return;
         }

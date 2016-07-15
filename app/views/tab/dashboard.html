@@ -48,21 +48,30 @@
         <div class="card">
           <div class="dash-progress-bar">
             <div class="dash-progress-bar-b">
-              <h3 class="count"><span class="value">{{dashData.accountInfo.used}}</span> / {{dashData.accountInfo.used + dashData.accountInfo.available}}</h3>
+              <h3 class="count" ng-if="!accountInfoLoading"><span class="value">{{dashData.accountInfo.used}}</span> / {{dashData.accountInfo.used + dashData.accountInfo.available}}</h3>
+              <h3 class="count" ng-if="accountInfoLoading"><span class="value">...</span></h3>
               <h4 class="title">Total PUTs</h4>
               <div class="progress">
-                <span class="progress-value" style="width:{{(dashData.accountInfo.used / (dashData.accountInfo.used + dashData.accountInfo.available)) * 100}}%"></span>
+                <span ng-show="!accountInfoLoading" class="progress-value" style="width:{{(dashData.accountInfo.used / (dashData.accountInfo.used + dashData.accountInfo.available)) * 100}}%"></span>
               </div>
-              <div class="desc">
+              <div class="desc" ng-if="!accountInfoLoading">
                 Each account is currently limited to {{dashData.accountInfo.used + dashData.accountInfo.available}} PUTs on the Network.
               </div>
-              <div class="opt">
+              <div class="desc" ng-if="accountInfoLoading">
+                Fetching data from the Network.
+              </div>
+              <div class="opt" ng-if="!accountInfoLoading">
                 <div class="opt-lt">
                   <button type="button" class="btn flat" name="update"
                     ng-disabled="!dashData.accountInfoUpdateEnabled" ng-click="updateUserAccount()">{{ dashData.accountInfoUpdateEnabled ? 'Update' :  (dashData.accountInfoUpdateTimeLeft) }}</button>
                 </div>
                 <div class="opt-rt">
                   Updated: {{dashData.accountInfoTimeString}}
+                </div>
+              </div>
+              <div class="opt onLoading" ng-if="accountInfoLoading">
+                <div class="opt-lt">
+                  <button type="button" class="btn flat" name="update" ng-disabled="true">Updating</button>
                 </div>
               </div>
             </div>
