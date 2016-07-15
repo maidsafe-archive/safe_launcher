@@ -88,6 +88,9 @@
           }
           &.disabled {
             opacity: 0.5;
+            &:hover {
+              background-color: @primary-blue;
+            }
           }
           &:first-child:after {
             display: none;
@@ -641,20 +644,32 @@
 }
 
 .count {
-  text-align: center;
-  padding: 13px 0;
+  text-align: left;
+  margin-top: 3px;
+  padding-right: 25px;
+  display: inline-block;
+  float: left;
+  position: relative;
   .count-val {
-    font-size: 28px;
-    line-height: 32px;
+    width: 52px;
+    text-align: right;
+    font-size: 18px;
+    line-height: 24px;
     font-weight: normal;
     color: @primary-blue;
+    float: left;
+    position: absolute;
+    top: 0;
+    left: 0;
   }
   .count-title {
-    font-size: 15px;
-    line-height: 18px;
-    margin-top: 8px;
+    font-size: 14px;
+    line-height: 25px;
+    margin: 0;
+    padding-left: 60px;
     font-weight: normal;
     color: #212121;
+    float: left;
   }
 }
 
@@ -662,10 +677,18 @@
 .dash {
   padding: 16px;
   height: @tab-cnt-ht;
-  overflow-y: auto;
+  ovleflow-y: auto;
   .dash-b {
     .dash-cnt {
       width: 100%;
+    }
+    .dash-title {
+      font-size: 14px;
+      font-weight: normal;
+      margin: 0;
+      padding: 0;
+      color: #212121;
+      opacity: 0.7;
     }
     .flex-cnt {
       display: flex;
@@ -704,32 +727,50 @@
 }
 
 .bar-chart {
-  padding: 24px;
+  padding: 16px 16px 9px;
   &:hover {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.26);
   }
+  .bar-chart-b {
+    display: block;
+    float: left;
+    height: 134px;
+  }
   .filters {
-    padding: 0 16px;
+    padding: 0 8px;
+    margin-top: 18px;
     margin-bottom: 12px;
     .filters-i {
       padding-right: 12px;
     }
     .clearfix();
   }
+  .bar-chart-count {
+    width: 100%;
+    margin-top: 12px;
+    float: left;
+    .clearfix();
+  }
+  .clearfix();
 }
 
 .pie-chart {
-  padding: 24px;
+  padding: 16px;
   position: relative;
   .pie-chart-b {
     position: relative;
     display: inline-block;
-    padding: 20px 0;
+    padding: 0;
+  }
+  .pie-chart-inner-b {
+    display: block;
+    float: left;
+    height: 140px;
   }
   .legends {
     width: 100%;
     padding-left: 110px;
-    padding-top: 20px;
+    padding-top: 30px;
     .legends-i {
       padding-left: 25px;
       margin-bottom: 8px;
@@ -766,7 +807,7 @@
   }
   svg {
     position: absolute;
-    top: 25px;
+    top: 20px;
     left: 0;
   }
 }
@@ -779,7 +820,7 @@
     display: table-cell;
     vertical-align: middle;
     text-align: left;
-    padding: 24px;
+    padding: 16px;
   }
   .count {
     font-size: 28px;
@@ -810,9 +851,10 @@
   .progress {
     width: 100%;
     height: 10px;
-    margin: 8px 0 16px;
+    margin: 8px 0;
     background-color: #DDD;
     position: relative;
+    float: left;
     .progress-value {
       width: 100%;
       height: 10px;
@@ -825,21 +867,24 @@
   }
   .desc {
     font-size: 14px;
-    line-height: 18px;
+    line-height: 16px;
     font-weight: normal;
     color: #212121;
+    float: left;
   }
   .opt {
-    margin-top: 16px;
+    width: 100%;
+    margin-top: 5px;
+    float: left;
     &.onLoading {
-      margin-top: 34px;
+      margin-top: 22px;
     }
     .opt-lt {
       display: inline-block;
       float: left;
       button {
         color: @primary-blue;
-        padding-left: 24px;
+        padding: 7px 0 0 24px;
         position: relative;
         &:before {
           content: '';
@@ -847,7 +892,7 @@
           height: 16px;
           display: block;
           position: absolute;
-          top: 9px;
+          top: 8px;
           left: 0;
           background-image: url(../images/refresh_small.svg);
           background-position: center;
@@ -860,7 +905,7 @@
       display: inline-block;
       float: right;
       font-size: 14px;
-      line-height: 34px;
+      line-height: 26px;
       font-weight: normal;
       color: #212121;
       opacity: 0.7;
@@ -878,19 +923,21 @@
     position: relative;
     font-size: 14px;
     font-weight: normal;
-    padding-left: 25px;
+    line-height: 16px;
+    padding-left: 20px;
     margin-right: 8px;
+    float: left;
     &:before {
       content: '';
-      width: 14px;
-      height: 14px;
-      margin: 1px 2px;
+      width: 10px;
+      height: 10px;
+      margin: 0;
       background-position: center;
       background-size: 16px;
       background-image: url(../images/tick.svg);
       background-color: transparent;
       position: absolute;
-      top: 0;
+      top: 1px;
       left: 0;
       border-width: 2px;
       border-style: solid;
@@ -1027,6 +1074,7 @@
       }
     }
   }
+  .clearfix();
 }
 
 // table view

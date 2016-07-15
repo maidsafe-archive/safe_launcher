@@ -16,6 +16,12 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
     // remove session
     $scope.removeSession = function(id) {
       $rootScope.currentAppDetails = null;
+      $rootScope.logList[id] = {
+        appName: $rootScope.appList[id].name,
+        activityName: 'Revoke app',
+        activityStatus: 1,
+        beginTime: (new Date()).getTime()
+      };
       $rootScope.$applyAsync();
       server.removeSession(id);
     };
@@ -51,6 +57,6 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
           }
         });
       }
-    };    
+    };
   }
 ]);

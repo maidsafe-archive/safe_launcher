@@ -42,7 +42,7 @@ var unregisteredClient = function(lib, observer) {
   lib.create_unregistered_client.async(unregisteredClient, function(e, result) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     if (e || result !== 0) {
-      return util.sendConnectionStatus(1, false);       
+      return util.sendConnectionStatus(1, false);
     }
     unregisteredClientHandle = unregisteredClient.deref();
     registerObserver(lib, unregisteredClientHandle, observer);

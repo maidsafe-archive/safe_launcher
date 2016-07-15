@@ -79,7 +79,9 @@ module.exports = function(libPath) {
   };
 
   var cleanUp = function() {
-    dropWriterHandles();
+    if (auth.getRegisteredClient()) {
+      dropWriterHandles();      
+    }
     dropClient();
   };
 
@@ -110,7 +112,7 @@ module.exports = function(libPath) {
           break;
 
         case 'reset':
-          cleanUp();          
+          cleanUp();
           break;
 
         case 'dns':

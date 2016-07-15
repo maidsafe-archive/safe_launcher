@@ -7,7 +7,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     var REQUEST_TIMEOUT = 90 * 1000;
     var FIELD_FOCUS_DELAY = 100;
     $scope.user = {};
-    $scope.isLoading = false;
     // $scope.registerTab = {
     //   tabs: {
     //     PIN: 'pin',
@@ -53,7 +52,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     };
 
     var onAuthResponse = function(err) {
-      $scope.isLoading = false;
+      $rootScope.isAuthLoading = false;
       $scope.$applyAsync();
       $rootScope.userInfo = $scope.user;
       $scope.user = {};
@@ -163,7 +162,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       };
       var request = new Request(onAuthResponse);
       $scope.cancelRequest = request.cancel;
-      $scope.isLoading = true;
+      $rootScope.isAuthLoading = true;
       request.execute(function(done) {
         auth.register(payload, done);
       });
@@ -206,7 +205,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       }
       var request = new Request(onAuthResponse);
       $scope.cancelRequest = request.cancel;
-      $scope.isLoading = true;
+      $rootScope.isAuthLoading = true;
       request.execute(function(done) {
         auth.login($scope.user, done);
       });

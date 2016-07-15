@@ -14,7 +14,7 @@ var UnauthGETChart = React.createClass({
     };
     var padding = 24;
     var containerWidth = 670;
-    var containerHeight = 140;
+    var containerHeight = 134;
     this.BAR_WIDTH = 16;
     this.GUTTER_WIDTH = 2;
     this.OFFSET_TO_MAX_VALUE = 5;
@@ -48,7 +48,7 @@ var UnauthGETChart = React.createClass({
       this.add(nextProps.data[nextProps.data.length - 1]);
   },
   render: function() {
-    return React.DOM.span({id: 'barChart'});
+    return React.DOM.span({id: 'barChart', className: 'bar-chart-b'});
   },
   add: function(entry) {
     var self = this;

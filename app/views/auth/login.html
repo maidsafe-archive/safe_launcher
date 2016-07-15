@@ -1,5 +1,5 @@
 <div class="form-b" ng-controller="authController">
-  <div ng-show="!isLoading">
+  <div ng-show="!isAuthLoading">
     <form class="form" name="loginForm" ng-submit="login()">
       <div class="inp-grp">
         <input id="pin" type="password" name="pin" required="true" ng-model="user.pin" field-validator focus="true" />
@@ -33,5 +33,5 @@
       Don't have a account ? <a ui-sref="app.account({currentPage: 'register'})">Create Account</a>
     </div>
   </div>
-  <ng-include src="'views/auth/loader.html'" ng-show="isLoading"></ng-include>
+  <ng-include src="'views/auth/loader.html'" ng-show="isAuthLoading"></ng-include>
 </div>

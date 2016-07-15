@@ -23,6 +23,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         newVal: 0
       }
     };
+    var updateAccountInfoTimer = null;
     eventRegistry.init();
     // handle proxy localy
     $rootScope.setProxy = function(status) {
@@ -33,6 +34,26 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     };
     $rootScope.clearProxy = function() {
       window.localStorage.clear();
+    };
+
+    var startAccountUpdateTimer = function() {
+      var currentTime = 0;
+      var dateDiff = 0;
+      updateAccountInfoTimer = $interval(function() {
+        currentTime = new Date();
+        dateDiff = window.moment.duration(window.moment(currentTime).diff($rootScope.dashData.accountInfoTime)).asSeconds();
+        dateDiff = Math.floor(dateDiff);
+        if (dateDiff <= 120) {
+          var secondsLeft = 120 - dateDiff;
+          var min = Math.floor(secondsLeft / 60);
+          var sec = secondsLeft - (min * 60);
+          sec = ('0' + sec).slice(-2);
+          $rootScope.dashData.accountInfoUpdateTimeLeft = '0' + min + ':' + sec ;
+          $rootScope.$applyAsync();
+        } else {
+          $interval.cancel(updateAccountInfoTimer);
+        }
+      }, 1000);
     };
 
     var proxyListener = function(status) {
@@ -119,6 +140,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     };
 
     $scope.updateUserAccount = function () {
+      startAccountUpdateTimer();
       $rootScope.accountInfoLoading = true;
       server.getAccountInfo(function(err, data) {
         $rootScope.accountInfoLoading = false;
@@ -187,6 +209,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         } else {
           $scope.fetchStatsForUnauthorisedClient();
         }
+        $rootScope.retryCount = 1;
         if ($rootScope.$networkStatus.status !== state) {
           $rootScope.$toaster.show({
             msg: 'Network connected',
@@ -200,17 +223,18 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       } else if (state === window.NETWORK_STATE.DISCONNECTED) {
         $rootScope.$networkStatus.status = state;
         $rootScope.clearIntervals();
-        var retryCount = CONSTANTS.RETRY_NETWORK_INIT_COUNT * window.msl.retryCount;
         if ($rootScope.$state.current.name !== 'splash' && $rootScope.$state.current.name  !== '') {
           $rootScope.$toaster.show({
             msg: 'Network Disconnected. Retrying in ',
             hasOption: true,
             isError: true,
-            autoCallbackIn: ((CONSTANTS.RETRY_NETWORK_MAX_COUNT >= retryCount) ? retryCount : CONSTANTS.RETRY_NETWORK_MAX_COUNT),
+            autoCallbackIn: Math.min(CONSTANTS.RETRY_NETWORK_INIT_COUNT * $rootScope.retryCount, CONSTANTS.RETRY_NETWORK_MAX_COUNT),
             opt: {
               name: "Retry Now"
             }
           }, function(err, data) {
+            $rootScope.retryCount *= 2;
+            $rootScope.$networkStatus.status = window.NETWORK_STATE.CONNECTING;
             $rootScope.$toaster.show({
               msg: 'Trying to reconnnect to the network',
               hasOption: false,

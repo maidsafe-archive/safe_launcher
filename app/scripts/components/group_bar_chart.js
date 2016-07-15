@@ -47,7 +47,7 @@ var GroupBarChart = React.createClass({
       this.add(nextProps.data[nextProps.data.length - 1]);
   },
   render: function() {
-    return React.DOM.span({id: 'groupChart'}, null);
+    return React.DOM.span({id: 'groupChart', className: 'bar-chart-b'}, null);
   },
   add: function(entry) {
     var self = this;
