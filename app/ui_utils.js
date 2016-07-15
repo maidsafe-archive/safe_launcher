@@ -39,7 +39,6 @@ export default class UIUtils {
     this.proxy = proxy;
     this.proxyListener = new ProxyListener();
     this.onNetworkStateChange = null;
-    this.retryCount = 1;
   }
 
   // login
@@ -171,10 +170,8 @@ export default class UIUtils {
         }
         var status;
         if (err) {
-          self.retryCount++;
           status = window.NETWORK_STATE.DISCONNECTED;
         } else {
-          self.retryCount = 1;
           status = window.NETWORK_STATE.CONNECTED;
         }
         self.onNetworkStateChange(status);

@@ -18,19 +18,23 @@ window.safeLauncher = angular
     $rootScope.userInfo = {};
     $rootScope.keys = Object.keys;
     $rootScope.isAuthenticated = false;
+    $rootScope.isAuthLoading = false;
     $rootScope.currentAppDetails = null;
+    $rootScope.appVersion = require('./package.json').version;
     $rootScope.appList = {};
     $rootScope.logList = {};
     $rootScope.intervals = [];
+    $rootScope.retryCount = 1;
     $rootScope.dashData = {
       accountInfo: {
         used: 0,
         available: 0
       },
+      accountInfoLoading: false,
       accountInfoTime: new Date(),
       accountInfoTimeString: window.moment().fromNow(),
       accountInfoUpdateEnabled: true,
-      accountInfoUpdateTimeLeft: 0,
+      accountInfoUpdateTimeLeft: '00:00',
       getsCount: 0,
       deletesCount: 0,
       postsCount: 0,
@@ -40,6 +44,12 @@ window.safeLauncher = angular
       download: 0,
       authHTTPMethods: []
     };
+    $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
+      if ($rootScope.isAuthLoading) {
+        event.preventDefault();
+        return;
+      }
+    });
     var Queuing = function() {
       this.queue = [];
       this.isProcessing = false;

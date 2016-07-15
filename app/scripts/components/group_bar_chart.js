@@ -7,7 +7,7 @@ var GroupBarChart = React.createClass({
   },
   componentDidMount: function () {
     var margin = {top: 20, right: 30, bottom: 30, left: 40};
-    this.width = 650 - margin.left - margin.right;
+    this.width = 680 - margin.left - margin.right;
     this.height = 140 - margin.top - margin.bottom;
 
     this.BAR_WIDTH = 8;
@@ -55,7 +55,7 @@ var GroupBarChart = React.createClass({
       this.add(nextProps.data[nextProps.data.length - 1]);
   },
   render: function() {
-    return React.DOM.span({id: 'groupChart'}, null);
+    return React.DOM.span({id: 'groupChart', className: 'bar-chart-b'}, null);
   },
   add: function(d) {
     var self = this;

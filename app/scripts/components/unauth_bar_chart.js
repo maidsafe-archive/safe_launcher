@@ -44,7 +44,7 @@ var UnauthGETChart = React.createClass({
       this.add(nextProps.data[nextProps.data.length - 1]);
   },
   render: function() {
-    return React.DOM.span({id: 'barChart'});
+    return React.DOM.span({id: 'barChart', className: 'bar-chart-b'});
   },
   add: function(d) {
     var self = this;
