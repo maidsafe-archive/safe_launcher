@@ -1,5 +1,12 @@
 # SAFE Launcher Change Log
 
+##[0.6.0]
+ - New Launcher UI with dashboard and log history
+ - NFS Create File API updated
+ - User credentials merged to a single input
+ - Proxy bug fixes
+ - FFI process restart issue fix 
+
 ##[0.5.1]
  - Fix for DNS get file error
  - Hide status banner after log in
