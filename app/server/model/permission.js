@@ -10,6 +10,19 @@ export default class Permission {
     });
   }
 
+  isEqual(compareWith) {
+    compareWith = compareWith || [];
+    if (compareWith.length !== this.list.length) {
+      return false;
+    }
+    for (var i in compareWith) {
+      if (this.list.indexOf(compareWith[i]) < 0) {
+        return false;
+      }
+    }
+    return true;
+  };
+
   isValid() {
     let self = this;
     var permission = null;

@@ -1,5 +1,5 @@
 import { log } from './../../logger/log';
-
+import { updateAppActivity } from './../utils.js';
 var Readable = require('stream').Readable;
 var util = require('util');
 
@@ -25,10 +25,13 @@ util.inherits(DnsReader, Readable);
 DnsReader.prototype._read = function() {
   let self = this;
   if (self.curOffset === self.end) {
+    updateAppActivity(self.req, self.res, true);
     return self.push(null);
   }
   let MAX_SIZE_TO_READ = 1048576; // 1 MB
   let diff = this.end - this.curOffset;
+  let eventEmitter = self.req.app.get('eventEmitter');
+  let eventType = self.req.app.get('EVENT_TYPE').DATA_DOWNLOADED;
   this.sizeToRead = diff > MAX_SIZE_TO_READ ? MAX_SIZE_TO_READ : diff;
   this.req.app.get('api').dns.getFile(this.longName, this.serviceName, this.filePath, this.curOffset,
     this.sizeToRead, this.hasSafeDriveAccess, this.appDirKey,
@@ -36,9 +39,11 @@ DnsReader.prototype._read = function() {
       if (err) {
         self.push(null);
         log.error(err);
+        updateAppActivity(self.req, self.res);
         return self.res.end();
       }
       self.curOffset += self.sizeToRead;
       self.push(new Buffer(JSON.parse(data).content, 'base64'));
+      eventEmitter.emit(eventType, data.length);
     });
 };

@@ -1,97 +1,45 @@
-<div class="msl-auth" ng-controller="authController">
-  <!-- auth banner -->
-  <div class="msl-auth-bnr">
-    <img src="./images/launcher_rocket.svg" alt="Auth banner" />
-  </div><!-- /auth banner -->
-  <div class="msl-auth-b" ng-show="!authLoader.isLoading">
-    <!-- regiter -->
-    <div class="msl-form msl-layout-1" ng-init="tabs.init(); focusField('registerPin', 'pin');">
-      <div class="msl-form-nav">
-        <div class="msl-form-nav-i" ng-class="{active: tabs.currentPos === tabs.state[0]}" ng-click="tabs.changePos('PIN')">PIN</div>
-        <div class="msl-form-nav-i" ng-class="{active: tabs.currentPos === tabs.state[1]}" ng-click="tabs.changePos('KEYWORD')">Keyword</div>
-        <div class="msl-form-nav-i" ng-class="{active: tabs.currentPos === tabs.state[2]}" ng-click="tabs.changePos('PASSWORD')">Password</div>
+<div class="form-b" ng-controller="authController">
+  <div ng-show="!isAuthLoading">
+    <form class="form" name="registerForm" ng-submit="register()" ng-init="toggleView = confirmToggleView = false">
+      <div class="inp-grp password-validator">
+        <input id="password" type="password" name="password" required="true" ng-model="user.password" validate-password focus="true" />
+        <span class="preview" ng-show="toggleView" ng-bind="user.password"></span>
+        <label for="password">Account Password</label>
+        <div class="msg"></div>
+        <div class="opt">
+          <div class="opt-i">
+              <button type="button" class="btn eye" name="toggleView" ng-mousedown="toggleView = true" ng-mouseup="toggleView = false" ng-mouseleave="toggleView = false"></button>
+          </div>
+        </div>
+        <span class="strength"></span>
+        <div class="status">
+          <span class="txt" data-val="min"></span>
+        </div>
       </div>
-
-      <!-- pin base -->
-      <form name="registerPin" ng-show="tabs.currentPos === tabs.state[0]" ng-submit="validatePin()">
-        <!-- pin -->
-        <div class="msl-form-grp no-margin">
-          <input type="password" name="pin" placeholder="PIN"
-          ng-model="user.pin"/>
-          <span name="clear-btn" class="clear-btn"
-          ng-show="user.pin"
-          ng-click="resetInputField('pin', $event)"></span>
+      <div class="inp-grp">
+        <input id="confirmPassword" type="password" name="confirmPassword" required="true" ng-model="user.confirmPassword" target="password" field-match-validator />
+        <span class="preview" ng-show="confirmToggleView" ng-bind="user.confirmPassword"></span>
+        <label for="confirmPassword">Confirm Password</label>
+        <div class="msg">
+          <span class="txt"></span>
+          <span class="icn"></span>
         </div>
-        <!-- confirm pin -->
-        <div class="msl-form-grp">
-          <input type="password" name="confirmPin" placeholder="Confirm PIN" ng-model="user.confirmPin" />
-          <span name="clear-btn" class="clear-btn"
-          ng-show="user.confirmPin"
-          ng-click="resetInputField('confirmPin', $event)"></span>
+        <div class="opt">
+          <div class="opt-i">
+              <button type="button" class="btn eye" name="toggleView" ng-mousedown="confirmToggleView = true" ng-mouseup="confirmToggleView = false" ng-mouseleave="confirmToggleView = false"></button>
+          </div>
         </div>
-        <div class="form-err" ng-class="{onErr: formError}">{{ formError || '&nbsp;' }}</div>
-        <!-- register btn -->
-        <div class="msl-form-grp act-btn">
-          <button type="submit" name="validatePinBtn" class="msl-btn msl-btn-primary">Next</button>
-        </div>
-      </form>
-
-      <!-- keyword -->
-      <form name="registerKeyword" ng-show="tabs.currentPos === tabs.state[1]" ng-submit="validateKeyword()">
-        <!-- keyword -->
-        <div class="msl-form-grp no-margin">
-          <input type="password" name="keyword" ng-load="log()" placeholder="Keyword"
-          ng-model="user.keyword" />
-          <span name="clear-btn" class="clear-btn"
-          ng-show="user.keyword"
-          ng-click="resetInputField('keyword', $event)"></span>
-        </div>
-        <!-- confirm keyword -->
-        <div class="msl-form-grp">
-          <input type="password" name="confirmKeyword" placeholder="Confirm Keyword" ng-model="user.confirmKeyword"  />
-          <span name="clear-btn" class="clear-btn"
-          ng-show="user.confirmKeyword"
-          ng-click="resetInputField('confirmKeyword', $event)"></span>
-        </div>
-        <div class="form-err" ng-class="{onErr: formError}">{{ formError || '&nbsp;' }}</div>
-        <!-- register btn -->
-        <div class="msl-form-grp act-btn">
-          <button type="submit" name="validateKeywordBtn" class="msl-btn msl-btn-primary">Next</button>
-        </div>
-      </form>
-
-      <!-- password -->
-      <form name="registerPassword" ng-show="tabs.currentPos === tabs.state[2]" ng-submit="validatePassword()">
-        <!-- password -->
-        <div class="msl-form-grp no-margin">
-          <input type="password" name="password" id="password" placeholder="Password"
-          ng-model="user.password" />
-          <span name="clear-btn" class="clear-btn"
-          ng-show="user.password"
-          ng-click="resetInputField('password', $event)"></span>
-        </div>
-        <!-- confirm password -->
-        <div class="msl-form-grp">
-          <input type="password" name="confirmPassword"
-          placeholder="Confirm Password"
-          ng-model="user.confirmPassword" />
-          <span name="clear-btn" class="clear-btn"
-          ng-show="user.confirmPassword"
-          ng-click="resetInputField('confirmPassword', $event)"></span>
-        </div>
-        <div class="form-err" ng-class="{onErr: formError}">{{ formError || '&nbsp;' }}</div>
-        <!-- register btn -->
-        <div class="msl-form-grp act-btn">
-          <button type="submit" name="validatePasswordBtn" class="msl-btn msl-btn-primary">Register</button>
-        </div>
-      </form>
-    </div><!-- /regiter -->
-    <!-- footer -->
-    <div class="msl-footer">
-      <span class="msl-footer-split"></span>
-      Already have an account? <a ui-sref="login">Log In</a>
-    </div><!-- /footer -->
+      </div>
+      <div class="inp-btn">
+        <button id="createAcc" type="submit" class="btn primary" name="createAcc"
+          ng-disabled="user.password === '' || (user.password !== user.confirmPassword) || !isPasswordValid">Create Account</button>
+      </div>
+    </form>
+    <div class="form-f">
+      <div class="form-f-b">
+        Already have an account? <a ui-sref="app.account({currentPage: 'login'})">Login</a>
+      </div>
+    </div>
   </div>
-  <!-- auth loading -->
-  <ng-include src="'views/components/auth_loader.html'" ng-show="authLoader.isLoading" />
+  <ng-include src="'views/auth/loader.html'" ng-show="isAuthLoading"></ng-include>
 </div>
