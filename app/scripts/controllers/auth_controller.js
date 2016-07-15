@@ -38,7 +38,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     var onAuthResponse = function(err) {
       $rootScope.isAuthLoading = false;
       $scope.$applyAsync();
-      $rootScope.userInfo = $scope.user;
+      $rootScope.userInfo = $scope.user.password;
       $scope.user = {};
       if (err) {
         return $rootScope.$toaster.show({
@@ -60,37 +60,14 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
           isError: true
         }, function() {});
       }
-      var payload = $scope.user.password;
+      var passPhrase = $scope.user.password;
       var request = new Request(onAuthResponse);
       $scope.cancelRequest = request.cancel;
       $rootScope.isAuthLoading = true;
       request.execute(function(done) {
-        auth.register(payload, done);
+        auth.register(passPhrase, done);
       });
     };
-
-    // $scope.checkPin = function() {
-    //   if (!$scope.pinForm.$valid) {
-    //       return validateAuthFields($scope.pinForm, [ 'pin', 'cpin' ]);
-    //   }
-    //   $scope.registerTab.current = $scope.registerTab.tabs.KEYWORD;
-    //   $scope.$applyAsync();
-    // };
-    //
-    // $scope.checkKeyword = function() {
-    //   if (!$scope.keywordForm.$valid) {
-    //       return validateAuthFields($scope.keywordForm, [ 'keyword', 'ckeyword' ]);
-    //   }
-    //   $scope.registerTab.current = $scope.registerTab.tabs.PASSWORD;
-    //   $scope.$applyAsync();
-    // };
-    //
-    // $scope.checkPassword = function() {
-    //   if (!$scope.passwordForm.$valid) {
-    //       return validateAuthFields($scope.passwordForm, [ 'password', 'cpassword' ]);
-    //   }
-    //   register();
-    // };
 
     // user login
     $scope.login = function() {
@@ -101,17 +78,12 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
           isError: true
         }, function() {});
       }
-      if (!$scope.loginForm.$valid) {
-          return validateAuthFields($scope.loginForm, [ 'pin', 'keyword', 'password' ]);
-      }
       var request = new Request(onAuthResponse);
       $scope.cancelRequest = request.cancel;
       $rootScope.isAuthLoading = true;
       request.execute(function(done) {
-        auth.login($scope.user, done);
+        auth.login($scope.user.password, done);
       });
     };
-
-    // $scope.registerTab.init();
   }
 ]);

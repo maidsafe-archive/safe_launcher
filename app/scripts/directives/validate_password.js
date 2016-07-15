@@ -1,6 +1,6 @@
 // validate form fields on change
-window.safeLauncher.directive('validatePassword', [ 'CONSTANTS', 'MESSAGES',
-  function($constant, $msg) {
+window.safeLauncher.directive('validatePassword', [ 'CONSTANTS', 'MESSAGES', '$rootScope',
+  function($constant, $msg, $rootScope) {
     var onChange = function(scope, ele, attr, ctrl) {
       var msgEle = ele.siblings('.msg');
       var parent = ele.parent();
@@ -52,6 +52,8 @@ window.safeLauncher.directive('validatePassword', [ 'CONSTANTS', 'MESSAGES',
             break;
           default:
         }
+        $rootScope.isPasswordValid = !parent.hasClass('error');
+        $rootScope.$applyAsync();
         strengthEle.width(Math.min((Math.floor(guesses_log10)  * 5), 100) + '%');
       });
     };

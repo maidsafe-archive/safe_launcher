@@ -160,11 +160,11 @@ export default class UIUtils {
     this.onNetworkStateChange = callback;
   }
 
-  reconnect(user) {
+  reconnect(passPhrase) {
     var self = this;
     this.api.reset();
-    if (user && Object.keys(user).length > 0) {
-      this.api.auth.login(user.pin, user.keyword, user.password, function(err) {
+    if (passPhrase) {
+      this.api.auth.login(passPhrase, function(err) {
         if (!self.onNetworkStateChange) {
           return;
         }

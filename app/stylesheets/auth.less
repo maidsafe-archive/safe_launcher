@@ -12,28 +12,36 @@
       margin: 0 auto;
     }
     .form-f {
+      width: 100%;
       margin-top: 50px;
-      border-top: 1px solid rgba(0, 0, 0, 0.4);
       display: block;
-      padding: 12px 0 0;
       font-size: 14px;
       color: #212121;
-      a {
-        text-decoration: none;
-        color: @primary-blue;
-        font-weight: 600;
-        text-transform: uppercase;
-        outline: 0;
-        padding: 5px;
-        &:hover {
-          color: @primary-blue-hover;
-        }
-        &:active {
-          color: @primary-blue-action;
-        }
-        &:focus {
-          color: @primary-blue-hover;
-          text-decoration: underline;
+      position: absolute;
+      bottom: 60px;
+      left: 0;
+      .form-f-b {
+        width: 70%;
+        padding: 12px 0 0;
+        margin: 0 auto;
+        border-top: 1px solid rgba(0, 0, 0, 0.4);
+        a {
+          text-decoration: none;
+          color: @primary-blue;
+          font-weight: 600;
+          text-transform: uppercase;
+          outline: 0;
+          padding: 5px;
+          &:hover {
+            color: @primary-blue-hover;
+          }
+          &:active {
+            color: @primary-blue-action;
+          }
+          &:focus {
+            color: @primary-blue-hover;
+            text-decoration: underline;
+          }
         }
       }
     }
@@ -44,7 +52,7 @@
   width: 300px;
   margin: 0 auto;
   .inp-grp {
-    margin-top: 18px;
+    margin-top: 24px;
     text-align: left;
     position: relative;
     label {
@@ -88,6 +96,7 @@
       position: absolute;
       right: 0;
       bottom: 22px;
+      z-index: 98;
       .opt-i {
         button.eye {
           width: 24px;
@@ -113,7 +122,7 @@
         .icn {
           width: 20px;
           height: 20px;
-          display: inline-block;
+          display: none;
           position: absolute;
           top: 0;
           right: 0;
@@ -143,6 +152,16 @@
       }
       input[type=password]:focus ~ .opt, input[type=password]:valid ~ .opt {
         display: block;
+      }
+      .preview {
+        width: 100%;
+        line-height: 32px;
+        background-color: #EAEAEA;
+        position: absolute;
+        top: -2px;
+        left: 0;
+        display: block;
+        z-index: 9;
       }
   }
   .inp-btn {
@@ -174,6 +193,7 @@
     position: absolute;
     bottom: 20px;
     left: 0;
+    z-index: 98;
   }
   .status {
     margin-left: -12px;
@@ -181,6 +201,7 @@
     position: absolute;
     left: 75%;
     bottom: 0;
+    z-index: 98;
     &:before {
       content: '';
       width: 2px;

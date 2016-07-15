@@ -2,13 +2,13 @@
   <div ng-show="!isAuthLoading">
     <form class="form" name="registerForm" ng-submit="register()" ng-init="toggleView = confirmToggleView = false">
       <div class="inp-grp password-validator">
-        <input id="password" type="password" ng-show="!toggleView" name="password" required="true" ng-model="user.password" validate-password focus="true" />
-        <input type="text" name="clonePassword" ng-show="toggleView" ng-value="user.password" />
+        <input id="password" type="password" name="password" required="true" ng-model="user.password" validate-password focus="true" />
+        <span class="preview" ng-show="toggleView" ng-bind="user.password"></span>
         <label for="password">Account Password</label>
         <div class="msg"></div>
         <div class="opt">
           <div class="opt-i">
-              <button type="button" class="btn eye" name="toggleView" ng-mousedown="toggleView = true" ng-mouseup="toggleView = false"></button>
+              <button type="button" class="btn eye" name="toggleView" ng-mousedown="toggleView = true" ng-mouseup="toggleView = false" ng-mouseleave="toggleView = false"></button>
           </div>
         </div>
         <span class="strength"></span>
@@ -17,8 +17,8 @@
         </div>
       </div>
       <div class="inp-grp">
-        <input id="confirmPassword" type="password" ng-show="!confirmToggleView"  name="confirmPassword" required="true" ng-model="user.confirmPassword" target="password" field-match-validator />
-        <input type="text" name="cloneConfirmPassword" ng-show="confirmToggleView" ng-value="user.confirmPassword" />
+        <input id="confirmPassword" type="password" name="confirmPassword" required="true" ng-model="user.confirmPassword" target="password" field-match-validator />
+        <span class="preview" ng-show="confirmToggleView" ng-bind="user.confirmPassword"></span>
         <label for="confirmPassword">Confirm Password</label>
         <div class="msg">
           <span class="txt"></span>
@@ -26,16 +26,19 @@
         </div>
         <div class="opt">
           <div class="opt-i">
-              <button type="button" class="btn eye" name="toggleView" ng-mousedown="confirmToggleView = true" ng-mouseup="confirmToggleView = false"></button>
+              <button type="button" class="btn eye" name="toggleView" ng-mousedown="confirmToggleView = true" ng-mouseup="confirmToggleView = false" ng-mouseleave="confirmToggleView = false"></button>
           </div>
         </div>
       </div>
       <div class="inp-btn">
-        <button type="submit" class="btn primary" name="createAcc" ng-disabled="user.password !== user.confirmPassword">Create Account</button>
+        <button id="createAcc" type="submit" class="btn primary" name="createAcc"
+          ng-disabled="user.password === '' || (user.password !== user.confirmPassword) || !isPasswordValid">Create Account</button>
       </div>
     </form>
     <div class="form-f">
-      Already have an account? <a ui-sref="app.account({currentPage: 'login'})">Login</a>
+      <div class="form-f-b">
+        Already have an account? <a ui-sref="app.account({currentPage: 'login'})">Login</a>
+      </div>
     </div>
   </div>
   <ng-include src="'views/auth/loader.html'" ng-show="isAuthLoading"></ng-include>
