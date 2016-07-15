@@ -1,32 +1,37 @@
 <div class="form-b" ng-controller="authController">
   <div ng-show="!isAuthLoading">
-    <form class="form" name="registerForm" ng-submit="register()">
+    <form class="form" name="registerForm" ng-submit="register()" ng-init="toggleView = confirmToggleView = false">
+      <div class="inp-grp password-validator">
+        <input id="password" type="password" ng-show="!toggleView" name="password" required="true" ng-model="user.password" validate-password focus="true" />
+        <input type="text" name="clonePassword" ng-show="toggleView" ng-value="user.password" />
+        <label for="password">Account Password</label>
+        <div class="msg"></div>
+        <div class="opt">
+          <div class="opt-i">
+              <button type="button" class="btn eye" name="toggleView" ng-mousedown="toggleView = true" ng-mouseup="toggleView = false"></button>
+          </div>
+        </div>
+        <span class="strength"></span>
+        <div class="status">
+          <span class="txt" data-val="min"></span>
+        </div>
+      </div>
       <div class="inp-grp">
-        <input id="pin" type="password" name="pin" required="true" ng-model="user.pin" field-validator focus="true" />
-        <label for="pin">PIN</label>
+        <input id="confirmPassword" type="password" ng-show="!confirmToggleView"  name="confirmPassword" required="true" ng-model="user.confirmPassword" target="password" field-match-validator />
+        <input type="text" name="cloneConfirmPassword" ng-show="confirmToggleView" ng-value="user.confirmPassword" />
+        <label for="confirmPassword">Confirm Password</label>
         <div class="msg">
           <span class="txt"></span>
           <span class="icn"></span>
         </div>
-      </div>
-      <div class="inp-grp">
-        <input id="keyword" type="password" name="keyword" required="true" ng-model="user.keyword" field-validator />
-        <label for="keyword">Keyword</label>
-        <div class="msg">
-          <span class="txt"></span>
-          <span class="icn"></span>
-        </div>
-      </div>
-      <div class="inp-grp">
-        <input id="password" type="password" name="password" required="true" ng-model="user.password" field-validator />
-        <label for="password">Password</label>
-        <div class="msg">
-          <span class="txt"></span>
-          <span class="icn"></span>
+        <div class="opt">
+          <div class="opt-i">
+              <button type="button" class="btn eye" name="toggleView" ng-mousedown="confirmToggleView = true" ng-mouseup="confirmToggleView = false"></button>
+          </div>
         </div>
       </div>
       <div class="inp-btn">
-        <button type="submit" class="btn primary" name="register">Register</button>
+        <button type="submit" class="btn primary" name="createAcc" ng-disabled="user.password !== user.confirmPassword">Create Account</button>
       </div>
     </form>
     <div class="form-f">

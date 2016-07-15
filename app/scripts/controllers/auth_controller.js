@@ -7,22 +7,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     var REQUEST_TIMEOUT = 90 * 1000;
     var FIELD_FOCUS_DELAY = 100;
     $scope.user = {};
-    // $scope.registerTab = {
-    //   tabs: {
-    //     PIN: 'pin',
-    //     KEYWORD: 'keyword',
-    //     PASSWORD: 'password'
-    //   },
-    //   current: null,
-    //   setCurrent: function(pos) {
-    //     this.current = pos;
-    //   },
-    //   init: function() {
-    //     this.current = this.tabs.PIN;
-    //     $scope.$applyAsync();
-    //   }
-    // };
-
     var Request = function(callback) {
       var self = this;
       var alive = true;
@@ -67,82 +51,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       console.log('Authorised successfully!');
     };
 
-    var focusField = function(form, field) {
-      $('form[name=' + form + ']').find('input[name=""]')
-      return true;
-    };
-
-    var validateAuthFields = function(form, fields) {
-      var formEle = null;
-      var inputEle = null;
-      var inputParent = null;
-      var msgEle = null;
-      var value = null;
-      var reset = function(target) {
-        formEle = $('form[name=' + form.$name + ']');
-        inputEle = formEle.find('input[name=' + form[target].$name + ']');
-        inputParent = inputEle.parent();
-        msgEle = inputEle.siblings('.msg').children('.txt');
-        value = form[target].$viewValue;
-        inputParent.removeClass('warn error');
-      };
-
-      var check = function(field) {
-        switch (field) {
-          case 'pin':
-            if (isNaN(value) || value.length < CONSTANTS.PIN_MIN_LEN) {
-              inputParent.addClass('error').removeClass('warn');
-              msgEle.text(MESSAGES.PIN_MUST_BE_FOUR_CHAR_LONG_AND_NUM);
-              return;
-            }
-            break;
-          case 'keyword':
-            if (value.length < CONSTANTS.KEYWORD_MIN_LEN) {
-              inputParent.addClass('error').removeClass('warn');
-              msgEle.text(MESSAGES.KEYWORD_MUST_BE_SIX_CHAR_LONG);
-              return;
-            }
-            break;
-          case 'password':
-            if (value.length < CONSTANTS.PASSWORD_MIN_LEN) {
-              inputParent.addClass('error').removeClass('warn');
-              msgEle.text(MESSAGES.PASSWORD_MUST_BE_SIX_CHAR_LONG);
-              return;
-            }
-            break;
-          case 'cpin':
-            if (value !== $scope.user.pin) {
-              inputParent.addClass('error').removeClass('warn');
-              return msgEle.text(MESSAGES.ENTRIES_DONT_MATCH);
-            }
-            break;
-          case 'ckeyword':
-            if (value !== $scope.user.keyword) {
-              inputParent.addClass('error').removeClass('warn');
-              return msgEle.text(MESSAGES.ENTRIES_DONT_MATCH);
-            }
-            break;
-          case 'cpassword':
-            if (value !== $scope.user.password) {
-              inputParent.addClass('error').removeClass('warn');
-              return msgEle.text(MESSAGES.ENTRIES_DONT_MATCH);
-            }
-            break;
-          default:
-            return true;
-        }
-        return true;
-      };
-
-      for(var i in fields) {
-        field = fields[i];
-        reset(field);
-        if (!check(field)) {
-          break;
-        }
-      }
-    };
-
     // user register
     $scope.register = function() {
       if ($rootScope.$networkStatus.status !== window.NETWORK_STATE.CONNECTED) {
@@ -152,14 +60,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
           isError: true
         }, function() {});
       }
-      if (!$scope.registerForm.$valid) {
-          return validateAuthFields($scope.registerForm, [ 'pin', 'keyword', 'password' ]);
-      }
-      var payload = {
-        pin: $scope.user.pin,
-        keyword: $scope.user.keyword,
-        password: $scope.user.password
-      };
+      var payload = $scope.user.password;
       var request = new Request(onAuthResponse);
       $scope.cancelRequest = request.cancel;
       $rootScope.isAuthLoading = true;
