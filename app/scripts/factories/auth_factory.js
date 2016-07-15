@@ -6,13 +6,13 @@ window.safeLauncher.factory('authFactory', [ 'serverFactory',
     var self = this;
 
     // Login
-    self.login = function(user, callback) {
-      window.msl.login(user.pin, user.keyword, user.password, callback);
+    self.login = function(passPhrase, callback) {
+      window.msl.login(passPhrase, callback);
     };
 
     // Register
-    self.register = function(user, callback) {
-      window.msl.register(user.pin, user.keyword, user.password, callback);
+    self.register = function(passPhrase, callback) {
+      window.msl.register(passPhrase, callback);
     };
 
     self.onAuthorisationReq = server.onAuthRequest;

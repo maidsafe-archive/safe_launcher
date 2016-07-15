@@ -14,7 +14,7 @@ window.safeLauncher.directive('fieldMatchValidator', [ 'CONSTANTS', 'MESSAGES',
       }
       ele.bind('keyup', function(e) {
         ctrl.$setValidity('fieldValidator', false);
-        parent.addClass('warn');
+        parent.addClass('error');
         value = e.target.value;
         if (!value) {
           return resetField();

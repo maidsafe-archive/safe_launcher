@@ -21,28 +21,30 @@ var UploadDownloadPieChart = React.createClass({
       return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
   },
   render: function() {
+    this.dataAvailable = ((this.props.download !== 0) || (this.props.upload !== 0));
     return React.DOM.span({className: 'pie-chart-b'}, [
       React.DOM.div({className: 'legends'}, [
         React.DOM.div({className: 'legends-i download'}, [
-          React.DOM.div({className: 'legends-i-name'}, 'Download'),
-          React.DOM.div({className: 'legends-i-val'}, this.bytesToSize(this.props.download))
+          React.DOM.div({className: 'legends-i-name'}, 'Total Data Downloaded:'),
+          React.DOM.div({className: 'legends-i-val'}, (this.dataAvailable ? this.bytesToSize(this.props.download) : 'No data yet.'))
         ]),
         React.DOM.div({className: 'legends-i upload'}, [
-          React.DOM.div({className: 'legends-i-name'}, 'Upload'),
-          React.DOM.div({className: 'legends-i-val'}, this.bytesToSize(this.props.upload))
+          React.DOM.div({className: 'legends-i-name'}, 'Total Data Upload:'),
+          React.DOM.div({className: 'legends-i-val'}, (this.dataAvailable ? this.bytesToSize(this.props.upload) : 'No data yet.'))
         ])
       ])
     ]);
   },
   initD3: function() {
-    var width = 105;
-    var height = 105;
+    var width = 100;
+    var height = 100;
+    var padding = 10;
     var radius = Math.min(width, height) / 2;
     this.colours = ["#5592d7", "#f7b558"];
-    this.arc = d3.arc()
-    .outerRadius(radius)
+    this.arc = d3.svg.arc()
+    .outerRadius(radius - (padding/2))
     .innerRadius(0);
-    this.pie = d3.pie()
+    this.pie = d3.layout.pie()
     .sort(null)
     .value(function(d) { return d; });
     this.svg = d3.select(ReactDOM.findDOMNode(this)).insert("svg:svg")
@@ -53,6 +55,9 @@ var UploadDownloadPieChart = React.createClass({
     this.update([this.props.download, this.props.upload]);
   },
   update: function(data) {
+    if (!this.dataAvailable) {
+      return this.defaultView();
+    }
     var self = this;
     this.svg.selectAll(".arc").remove();
     var g = this.svg.selectAll(".arc")
@@ -63,6 +68,21 @@ var UploadDownloadPieChart = React.createClass({
     g.append("path")
         .attr("d", this.arc)
         .style("fill", function(d, i) { return self.colours[i]; });
+  },
+  defaultView: function() {
+    var defaultColor = '#d6d6d6';
+    var strokeColor = '#212121';
+    var strokeWidth = 2;
+    this.svg.selectAll(".arc").remove();
+    var g = this.svg.selectAll(".arc")
+               .data(this.pie([1]))
+               .enter().append("g")
+               .attr("class", "arc");
+   g.append("path")
+       .attr("d", this.arc)
+       .style("fill", defaultColor)
+       .style('stroke', strokeColor)
+       .style('stroke-width', strokeWidth);
   }
 });
 

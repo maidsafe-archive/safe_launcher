@@ -7,6 +7,7 @@ var AppLogs = React.createClass({
     table: React.PropTypes.string
   },
   render: function() {
+    var self = this;
     var rows = [];
     var row = null;
     var STATUS_CLASS = {
@@ -19,6 +20,7 @@ var AppLogs = React.createClass({
       1: 'SUCCESS',
       '-1': 'FAILURE'
     };
+
     var tableHead = React.DOM.thead(null,
       React.DOM.tr(null,
         React.DOM.th(null, 'App Name'),
@@ -27,15 +29,25 @@ var AppLogs = React.createClass({
         React.DOM.th(null, 'Time Sent')
       )
     );
-    var list = null;
-    if (!this.props.list || Object.keys(this.props.list).length === 0) {
+
+    var listKeys = this.props.list ? Object.keys(this.props.list) : [];
+    if (listKeys.length === 0) {
       return React.DOM.span(null, null);
     }
-    for (var i in this.props.list) {
-      list = this.props.list[i];
+
+    var listArr = [];
+    listKeys.map(function(key) {
+      listArr.push(self.props.list[key]);
+    });
+    listArr.sort(function(a, b) {
+      var aTime = new Date(a.beginTime).getTime();
+      var bTime = new Date(b.beginTime).getTime();
+      return aTime < bTime;
+    });
+    listArr.map(function(list, i) {
       list['status'] = STATUS_CODE[list.activityStatus];
-      if ((this.props.filter.length === 0) || (this.props.filter.indexOf(list.status) === -1)) {
-        continue;
+      if ((self.props.filter.length === 0) || (self.props.filter.indexOf(list.status) === -1)) {
+        return;
       }
       row = React.DOM.tr({key: i, className: STATUS_CLASS[list.status]}, [
         React.DOM.td({key: 'td-name-' + i}, list.appName),
@@ -44,7 +56,7 @@ var AppLogs = React.createClass({
         React.DOM.td({key: 'td-time-' + i}, window.moment(list.beginTime).format('HH:mm:ss'))
       ]);
       rows.push(row);
-    }
+    });
     return React.DOM.div({key: 'inner-b', className: 'table-inner-b'}, [
       React.DOM.table({key: 'table', className: this.props.table},
         tableHead,

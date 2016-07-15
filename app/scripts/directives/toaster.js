@@ -45,7 +45,13 @@ window.safeLauncher.directive('toaster', [ '$rootScope', '$interval', 'CONSTANTS
         return;
       }
       process();
-    })
+    });
+    scope.handleClick = function() {
+      if (timer) {
+        $interval.cancel(timer);
+      }
+      scope.callback();
+    }
   };
 
   return {
