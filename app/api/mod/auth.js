@@ -7,28 +7,24 @@ export default class Auth {
     this.MODULE = 'auth';
   }
 
-  register(pin, keyword, password, callback) {
+  register(passPhrase, callback) {
     log.debug('Invoking Auth::register API');
     this.send({
       module: this.MODULE,
       action: 'register',
       params: {
-        keyword: keyword,
-        pin: pin,
-        password: password
+        phrase: passPhrase
       }
     }, callback);
   }
 
-  login(pin, keyword, password, callback) {
+  login(passPhrase, callback) {
     log.debug('Invoking Auth::login API');
     this.send({
       module: this.MODULE,
       action: 'login',
       params: {
-        keyword: keyword,
-        pin: pin,
-        password: password
+        phrase: passPhrase
       }
     }, callback);
   }

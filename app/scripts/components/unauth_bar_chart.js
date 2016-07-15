@@ -1,36 +1,32 @@
 var React = window.React;
 var ReactDOM = window.ReactDOM;
-var d3 = window.d3;
+var d3 = require('d3');
 var UnauthGETChart = React.createClass({
   propTypes: {
     data: React.PropTypes.array
   },
   componentDidMount: function () {
     var margin = {
-      top: 12,
-      left: 12,
-      right: 35,
-      bottom: 25
+      top: 20,
+      right: 20,
+      bottom: 30,
+      left: 40
     };
-    var padding = 24;
-    var containerWidth = 670;
-    var containerHeight = 134;
-    this.BAR_WIDTH = 16;
-    this.GUTTER_WIDTH = 2;
-    this.OFFSET_TO_MAX_VALUE = 5;
-    this.BAR_POSITION_OFFSET = (this.BAR_WIDTH - this.GUTTER_WIDTH) / 2;
-    this.container = d3.select(ReactDOM.findDOMNode(this)).insert("svg:svg")
-    .attr('width', containerWidth)
-    .attr('height', containerHeight)
-    .style('background-color', '#eaeaea')
-    .append("svg:g");
-    this.container = this.container.append('g')
-    .attr('transform', 'translate(' + (padding + margin.left) + ',' + margin.top + ')');
-    this.height = containerHeight - margin.top - margin.bottom;
-    this.width = containerWidth - margin.right - margin.left;
-    this.MAX_BARS = Math.floor(this.width / this.BAR_WIDTH);
-    this.data = [ 0, 0 ];
-    this.actualDataSize = 0;
+    this.width = 670 - margin.left - margin.right;
+    this.height = 140 - margin.top - margin.bottom;
+
+    var BAR_WIDTH = 10;
+    var GUTTER_SCALE = 0.2;
+    this.actualData = [];
+    this.MAX_BARS = Math.floor((this.width - (this.width / (GUTTER_SCALE * 10))) / BAR_WIDTH) + 1;
+    this.svg = d3.select(ReactDOM.findDOMNode(this))
+                .append("svg")
+                .attr("width", this.width + margin.left + margin.right)
+                .attr("height", this.height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");;
+    this.x = d3.scale.ordinal().rangeRoundBands([0, this.width], GUTTER_SCALE);
+    this.y = d3.scale.linear().range([this.height, 0]);
     this.add();
 
     var tempData = this.props.data;
@@ -50,56 +46,93 @@ var UnauthGETChart = React.createClass({
   render: function() {
     return React.DOM.span({id: 'barChart', className: 'bar-chart-b'});
   },
-  add: function(entry) {
+  add: function(d) {
     var self = this;
-    if (entry !== undefined) {
-      this.data.splice(1, 0, entry);
-      if (this.actualDataSize < this.MAX_BARS) {
-        this.actualDataSize++;
+    var data = [];
+      if (d != null) {
+        self.actualData.splice(0, 0, d);
+        if (self.actualData.length > self.MAX_BARS) {
+          self.actualData.pop();
+        }
       }
-    }
-    if (this.data.length > this.MAX_BARS) {
-      this.data.splice(this.data.length - 2, 1);
-    } else {
-      while (this.data.length <= this.MAX_BARS) {
-        this.data.splice(this.data.length - 1, 0, 0);
+      for (var i in self.actualData) {
+        data.push(self.actualData[i]);
       }
-    }
-    var xRange = this.data.map(function(d, i) {
-      return self.width - ((self.data.length - i) * self.BAR_WIDTH);
-    });
-    var xScale = d3.scaleOrdinal().range(xRange);
-    var yScale = d3.scaleLinear().range([ this.height, 0 ]);
-    xScale.domain(this.data.map(function(d, i) { return self.data.length - i - 1; }));
-    yScale.domain([ 0, d3.max(this.data, function(d) {return d + self.OFFSET_TO_MAX_VALUE;}) ]);
-    this.container.selectAll('g').remove();
-    var groups = this.container.selectAll("g")
-                  .data(this.data)
-                  .enter().append("g")
-                  .attr("transform", function(d, i) {
-                    return "translate(" + (xScale(i) - self.BAR_POSITION_OFFSET) + ", 0)";
-                  });
-    groups.append('rect')
-            .attr("y", function(d) { return yScale(d); })
-            .attr("height", function(d) { return self.height - yScale(d); })
-            .attr("width", this.BAR_WIDTH - this.GUTTER_WIDTH)
-            .attr('class', 'svg-get');
-    var xAxis = d3.axisBottom().scale(xScale).tickValues(xScale.domain().filter(function(d) {
-        return (self.actualDataSize === d) || (self.actualDataSize >= d) && !(d % 4);
-      })).tickFormat(function(d) { return d === 0 ? '' : '-' + d + 'm'});
-    var yAxisLeft = d3.axisLeft().scale(yScale).ticks(5);
-    var yAxisRight = d3.axisRight().scale(yScale).tickValues('');
-    this.container.append("g")
-        .attr("class", "x-axis")
-        .attr("transform", "translate(0," + this.height + ")")
-        .call(xAxis);
-    this.container.append("g")
-      .attr("class", "y axis")
-      .call(yAxisLeft);
-    this.container.append("g")
-      .attr("class", "y axis")
-      .attr("transform", 'translate(' + (this.width - this.BAR_WIDTH - this.GUTTER_WIDTH) + ',' + 0 + ")")
-      .call(yAxisRight);
+      while (data.length < self.MAX_BARS) {
+        data.push(0);
+      }
+
+      this.x.domain(d3.range(self.MAX_BARS).reverse());
+      this.y.domain([0, (d3.max(data, function(d) { return d; }) + 10) ]);
+
+      var xAxis = d3.svg.axis()
+          .scale(self.x)
+          .orient("bottom")
+          .tickFormat(function(d) { return '-' + (d+1) + 'm'})
+          .tickValues(self.x.domain().filter(function(d) {
+            return d !== 0 && !((d + 1)% 4);
+          }))
+          .outerTickSize(0);
+      var yAxis = d3.svg.axis()
+          .scale(self.y)
+          .orient("left")
+          .ticks(5)
+          .outerTickSize(0);
+      var yAxisRight = d3.svg.axis()
+          .scale(self.y)
+          .orient("right")
+          .ticks(0)
+          .outerTickSize(0);
+
+      self.svg.selectAll('g').remove();
+      self.svg.selectAll('rect').remove();
+
+      self.svg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + self.height + ")")
+          .call(xAxis);
+
+      self.svg.append("g")
+          .attr("class", "y axis")
+          .call(yAxis)
+          .append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end").text('Count');
+
+      self.svg.append("g")
+          .attr("class", "y axis")
+          .attr("transform", "translate(" + self.width + "," + 0 + ")")
+          .call(yAxisRight);
+
+
+      self.svg.select('.x.axis').transition().duration(300).call(xAxis);
+
+      self.svg.select(".y.axis").transition().duration(300).call(yAxis)
+
+      var bars = self.svg.selectAll(".bar").data(data);
+
+      bars.exit()
+        .transition()
+        .duration(0)
+        .attr("y", self.y(0))
+        .attr("height", self.height - self.y(0))
+        .style('fill-opacity', 1e-6)
+        .remove();
+
+      bars.enter().append("rect")
+        .attr("class", "svg-get")
+        .attr("y", self.y(0))
+        .attr("height", self.height - self.y(0));
+
+      bars.transition().duration(0)
+          .attr("x", function(d,i) { return self.x(i); })
+          .attr("width", self.x.rangeBand())
+          .attr("y", self.y)
+          .attr("height", function(d, i) {
+            return self.height - self.y(d);
+          });
   }
 });
 window.safeLauncher.value('UnauthGETChart', UnauthGETChart);

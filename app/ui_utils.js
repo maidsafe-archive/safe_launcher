@@ -42,14 +42,14 @@ export default class UIUtils {
   }
 
   // login
-  login(pin, keyword, password, callback) {
-    this.api.auth.login(String(pin), keyword, password, callback);
+  login(passPhrase, callback) {
+    this.api.auth.login(passPhrase, callback);
   }
 
   // register
-  register(pin, keyword, password, callback) {
+  register(passPhrase, callback) {
     var self = this;
-    this.api.auth.register(String(pin), keyword, password, function(err) {
+    this.api.auth.register(passPhrase, function(err) {
       if (err) {
         return callback(err);
       }

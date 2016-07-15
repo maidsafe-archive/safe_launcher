@@ -180,7 +180,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       $state.go('app', {isFirstLogin: true});
     };
 
-    $scope.checkProxy = function() {
+    var checkProxy = function() {
       if ($state.params.hasOwnProperty('isFirstLogin') && $state.params.isFirstLogin) {
         return;
       }
@@ -207,6 +207,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
           $scope.updateUserAccount();
           $scope.pollUserAccount();
         } else {
+          checkProxy();
           $scope.fetchStatsForUnauthorisedClient();
         }
         $rootScope.retryCount = 1;

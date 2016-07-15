@@ -1,7 +1,7 @@
 # safe_launcher
 
 # Quick start
-he development dependency of this project is [Node.js v5.5](https://nodejs.org/download/release/v5.5.0/).
+The development dependency of this project is [Node.js v5.5](https://nodejs.org/download/release/v5.5.0/).
 Build [safe_core](https://github.com/maidsafe/safe_core) with the mock Routing feature:
  
 ```
