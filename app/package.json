@@ -9,9 +9,10 @@
   "main": "background.js",
   "dependencies": {
     "angular": "^1.5.7",
+    "base64-url": "^1.2.2",
     "body-parser": "~1.13.2",
     "chart.js": "^1.1.1",
-    "d3": "^4.1.1",
+    "d3": "3.5.17",
     "express": "^4.13.4",
     "ffi": "^2.0.0",
     "fs-extra": "^0.30.0",

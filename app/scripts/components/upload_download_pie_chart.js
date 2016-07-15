@@ -39,10 +39,10 @@ var UploadDownloadPieChart = React.createClass({
     var height = 105;
     var radius = Math.min(width, height) / 2;
     this.colours = ["#5592d7", "#f7b558"];
-    this.arc = d3.arc()
+    this.arc = d3.svg.arc()
     .outerRadius(radius)
     .innerRadius(0);
-    this.pie = d3.pie()
+    this.pie = d3.layout.pie()
     .sort(null)
     .value(function(d) { return d; });
     this.svg = d3.select(ReactDOM.findDOMNode(this)).insert("svg:svg")
