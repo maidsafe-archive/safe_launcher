@@ -98,15 +98,16 @@
       bottom: 22px;
       z-index: 98;
       .opt-i {
-        button.eye {
+        .eye {
           width: 24px;
           height: 24px;
+          display: inline-block;
           background-color: transparent;
           background-image: url(../images/show_password.svg);
           &:hover {
             background-image: url(../images/show_password_hover.svg);
           }
-          &:active {
+          &.active {
             background-image: url(../images/show_password_active.svg);
           }
         }
