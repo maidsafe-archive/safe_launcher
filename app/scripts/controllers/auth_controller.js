@@ -1,9 +1,9 @@
 /**
  * Authentication Controller
  */
-window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootScope',
+window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootScope', '$timeout',
   'authFactory', 'CONSTANTS', 'MESSAGES',
-  function($scope, $state, $rootScope, auth, CONSTANTS, MESSAGES) {
+  function($scope, $state, $rootScope, $timeout, auth, CONSTANTS, MESSAGES) {
     var REQUEST_TIMEOUT = 90 * 1000;
     var FIELD_FOCUS_DELAY = 100;
     $scope.user = {};
