@@ -11,7 +11,7 @@
         </div>
         <div class="opt">
           <div class="opt-i">
-              <button type="button" class="btn eye" name="toggleView" ng-mousedown="toggleView = true" ng-mouseup="toggleView = false" ng-mouseleave="toggleView = false"></button>
+              <span class="eye" ng-class="{active: toggleView}" ng-click="toggleView = !toggleView"></span>
           </div>
         </div>
       </div>

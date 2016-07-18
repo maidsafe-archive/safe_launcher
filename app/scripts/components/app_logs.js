@@ -40,8 +40,8 @@ var AppLogs = React.createClass({
       listArr.push(self.props.list[key]);
     });
     listArr.sort(function(a, b) {
-      var aTime = new Date(a.beginTime).getTime();
-      var bTime = new Date(b.beginTime).getTime();
+      var aTime = a.endTime ? new Date(a.endTime).getTime() : new Date(a.beginTime).getTime();
+      var bTime = b.endTime ? new Date(b.endTime).getTime() : new Date(b.beginTime).getTime();
       return aTime < bTime;
     });
     listArr.map(function(list, i) {

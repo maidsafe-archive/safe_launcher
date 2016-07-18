@@ -24,7 +24,9 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       }
     };
     var updateAccountInfoTimer = null;
+
     eventRegistry.init();
+    
     // handle proxy localy
     $rootScope.setProxy = function(status) {
       window.localStorage.setItem('proxy', JSON.stringify({status: Boolean(status)}));

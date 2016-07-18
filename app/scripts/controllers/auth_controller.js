@@ -1,12 +1,13 @@
 /**
  * Authentication Controller
  */
-window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootScope', '$timeout',
-  'authFactory', 'fieldValidator', 'CONSTANTS', 'MESSAGES',
-  function($scope, $state, $rootScope, $timeout, auth, validator, CONSTANTS, MESSAGES) {
+window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootScope',
+  'authFactory', 'CONSTANTS', 'MESSAGES',
+  function($scope, $state, $rootScope, auth, CONSTANTS, MESSAGES) {
     var REQUEST_TIMEOUT = 90 * 1000;
     var FIELD_FOCUS_DELAY = 100;
     $scope.user = {};
+    $scope.passwordValid = false;
     var Request = function(callback) {
       var self = this;
       var alive = true;
@@ -84,6 +85,10 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       request.execute(function(done) {
         auth.login($scope.user.password, done);
       });
+    };
+
+    $scope.checkPasswordValid = function(result) {
+      $scope.passwordValid = result;
     };
   }
 ]);

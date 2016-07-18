@@ -52,12 +52,17 @@ window.safeLauncher.directive('validatePassword', [ 'CONSTANTS', 'MESSAGES', '$r
             break;
           default:
         }
-        $rootScope.isPasswordValid = !parent.hasClass('error');
-        $rootScope.$applyAsync();
+        scope.isPasswordValid({
+          result: !parent.hasClass('error')
+        });
+        scope.$applyAsync();
         strengthEle.width(Math.min((Math.floor(guesses_log10)  * 5), 100) + '%');
       });
     };
     return {
+      scope: {
+        isPasswordValid: '&isPasswordValid'
+      },
       restrict: 'A',
       require: '^?ngModel',
       link: onChange
