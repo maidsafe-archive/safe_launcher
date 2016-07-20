@@ -40,9 +40,9 @@ var AppLogs = React.createClass({
       listArr.push(self.props.list[key]);
     });
     listArr.sort(function(a, b) {
-      var aTime = a.endTime ? new Date(a.endTime).getTime() : new Date(a.beginTime).getTime();
-      var bTime = b.endTime ? new Date(b.endTime).getTime() : new Date(b.beginTime).getTime();
-      return aTime < bTime;
+      var aTime = a.endTime ? new Date(a.endTime) : new Date(a.beginTime);
+      var bTime = b.endTime ? new Date(b.endTime) : new Date(b.beginTime);
+      return bTime - aTime;
     });
     listArr.map(function(list, i) {
       list['status'] = STATUS_CODE[list.activityStatus];

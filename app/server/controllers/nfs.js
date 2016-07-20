@@ -262,8 +262,8 @@ export var getFile = function(req, res, next) {
       "Content-Range": "bytes " + start + "-" + end + "/" + total,
       "Accept-Ranges": "bytes",
       "Content-Length": chunksize,
-      "Created-On": new Date(fileStats.createdOn).toUTCString(),
-      "Last-Modified": new Date(fileStats.modifiedOn).toUTCString(),
+      "Created-On": new Date(fileStats.createdTimeSec || fileStats.createdOn).toUTCString(),
+      "Last-Modified": new Date(fileStats.modifiedTimeSec || fileStats.modifiedOn).toUTCString(),
       "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
     };
     if (fileStats.metadata) {
