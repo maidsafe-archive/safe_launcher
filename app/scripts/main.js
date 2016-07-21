@@ -19,7 +19,9 @@ window.safeLauncher = angular
     $rootScope.keys = Object.keys;
     $rootScope.isAuthenticated = false;
     $rootScope.isAuthLoading = false;
-    $rootScope.currentAppDetails = null;
+    $rootScope.currentAppDetails = {
+      logs: {}
+    };
     $rootScope.appVersion = require('./package.json').version;
     $rootScope.appList = {};
     $rootScope.logList = {};

@@ -8,9 +8,11 @@ window.safeLauncher.directive('validateAccountSecret', [ 'CONSTANTS', 'MESSAGES'
       var statusEle = ele.siblings('.status');
       var value = '';
       var zxcvbn = require('zxcvbn');
+      var isValid = false;
 
       var resetField = function() {
-        parent.removeClass('week somewhat-secure secure');
+        isValid = false;
+        parent.removeClass('vweak weak somewhat-secure secure');
         ctrl.$setValidity('fieldValidator', true);
         strengthEle.width('0');
         statusEle.removeClass('icn');
@@ -23,39 +25,44 @@ window.safeLauncher.directive('validateAccountSecret', [ 'CONSTANTS', 'MESSAGES'
         if (!value) {
           return;
         }
-        var score = zxcvbn(value).score
+        var log10 = zxcvbn(value).guesses_log10;
         statusEle.removeClass('icn');
         switch (true) {
-          case (score === 1):
-            parent.addClass('week');
+          case (log10 < 4):
+            parent.addClass('vweak');
             msgEle.text($msg.PASS_VERY_WEEK);
             break;
-          case (score === 2):
-            parent.addClass('week');
+          case (log10 < 8):
+            parent.addClass('weak');
             msgEle.text($msg.PASS_WEEK);
             break;
-          case (score === 3):
+          case (log10 < 10):
             parent.addClass('somewhat-secure');
+            if (attr.fieldType === 'SECRET') {
+              statusEle.addClass('icn');
+              isValid = true;
+            }
             msgEle.text($msg.PASS_SOMEWHAT_SECURE);
             break;
-          case (score === 4):
+          case (log10 >= 10):
             parent.addClass('secure');
             statusEle.addClass('icn');
             msgEle.text($msg.PASS_SECURE);
-            ctrl.$setValidity('fieldValidator', true);
+            isValid = true;
             break;
           default:
         }
+        strengthEle.width(Math.min((log10/16)*100, 100) + '%');
+        ctrl.$setValidity('fieldValidator', isValid);
         scope.isPasswordValid({
-          result: !parent.hasClass('week')
+          result: isValid
         });
         scope.$applyAsync();
-        strengthEle.width((score * 25) + '%');
       });
     };
     return {
       scope: {
-        isPasswordValid: '&isPasswordValid'
+        isPasswordValid: '&'
       },
       restrict: 'A',
       require: '^?ngModel',

@@ -32,7 +32,16 @@ var AppLogs = React.createClass({
 
     var listKeys = this.props.list ? Object.keys(this.props.list) : [];
     if (listKeys.length === 0) {
-      return React.DOM.span(null, null);
+      return React.DOM.div({key: 'inner-b', className: 'table-inner-b'}, [
+        React.DOM.table({key: 'table', className: this.props.table}, [
+          tableHead,
+          React.DOM.tbody(null, [
+            React.DOM.tr({key: 'default-row', className: 'default-row'}, [
+              React.DOM.td({key: 'default-col', colspan:'100%'}, 'No requests made yet.')
+            ])
+          ])
+        ])
+      ]);
     }
 
     var listArr = [];
@@ -44,6 +53,7 @@ var AppLogs = React.createClass({
       var bTime = b.endTime ? new Date(b.endTime) : new Date(b.beginTime);
       return bTime - aTime;
     });
+
     listArr.map(function(list, i) {
       list['status'] = STATUS_CODE[list.activityStatus];
       if ((self.props.filter.length === 0) || (self.props.filter.indexOf(list.status) === -1)) {

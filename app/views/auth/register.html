@@ -2,13 +2,15 @@
   <div ng-show="!isAuthLoading">
     <!-- account secret -->
     <form ng-show="createAccState === 0" class="form" name="accountSecretForm" ng-submit="setAccountSecret()" ng-init="toggleAccSecret = toggleConfirmAccSecret = true">
-      <div class="inp-grp validate-field">
+      <div id="errorTarget" class="inp-grp validate-field">
         <input id="accountSecret"
           type="{{toggleAccSecret ? 'password' : 'text'}}"
           name="accountSecret"
           required="true"
           ng-model="user.accountSecret"
           validate-account-secret
+          field-type="SECRET"
+          is-password-valid="checkSecretValid(result)"
           focus="true" />
         <label for="accountSecret">Account Secret</label>
         <div class="msg"></div>
@@ -26,9 +28,9 @@
           name="confirmAccountSecret"
           required="true"
           target="accountSecret"
-          field-match-validator
-          ng-model="user.confirmAccountSecret"/>
-        <label for="confirmAccountSecret">Account Secret</label>
+          ng-model="user.confirmAccountSecret"
+          field-match-validator/>
+        <label for="confirmAccountSecret">Confirm Account Secret</label>
         <div class="msg"></div>
         <div class="opt">
           <div class="opt-i">
@@ -38,20 +40,22 @@
       </div>
       <div class="inp-btn">
         <button type="submit" class="btn primary" name="next"
-          ng-disabled="!accountSecretForm.$valid || (user.accountSecret !== user.confirmAccountSecret)">Next</button>
+          ng-disabled="(user.accountSecret !== user.confirmAccountSecret) || !secretValid">Next</button>
       </div>
     </form>
     <!-- account password -->
-    <form ng-show="createAccState === 1" class="form" name="accountPasswordForm" ng-submit="setAccountPassword()" ng-init="toggleAccPass = toggleConfirmAccPass = true">
+    <form ng-show="createAccState === 1" class="form" name="accountPasswordForm" ng-submit="createAccount()" ng-init="toggleAccPass = toggleConfirmAccPass = true">
       <div class="inp-grp validate-field">
         <input id="accountPassword"
           type="{{toggleAccPass ? 'password' : 'text'}}"
           name="accountPassword"
           required="true"
           ng-model="user.accountPassword"
+          field-type="PASSWORD"
+          is-password-valid="checkPasswordValid(result)"
           validate-account-secret
           focus="true" />
-        <label for="accountPassword">Account Secret</label>
+        <label for="accountPassword">Account Password</label>
         <div class="msg"></div>
         <div class="opt">
           <div class="opt-i">
@@ -67,9 +71,9 @@
           name="confirmAccountPassword"
           required="true"
           target="accountPassword"
-          field-match-validator
-          ng-model="user.confirmAccountPassword"/>
-        <label for="confirmAccountPassword">Account Secret</label>
+          ng-model="user.confirmAccountPassword"
+          field-match-validator/>
+        <label for="confirmAccountPassword">Confirm Account Password</label>
         <div class="msg"></div>
         <div class="opt">
           <div class="opt-i">
@@ -79,7 +83,7 @@
       </div>
       <div class="inp-btn">
         <button type="submit" class="btn primary" name="next"
-          ng-disabled="!accountPasswordForm.$valid || (user.accountPassword !== user.confirmAccountPassword)">Create Account</button>
+          ng-disabled="(user.accountPassword !== user.confirmAccountPassword) || !passwordValid">Create Account</button>
       </div>
     </form>
     <div class="form-f">

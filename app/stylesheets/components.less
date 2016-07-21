@@ -88,6 +88,7 @@
           }
           &.disabled {
             opacity: 0.5;
+            cursor: default;
             &:hover {
               background-color: @primary-blue;
             }
@@ -1086,6 +1087,9 @@
   .table-filter {
     width: 100%;
     margin-bottom: 16px;
+    &.disabled {
+      opacity: 0.5;
+    }
     .table-filter-i {
       display: inline-block;
       margin-right: 8px;
@@ -1117,6 +1121,12 @@
     }
     &.three-col {
       tr {
+        &.default-row {
+          td:first-child {
+            display: table-cell !important;
+            text-transform: none;
+          }
+        }
         th:nth-child(1), td:first-child {
           display: none;
         }
@@ -1138,6 +1148,14 @@
       padding: 3px;
     }
     tr {
+      &.default-row {
+        td {
+          color: #212121;
+          background-color: transparent !important;
+          opacity: 0.7;
+          text-transform: none;
+        }
+      }
       td {
         background-color: #EEE;
         padding: 3px;
@@ -1176,7 +1194,7 @@
     bottom: 0;
   }
   .toaster-b {
-    min-width: 260px;
+    min-width: 280px;
     max-width: 640px;
     height: inherit;
     display: inline-block;

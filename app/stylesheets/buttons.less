@@ -27,6 +27,10 @@
   }
   &[disabled='disabled'] {
     opacity: 0.5;
+    cursor: default;
+    &:hover {
+      background-color: @primary-blue;
+    }
   }
   &.flat {
     background-color: transparent !important;

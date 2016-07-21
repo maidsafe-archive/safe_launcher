@@ -1,7 +1,7 @@
 <div class="form-b" ng-controller="authController">
   <div ng-show="!isAuthLoading">
     <form class="form" name="loginForm" ng-submit="login()" ng-init="toggleAccSecret = toggleAccPass = true">
-      <div class="inp-grp">
+      <div id="errorTarget" class="inp-grp">
         <input id="accountSecret"
           type="{{toggleAccSecret ? 'password' : 'text'}}"
           name="accountSecret"

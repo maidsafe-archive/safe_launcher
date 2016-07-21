@@ -121,6 +121,7 @@
     }
     input {
       width: 100%;
+      padding-right: 30px;
       font-size: 16px;
       line-height: 30px;
       border-width: 0 0 2px;
@@ -164,6 +165,7 @@
     top: 30px;
     margin-top: -1px;
     background-color: @primary-blue;
+    z-index: 99;
   }
   .status {
     display: inline-block;
@@ -177,7 +179,7 @@
       content: '';
       width: 2px;
       height: 5px;
-      margin-left: -1px;
+      margin-left: -1.5px;
       display: block;
       position: relative;
       top: -3px;
@@ -201,24 +203,23 @@
       }
     }
     &.last {
-      left: auto;
-      right: 0;
-      margin-left: 0;
-      &:before {
-        margin-left: -2px;
-        left: 100%;
-      }
-      &:after {
-        margin-left: 10px;
-      }
+      left: 62.5%;
     }
   }
-  &.week {
+  &.vweak {
     .msg {
-      color: @pass-week;
+      color: @pass-vweak;
     }
     .strength {
-      background-color: @pass-week;
+      background-color: @pass-vweak;
+    }
+  }
+  &.weak {
+    .msg {
+      color: @pass-weak-txt;
+    }
+    .strength {
+      background-color: @pass-weak;
     }
   }
   &.somewhat-secure {
@@ -229,7 +230,7 @@
       background-color: @pass-ok;
     }
     .status.icn:after {
-      background-image: url(../images/tick_create_warn.svg);
+      background-image: url(../images/tick_create_success.svg);
     }
   }
   &.secure {
