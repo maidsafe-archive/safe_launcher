@@ -1,16 +1,16 @@
-// validate form fields on change
-window.safeLauncher.directive('validatePassword', [ 'CONSTANTS', 'MESSAGES', '$rootScope',
+// validate account password on change
+window.safeLauncher.directive('validateAccountSecret', [ 'CONSTANTS', 'MESSAGES', '$rootScope',
   function($constant, $msg, $rootScope) {
     var onChange = function(scope, ele, attr, ctrl) {
       var msgEle = ele.siblings('.msg');
       var parent = ele.parent();
       var strengthEle = ele.siblings('.strength');
-      var statusEle = ele.siblings('.status').children('.txt');
+      var statusEle = ele.siblings('.status');
       var value = '';
       var zxcvbn = require('zxcvbn');
 
       var resetField = function() {
-        parent.removeClass('success warn error');
+        parent.removeClass('week somewhat-secure secure');
         ctrl.$setValidity('fieldValidator', true);
         strengthEle.width('0');
         statusEle.removeClass('icn');
@@ -23,40 +23,34 @@ window.safeLauncher.directive('validatePassword', [ 'CONSTANTS', 'MESSAGES', '$r
         if (!value) {
           return;
         }
-        var guesses_log10 = zxcvbn(value).guesses_log10
+        var score = zxcvbn(value).score
         statusEle.removeClass('icn');
         switch (true) {
-          case (guesses_log10 < 5):
-            parent.addClass('error');
-            msgEle.text($msg.PASS_TOO_GUESSABLE);
+          case (score === 1):
+            parent.addClass('week');
+            msgEle.text($msg.PASS_VERY_WEEK);
             break;
-          case (guesses_log10 < 10):
-            parent.addClass('error');
-            msgEle.text($msg.PASS_VERY_GUESSABLE);
+          case (score === 2):
+            parent.addClass('week');
+            msgEle.text($msg.PASS_WEEK);
             break;
-          case (guesses_log10 < 15):
-            parent.addClass('error');
-            msgEle.text($msg.PASS_SOMEWHAT_GUESSABLE);
+          case (score === 3):
+            parent.addClass('somewhat-secure');
+            msgEle.text($msg.PASS_SOMEWHAT_SECURE);
             break;
-          case (guesses_log10 < 20):
-            parent.addClass('warn');
+          case (score === 4):
+            parent.addClass('secure');
             statusEle.addClass('icn');
-            msgEle.text($msg.PASS_SAFELY_UNGUESSABLE);
-            ctrl.$setValidity('fieldValidator', true);
-            break;
-          case (guesses_log10 >= 20):
-            parent.addClass('success');
-            statusEle.addClass('icn');
-            msgEle.text($msg.PASS_VERY_UNGUESSABLE);
+            msgEle.text($msg.PASS_SECURE);
             ctrl.$setValidity('fieldValidator', true);
             break;
           default:
         }
         scope.isPasswordValid({
-          result: !parent.hasClass('error')
+          result: !parent.hasClass('week')
         });
         scope.$applyAsync();
-        strengthEle.width(Math.min((Math.floor(guesses_log10)  * 5), 100) + '%');
+        strengthEle.width((score * 25) + '%');
       });
     };
     return {

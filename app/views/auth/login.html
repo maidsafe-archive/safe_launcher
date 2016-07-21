@@ -1,17 +1,32 @@
 <div class="form-b" ng-controller="authController">
   <div ng-show="!isAuthLoading">
-    <form class="form" name="loginForm" ng-submit="login()" ng-init="toggleView = false">
+    <form class="form" name="loginForm" ng-submit="login()" ng-init="toggleAccSecret = toggleAccPass = true">
       <div class="inp-grp">
-        <input id="password" type="password" name="password" required="true" ng-model="user.password" focus="true" />
-        <span class="preview" ng-show="toggleView" ng-bind="user.password"></span>
-        <label for="password">Account Password</label>
-        <div class="msg">
-          <span class="txt"></span>
-          <span class="icn"></span>
-        </div>
+        <input id="accountSecret"
+          type="{{toggleAccSecret ? 'password' : 'text'}}"
+          name="accountSecret"
+          required="true"
+          ng-model="user.accountSecret"
+          focus="true" />
+        <label for="accountSecret">Account Secret</label>
+        <div class="msg"></div>
         <div class="opt">
           <div class="opt-i">
-              <span class="eye" ng-class="{active: toggleView}" ng-click="toggleView = !toggleView"></span>
+              <span class="eye" ng-class="{active: !toggleAccSecret}" ng-click="toggleAccSecret = !toggleAccSecret"></span>
+          </div>
+        </div>
+      </div>
+      <div class="inp-grp">
+        <input id="accountPassword"
+          type="{{toggleAccPass ? 'password' : 'text'}}"
+          name="accountPassword"
+          required="true"
+          ng-model="user.accountPassword"/>
+        <label for="accountPassword">Account Password</label>
+        <div class="msg"></div>
+        <div class="opt">
+          <div class="opt-i">
+              <span class="eye" ng-class="{active: !toggleAccPass}" ng-click="toggleAccPass = !toggleAccPass"></span>
           </div>
         </div>
       </div>

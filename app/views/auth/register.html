@@ -1,45 +1,85 @@
 <div class="form-b" ng-controller="authController">
   <div ng-show="!isAuthLoading">
-    <form class="form" name="registerForm" ng-submit="register()" ng-init="toggleView = confirmToggleView = false">
-      <div class="inp-grp password-validator">
-        <input id="password" type="password" name="password" required="true"
-          ng-model="user.password"
-          is-password-valid="checkPasswordValid(result)"
-          validate-password
+    <!-- account secret -->
+    <form ng-show="createAccState === 0" class="form" name="accountSecretForm" ng-submit="setAccountSecret()" ng-init="toggleAccSecret = toggleConfirmAccSecret = true">
+      <div class="inp-grp validate-field">
+        <input id="accountSecret"
+          type="{{toggleAccSecret ? 'password' : 'text'}}"
+          name="accountSecret"
+          required="true"
+          ng-model="user.accountSecret"
+          validate-account-secret
           focus="true" />
-        <span class="preview" ng-show="toggleView" ng-bind="user.password"></span>
-        <label for="password">Account Password</label>
+        <label for="accountSecret">Account Secret</label>
         <div class="msg"></div>
         <div class="opt">
           <div class="opt-i">
-              <span class="eye" ng-class="{active: toggleView}" ng-mousedown="toggleView = !toggleView"></span>
+              <span class="eye" ng-class="{active: !toggleAccSecret}" ng-mousedown="toggleAccSecret = !toggleAccSecret"></span>
           </div>
         </div>
         <span class="strength"></span>
-        <div class="status">
-          <span class="txt" data-val="min"></span>
-        </div>
+        <span class="status" data-val="min"></span>
       </div>
       <div class="inp-grp">
-        <input id="confirmPassword" type="password" name="confirmPassword" required="true"
-          ng-model="user.confirmPassword"
-          target="password"
-          field-match-validator />
-        <span class="preview" ng-show="confirmToggleView" ng-bind="user.confirmPassword"></span>
-        <label for="confirmPassword">Confirm Password</label>
-        <div class="msg">
-          <span class="txt"></span>
-          <span class="icn"></span>
-        </div>
+        <input id="confirmAccountSecret"
+          type="{{toggleConfirmAccSecret ? 'password' : 'text'}}"
+          name="confirmAccountSecret"
+          required="true"
+          target="accountSecret"
+          field-match-validator
+          ng-model="user.confirmAccountSecret"/>
+        <label for="confirmAccountSecret">Account Secret</label>
+        <div class="msg"></div>
         <div class="opt">
           <div class="opt-i">
-            <span class="eye" ng-class="{active: confirmToggleView}" ng-click="confirmToggleView = !confirmToggleView"></span>
+              <span class="eye" ng-class="{active: !toggleConfirmAccSecret}" ng-mousedown="toggleConfirmAccSecret = !toggleConfirmAccSecret"></span>
           </div>
         </div>
       </div>
       <div class="inp-btn">
-        <button type="submit" class="btn primary" name="createAcc"
-          ng-disabled="!user.password || (user.password !== user.confirmPassword) || !passwordValid">Create Account</button>
+        <button type="submit" class="btn primary" name="next"
+          ng-disabled="!accountSecretForm.$valid || (user.accountSecret !== user.confirmAccountSecret)">Next</button>
+      </div>
+    </form>
+    <!-- account password -->
+    <form ng-show="createAccState === 1" class="form" name="accountPasswordForm" ng-submit="setAccountPassword()" ng-init="toggleAccPass = toggleConfirmAccPass = true">
+      <div class="inp-grp validate-field">
+        <input id="accountPassword"
+          type="{{toggleAccPass ? 'password' : 'text'}}"
+          name="accountPassword"
+          required="true"
+          ng-model="user.accountPassword"
+          validate-account-secret
+          focus="true" />
+        <label for="accountPassword">Account Secret</label>
+        <div class="msg"></div>
+        <div class="opt">
+          <div class="opt-i">
+              <span class="eye" ng-class="{active: !toggleAccPass}" ng-mousedown="toggleAccPass = !toggleAccPass"></span>
+          </div>
+        </div>
+        <span class="strength"></span>
+        <span class="status last" data-val="min"></span>
+      </div>
+      <div class="inp-grp">
+        <input id="confirmAccountPassword"
+          type="{{toggleConfirmAccPass ? 'password' : 'text'}}"
+          name="confirmAccountPassword"
+          required="true"
+          target="accountPassword"
+          field-match-validator
+          ng-model="user.confirmAccountPassword"/>
+        <label for="confirmAccountPassword">Account Secret</label>
+        <div class="msg"></div>
+        <div class="opt">
+          <div class="opt-i">
+              <span class="eye" ng-class="{active: !toggleConfirmAccPass}" ng-mousedown="toggleConfirmAccPass = !toggleConfirmAccPass"></span>
+          </div>
+        </div>
+      </div>
+      <div class="inp-btn">
+        <button type="submit" class="btn primary" name="next"
+          ng-disabled="!accountPasswordForm.$valid || (user.accountPassword !== user.confirmAccountPassword)">Create Account</button>
       </div>
     </form>
     <div class="form-f">

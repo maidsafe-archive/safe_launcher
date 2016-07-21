@@ -7,8 +7,8 @@
     <div class="splash-media"></div>
     <span class="splash-i">Could not connect to the SAFE Network!</span>
     <div class="opt">
-      <button type="button" class="btn danger" name="button" ng-click="$networkStatus.retry()">Retry</button>
+      <button type="button" class="btn danger" name="button" ng-click="reconnectNetwork()">Retry</button>
     </div>
   </div>
 </div>
-<ng-include ng-show="$networkStatus.status === 1" src="'views/common/proxy_popup.html'"></ng-include>
+<!-- <ng-include ng-show="$networkStatus.status === 1" src="'views/common/proxy_popup.html'"></ng-include> -->

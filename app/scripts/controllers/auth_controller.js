@@ -7,7 +7,25 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     var REQUEST_TIMEOUT = 90 * 1000;
     var FIELD_FOCUS_DELAY = 100;
     $scope.user = {};
+    $scope.secretValid = false;
     $scope.passwordValid = false;
+    $scope.createAccState = 0;
+    $scope.authIntro = {
+      totalCount: 3,
+      currentPos: 1,
+      continue: function() {
+        if (this.currentPos < this.totalCount) {
+          this.currentPos++;
+        } else if (this.currentPos === this.totalCount) {
+          $state.go('app.account', {currentPage: 'register'});
+        }
+      },
+      back: function() {
+        if (this.currentPos > 1) {
+          this.currentPos--;
+        }
+      }
+    };
     var Request = function(callback) {
       var self = this;
       var alive = true;
@@ -89,6 +107,18 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
 
     $scope.checkPasswordValid = function(result) {
       $scope.passwordValid = result;
+    };
+
+    $scope.checkSecretValid = function(result) {
+      $scope.secretValid = result;
+    };
+
+    $scope.setAccountSecret = function() {
+      $scope.createAccState = 1;
+    };
+
+    $scope.setAccountPassword = function() {
+      register();
     };
   }
 ]);
