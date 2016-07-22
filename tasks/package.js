@@ -33,7 +33,7 @@ var packageForOs = {
     '--helper-bundle-id=' + packageConfig.identifier + 'helper'
   },
   linux: {
-    icon: 'resources/windows/icon.ico',
+    icon: 'resources/icon.png',
     unpack: '*.so',
     platform: 'linux',
     packageName: packageConfig.productName.toLowerCase().replace(' ', '_'),

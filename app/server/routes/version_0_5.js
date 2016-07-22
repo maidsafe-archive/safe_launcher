@@ -3,8 +3,10 @@ import * as NFS from '../controllers/nfs';
 import * as DNS from '../controllers/dns';
 import * as Auth from '../controllers/auth';
 import { addAppActivity } from '../utils';
+import timeout from 'connect-timeout';
 
 var router = express.Router();
+var TIMEOUT = 300000;
 
 var ActivityMiddleware = function(activityName) {
 
@@ -28,9 +30,9 @@ router.put('/nfs/directory/:rootPath/*', new ActivityMiddleware('Update director
 router.post('/nfs/movedir', new ActivityMiddleware('Move/copy directory'), NFS.moveDirectory);
 
 // NFS - FILE API
-router.post('/nfs/file/:rootPath/*', new ActivityMiddleware('Create file'), NFS.createFile);
+router.post('/nfs/file/:rootPath/*', timeout(TIMEOUT), new ActivityMiddleware('Create file'), NFS.createFile);
 router.delete('/nfs/file/:rootPath/*', new ActivityMiddleware('Delete file'), NFS.deleteFile);
-router.put('/nfs/file/metadata/:rootPath/*', new ActivityMiddleware('Update file metadata'), NFS.modifyFileMeta);
+router.put('/nfs/file/metadata/:rootPath/*', timeout(TIMEOUT), new ActivityMiddleware('Update file metadata'), NFS.modifyFileMeta);
 router.put('/nfs/file/:rootPath/*', new ActivityMiddleware('Update file'), NFS.modifyFileContent);
 router.get('/nfs/file/:rootPath/*', new ActivityMiddleware('Read file'), NFS.getFile);
 router.head('/nfs/file/:rootPath/*', new ActivityMiddleware('Fetch file metadata'), NFS.getFileMetadata);

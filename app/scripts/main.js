@@ -17,35 +17,42 @@ window.safeLauncher = angular
     $rootScope.$state = $state;
     $rootScope.userInfo = {};
     $rootScope.keys = Object.keys;
-    $rootScope.isAuthenticated = false;
-    $rootScope.isAuthLoading = false;
-    $rootScope.currentAppDetails = {
-      logs: {}
-    };
     $rootScope.appVersion = require('./package.json').version;
-    $rootScope.appList = {};
-    $rootScope.logList = {};
-    $rootScope.intervals = [];
-    $rootScope.retryCount = 1;
-    $rootScope.dashData = {
-      accountInfo: {
-        used: 0,
-        available: 0
-      },
-      accountInfoLoading: false,
-      accountInfoTime: new Date(),
-      accountInfoTimeString: window.moment().fromNow(),
-      accountInfoUpdateEnabled: true,
-      accountInfoUpdateTimeLeft: '00:00',
-      getsCount: 0,
-      deletesCount: 0,
-      postsCount: 0,
-      putsCount: 0,
-      unAuthGET: [],
-      upload: 0,
-      download: 0,
-      authHTTPMethods: []
+
+    $rootScope.resetAppStates = function () {
+      $rootScope.isAuthenticated = false;
+      $rootScope.isAuthLoading = false;
+      $rootScope.currentAppDetails = {
+        logs: {}
+      };
+      $rootScope.appList = {};
+      $rootScope.logList = {};
+      $rootScope.intervals = [];
+      $rootScope.retryCount = 1;
     };
+
+    $rootScope.resetStats = function() {
+      $rootScope.dashData = {
+        accountInfo: {
+          used: 0,
+          available: 0
+        },
+        accountInfoLoading: false,
+        accountInfoTime: new Date(),
+        accountInfoTimeString: window.moment().fromNow(),
+        accountInfoUpdateEnabled: true,
+        accountInfoUpdateTimeLeft: '00:00',
+        getsCount: 0,
+        deletesCount: 0,
+        postsCount: 0,
+        putsCount: 0,
+        unAuthGET: [],
+        upload: 0,
+        download: 0,
+        authHTTPMethods: []
+      };
+    };
+
     $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
       if ($rootScope.isAuthLoading) {
         event.preventDefault();
@@ -120,5 +127,8 @@ window.safeLauncher = angular
         isError: isError
       }, function(err, data) {});
     };
+
+    $rootScope.resetAppStates();
+    $rootScope.resetStats();
   }
 ]);

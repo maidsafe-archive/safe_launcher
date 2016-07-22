@@ -12,8 +12,6 @@ import { log } from './logger/log';
 
 log.debug('Application starting');
 
-let ignoreUnRegisteredObserver = false;
-
 let restServer = new RESTServer(api, env.serverPort);
 let proxyServer = {
   process: null,

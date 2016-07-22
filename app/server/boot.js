@@ -113,6 +113,10 @@ export default class RESTServer {
     this.app.get('eventEmitter').emit(this.EVENT_TYPE.SESSION_REMOVED, id);
   }
 
+  clearAllSessions() {
+    sessionManager.clear();    
+  }
+
   addEventListener(event, listener) {
     this.app.get('eventEmitter').addListener(event, listener);
   }
