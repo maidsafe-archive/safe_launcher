@@ -71,6 +71,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         }, function() {});
       }
       $rootScope.isAuthenticated = true;
+      $rootScope.setLastLogin();
       $rootScope.$applyAsync();
       console.log('Authorised successfully!');
     };
