@@ -1,7 +1,7 @@
 <div class="form-b" ng-controller="authController">
   <div ng-show="!isAuthLoading">
     <!-- account secret -->
-    <form ng-show="createAccState === 0" class="form" name="accountSecretForm" ng-submit="setAccountSecret()" ng-init="toggleAccSecret = toggleConfirmAccSecret = true">
+    <form ng-if="createAccState === 0" class="form" name="accountSecretForm" ng-submit="setAccountSecret()" ng-init="toggleAccSecret = toggleConfirmAccSecret = true">
       <div id="errorTarget" class="inp-grp validate-field">
         <input id="accountSecret"
           type="{{toggleAccSecret ? 'password' : 'text'}}"
@@ -44,7 +44,7 @@
       </div>
     </form>
     <!-- account password -->
-    <form ng-show="createAccState === 1" class="form" name="accountPasswordForm" ng-submit="createAccount()" ng-init="toggleAccPass = toggleConfirmAccPass = true">
+    <form ng-if="createAccState === 1" class="form" name="accountPasswordForm" ng-submit="createAccount()" ng-init="toggleAccPass = toggleConfirmAccPass = true">
       <div class="inp-grp validate-field">
         <input id="accountPassword"
           type="{{toggleAccPass ? 'password' : 'text'}}"
