@@ -116,6 +116,10 @@ export default class UIUtils {
     this.restServer.removeSession(id);
   }
 
+  clearAllSessions() {
+    this.restServer.clearAllSessions();
+  }
+
   // focus window
   focusWindow() {
     var browserWindow = this.remote.getCurrentWindow();

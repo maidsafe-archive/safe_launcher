@@ -62,5 +62,16 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
         });
       }
     };
+
+    $scope.logout = function() {      
+      window.msl.clearAllSessions();
+      $rootScope.clearIntervals();
+      $rootScope.resetStats();
+      $rootScope.resetAppStates();
+      server.reconnectNetwork();
+      $state.go('app.account', {
+        currentPage: 'login'
+      });
+    };
   }
 ]);
