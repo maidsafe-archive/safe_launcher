@@ -210,10 +210,10 @@ var write = function(lib, request) {
   if (!writerHandlePool.hasOwnProperty(writerId)) {
     return util.sendError(request.id, 999, 'Writer not found');
   }
-  var offset = request.params.offset || 0;
+  // var offset = request.params.offset || 0;
   var data = new Buffer(request.params.data, 'base64');
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  lib.nfs_stream_write.async(writerHandlePool[writerId], offset, data, data.length, function(err, result) {
+  lib.nfs_stream_write.async(writerHandlePool[writerId], data, data.length, function(err, result) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     if (err) {
      return util.sendException(request.id, e);

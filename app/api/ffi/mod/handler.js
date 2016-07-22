@@ -43,7 +43,7 @@ module.exports = function(libPath) {
       'log_in': [ int, [ cString, cString, voidPtrPtr ] ],
       'nfs_create_file': [ int, [ cString, voidPtrPtr, voidPtrPtr ] ],
       'nfs_stream_close': [ int, [ voidPtrPtr ] ],
-      'nfs_stream_write': [ int, [ voidPtrPtr, int, refUin8Array, size_t ] ],
+      'nfs_stream_write': [ int, [ voidPtrPtr, refUin8Array, size_t ] ],
       'register_network_event_observer': [ 'void', [ voidPtrPtr, 'pointer' ] ]
     };
   };
