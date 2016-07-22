@@ -2,11 +2,31 @@
  * Authentication Controller
  */
 window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootScope', '$timeout',
-  'authFactory', 'fieldValidator', 'CONSTANTS', 'MESSAGES',
-  function($scope, $state, $rootScope, $timeout, auth, validator, CONSTANTS, MESSAGES) {
+  'authFactory', 'CONSTANTS', 'MESSAGES',
+  function($scope, $state, $rootScope, $timeout, auth, CONSTANTS, MESSAGES) {
     var REQUEST_TIMEOUT = 90 * 1000;
     var FIELD_FOCUS_DELAY = 100;
     $scope.user = {};
+    $scope.secretValid = false;
+    $scope.secretValid = false;
+    $scope.passwordValid = false;
+    $scope.createAccState = 0;
+    $scope.authIntro = {
+      totalCount: 3,
+      currentPos: 1,
+      continue: function() {
+        if (this.currentPos < this.totalCount) {
+          this.currentPos++;
+        } else if (this.currentPos === this.totalCount) {
+          $state.go('app.account', {currentPage: 'register'});
+        }
+      },
+      back: function() {
+        if (this.currentPos > 1) {
+          this.currentPos--;
+        }
+      }
+    };
     var Request = function(callback) {
       var self = this;
       var alive = true;
@@ -41,8 +61,12 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       $rootScope.userInfo = $scope.user.password;
       $scope.user = {};
       if (err) {
+        // TODO set register/login based error messages
+        var errorTarget = $('#errorTarget');
+        errorTarget.addClass('error');
+        errorTarget.children('.msg').text('Invalid entries, account does not exist.');
         return $rootScope.$toaster.show({
-          msg: 'Invalid PIN, Keyword or Password.',
+          msg: 'Authentication failed, invalid entries',
           isError: true
         }, function() {});
       }
@@ -51,8 +75,8 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       console.log('Authorised successfully!');
     };
 
-    // user register
-    $scope.register = function() {
+    // user create account
+    $scope.createAccount = function() {
       if ($rootScope.$networkStatus.status !== window.NETWORK_STATE.CONNECTED) {
         return $rootScope.$toaster.show({
           msg: 'Network not yet conneted',
@@ -60,12 +84,11 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
           isError: true
         }, function() {});
       }
-      var passPhrase = $scope.user.password;
       var request = new Request(onAuthResponse);
       $scope.cancelRequest = request.cancel;
       $rootScope.isAuthLoading = true;
       request.execute(function(done) {
-        auth.register(passPhrase, done);
+        auth.register($scope.user.accountSecret, $scope.user.accountPassword, done);
       });
     };
 
@@ -82,8 +105,22 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       $scope.cancelRequest = request.cancel;
       $rootScope.isAuthLoading = true;
       request.execute(function(done) {
-        auth.login($scope.user.password, done);
+        auth.login($scope.user.accountSecret, $scope.user.accountPassword, done);
       });
+    };
+
+    $scope.checkPasswordValid = function(result) {
+      $scope.passwordValid = result;
+      $scope.$applyAsync();
+    };
+
+    $scope.checkSecretValid = function(result) {
+      $scope.secretValid = result;
+      $scope.$applyAsync();
+    };
+
+    $scope.setAccountSecret = function() {
+      $scope.createAccState = 1;
     };
   }
 ]);

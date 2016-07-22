@@ -12,11 +12,10 @@ window.safeLauncher.constant('MESSAGES', {
   'PASSWORD_MUST_BE_SIX_CHAR_LONG': 'Password must be a minimum of 6 characters.',
   'NETWORK_NOT_CONNECTED': 'Waiting for establishing connection with SAFE Network',
   'ENTRIES_DONT_MATCH': 'Entries don\'t match.',
-  'PASS_TOO_GUESSABLE': 'Very weak',
-  'PASS_VERY_GUESSABLE': 'Weak',
-  'PASS_SOMEWHAT_GUESSABLE': 'Not quite good enough',
-  'PASS_SAFELY_UNGUESSABLE': 'Good enough',
-  'PASS_VERY_UNGUESSABLE': 'Strong'
+  'PASS_VERY_WEEK': 'Very weak',
+  'PASS_WEEK': 'Weak',
+  'PASS_SOMEWHAT_SECURE': 'Somewhat secure',
+  'PASS_SECURE': 'Secure'
 });
 
 // Constants

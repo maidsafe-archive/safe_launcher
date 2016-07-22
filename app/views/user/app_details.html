@@ -14,17 +14,24 @@
       </ul>
     </div>
     <div class="table-view without-pad">
-      <div class="table-filter">
+      <div class="table-filter" ng-class="{disabled: (keys(currentAppDetails.logs).length === 0)}">
         <div class="table-filter-i checkbox in-progress" ng-init="logFilterInProgress = logFilterComplete = logFilterError = true;">
-          <input id="inProgress" type="checkbox" name="inProgress" value="" ng-model="logFilterInProgress" ng-change="toggleFilter('IN_PROGRESS')" checked="{{logFilterInProgress}}">
+          <input id="inProgress" type="checkbox" name="inProgress" value="" ng-model="logFilterInProgress"
+            ng-change="toggleFilter('IN_PROGRESS')"
+            checked="{{logFilterInProgress}}"
+            ng-disabled="(keys(currentAppDetails.logs).length === 0)">
           <label for="inProgress">In Progress</label>
         </div>
         <div class="table-filter-i checkbox completed">
-          <input id="completed" type="checkbox" name="completed" value="" ng-model="logFilterComplete" ng-change="toggleFilter('SUCCESS')" checked="{{logFilterComplete}}">
+          <input id="completed" type="checkbox" name="completed" value="" ng-model="logFilterComplete"
+            ng-change="toggleFilter('SUCCESS')" checked="{{logFilterComplete}}"
+            ng-disabled="(keys(currentAppDetails.logs).length === 0)">
           <label for="completed">Completed</label>
         </div>
         <div class="table-filter-i checkbox error">
-          <input id="error" type="checkbox" name="error" value="" ng-model="logFilterError" ng-change="toggleFilter('FAILURE')" checked="{{logFilterError}}">
+          <input id="error" type="checkbox" name="error" value="" ng-model="logFilterError"
+            ng-change="toggleFilter('FAILURE')" checked="{{logFilterError}}"
+            ng-disabled="(keys(currentAppDetails.logs).length === 0)">
           <label for="error">Error</label>
         </div>
       </div>

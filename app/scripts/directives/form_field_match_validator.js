@@ -3,12 +3,12 @@ window.safeLauncher.directive('fieldMatchValidator', [ 'CONSTANTS', 'MESSAGES',
   function($constant, $msg) {
     'use strict';
     var onChange = function(scope, ele, attr, ctrl) {
-      var msgEle = $(ele).siblings('.msg').children('.txt');
+      var msgEle = $(ele).siblings('.msg');
       var parent = $(ele).parent();
       var target = ctrl.$$parentForm[attr.target];
       var value = '';
       var resetField = function() {
-        parent.removeClass('warn error');
+        parent.removeClass('error');
         ctrl.$setValidity('fieldValidator', true);
         return msgEle.text('');
       }
