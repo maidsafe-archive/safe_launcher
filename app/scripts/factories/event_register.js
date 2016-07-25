@@ -13,7 +13,9 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
         var showPrompt = function(appData, callback) {
           $rootScope.$authReq.show(appData, function(err, status) {
             server.confirmResponse(appData, status);
-            $rootScope.$loader.show('Preparing application root directory.')
+            if (status) {
+              $rootScope.$loader.show('Preparing application root directory.');
+            }
             callback();
           });
           $rootScope.$applyAsync();

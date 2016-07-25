@@ -26,9 +26,17 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     var updateAccountInfoTimer = null;
     var LOCAL_STORAGE_KEYS = {
       PROXY: 'proxy',
-      LAST_LOGIN: 'lastLogin'
+      version: 'version'
     };
     eventRegistry.init();
+
+    $rootScope.showIntroPage = false;
+    var previousVersion = window.localStorage.getItem('version');
+    var currentVersion = require('./package').version;
+    if (previousVersion === null || previousVersion !== currentVersion) {
+      $rootScope.showIntroPage = true;
+      window.localStorage.setItem('version', currentVersion);
+    }
 
     // handle proxy localy
     $rootScope.setProxy = function(status) {
@@ -37,15 +45,6 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
 
     $rootScope.getProxy = function() {
       return JSON.parse(window.localStorage.getItem(LOCAL_STORAGE_KEYS.PROXY));
-    };
-
-    // handle lastLogin
-    $rootScope.setLastLogin = function() {
-      window.localStorage.setItem(LOCAL_STORAGE_KEYS.LAST_LOGIN, (new Date()).getTime());
-    };
-
-    $rootScope.getLastLogin = function() {
-      return window.localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_LOGIN);
     };
 
     $rootScope.clearLocalStorage = function() {
@@ -95,9 +94,6 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     };
 
     var checkProxy = function() {
-      if (!$rootScope.getLastLogin()) {
-        return;
-      }
       var proxy = $rootScope.getProxy();
       if (proxy && proxy.hasOwnProperty('status')) {
         if (proxy.status) {
@@ -105,7 +101,6 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         }
         return;
       }
-      $state.go('splash');
     };
 
     $scope.fetchStatsForUnauthorisedClient = function() {
@@ -207,12 +202,12 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       server.openExternal(url);
     };
 
-    $scope.enableProxySetting = function(status) {
+    $scope.configureProxySetting = function(status) {
       $rootScope.setProxy(status);
       if (status) {
         $scope.toggleProxyServer();
       }
-      return ($rootScope.getLastLogin() ? $state.go('app') : $state.go('app.account', {currentPage: 'authIntro'}));
+      return $state.go('app.account', {currentPage: 'authIntro'});
     };
 
     $scope.reconnectNetwork = function(user) {
