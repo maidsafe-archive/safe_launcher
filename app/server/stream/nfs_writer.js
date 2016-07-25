@@ -19,8 +19,7 @@ NfsWriter.prototype._write = function(data, enc, next) {
   var eventEmitter = self.req.app.get('eventEmitter');
   var uploadEvent = self.req.app.get('EVENT_TYPE').DATA_UPLOADED;
   this.req.app.get('api').nfs.write(this.writerId, this.curOffset, data, function(err) {
-    if (err) {
-      next(err);      
+    if (err) {         
       return self.responseHandler(err);
     }
     eventEmitter.emit(uploadEvent, data.length);

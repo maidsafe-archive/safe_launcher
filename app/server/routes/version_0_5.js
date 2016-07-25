@@ -31,7 +31,7 @@ router.post('/nfs/movedir', new ActivityMiddleware('Move/copy directory'), NFS.m
 router.post('/nfs/file/:rootPath/*', new ActivityMiddleware('Create file'), NFS.createFile);
 router.delete('/nfs/file/:rootPath/*', new ActivityMiddleware('Delete file'), NFS.deleteFile);
 router.put('/nfs/file/metadata/:rootPath/*', new ActivityMiddleware('Update file metadata'), NFS.modifyFileMeta);
-router.put('/nfs/file/:rootPath/*', new ActivityMiddleware('Update file'), NFS.modifyFileContent);
+// router.put('/nfs/file/:rootPath/*', new ActivityMiddleware('Update file'), NFS.modifyFileContent);
 router.get('/nfs/file/:rootPath/*', new ActivityMiddleware('Read file'), NFS.getFile);
 router.head('/nfs/file/:rootPath/*', new ActivityMiddleware('Fetch file metadata'), NFS.getFileMetadata);
 router.post('/nfs/movefile', new ActivityMiddleware('Move/copy file'), NFS.moveFile);

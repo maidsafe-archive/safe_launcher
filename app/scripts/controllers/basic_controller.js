@@ -24,15 +24,31 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       }
     };
     var updateAccountInfoTimer = null;
+    var LOCAL_STORAGE_KEYS = {
+      PROXY: 'proxy',
+      LAST_LOGIN: 'lastLogin'
+    };
     eventRegistry.init();
+
     // handle proxy localy
     $rootScope.setProxy = function(status) {
-      window.localStorage.setItem('proxy', JSON.stringify({status: Boolean(status)}));
+      window.localStorage.setItem(LOCAL_STORAGE_KEYS.PROXY, JSON.stringify({status: Boolean(status)}));
     };
+
     $rootScope.getProxy = function() {
-      return JSON.parse(window.localStorage.getItem('proxy'));
+      return JSON.parse(window.localStorage.getItem(LOCAL_STORAGE_KEYS.PROXY));
     };
-    $rootScope.clearProxy = function() {
+
+    // handle lastLogin
+    $rootScope.setLastLogin = function() {
+      window.localStorage.setItem(LOCAL_STORAGE_KEYS.LAST_LOGIN, (new Date()).getTime());
+    };
+
+    $rootScope.getLastLogin = function() {
+      return window.localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_LOGIN);
+    };
+
+    $rootScope.clearLocalStorage = function() {
       window.localStorage.clear();
     };
 
@@ -76,6 +92,20 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         }
         $rootScope.$applyAsync();
       }
+    };
+
+    var checkProxy = function() {
+      if (!$rootScope.getLastLogin()) {
+        return;
+      }
+      var proxy = $rootScope.getProxy();
+      if (proxy && proxy.hasOwnProperty('status')) {
+        if (proxy.status) {
+          return $scope.toggleProxyServer();
+        }
+        return;
+      }
+      $state.go('splash');
     };
 
     $scope.fetchStatsForUnauthorisedClient = function() {
@@ -172,35 +202,28 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       server.startProxyServer(proxyListener);
     };
 
-    $scope.enableProxySetting = function(status) {
-      $rootScope.setProxy(status);
-      if (status) {
-        $scope.toggleProxyServer();
-      }
-      $state.go('app', {isFirstLogin: true});
-    };
-
-    var checkProxy = function() {
-      if ($state.params.hasOwnProperty('isFirstLogin') && $state.params.isFirstLogin) {
-        return;
-      }
-      var proxy = $rootScope.getProxy();
-      if (proxy && proxy.hasOwnProperty('status')) {
-        if (proxy.status) {
-          return $scope.toggleProxyServer();
-        }
-        return;
-      }
-      $state.go('splash');
-    };
-
     $scope.openExternal= function(e, url) {
       e.preventDefault();
       server.openExternal(url);
     };
 
+    $scope.enableProxySetting = function(status) {
+      $rootScope.setProxy(status);
+      if (status) {
+        $scope.toggleProxyServer();
+      }
+      return ($rootScope.getLastLogin() ? $state.go('app') : $state.go('app.account', {currentPage: 'authIntro'}));
+    };
+
+    $scope.reconnectNetwork = function(user) {
+      server.reconnectNetwork(user);
+    };
+
     window.msl.setNetworkStateChangeListener(function(state) {
       if (state === window.NETWORK_STATE.CONNECTED) {
+        if ($state.current.name === 'splash' || $state.current.name === '') {
+          $rootScope.getProxy() && $rootScope.getProxy().hasOwnProperty('status') ? $state.go('app') : $state.go('initProxy');
+        }
         if ($rootScope.isAuthenticated) {
           $rootScope.clearIntervals();
           $scope.fetchStatsForAuthorisedClient();
@@ -241,7 +264,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
               hasOption: false,
               isError: false
             }, function(err, data) {});
-            server.reconnectNetwork($rootScope.userInfo);
+            $scope.reconnectNetwork($rootScope.userInfo);
           });
         }
       }

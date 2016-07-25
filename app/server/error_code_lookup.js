@@ -61,7 +61,17 @@ export function errorCodeLookup(errCode) {
     case CLIENT_ERROR_START_RANGE - 27:
       return 'CoreError::MutationFailure::MutationError::NetworkFull';
     case CLIENT_ERROR_START_RANGE - 28:
-      return 'CoreError::SelfEncryption';
+      return 'SelfEncryptionError::Compression::<SelfEncryptionStorageError>)';
+    case CLIENT_ERROR_START_RANGE - 29:
+      return 'SelfEncryptionError::Decryption::<SelfEncryptionStorageError>)';
+    case CLIENT_ERROR_START_RANGE - 30:
+      return 'CoreError::SelfEncryption(SelfEncryptionError::Io::<SelfEncryptionStorageError>)';
+    case CLIENT_ERROR_START_RANGE - 31:
+      return 'CoreError::GetAccountInfoFailure::GetError::NoSuchAccount';
+    case CLIENT_ERROR_START_RANGE - 32:
+      return 'CoreError::GetAccountInfoFailure';
+    case CLIENT_ERROR_START_RANGE - 33:
+      return 'CoreError::RequestTimeout';
     case NFS_ERROR_START_RANGE - 1:
       return 'NfsError::DirectoryAlreadyExistsWithSameName';
     case NFS_ERROR_START_RANGE - 2:
@@ -83,7 +93,11 @@ export function errorCodeLookup(errCode) {
     case NFS_ERROR_START_RANGE - 10:
       return 'NfsError::UnsuccessfulEncodeDecode';
     case NFS_ERROR_START_RANGE - 11:
-      return 'NfsError::SelfEncryption';
+      return '::Compression::<SelfEncryptionStorageError>)';
+    case NFS_ERROR_START_RANGE - 12:
+      return '::Decryption::<SelfEncryptionStorageError>)';
+    case NFS_ERROR_START_RANGE - 13:
+      return 'NfsError::SelfEncryption(SelfEncryptionError::Io::<SelfEncryptionStorageError>)';
     case DNS_ERROR_START_RANGE:
       return 'DnsError::DnsNameAlreadyRegistered';
     case DNS_ERROR_START_RANGE - 1:

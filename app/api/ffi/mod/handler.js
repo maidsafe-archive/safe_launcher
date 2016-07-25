@@ -29,7 +29,7 @@ module.exports = function(libPath) {
       'client_issued_gets': [ int, [ voidPtrPtr ] ],
       'client_issued_posts': [ int, [ voidPtrPtr ] ],
       'client_issued_puts': [ int, [ voidPtrPtr ] ],
-      'create_account': [ int, [ cString, voidPtrPtr ] ],
+      'create_account': [ int, [ cString, cString, voidPtrPtr ] ],
       'create_unregistered_client': [ int, [ voidPtrPtr ] ],
       'drop_client': [ 'void', [ voidPtrPtr ] ],
       'drop_vector': [ 'void', [ 'pointer', int, int ] ],
@@ -40,10 +40,10 @@ module.exports = function(libPath) {
       'get_nfs_writer': [ int, [ cString, voidPtrPtr, voidPtrPtr ] ],
       'get_safe_drive_key': [ 'pointer', [ intPtr, intPtr, intPtr, voidPtrPtr ] ],
       'init_logging': [ int, [] ],
-      'log_in': [ int, [ cString, voidPtrPtr ] ],
+      'log_in': [ int, [ cString, cString, voidPtrPtr ] ],
       'nfs_create_file': [ int, [ cString, voidPtrPtr, voidPtrPtr ] ],
       'nfs_stream_close': [ int, [ voidPtrPtr ] ],
-      'nfs_stream_write': [ int, [ voidPtrPtr, int, refUin8Array, size_t ] ],
+      'nfs_stream_write': [ int, [ voidPtrPtr, refUin8Array, size_t ] ],
       'register_network_event_observer': [ 'void', [ voidPtrPtr, 'pointer' ] ]
     };
   };
