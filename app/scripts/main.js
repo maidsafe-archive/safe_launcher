@@ -18,7 +18,18 @@ window.safeLauncher = angular
     $rootScope.userInfo = {};
     $rootScope.keys = Object.keys;
     $rootScope.appVersion = require('./package.json').version;
-
+    $rootScope.$loader = {
+      status: false,
+      description: '',
+      show: function(description) {
+        this.status = true;
+        this.description = description || '';
+      },
+      hide: function() {
+        this.status = false;
+        this.description = '';
+      }
+    };
     $rootScope.resetAppStates = function () {
       $rootScope.isAuthenticated = false;
       $rootScope.isAuthLoading = false;

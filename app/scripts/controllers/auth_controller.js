@@ -61,10 +61,13 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       $rootScope.userInfo = $scope.user.password;
       $scope.user = {};
       if (err) {
-        // TODO set register/login based error messages
-        var errorTarget = $('#errorTarget');
-        errorTarget.addClass('error');
-        errorTarget.children('.msg').text('Invalid entries, account does not exist.');
+        if ($state.params.currentPage === 'login') {
+          var errorTarget = $('#errorTarget');
+          errorTarget.addClass('error');
+          errorTarget.children('.msg').text('Invalid entries, account does not exist.');
+        } else {
+          $state.go('app.account', {currentPage: 'register'}, {reload: true});
+        }
         return $rootScope.$toaster.show({
           msg: 'Authentication failed, invalid entries',
           isError: true
