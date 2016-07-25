@@ -91,7 +91,7 @@ export default class RESTServer {
     app.use(function(err, req, res) {
       if (res.headersSent) {
         return;
-      }      
+      }
       res.status(404).send('Not Found');
     });
 
@@ -139,6 +139,7 @@ export default class RESTServer {
   }
 
   authRejected(payload) {
+    updateAppActivity(payload.request, payload.response);
     payload.response.status(401).send('Unauthorised');
   }
 }
