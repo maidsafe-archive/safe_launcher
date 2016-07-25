@@ -65,6 +65,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
           var errorTarget = $('#errorTarget');
           errorTarget.addClass('error');
           errorTarget.children('.msg').text('Invalid entries, account does not exist.');
+          errorTarget.focus();
           return $rootScope.$toaster.show({
             msg: 'Authentication failed, invalid entries',
             isError: true
@@ -76,7 +77,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
           isError: true
         }, function() {});
       }
-      $rootScope.isAuthenticated = true;      
+      $rootScope.isAuthenticated = true;
       $rootScope.$applyAsync();
       console.log('Authorised successfully!');
     };

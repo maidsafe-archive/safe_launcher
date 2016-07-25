@@ -19,7 +19,7 @@ window.safeLauncher = angular
     $rootScope.keys = Object.keys;
     $rootScope.appVersion = require('./package.json').version;
     $rootScope.ACCOUNT_STATES = [ 'login', 'register', 'authIntro' ];
-    $rootScope.accountLastState = $rootScope.ACCOUNT_STATES[0];
+    $rootScope.accountLastState = null;
     $rootScope.$loader = {
       status: false,
       description: '',
@@ -77,7 +77,7 @@ window.safeLauncher = angular
         }
       }
       if (fromState.name !== 'app.account' && toState.name === 'app.account') {
-        toParams.currentPage = $rootScope.accountLastState;
+        toParams.currentPage = $rootScope.accountLastState || toParams.currentPage;
       }
     });
     var Queuing = function() {
