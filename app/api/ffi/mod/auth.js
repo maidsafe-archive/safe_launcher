@@ -77,7 +77,7 @@ var register = function(lib, request, observer) {
   var regClient = ref.alloc(clientHandlePtrPtr);
 
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  lib.create_account.async(params.phrase, regClient, function(err, res) {
+  lib.create_account.async(params.location, params.password, regClient, function(err, res) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     if (err) {
       return util.sendError(request.id, 999, err.message);
@@ -86,7 +86,6 @@ var register = function(lib, request, observer) {
       return util.sendError(request.id, res);
     }
     registeredClientHandle = regClient.deref();
-    // dropUnregisteredClient(lib);
     registerObserver(lib, registeredClientHandle, observer);
     var safeDriveError = setSafeDriveKey(lib);
     if (safeDriveError) {
@@ -101,7 +100,7 @@ var login = function(lib, request, observer) {
   var params = request.params;
   var regClient = ref.alloc(clientHandlePtrPtr);
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  lib.log_in.async(params.phrase, regClient, function(err, res) {
+  lib.log_in.async(params.location, params.password, regClient, function(err, res) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     if(err) {
       return util.sendException(request.id, err.message);

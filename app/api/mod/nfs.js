@@ -247,7 +247,7 @@ export default class NFS {
         hasSafeDriveAccess: false,
         params: {
           writerId: writerId,
-          offset: offset,
+          // offset: offset,
           data: data.toString('base64')
         }
       }, callback);

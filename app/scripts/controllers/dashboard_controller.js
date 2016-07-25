@@ -1,8 +1,8 @@
 /**
  * Dashboard Controller
  */
-window.safeLauncher.controller('dashboardController', [ '$scope', '$state', '$rootScope', '$interval', 'serverFactory',
-  function($scope, $state, $rootScope, $interval, server) {
+window.safeLauncher.controller('dashboardController', [ '$scope', '$state', '$rootScope', 'serverFactory',
+  function($scope, $state, $rootScope, server) {
     var currentTime = 0;
     var dateDiff = 0;
     $scope.logFilter = [
@@ -16,6 +16,6 @@ window.safeLauncher.controller('dashboardController', [ '$scope', '$state', '$ro
         return $scope.logFilter.splice(index, 1);
       }
       $scope.logFilter.unshift(name);
-    };    
+    };
   }
 ]);

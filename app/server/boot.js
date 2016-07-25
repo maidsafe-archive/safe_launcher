@@ -89,12 +89,15 @@ export default class RESTServer {
 
     // catch 404
     app.use(function(err, req, res) {
-      log.error(err.message);
+      if (res.headersSent) {
+        return;
+      }      
       res.status(404).send('Not Found');
     });
 
     app.set('port', this.port);
     this.server = http.createServer(app);
+    this.server.timeout = 0;
     this.server.listen(this.port, this.callback);
     this.server.on('error', this._onError(this.EVENT_TYPE.ERROR, eventEmitter));
     this.server.on('close', this._onClose(this.EVENT_TYPE.STOPPED, eventEmitter));
@@ -111,6 +114,10 @@ export default class RESTServer {
   removeSession(id) {
     sessionManager.remove(id);
     this.app.get('eventEmitter').emit(this.EVENT_TYPE.SESSION_REMOVED, id);
+  }
+
+  clearAllSessions() {
+    sessionManager.clear();
   }
 
   addEventListener(event, listener) {

@@ -15,7 +15,9 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
 
     // remove session
     $scope.removeSession = function(id) {
-      $rootScope.currentAppDetails = null;
+      $rootScope.currentAppDetails = {
+        logs: {}
+      };
       $rootScope.logList[id] = {
         appName: $rootScope.appList[id].name,
         activityName: 'Revoke app',
@@ -40,7 +42,9 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
 
     $scope.toggleAppDetails = function(id) {
       if (!id) {
-        return $rootScope.currentAppDetails = null;
+        return $rootScope.currentAppDetails = {
+          logs: {}
+        };
       }
       for(var i in $rootScope.appList) {
         if ($rootScope.appList[i].id === id) {
@@ -57,6 +61,17 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
           }
         });
       }
+    };
+
+    $scope.logout = function() {      
+      window.msl.clearAllSessions();
+      $rootScope.clearIntervals();
+      $rootScope.resetStats();
+      $rootScope.resetAppStates();
+      server.reconnectNetwork();
+      $state.go('app.account', {
+        currentPage: 'login'
+      });
     };
   }
 ]);

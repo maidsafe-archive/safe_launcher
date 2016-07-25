@@ -4,6 +4,10 @@ class SessionManager {
     this.sessionPool = {};
   }
 
+  clear() {
+    this.sessionPool = {};
+  }
+
   put(sessionId, sessionInfo) {
     if (this.sessionPool[sessionId]) {
       return false;

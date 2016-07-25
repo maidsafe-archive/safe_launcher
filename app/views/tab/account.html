@@ -3,6 +3,7 @@
   <div class="auth-b">
     <ng-include src="'views/auth/login.html'" ng-show="!$state.params.currentPage || $state.params.currentPage === 'login'"></ng-include>
     <ng-include src="'views/auth/register.html'" ng-show="$state.params.currentPage === 'register'"></ng-include>
+    <ng-include src="'views/auth/auth_intro.html'" ng-show="$state.params.currentPage === 'authIntro'"></ng-include>
   </div>
 </div>
 <!-- /Authentication -->

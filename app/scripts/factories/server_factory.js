@@ -56,7 +56,7 @@ window.safeLauncher.factory('serverFactory', [
     };
 
     // handle auth request
-    self.onAuthRequest = function(callback) {      
+    self.onAuthRequest = function(callback) {
       window.msl.onAuthRequest(callback);
     };
 

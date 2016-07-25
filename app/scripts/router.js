@@ -2,7 +2,7 @@
  * Router
  */
 window.safeLauncher.config(function($stateProvider, $urlRouterProvider) {
-  $urlRouterProvider.otherwise('app');
+  $urlRouterProvider.otherwise('splash');
   $stateProvider
   .state('splash', {
     'url': '/splash',
@@ -12,8 +12,16 @@ window.safeLauncher.config(function($stateProvider, $urlRouterProvider) {
       }
     }
   })
+  .state('initProxy', {
+    'url': '/init_proxy',
+    'views': {
+      'root': {
+        'templateUrl': 'views/common/proxy_popup.html'
+      }
+    }
+  })
   .state('app', {
-    'url': '/app?:isFirstLogin?',
+    'url': '/app',
     'views': {
       'root': {
         'templateUrl': 'views/tab/base.html'
