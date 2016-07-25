@@ -19,6 +19,7 @@
   <alert ng-show="$prompt.isProcessing" payload="$prompt.payload" callback="$prompt.callback()"></alert>
   <toaster payload="$toaster.payload" callback="$toaster.callback()"></toaster>
   <authorise-req ng-show="$authReq.isProcessing" payload="$authReq.payload" callback="$authReq.callback(err, data)"></authorise-req>
+  <ng-include src="'views/common/spinner.html'" ng-show="$loader.status"></ng-include>
   <script>
     window.$ = window.jQuery = require('./bower_components/jquery/dist/jquery.min.js');
   </script>
