@@ -14,7 +14,8 @@
   <span class="network-status" ng-class="{
     error: $networkStatus.status === -1 || $networkStatus.status === 2,
     connecting: $networkStatus.status === 0,
-    connected: $networkStatus.status === 1
+    connected: $networkStatus.status === 1,
+    'splash-screen': $state.current.name === 'splash'
   }" ng-click="showNetworkStatus($networkStatus.status)"></span>
   <alert ng-show="$prompt.isProcessing" payload="$prompt.payload" callback="$prompt.callback()"></alert>
   <toaster payload="$toaster.payload" callback="$toaster.callback()"></toaster>
