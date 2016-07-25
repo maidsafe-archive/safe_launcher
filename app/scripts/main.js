@@ -18,6 +18,8 @@ window.safeLauncher = angular
     $rootScope.userInfo = {};
     $rootScope.keys = Object.keys;
     $rootScope.appVersion = require('./package.json').version;
+    $rootScope.ACCOUNT_STATES = [ 'login', 'register', 'authIntro' ];
+    $rootScope.accountLastState = $rootScope.ACCOUNT_STATES[0];
     $rootScope.$loader = {
       status: false,
       description: '',
@@ -68,6 +70,14 @@ window.safeLauncher = angular
       if ($rootScope.isAuthLoading) {
         event.preventDefault();
         return;
+      }
+      if (fromState.name === 'app.account' && toState.name !== 'app.account') {
+        if (fromParams.currentPage && ($rootScope.ACCOUNT_STATES.indexOf(fromParams.currentPage) !== -1)) {
+          $rootScope.accountLastState = fromParams.currentPage;
+        }
+      }
+      if (fromState.name !== 'app.account' && toState.name === 'app.account') {
+        toParams.currentPage = $rootScope.accountLastState;
       }
     });
     var Queuing = function() {
