@@ -16,7 +16,8 @@ app.on('ready', function() {
   mainWindow = new BrowserWindow({
     'width': 750  + (process.platform === 'win32' ? 20 : 0),
     'height': 550 + (process.platform === 'win32' ? 30 : 0),
-    'resizable': false
+    'resizable': false,
+    'icon': __dirname + '/images/app_icon.png'
   });
   mainWindow.loadURL('file://' + __dirname + '/app.html');
 
