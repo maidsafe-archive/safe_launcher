@@ -216,6 +216,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     };
 
     $scope.reconnectNetwork = function(user) {
+      $rootScope.$networkStatus.status = window.NETWORK_STATE.CONNECTING;
       server.reconnectNetwork(user);
     };
 

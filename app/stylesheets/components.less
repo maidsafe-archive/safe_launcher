@@ -1311,6 +1311,11 @@
   &:active {
     background-color: @primary-blue-action;
   }
+  &.splash-screen {
+    &:hover, &:active {
+      background-color: transparent !important;
+    }
+  }
   &.connecting:after {
     background-image: url(../images/loading.svg);
     animation: loading 0.5s linear infinite;
