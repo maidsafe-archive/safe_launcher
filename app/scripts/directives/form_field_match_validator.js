@@ -5,7 +5,8 @@ window.safeLauncher.directive('fieldMatchValidator', [ 'CONSTANTS', 'MESSAGES',
     var onChange = function(scope, ele, attr, ctrl) {
       var msgEle = $(ele).siblings('.msg');
       var parent = $(ele).parent();
-      var target = ctrl.$$parentForm[attr.target];
+      var targetEle = angular.element(document.getElementsByName(ctrl.$$parentForm.$name)).find('input[name='+attr.target+']');
+      var targetVal = targetEle.val();
       var value = '';
       var resetField = function() {
         parent.removeClass('error');
@@ -19,7 +20,19 @@ window.safeLauncher.directive('fieldMatchValidator', [ 'CONSTANTS', 'MESSAGES',
         if (!value) {
           return resetField();
         }
-        if (value !== target.$viewValue) {
+        if (value !== targetVal) {
+          return msgEle.text($msg.ENTRIES_DONT_MATCH);
+        }
+        return resetField();
+      });
+      targetEle.bind('keyup', function(e) {
+        targetVal = e.target.value;
+        if (!value || !targetVal) {
+          return;
+        }
+        ctrl.$setValidity('fieldValidator', false);
+        parent.addClass('error');
+        if (value !== targetVal) {
           return msgEle.text($msg.ENTRIES_DONT_MATCH);
         }
         return resetField();
