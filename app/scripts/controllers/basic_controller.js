@@ -93,13 +93,18 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       }
     };
 
-    var checkProxy = function() {
+    var loadProxybasedOnSettings = function() {
       var proxy = $rootScope.getProxy();
-      if (proxy && proxy.hasOwnProperty('status')) {
-        if (proxy.status) {
-          return $scope.toggleProxyServer();
-        }
+      if (!(proxy && proxy.hasOwnProperty('status'))) {
+        return
+      }
+      if (proxy.status === $rootScope.$proxyServer) {
         return;
+      }
+      if (proxy.status) {
+        server.startProxyServer(proxyListener);
+      } else {
+        server.stopProxyServer();
       }
     };
 
@@ -226,7 +231,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
           $scope.updateUserAccount();
           $scope.pollUserAccount();
         } else {
-          checkProxy();
+          loadProxybasedOnSettings();
           $scope.fetchStatsForUnauthorisedClient();
         }
         $rootScope.retryCount = 1;
