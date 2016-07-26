@@ -94,7 +94,7 @@
     .msg {
       height: 20px;
       margin-top: 3px;
-      font-size: 12px;
+      font-size: 14px;
       line-height: 20px;
       position: relative;
       &:after {
@@ -138,7 +138,7 @@
     input:focus ~ label {
       display: block !important;
       top: -18px;
-      font-size: 12px;
+      font-size: 14px;
       line-height: 16px;
     }
     input:valid ~ label {
@@ -146,6 +146,34 @@
     }
     input:valid ~ .opt {
       display: block;
+    }
+    &.light-theme {
+      label {
+        color: #FFF;
+        opacity: 1;
+      }
+      input {
+        color: #FFF;
+        border-color: rgba(255, 255, 255, 0.4);
+        &:focus {
+          border-color: #FFF;
+        }
+      }
+      .msg {
+        color: #FFF;
+      }
+      .opt-i {
+        margin: 3px 0;
+        .eye {
+          background-image: url(../images/show_password_light.svg);
+          &:hover {
+            background-image: url(../images/show_password_light_hover.svg);
+          }
+          &.active {
+            background-image: url(../images/show_password_light_active.svg);
+          }
+        }
+      }
     }
   }
   .inp-btn {
@@ -164,7 +192,7 @@
     position: absolute;
     top: 30px;
     margin-top: -1px;
-    background-color: @primary-blue;
+    background-color: #FFF;
     z-index: 99;
   }
   .status {
@@ -184,7 +212,7 @@
       position: relative;
       top: -3px;
       left: 50%;
-      background-color: #212121;
+      background-color: #FFF;
     }
     &:after {
       content: attr(data-val);
@@ -200,56 +228,58 @@
         width: 20px;
         height: 20px;
         display: block;
+        background-image: url(../images/tick_create_light.svg);
       }
     }
     &.last {
       left: 62.5%;
     }
   }
-  &.vweak {
-    .msg {
-      color: @pass-vweak;
-    }
-    .strength {
-      background-color: @pass-vweak;
-    }
-  }
-  &.weak {
-    .msg {
-      color: @pass-weak-txt;
-    }
-    .strength {
-      background-color: @pass-weak;
-    }
-  }
-  &.somewhat-secure {
-    .msg {
-      color: @pass-ok-txt;
-    }
-    .strength {
-      background-color: @pass-ok;
-    }
-    .status.icn:after {
-      background-image: url(../images/tick_create_success.svg);
-    }
-  }
-  &.secure {
-    .msg {
-      color: @pass-secure-txt;
-    }
-    .strength {
-      background-color: @pass-secure;
-    }
-    .status.icn:after {
-      background-image: url(../images/tick_create_success.svg);
-    }
-  }
+  // &.vweak {
+  //   .msg {
+  //     color: @pass-vweak;
+  //   }
+  //   .strength {
+  //     background-color: @pass-vweak;
+  //   }
+  // }
+  // &.weak {
+  //   .msg {
+  //     color: @pass-weak-txt;
+  //   }
+  //   .strength {
+  //     background-color: @pass-weak;
+  //   }
+  // }
+  // &.somewhat-secure {
+  //   .msg {
+  //     color: @pass-ok-txt;
+  //   }
+  //   .strength {
+  //     background-color: @pass-ok;
+  //   }
+  //   .status.icn:after {
+  //     background-image: url(../images/tick_create_success.svg);
+  //   }
+  // }
+  // &.secure {
+  //   .msg {
+  //     color: @pass-secure-txt;
+  //   }
+  //   .strength {
+  //     background-color: @pass-secure;
+  //   }
+  //   .status.icn:after {
+  //     background-image: url(../images/tick_create_success.svg);
+  //   }
+  // }
 }
 
 .auth-intro {
   .auth-intro-b {
     width: 480px;
     margin: 0 auto;
+    position: relative;
   }
   .auth-intro-cnt {
     height: 360px;
@@ -279,7 +309,7 @@
       font-size: 16px;
       font-weight: normal;
     }
-    .opt {
+    > .opt {
       width: 100%;
       padding: 0 24px;
       position: absolute;
@@ -287,8 +317,15 @@
       left: 0;
       text-align: right;
       margin-top: 20px;
+      z-index: 9;
       .opt-i {
         display: inline-block;
+        &.lt {
+          float: left;
+        }
+        &.rt {
+          float: right;
+        }
         .btn {
           background-color: transparent;
           color: #FFF;
@@ -300,60 +337,26 @@
     }
   }
   .auth-intro-nav-btn {
-    margin-top: 20px;
-    margin-bottom: 45px;
+    width: 150px;
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    display: inline-block;
+    margin-left: -75px;
+    text-align: center;
+    z-index: 99;
     .auth-intro-nav-btn-i {
       display: inline-block;
       width: 10px;
       height: 10px;
-      border: 1px solid @primary-blue;
+      margin: 0 3px;
+      border: 1px solid #FFF;
       border-radius: 50%;
+      cursor: pointer;
       &.active {
-        background-color: @primary-blue;
+        background-color: #FFF;
       }
     }
-  }
-}
-
-.create-acc {
-  margin-bottom: 50px;
-  .create-acc-b {
-    width: 460px;
-    height: 330px;
-    background-color: #FFF;
-    margin: 0 auto;
-  }
-  .create-acc-nav {
-    padding-bottom: 20px;
-    ul {
-      margin: 0;
-      padding: 0;
-      list-style-type: none;
-      text-align: center;
-      display: flex;
-      li {
-        display: inline-block;
-        float: left;
-        flex: 1;
-        font-size: 18px;
-        padding: 10px 0;
-        cursor: pointer;
-        background-color: rgba(234, 234, 234, 0.5);
-        color: rgba(0, 0, 0, 0.4);
-        &.active {
-          background-color: #FFF;
-          color: #000;
-        }
-        &.disabled {
-          color: rgba(0, 0, 0, 0.2);
-          cursor: default;
-        }
-      }
-      .clearfix();
-    }
-  }
-  .create-acc-cnt {
-
   }
 }
 

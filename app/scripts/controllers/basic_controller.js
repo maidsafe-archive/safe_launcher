@@ -212,7 +212,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       if (status) {
         $scope.toggleProxyServer();
       }
-      return $state.go('app.account', {currentPage: 'authIntro'});
+      return $state.go('app.account', {currentPage: 'register'});
     };
 
     $scope.reconnectNetwork = function(user) {

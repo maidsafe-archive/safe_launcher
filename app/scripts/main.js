@@ -16,6 +16,7 @@ window.safeLauncher = angular
   function($rootScope, $state, $stateParams, $timeout, $interval, CONSTANTS) {
     $rootScope.$state = $state;
     $rootScope.userInfo = {};
+    $rootScope.user = {};
     $rootScope.keys = Object.keys;
     $rootScope.appVersion = require('./package.json').version;
     $rootScope.ACCOUNT_STATES = [ 'login', 'register', 'authIntro' ];
@@ -73,11 +74,18 @@ window.safeLauncher = angular
       }
       if (fromState.name === 'app.account' && toState.name !== 'app.account') {
         if (fromParams.currentPage && ($rootScope.ACCOUNT_STATES.indexOf(fromParams.currentPage) !== -1)) {
-          $rootScope.accountLastState = fromParams.currentPage;
+          $rootScope.accountLastState = fromParams;
         }
       }
       if (fromState.name !== 'app.account' && toState.name === 'app.account') {
-        toParams.currentPage = $rootScope.accountLastState || toParams.currentPage;
+        if ($rootScope.accountLastState) {
+          toParams.currentPage = $rootScope.accountLastState.currentPage || toParams.currentPage;
+          toParams.currentState = $rootScope.accountLastState.currentState || toParams.currentState;
+        }
+      }
+      if ((toState.name === 'app.account') && (toParams.currentPage === 'login')) {
+        $rootScope.user = {};
+        toParams.currentState = null;
       }
     });
     var Queuing = function() {

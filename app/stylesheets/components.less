@@ -27,6 +27,10 @@
       width: 100%;
       height: @header-ht;
       background-color: @primary-blue;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 9;
       ul {
         padding: 0;
         margin: 0;
@@ -131,6 +135,14 @@
         }
         .clearfix();
       }
+    }
+    .tab-cnt {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding-top: 46px;
     }
   }
 }
@@ -268,7 +280,6 @@
   .app-details-cnt {
     max-height: @tab-cnt-ht;
     padding: 24px;
-    overflow-y: auto;
     position: relative;
     .title {
       font-size: 24px;
@@ -431,11 +442,18 @@
             display: block;
             border-bottom: 1px solid transparent;
             cursor: pointer;
+            position: relative;
             &:hover {
               background-color: #EEE;
             }
-            &.none:hover {
-              background-color: transparent;
+            &.none {
+              cursor: default;
+              &:hover {
+                background-color: transparent;
+              }
+              &:after {
+                display: none;
+              }
             }
             &:after {
               content: '';
@@ -1096,48 +1114,53 @@
   .table-inner-b {
     height: 370px;
     overflow-y: auto;
-  }
-  table {
-    width: 100%;
-    font-size: 14px;
     &.four-col {
-      tr {
-        th:nth-child(1) {
-          width: 40%;
-        }
-        th:nth-child(2) {
-          width: 30%;
-        }
-        th:nth-child(3) {
-          width: 15%;
-        }
-        th:nth-child(4) {
-          width: 15%;
+      table {
+        tr {
+          th:nth-child(1) {
+            width: 40%;
+          }
+          th:nth-child(2) {
+            width: 30%;
+          }
+          th:nth-child(3) {
+            width: 15%;
+          }
+          th:nth-child(4) {
+            width: 15%;
+          }
         }
       }
     }
     &.three-col {
-      tr {
-        &.default-row {
-          td:first-child {
-            display: table-cell !important;
-            text-transform: none;
+      height: 260px;
+      table {
+        tr {
+          &.default-row {
+            td:first-child {
+              display: table-cell !important;
+              text-transform: none;
+            }
           }
-        }
-        th:nth-child(1), td:first-child {
-          display: none;
-        }
-        th:nth-child(2) {
-          width: 60%;
-        }
-        th:nth-child(3) {
-          width: 20%;
-        }
-        th:nth-child(4) {
-          width: 20%;
+          th:nth-child(1), td:first-child {
+            display: none;
+          }
+          th:nth-child(2) {
+            width: 60%;
+          }
+          th:nth-child(3) {
+            width: 20%;
+          }
+          th:nth-child(4) {
+            width: 20%;
+          }
         }
       }
     }
+  }
+  table {
+    width: 100%;
+    font-size: 14px;
     th {
       text-align: left;
       font-weight: 600;

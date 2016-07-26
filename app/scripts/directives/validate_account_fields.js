@@ -12,7 +12,7 @@ window.safeLauncher.directive('validateAccountSecret', [ 'CONSTANTS', 'MESSAGES'
 
       var resetField = function() {
         isValid = false;
-        parent.removeClass('vweak weak somewhat-secure secure');
+        // parent.removeClass('vweak weak somewhat-secure secure');
         ctrl.$setValidity('fieldValidator', true);
         strengthEle.width('0');
         statusEle.removeClass('icn');
@@ -29,15 +29,15 @@ window.safeLauncher.directive('validateAccountSecret', [ 'CONSTANTS', 'MESSAGES'
         statusEle.removeClass('icn');
         switch (true) {
           case (log10 < 4):
-            parent.addClass('vweak');
+            // parent.addClass('vweak');
             msgEle.text($msg.PASS_VERY_WEEK);
             break;
           case (log10 < 8):
-            parent.addClass('weak');
+            // parent.addClass('weak');
             msgEle.text($msg.PASS_WEEK);
             break;
           case (log10 < 10):
-            parent.addClass('somewhat-secure');
+            // parent.addClass('somewhat-secure');
             if (attr.fieldType === 'SECRET') {
               statusEle.addClass('icn');
               isValid = true;
@@ -45,7 +45,7 @@ window.safeLauncher.directive('validateAccountSecret', [ 'CONSTANTS', 'MESSAGES'
             msgEle.text($msg.PASS_SOMEWHAT_SECURE);
             break;
           case (log10 >= 10):
-            parent.addClass('secure');
+            // parent.addClass('secure');
             statusEle.addClass('icn');
             msgEle.text($msg.PASS_SECURE);
             isValid = true;

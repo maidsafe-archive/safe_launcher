@@ -67,8 +67,8 @@ var AppLogs = React.createClass({
       ]);
       rows.push(row);
     });
-    return React.DOM.div({key: 'inner-b', className: 'table-inner-b'}, [
-      React.DOM.table({key: 'table', className: this.props.table},
+    return React.DOM.div({key: 'inner-b', className: 'table-inner-b '  + this.props.table}, [
+      React.DOM.table({key: 'table'},
         tableHead,
         React.DOM.tbody(null, rows)
       )

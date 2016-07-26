@@ -6,27 +6,39 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
   function($scope, $state, $rootScope, $timeout, auth, CONSTANTS, MESSAGES) {
     var REQUEST_TIMEOUT = 90 * 1000;
     var FIELD_FOCUS_DELAY = 100;
-    $scope.user = {};
-    $scope.secretValid = false;
     $scope.secretValid = false;
     $scope.passwordValid = false;
-    $scope.CREATE_ACC_STATES = {
-      ACC_SECRET: 'accountSecret',
-      ACC_PASS: 'accountPassword'
-    };
-    $scope.createAccCurrentState = $scope.CREATE_ACC_STATES.ACC_SECRET;
-    $scope.authIntro = {
-      totalCount: 3,
-      currentPos: 1,
+    $scope.createAccFlow = {
+      states: [
+        'WELCOME',
+        'ACC_INFO',
+        'ACC_SECRET_FORM',
+        'ACC_PASS',
+        'ACC_PASS_FORM'
+      ],
+      totalCount: function() {
+        return this.states.length;
+      },
+      currentPos: 0,
+      getPos: function(state) {
+        return this.states.indexOf(state);
+      },
+      setPos: function(state) {
+        if (this.states.indexOf(state) > this.states.indexOf('ACC_SECRET_FORM')) {
+          if (($scope.user.accountSecret !== $scope.user.confirmAccountSecret) || !$scope.secretValid) {
+            return;
+          }
+        }
+        $state.go('app.account', {currentPage: $state.params.currentPage, currentState: state}, {notify: false});
+        this.currentPos = state ? this.states.indexOf(state) : 0;
+      },
       continue: function() {
-        if (this.currentPos < this.totalCount) {
-          this.currentPos++;
-        } else if (this.currentPos === this.totalCount) {
-          $state.go('app.account', {currentPage: 'register'});
+        if (this.currentPos < this.totalCount()) {
+          this.setPos(this.states[this.currentPos + 1]);
         }
       },
       back: function() {
-        if (this.currentPos > 1) {
+        if (this.currentPos > 0) {
           this.currentPos--;
         }
       }
@@ -75,7 +87,11 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         var errorTarget = $('#errorTarget');
         errorTarget.addClass('error');
         errorTarget.children('.msg').text('Invalid entries, account does not exist.');
-        errorTarget.focus();
+        errorTarget.children('input').focus();
+        errorTarget.children('input').bind('keyup', function(e) {
+          errorTarget.children('.msg').text('');
+          errorTarget.removeClass('error');
+        });
         return $rootScope.$toaster.show({
           msg: 'Authentication failed, invalid entries',
           isError: true
@@ -128,10 +144,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     $scope.checkSecretValid = function(result) {
       $scope.secretValid = result;
       $scope.$applyAsync();
-    };
-
-    $scope.setAccountSecret = function() {
-      $scope.createAccCurrentState = $scope.CREATE_ACC_STATES.ACC_PASS;
     };
 
     $scope.createAccNavigation = function(e, state) {
