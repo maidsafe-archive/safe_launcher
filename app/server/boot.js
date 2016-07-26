@@ -60,13 +60,12 @@ export default class RESTServer {
     let EVENT_TYPE = this.app.get('EVENT_TYPE');
     let eventEmitter = this.app.get('eventEmitter');
 
-    app.use(bodyParser.json({strict: false}));
-
-    app.use(setSessionHeaderAndParseBody);
 
     app.use(bodyParser.urlencoded({
       extended: false
     }));
+
+    app.use(setSessionHeaderAndParseBody);
 
     app.use('/health', function(req, res) {
       res.sendStatus(200);
