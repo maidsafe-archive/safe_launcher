@@ -10,7 +10,11 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     $scope.secretValid = false;
     $scope.secretValid = false;
     $scope.passwordValid = false;
-    $scope.createAccState = 0;
+    $scope.CREATE_ACC_STATES = {
+      ACC_SECRET: 'accountSecret',
+      ACC_PASS: 'accountPassword'
+    };
+    $scope.createAccCurrentState = $scope.CREATE_ACC_STATES.ACC_SECRET;
     $scope.authIntro = {
       totalCount: 3,
       currentPos: 1,
@@ -127,7 +131,14 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     };
 
     $scope.setAccountSecret = function() {
-      $scope.createAccState = 1;
+      $scope.createAccCurrentState = $scope.CREATE_ACC_STATES.ACC_PASS;
+    };
+
+    $scope.createAccNavigation = function(e, state) {
+      if (e.target.className.split(',').indexOf('disabled') !== -1) {
+        return;
+      }
+      $scope.createAccCurrentState = state;
     };
   }
 ]);

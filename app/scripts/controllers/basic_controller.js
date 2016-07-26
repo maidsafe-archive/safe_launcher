@@ -218,7 +218,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     window.msl.setNetworkStateChangeListener(function(state) {
       if (state === window.NETWORK_STATE.CONNECTED) {
         if ($state.current.name === 'splash' || $state.current.name === '') {
-          $rootScope.getProxy() && $rootScope.getProxy().hasOwnProperty('status') ? $state.go('app') : $state.go('initProxy');
+          $rootScope.getProxy() && $rootScope.getProxy().hasOwnProperty('status') ? $state.go('app.account', {currentPage: 'register'}) : $state.go('initProxy');
         }
         if ($rootScope.isAuthenticated) {
           $rootScope.clearIntervals();
