@@ -186,8 +186,12 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
           version: session.info.appVersion,
           vendor: session.info.vendor,
           permissions: session.info.permissions.list,
-          status: {},
-          lastActive: null
+          status: {
+            beginTime: new Date(),
+            activityName: 'Authorisation',
+            activityStatus: 1
+          },
+          lastActive: window.moment().fromNow()
         };
         $rootScope.$loader.hide();
         $rootScope.$applyAsync();

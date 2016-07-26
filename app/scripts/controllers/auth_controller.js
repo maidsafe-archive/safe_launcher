@@ -61,19 +61,19 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       $rootScope.userInfo = $scope.user.password;
       $scope.user = {};
       if (err) {
-        if ($state.params.currentPage === 'login') {
-          var errorTarget = $('#errorTarget');
-          errorTarget.addClass('error');
-          errorTarget.children('.msg').text('Invalid entries, account does not exist.');
-          errorTarget.focus();
+        if ($state.params.currentPage === 'register') {
+          $state.go('app.account', {currentPage: 'register'}, {reload: true});
           return $rootScope.$toaster.show({
-            msg: 'Authentication failed, invalid entries',
+            msg: 'Failed to create account',
             isError: true
           }, function() {});
         }
-        $state.go('app.account', {currentPage: 'register'}, {reload: true});
+        var errorTarget = $('#errorTarget');
+        errorTarget.addClass('error');
+        errorTarget.children('.msg').text('Invalid entries, account does not exist.');
+        errorTarget.focus();
         return $rootScope.$toaster.show({
-          msg: 'Failed to create account',
+          msg: 'Authentication failed, invalid entries',
           isError: true
         }, function() {});
       }
