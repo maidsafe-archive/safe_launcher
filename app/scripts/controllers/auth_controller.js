@@ -111,7 +111,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
     var onAuthResponse = function(err) {
       $rootScope.isAuthLoading = false;
       $scope.$applyAsync();
-      $rootScope.userInfo = $scope.user.password;
+      $rootScope.userInfo = $scope.user;
       $scope.user = {};
       if (err) {
         if ($state.params.currentPage === 'register') {
