@@ -140,12 +140,12 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
           var lastkey = logKeys.pop();
           delete $rootScope.logList[lastkey];
         }
-        data.activity['appName'] = data.app ? $rootScope.appList[data.app].name : 'Anonymous Application';
+        data.activity['appName'] = data.appName || 'Anonymous Application';
         $rootScope.logList[data.activity.activityId] = data.activity;
         if ($rootScope.currentAppDetails) {
           $rootScope.currentAppDetails['logs'][data.activity.activityId] = data.activity;
         }
-        if (data.app) {
+        if (data.app && $rootScope.appList[data.app]) {
             $rootScope.appList[data.app].status = data.activity;
         }
         $rootScope.$applyAsync();
