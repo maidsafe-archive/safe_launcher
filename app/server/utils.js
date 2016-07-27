@@ -185,8 +185,10 @@ export var formatResponse = function(data) {
 
 export let addAppActivity = function(req, activityName) {
   let activity = new Activity(req.id, activityName, Date.now());
+  let sessionInfo = req.headers.sessionId ? sessionManager.get(req.headers.sessionId) : null;
   req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').ACTIVITY_NEW, {
     app: req.headers.sessionId,
+    appName: sessionInfo ? sessionInfo.appName : null,
     activity: activity
   });
   if (req.headers.sessionId) {
@@ -199,7 +201,7 @@ export let updateAppActivity = function(req, res, isSuccess) {
   let activity = req.activity;
   activity.endTime = Date.now();
   activity.activityStatus = isSuccess ? ActivityStatus.SUCCESS : ActivityStatus.FAILURE;
-  let sessionInfo = sessionManager.get(req.headers.sessionId);
+  let sessionInfo = req.headers.sessionId ? sessionManager.get(req.headers.sessionId) : null;
   req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').ACTIVITY_UPDATE, {
     app: req.headers.sessionId,
     appName: sessionInfo ? sessionInfo.appName : null,

@@ -261,23 +261,31 @@
   .app-details-h {
     width: 100%;
     background-color: @primary-blue;
-    padding: 11px 16px;
+    height: 46px;
     .back {
-      height: 24px;
+      display: inline-block;
+      float: left;
       button {
-        width: 24px;
-        height: 24px;
+        width: 46px;
+        height: 46px;
         background-color: transparent;
         border: 0;
         outline: 0;
         color: #FFF;
         background-image: url(../images/back_arrow.svg);
-        background-size: cover;
+        background-size: 24px;
         background-repeat: no-repeat;
         background-position: center;
         cursor: pointer;
+        &:hover {
+          background-color: @primary-blue-hover;
+        }
+        &:active {
+          background-color: @primary-blue-action;
+        }
       }
     }
+    .clearfix();
   }
   .app-details-cnt {
     max-height: @tab-cnt-ht;
@@ -1315,6 +1323,31 @@
   right: 0;
   z-index: 97;
   cursor: pointer;
+  .network-status-tooltip {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    display: none;
+    padding: 8px;
+    background-color: #FFF;
+    color: @primary-blue;
+    font-size: 14px;
+    font-weight: normal;
+    border-radius: 3px;
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+    z-index: 99;
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -10px;
+      right: 18px;
+      border-width: 5px;
+      border-color: transparent transparent #FFF;
+      border-style: solid;
+    }
+  }
   &:after {
     content: '';
     width: 100%;
@@ -1329,6 +1362,9 @@
   }
   &:hover {
     background-color: @primary-blue-hover;
+    .network-status-tooltip {
+      display: inline-block;
+    }
   }
   &:active {
     background-color: @primary-blue-action;

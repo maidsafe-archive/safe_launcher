@@ -16,7 +16,7 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
     // remove session
     $scope.removeSession = function(id) {
       $rootScope.currentAppDetails = {
-        logs: {}
+        logs: []
       };
       var logIndex = $rootScope.logList.map(function(obj) { return obj.activityId; }).indexOf(id);
       $rootScope.logList[logIndex] = {
