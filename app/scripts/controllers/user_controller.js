@@ -18,7 +18,8 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
       $rootScope.currentAppDetails = {
         logs: {}
       };
-      $rootScope.logList[id] = {
+      var logIndex = $rootScope.logList.map(function(obj) { return obj.activityId; }).indexOf(id);
+      $rootScope.logList[logIndex] = {
         appName: $rootScope.appList[id].name,
         activityName: 'Revoke app',
         activityStatus: 1,
@@ -63,7 +64,7 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
       }
     };
 
-    $scope.logout = function() {      
+    $scope.logout = function() {
       window.msl.clearAllSessions();
       $rootScope.clearIntervals();
       $rootScope.resetStats();

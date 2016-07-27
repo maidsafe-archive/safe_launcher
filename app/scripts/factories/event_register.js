@@ -134,16 +134,19 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
     };
 
     var activityEvents = function() {
-      var updateActivity = function(data) {
-        var logKeys = Object.keys($rootScope.logList);
-        if (logKeys.length >= CONSTANTS.LOG_LIST_LIMIT) {
-          var lastkey = logKeys.pop();
-          delete $rootScope.logList[lastkey];
-        }
+      var updateActivity = function(data, isNew) {
         data.activity['appName'] = data.app ? $rootScope.appList[data.app].name : 'Anonymous Application';
-        $rootScope.logList[data.activity.activityId] = data.activity;
+        if (isNew) {
+          if ($rootScope.logList.length > CONSTANTS.LOG_LIST_LIMIT) {
+            $rootScope.logList.pop();
+          }
+        } else {
+          var activityIndex = $rootScope.logList.map(function(obj) { return obj.activityId; }).indexOf(data.activity.activityId);
+          $rootScope.logList.splice(activityIndex, 1);
+        }
+        $rootScope.logList.unshift(data.activity);
         if ($rootScope.currentAppDetails) {
-          $rootScope.currentAppDetails['logs'][data.activity.activityId] = data.activity;
+          $rootScope.currentAppDetails['logs'] = data.activity;
         }
         if (data.app) {
             $rootScope.appList[data.app].status = data.activity;
@@ -155,14 +158,14 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
         if (!data) {
           return;
         }
-        updateActivity(data);
+        updateActivity(data, true);
       });
 
       server.onUpdatedAppActivity(function(data) {
         if (!data) {
           return;
         }
-        updateActivity(data);
+        updateActivity(data, false);
       });
     };
 

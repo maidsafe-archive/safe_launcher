@@ -78,7 +78,8 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       $scope.user = {};
       if (err) {
         if ($state.params.currentPage === 'register') {
-          $state.go('app.account', {currentPage: 'register'}, {reload: true});
+          $state.go('app.account', {currentPage: 'register', currentState: $scope.createAccFlow.states[2]}, {reload: true});
+          $rootScope.user= {};
           return $rootScope.$toaster.show({
             msg: 'Failed to create account',
             isError: true

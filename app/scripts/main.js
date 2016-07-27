@@ -40,7 +40,7 @@ window.safeLauncher = angular
         logs: {}
       };
       $rootScope.appList = {};
-      $rootScope.logList = {};
+      $rootScope.logList = [];
       $rootScope.intervals = [];
       $rootScope.retryCount = 1;
     };
