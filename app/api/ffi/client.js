@@ -23,10 +23,10 @@ var startWorker = function() {
   workerProcess = childProcess.fork(workerPath, [], {cwd: executableDirPath});
   workerProcess.on('close', function() {
     if (isClosed) {
-      log.warn('Starting FFI worker client closed already');
+      log.warn('FFI worker client closed already');
       return;
     }
-    log.debug('Starting FFI worker client closed');
+    log.debug('FFI worker client closed');
     isClosed = true;
     if (networkStateListener) {
       log.debug('Sending network state closed signal');

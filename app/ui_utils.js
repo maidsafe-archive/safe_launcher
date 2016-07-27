@@ -168,7 +168,7 @@ export default class UIUtils {
     var self = this;
     this.api.reset();
     if (user) {
-      this.api.auth.login(user.location, user.password, function(err) {
+      this.api.auth.login(user.accountSecret, user.accountPassword, function(err) {
         if (!self.onNetworkStateChange) {
           return;
         }
