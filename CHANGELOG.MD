@@ -1,11 +1,20 @@
 # SAFE Launcher Change Log
 
+##[0.7.0]
+- Authorisation now uses secret and password
+- NFS modify file API is temporarily disabled
+    - until SequentialEncryptor can handle accepting offsets
+- Persist user settings through sessions
+- Log tab should have content ordered
+- Create account UI updated
+- Various bug fixes and UX updates
+
 ##[0.6.0]
  - New Launcher UI with dashboard and log history
  - NFS Create File API updated
  - User credentials merged to a single input
  - Proxy bug fixes
- - FFI process restart issue fix 
+ - FFI process restart issue fix
 
 ##[0.5.1]
  - Fix for DNS get file error
