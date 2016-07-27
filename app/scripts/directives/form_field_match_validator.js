@@ -9,33 +9,35 @@ window.safeLauncher.directive('fieldMatchValidator', [ 'CONSTANTS', 'MESSAGES',
       var targetVal = targetEle.val();
       var value = '';
       var resetField = function() {
-        // parent.removeClass('error');
-        ctrl.$setValidity('fieldValidator', true);
+        parent.removeClass('error');
+        // ctrl.$setValidity('fieldValidator', true);
         return msgEle.text('');
       }
       ele.bind('keyup', function(e) {
-        ctrl.$setValidity('fieldValidator', false);
+        resetField();
+        // ctrl.$setValidity('fieldValidator', false);
         // parent.addClass('error');
-        value = e.target.value;
-        if (!value) {
-          return resetField();
-        }
-        if (value !== targetVal) {
-          return msgEle.text($msg.ENTRIES_DONT_MATCH);
-        }
-        return resetField();
+        // value = e.target.value;
+        // if (!value) {
+        //   return resetField();
+        // }
+        // if (value !== targetVal) {
+        //   return msgEle.text($msg.ENTRIES_DONT_MATCH);
+        // }
+        // return resetField();
       });
       targetEle.bind('keyup', function(e) {
-        targetVal = e.target.value;
-        if (!value || !targetVal) {
-          return;
-        }
-        ctrl.$setValidity('fieldValidator', false);
+        resetField();
+        // targetVal = e.target.value;
+        // if (!value || !targetVal) {
+        //   return;
+        // }
+        // ctrl.$setValidity('fieldValidator', false);
         // parent.addClass('error');
-        if (value !== targetVal) {
-          return msgEle.text($msg.ENTRIES_DONT_MATCH);
-        }
-        return resetField();
+        // if (value !== targetVal) {
+        //   return msgEle.text($msg.ENTRIES_DONT_MATCH);
+        // }
+        // return resetField();
       });
     };
 

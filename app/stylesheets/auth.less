@@ -166,11 +166,22 @@
         color: #FFF;
       }
       &.error {
+        input {
+          border-color: @error-red-form;
+        }
         .msg {
           color: @error-red-form;
+          font-weight: 600;
+          &:after {
+            content: '';
+            background-image: url(../images/error_login.svg);
+          }
         }
         .strength {
           background-color: @error-red-form;
+        }
+        .status {
+          display: none;
         }
       }
       .opt-i {
@@ -232,6 +243,7 @@
       top: 0;
       left: 0;
       font-size: 14px;
+      margin-left: -4px;
     }
     &.icn {
       &:after {
@@ -239,6 +251,7 @@
         width: 20px;
         height: 20px;
         display: block;
+        margin-left: 0;
         background-image: url(../images/tick_create_light.svg);
       }
     }

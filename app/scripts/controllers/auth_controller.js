@@ -6,6 +6,30 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
   function($scope, $state, $rootScope, $timeout, auth, CONSTANTS, MESSAGES) {
     var REQUEST_TIMEOUT = 90 * 1000;
     var FIELD_FOCUS_DELAY = 100;
+
+    var showErrorField = function(targetId, msg) {
+      var errorTarget = $('#' + targetId);
+      errorTarget.addClass('error');
+      errorTarget.children('.msg').text(msg);
+      errorTarget.children('input').focus();
+    };
+
+    // user create account
+    var createAccount = function() {
+      if ($rootScope.$networkStatus.status !== window.NETWORK_STATE.CONNECTED) {
+        return $rootScope.$toaster.show({
+          msg: 'Network not yet conneted',
+          hasOption: false,
+          isError: true
+        }, function() {});
+      }
+      var request = new Request(onAuthResponse);
+      $scope.cancelRequest = request.cancel;
+      $rootScope.isAuthLoading = true;
+      request.execute(function(done) {
+        auth.register($scope.user.accountSecret, $scope.user.accountPassword, done);
+      });
+    };
     $scope.secretValid = false;
     $scope.passwordValid = false;
     $scope.createAccFlow = {
@@ -25,26 +49,35 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       },
       setPos: function(state) {
         if (this.states.indexOf(state) > this.states.indexOf('ACC_SECRET_FORM')) {
-          if (($scope.user.accountSecret !== $scope.user.confirmAccountSecret) || !$scope.secretValid) {
-            var errorTarget = $('#errorTarget');
-            errorTarget.addClass('error');
-            errorTarget.children('.msg').text('Invalid entries.');
-            errorTarget.children('input').focus();
-            return;
+          if (!$scope.secretValid) {
+            return showErrorField('AccountSecret', MESSAGES.ACC_SECRET_MUST_STRONGER);
+          }
+          if ($scope.user.accountSecret !== $scope.user.confirmAccountSecret) {
+            return showErrorField('AccountSecretConfirm', MESSAGES.ENTRIES_DONT_MATCH);
           }
         }
         $state.go('app.account', {currentPage: $state.params.currentPage, currentState: state}, {notify: false});
         this.currentPos = state ? this.states.indexOf(state) : 0;
       },
       continue: function() {
-        if (this.currentPos < this.totalCount()) {
-          this.setPos(this.states[this.currentPos + 1]);
+        if (this.currentPos < (this.totalCount() - 1)) {
+          return this.setPos(this.states[this.currentPos + 1]);
         }
+        if (this.currentPos === this.states.indexOf('ACC_PASS_FORM')) {
+          if (!$scope.passwordValid) {
+            return showErrorField('AccountPass', MESSAGES.ACC_PASS_MUST_STRONGER);
+          }
+          if ($scope.user.accountPassword !== $scope.user.confirmAccountPassword) {
+            return showErrorField('AccountPassConfirm', MESSAGES.ENTRIES_DONT_MATCH);
+          }
+        }
+        createAccount();
       },
       back: function() {
         if (this.currentPos > 0) {
           this.currentPos--;
         }
+        $state.go('app.account', {currentPage: $state.params.currentPage, currentState: this.states[this.currentPos]}, {notify: false});
       }
     };
     var Request = function(callback) {
@@ -105,23 +138,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       $rootScope.isAuthenticated = true;
       $rootScope.$applyAsync();
       console.log('Authorised successfully!');
-    };
-
-    // user create account
-    $scope.createAccount = function() {
-      if ($rootScope.$networkStatus.status !== window.NETWORK_STATE.CONNECTED) {
-        return $rootScope.$toaster.show({
-          msg: 'Network not yet conneted',
-          hasOption: false,
-          isError: true
-        }, function() {});
-      }
-      var request = new Request(onAuthResponse);
-      $scope.cancelRequest = request.cancel;
-      $rootScope.isAuthLoading = true;
-      request.execute(function(done) {
-        auth.register($scope.user.accountSecret, $scope.user.accountPassword, done);
-      });
     };
 
     // user login
