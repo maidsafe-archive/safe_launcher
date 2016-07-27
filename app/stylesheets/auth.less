@@ -24,6 +24,9 @@
         padding: 12px 0 0;
         margin: 0 auto;
         border-top: 1px solid rgba(0, 0, 0, 0.4);
+        &.no-border {
+          border-top: 0;
+        }
         a {
           text-decoration: none;
           color: @primary-blue;
@@ -150,11 +153,11 @@
     &.light-theme {
       label {
         color: #FFF;
-        opacity: 1;
+        opacity: 0.6;
       }
       input {
         color: #FFF;
-        border-color: rgba(255, 255, 255, 0.4);
+        border-color: rgba(255, 255, 255, 0.6);
         &:focus {
           border-color: #FFF;
         }
@@ -277,25 +280,42 @@
 
 .auth-intro {
   .auth-intro-b {
-    width: 480px;
-    margin: 0 auto;
+    width: 520px;
+    margin: 22px auto 50px;
     position: relative;
   }
   .auth-intro-cnt {
-    height: 360px;
-    padding: 24px;
+    height: 410px;
+    padding: 32px 45px 28px;
     text-align: left;
     color: #FFF;
     background-color: @primary-blue;
     position: relative;
     .title {
-      font-size: 20px;
+      font-size: 22px;
+      font-weight: bold;
       margin: 0;
       padding: 0;
     }
+    .form-b {
+      width: 400px;
+      margin: 44px auto 0;
+      form {
+        width: 100%;
+      }
+    }
     .auth-intro-media {
-      height: 130px;
-      margin-top: 12px;
+      height: 128px;
+      margin: 32px 0 8px;
+      &.sm {
+        margin-top: 12px;
+        img {
+          width: 100%;
+          height: auto;
+          max-width: none;
+          max-height: none;
+        }
+      }
       img {
         width: auto;
         height: auto;
@@ -305,7 +325,7 @@
       }
     }
     .desc {
-      margin-top: 12px;
+      padding-top: 20px;
       font-size: 16px;
       font-weight: normal;
     }
@@ -313,7 +333,7 @@
       width: 100%;
       padding: 0 24px;
       position: absolute;
-      bottom: 24px;
+      bottom: 28px;
       left: 0;
       text-align: right;
       margin-top: 20px;
@@ -331,6 +351,36 @@
           color: #FFF;
           padding-top: 0;
           padding-bottom: 0;
+          &:disabled {
+            &:hover, &:active {
+              color: #FFF;
+            }
+          }
+          &:hover {
+            color: #C1D5EB;
+          }
+          &:active {
+            color: #87ADD4;
+          }
+          &.btn-box {
+            background-color: #FFF;
+            padding: 8px 16px;
+            border-radius: 0;
+            color: @primary-blue;
+            &:hover {
+              background-color: #C1D5EB;
+              color: @primary-blue;
+            }
+            &:disabled {
+              background-color: #6497C4;
+              color: @primary-blue;
+              opacity: 1;
+              &:hover, &.active {
+                background-color: #6497C4;
+                color: @primary-blue;
+              }
+            }
+          }
         }
       }
       .clearfix();
@@ -339,7 +389,7 @@
   .auth-intro-nav-btn {
     width: 150px;
     position: absolute;
-    bottom: 24px;
+    bottom: 28px;
     left: 50%;
     display: inline-block;
     margin-left: -75px;
@@ -349,7 +399,7 @@
       display: inline-block;
       width: 10px;
       height: 10px;
-      margin: 0 3px;
+      margin: 0 5px;
       border: 1px solid #FFF;
       border-radius: 50%;
       cursor: pointer;

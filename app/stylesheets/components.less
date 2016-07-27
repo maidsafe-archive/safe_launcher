@@ -92,7 +92,9 @@
           }
           &.disabled {
             opacity: 0.5;
-            cursor: default;
+            a {
+              cursor: default !important;
+            }
             &:hover {
               background-color: @primary-blue;
             }
