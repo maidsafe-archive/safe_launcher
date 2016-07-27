@@ -150,15 +150,15 @@ window.safeLauncher = angular
       //   window.msl.reconnect();
       // }
     };
+    $rootScope.networkStatusMsg = {
+      0: 'Connecting to SAFE Network',
+      1: 'Connected to SAFE Network',
+      2: 'Connection to SAFE Network Disconnected'
+    };
     $rootScope.showNetworkStatus = function(status) {
-      var nwStatusMsg = {
-        0: 'Connecting to SAFE Network',
-        1: 'Connected to SAFE Network',
-        2: 'Connection to SAFE Network Disconnected'
-      };
       var isError = (status === window.NETWORK_STATE.DISCONNECTED);
       $rootScope.$toaster.show({
-        msg: nwStatusMsg[status],
+        msg: $rootScope.networkStatusMsg[status],
         hasOption: false,
         isError: isError
       }, function(err, data) {});

@@ -1323,6 +1323,31 @@
   right: 0;
   z-index: 97;
   cursor: pointer;
+  .network-status-tooltip {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    display: none;
+    padding: 8px;
+    background-color: #FFF;
+    color: @primary-blue;
+    font-size: 14px;
+    font-weight: normal;
+    border-radius: 3px;
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+    z-index: 99;
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -10px;
+      right: 18px;
+      border-width: 5px;
+      border-color: transparent transparent #FFF;
+      border-style: solid;
+    }
+  }
   &:after {
     content: '';
     width: 100%;
@@ -1337,6 +1362,9 @@
   }
   &:hover {
     background-color: @primary-blue-hover;
+    .network-status-tooltip {
+      display: inline-block;
+    }
   }
   &:active {
     background-color: @primary-blue-action;

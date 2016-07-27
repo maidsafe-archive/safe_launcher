@@ -16,7 +16,9 @@
     connecting: $networkStatus.status === 0,
     connected: $networkStatus.status === 1,
     'splash-screen': $state.current.name === 'splash'
-  }" ng-click="showNetworkStatus($networkStatus.status)"></span>
+  }" ng-click="showNetworkStatus($networkStatus.status)">
+    <span class="network-status-tooltip">{{networkStatusMsg[$networkStatus.status]}}</span>
+  </span>
   <alert ng-show="$prompt.isProcessing" payload="$prompt.payload" callback="$prompt.callback()"></alert>
   <toaster payload="$toaster.payload" callback="$toaster.callback()"></toaster>
   <authorise-req ng-show="$authReq.isProcessing" payload="$authReq.payload" callback="$authReq.callback(err, data)"></authorise-req>
