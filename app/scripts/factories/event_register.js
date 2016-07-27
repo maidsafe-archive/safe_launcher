@@ -51,7 +51,7 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
       // handle auth request
       server.onAuthRequest(function(data) {
         if (!$rootScope.isAuthenticated) {
-          return auth.confirmAuthorisation(data, false);
+          return server.confirmResponse(data, false);
         }
         server.focusWindow();
         queue.push(data);
