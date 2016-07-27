@@ -2,7 +2,7 @@
 var React = window.React;
 var AppLogs = React.createClass({
   propTypes: {
-    list: React.PropTypes.object,
+    list: React.PropTypes.array,
     filter: React.PropTypes.array,
     table: React.PropTypes.string
   },
@@ -30,31 +30,26 @@ var AppLogs = React.createClass({
       )
     );
 
-    var listKeys = this.props.list ? Object.keys(this.props.list) : [];
-    if (listKeys.length === 0) {
+    if (this.props.list.length === 0) {
       return React.DOM.div({key: 'inner-b', className: 'table-inner-b'}, [
         React.DOM.table({key: 'table', className: this.props.table}, [
           tableHead,
           React.DOM.tbody(null, [
             React.DOM.tr({key: 'default-row', className: 'default-row'}, [
-              React.DOM.td({key: 'default-col', colspan:'100%'}, 'No requests made yet.')
+              React.DOM.td({key: 'default-col', colSpan:'100%'}, 'No requests made yet.')
             ])
           ])
         ])
       ]);
     }
 
-    var listArr = [];
-    listKeys.map(function(key) {
-      listArr.push(self.props.list[key]);
-    });
-    listArr.sort(function(a, b) {
+    this.props.list.sort(function(a, b) {
       var aTime = a.endTime ? new Date(a.endTime) : new Date(a.beginTime);
       var bTime = b.endTime ? new Date(b.endTime) : new Date(b.beginTime);
       return bTime - aTime;
     });
 
-    listArr.map(function(list, i) {
+    this.props.list.map(function(list, i) {
       list['status'] = STATUS_CODE[list.activityStatus];
       if ((self.props.filter.length === 0) || (self.props.filter.indexOf(list.status) === -1)) {
         return;
@@ -67,8 +62,8 @@ var AppLogs = React.createClass({
       ]);
       rows.push(row);
     });
-    return React.DOM.div({key: 'inner-b', className: 'table-inner-b'}, [
-      React.DOM.table({key: 'table', className: this.props.table},
+    return React.DOM.div({key: 'inner-b', className: 'table-inner-b '  + this.props.table}, [
+      React.DOM.table({key: 'table'},
         tableHead,
         React.DOM.tbody(null, rows)
       )

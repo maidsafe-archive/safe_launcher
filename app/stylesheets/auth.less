@@ -24,6 +24,9 @@
         padding: 12px 0 0;
         margin: 0 auto;
         border-top: 1px solid rgba(0, 0, 0, 0.4);
+        &.no-border {
+          border-top: 0;
+        }
         a {
           text-decoration: none;
           color: @primary-blue;
@@ -63,7 +66,7 @@
       position: absolute;
       top: 0;
       left: 0;
-      z-index: -1;
+      z-index: 0;
       transition: top 0.1s ease;
       opacity: 0.4;
     }
@@ -94,7 +97,7 @@
     .msg {
       height: 20px;
       margin-top: 3px;
-      font-size: 12px;
+      font-size: 14px;
       line-height: 20px;
       position: relative;
       &:after {
@@ -130,7 +133,7 @@
       outline: none;
       background-color: transparent;
       position: relative;
-      z-index: 0;
+      z-index: 1;
     }
     input:focus {
       border-color: @primary-blue;
@@ -138,7 +141,7 @@
     input:focus ~ label {
       display: block !important;
       top: -18px;
-      font-size: 12px;
+      font-size: 14px;
       line-height: 16px;
     }
     input:valid ~ label {
@@ -146,6 +149,53 @@
     }
     input:valid ~ .opt {
       display: block;
+    }
+    &.light-theme {
+      label {
+        color: #FFF;
+        opacity: 0.6;
+      }
+      input {
+        color: #FFF;
+        border-color: rgba(255, 255, 255, 0.6);
+        &:focus {
+          border-color: #FFF;
+        }
+      }
+      .msg {
+        color: #FFF;
+      }
+      &.error {
+        input {
+          border-color: @error-red-form;
+        }
+        .msg {
+          color: @error-red-form;
+          font-weight: 600;
+          &:after {
+            content: '';
+            background-image: url(../images/error_login.svg);
+          }
+        }
+        .strength {
+          background-color: @error-red-form;
+        }
+        .status {
+          display: none;
+        }
+      }
+      .opt-i {
+        margin: 3px 0;
+        .eye {
+          background-image: url(../images/show_password_light.svg);
+          &:hover {
+            background-image: url(../images/show_password_light_hover.svg);
+          }
+          &.active {
+            background-image: url(../images/show_password_light_active.svg);
+          }
+        }
+      }
     }
   }
   .inp-btn {
@@ -164,7 +214,7 @@
     position: absolute;
     top: 30px;
     margin-top: -1px;
-    background-color: @primary-blue;
+    background-color: #FFF;
     z-index: 99;
   }
   .status {
@@ -184,7 +234,7 @@
       position: relative;
       top: -3px;
       left: 50%;
-      background-color: #212121;
+      background-color: #FFF;
     }
     &:after {
       content: attr(data-val);
@@ -193,6 +243,7 @@
       top: 0;
       left: 0;
       font-size: 14px;
+      margin-left: -4px;
     }
     &.icn {
       &:after {
@@ -200,72 +251,92 @@
         width: 20px;
         height: 20px;
         display: block;
+        margin-left: 0;
+        background-image: url(../images/tick_create_light.svg);
       }
     }
     &.last {
       left: 62.5%;
     }
   }
-  &.vweak {
-    .msg {
-      color: @pass-vweak;
-    }
-    .strength {
-      background-color: @pass-vweak;
-    }
-  }
-  &.weak {
-    .msg {
-      color: @pass-weak-txt;
-    }
-    .strength {
-      background-color: @pass-weak;
-    }
-  }
-  &.somewhat-secure {
-    .msg {
-      color: @pass-ok-txt;
-    }
-    .strength {
-      background-color: @pass-ok;
-    }
-    .status.icn:after {
-      background-image: url(../images/tick_create_success.svg);
-    }
-  }
-  &.secure {
-    .msg {
-      color: @pass-secure-txt;
-    }
-    .strength {
-      background-color: @pass-secure;
-    }
-    .status.icn:after {
-      background-image: url(../images/tick_create_success.svg);
-    }
-  }
+  // &.vweak {
+  //   .msg {
+  //     color: @pass-vweak;
+  //   }
+  //   .strength {
+  //     background-color: @pass-vweak;
+  //   }
+  // }
+  // &.weak {
+  //   .msg {
+  //     color: @pass-weak-txt;
+  //   }
+  //   .strength {
+  //     background-color: @pass-weak;
+  //   }
+  // }
+  // &.somewhat-secure {
+  //   .msg {
+  //     color: @pass-ok-txt;
+  //   }
+  //   .strength {
+  //     background-color: @pass-ok;
+  //   }
+  //   .status.icn:after {
+  //     background-image: url(../images/tick_create_success.svg);
+  //   }
+  // }
+  // &.secure {
+  //   .msg {
+  //     color: @pass-secure-txt;
+  //   }
+  //   .strength {
+  //     background-color: @pass-secure;
+  //   }
+  //   .status.icn:after {
+  //     background-image: url(../images/tick_create_success.svg);
+  //   }
+  // }
 }
 
 .auth-intro {
   .auth-intro-b {
-    width: 480px;
-    margin: 0 auto;
+    width: 520px;
+    margin: 22px auto 50px;
+    position: relative;
   }
   .auth-intro-cnt {
-    height: 360px;
-    padding: 24px;
+    height: 410px;
+    padding: 32px 45px 28px;
     text-align: left;
     color: #FFF;
     background-color: @primary-blue;
     position: relative;
     .title {
-      font-size: 20px;
+      font-size: 22px;
+      font-weight: bold;
       margin: 0;
       padding: 0;
     }
+    .form-b {
+      width: 400px;
+      margin: 44px auto 0;
+      form {
+        width: 100%;
+      }
+    }
     .auth-intro-media {
-      height: 130px;
-      margin-top: 12px;
+      height: 128px;
+      margin: 32px 0 8px;
+      &.sm {
+        margin-top: 12px;
+        img {
+          width: 100%;
+          height: auto;
+          max-width: none;
+          max-height: none;
+        }
+      }
       img {
         width: auto;
         height: auto;
@@ -275,41 +346,86 @@
       }
     }
     .desc {
-      margin-top: 12px;
+      padding-top: 20px;
       font-size: 16px;
       font-weight: normal;
     }
-    .opt {
+    > .opt {
       width: 100%;
       padding: 0 24px;
       position: absolute;
-      bottom: 24px;
+      bottom: 28px;
       left: 0;
       text-align: right;
       margin-top: 20px;
+      z-index: 9;
       .opt-i {
         display: inline-block;
+        &.lt {
+          float: left;
+        }
+        &.rt {
+          float: right;
+        }
         .btn {
           background-color: transparent;
           color: #FFF;
           padding-top: 0;
           padding-bottom: 0;
+          &:disabled {
+            &:hover, &:active {
+              color: #FFF;
+            }
+          }
+          &:hover {
+            color: #C1D5EB;
+          }
+          &:active {
+            color: #87ADD4;
+          }
+          &.btn-box {
+            background-color: #FFF;
+            padding: 8px 16px;
+            border-radius: 0;
+            color: @primary-blue;
+            &:hover {
+              background-color: #C1D5EB;
+              color: @primary-blue;
+            }
+            &:disabled {
+              background-color: #FFFFFF;
+              color: @primary-blue;
+              opacity: 0.25;
+              &:hover, &:active {
+                background-color: #FFFFFF;
+                color: @primary-blue;
+              }
+            }
+          }
         }
       }
       .clearfix();
     }
   }
   .auth-intro-nav-btn {
-    margin-top: 20px;
-    margin-bottom: 45px;
+    width: 150px;
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    display: inline-block;
+    margin-left: -75px;
+    text-align: center;
+    z-index: 99;
     .auth-intro-nav-btn-i {
       display: inline-block;
       width: 10px;
       height: 10px;
-      border: 1px solid @primary-blue;
+      margin: 0 5px;
+      border: 1px solid #FFF;
       border-radius: 50%;
+      cursor: pointer;
       &.active {
-        background-color: @primary-blue;
+        background-color: #FFF;
       }
     }
   }

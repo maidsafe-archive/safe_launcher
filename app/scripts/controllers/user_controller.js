@@ -18,7 +18,8 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
       $rootScope.currentAppDetails = {
         logs: {}
       };
-      $rootScope.logList[id] = {
+      var logIndex = $rootScope.logList.map(function(obj) { return obj.activityId; }).indexOf(id);
+      $rootScope.logList[logIndex] = {
         appName: $rootScope.appList[id].name,
         activityName: 'Revoke app',
         activityStatus: 1,
@@ -43,27 +44,27 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
     $scope.toggleAppDetails = function(id) {
       if (!id) {
         return $rootScope.currentAppDetails = {
-          logs: {}
+          logs: []
         };
       }
       for(var i in $rootScope.appList) {
         if ($rootScope.appList[i].id === id) {
-          $rootScope.currentAppDetails = $rootScope.appList[i];
+          $rootScope.currentAppDetails['app'] = $rootScope.appList[i];
           break;
         }
       }
       if ($rootScope.currentAppDetails) {
-        server.getAppActivityList($rootScope.currentAppDetails.id, function(data) {
-          $rootScope.currentAppDetails['logs'] = {};
+        server.getAppActivityList($rootScope.currentAppDetails.app.id, function(data) {
+          $rootScope.currentAppDetails.logs = [];
           for(var i in data) {
-            $rootScope.currentAppDetails.logs[data[i].activityId] = data[i];
-            $rootScope.currentAppDetails.logs[data[i].activityId]['name'] = $rootScope.currentAppDetails.appName;
+            data[i]['name'] = $rootScope.currentAppDetails.app.appName;
+            $rootScope.currentAppDetails.logs.unshift(data[i]);
           }
         });
       }
     };
 
-    $scope.logout = function() {      
+    $scope.logout = function() {
       window.msl.clearAllSessions();
       $rootScope.clearIntervals();
       $rootScope.resetStats();

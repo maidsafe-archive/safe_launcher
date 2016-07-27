@@ -15,7 +15,9 @@ window.safeLauncher.constant('MESSAGES', {
   'PASS_VERY_WEEK': 'Very weak',
   'PASS_WEEK': 'Weak',
   'PASS_SOMEWHAT_SECURE': 'Somewhat secure',
-  'PASS_SECURE': 'Secure'
+  'PASS_SECURE': 'Secure',
+  'ACC_SECRET_MUST_STRONGER': 'Account secret needs to be stronger.',
+  'ACC_PASS_MUST_STRONGER': 'Account password needs to be stronger.'
 });
 
 // Constants

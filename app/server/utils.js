@@ -196,11 +196,12 @@ export let updateAppActivity = function(req, res, isSuccess) {
   let activity = req.activity;
   activity.endTime = Date.now();
   activity.activityStatus = isSuccess ? ActivityStatus.SUCCESS : ActivityStatus.FAILURE;
+  let sessionInfo = sessionManager.get(req.headers.sessionId);
   req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').ACTIVITY_UPDATE, {
     app: req.headers.sessionId,
+    appName: sessionInfo ? sessionInfo.appName : null,
     activity: activity
   });
-  let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (req.headers.sessionId && sessionInfo) {
     sessionManager.get(req.headers.sessionId).updateActivity(activity);
   }

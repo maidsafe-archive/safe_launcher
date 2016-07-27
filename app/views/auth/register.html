@@ -1,95 +1,20 @@
-<div class="form-b" ng-controller="authController">
-  <div ng-show="!isAuthLoading">
-    <!-- account secret -->
-    <form ng-if="createAccState === 0" class="form" name="accountSecretForm" ng-submit="setAccountSecret()" ng-init="toggleAccSecret = toggleConfirmAccSecret = true">
-      <div id="errorTarget" class="inp-grp validate-field">
-        <input id="accountSecret"
-          type="{{toggleAccSecret ? 'password' : 'text'}}"
-          name="accountSecret"
-          required="true"
-          ng-model="user.accountSecret"
-          validate-account-secret
-          field-type="SECRET"
-          is-password-valid="checkSecretValid(result)"
-          focus="true" />
-        <label for="accountSecret">Account Secret</label>
-        <div class="msg"></div>
-        <div class="opt">
-          <div class="opt-i">
-              <span class="eye" ng-class="{active: !toggleAccSecret}" ng-mousedown="toggleAccSecret = !toggleAccSecret"></span>
-          </div>
-        </div>
-        <span class="strength"></span>
-        <span class="status" data-val="min"></span>
-      </div>
-      <div class="inp-grp">
-        <input id="confirmAccountSecret"
-          type="{{toggleConfirmAccSecret ? 'password' : 'text'}}"
-          name="confirmAccountSecret"
-          required="true"
-          target="accountSecret"
-          ng-model="user.confirmAccountSecret"
-          field-match-validator/>
-        <label for="confirmAccountSecret">Confirm Account Secret</label>
-        <div class="msg"></div>
-        <div class="opt">
-          <div class="opt-i">
-              <span class="eye" ng-class="{active: !toggleConfirmAccSecret}" ng-mousedown="toggleConfirmAccSecret = !toggleConfirmAccSecret"></span>
-          </div>
-        </div>
-      </div>
-      <div class="inp-btn">
-        <button type="submit" class="btn primary" name="next"
-          ng-disabled="(user.accountSecret !== user.confirmAccountSecret) || !secretValid">Next</button>
-      </div>
-    </form>
-    <!-- account password -->
-    <form ng-if="createAccState === 1" class="form" name="accountPasswordForm" ng-submit="createAccount()" ng-init="toggleAccPass = toggleConfirmAccPass = true">
-      <div class="inp-grp validate-field">
-        <input id="accountPassword"
-          type="{{toggleAccPass ? 'password' : 'text'}}"
-          name="accountPassword"
-          required="true"
-          ng-model="user.accountPassword"
-          field-type="PASSWORD"
-          is-password-valid="checkPasswordValid(result)"
-          validate-account-secret
-          focus="true" />
-        <label for="accountPassword">Account Password</label>
-        <div class="msg"></div>
-        <div class="opt">
-          <div class="opt-i">
-              <span class="eye" ng-class="{active: !toggleAccPass}" ng-mousedown="toggleAccPass = !toggleAccPass"></span>
-          </div>
-        </div>
-        <span class="strength"></span>
-        <span class="status last" data-val="min"></span>
-      </div>
-      <div class="inp-grp">
-        <input id="confirmAccountPassword"
-          type="{{toggleConfirmAccPass ? 'password' : 'text'}}"
-          name="confirmAccountPassword"
-          required="true"
-          target="accountPassword"
-          ng-model="user.confirmAccountPassword"
-          field-match-validator/>
-        <label for="confirmAccountPassword">Confirm Account Password</label>
-        <div class="msg"></div>
-        <div class="opt">
-          <div class="opt-i">
-              <span class="eye" ng-class="{active: !toggleConfirmAccPass}" ng-mousedown="toggleConfirmAccPass = !toggleConfirmAccPass"></span>
-          </div>
-        </div>
-      </div>
-      <div class="inp-btn">
-        <button type="submit" class="btn primary" name="next"
-          ng-disabled="(user.accountPassword !== user.confirmAccountPassword) || !passwordValid">Create Account</button>
-      </div>
-    </form>
-    <div class="form-f">
-      <div class="form-f-b">
-        Already have an account? <a ui-sref="app.account({currentPage: 'login'})">Login</a>
-      </div>
+<div class="auth-intro form-b" ng-controller="authController" ng-init="createAccFlow.setPos($state.params.currentState)">
+  <div class="auth-intro-b" ng-show="!isAuthLoading">
+    <ng-include src="'views/auth/_welcome.html'" ng-show="createAccFlow.currentPos === createAccFlow.getPos('WELCOME')"></ng-include>
+    <ng-include src="'views/auth/_acc_info.html'" ng-show="createAccFlow.currentPos === createAccFlow.getPos('ACC_INFO')"></ng-include>
+    <ng-include src="'views/auth/_acc_secret_form.html'" ng-show="createAccFlow.currentPos === createAccFlow.getPos('ACC_SECRET_FORM')"></ng-include>
+    <ng-include src="'views/auth/_acc_password.html'" ng-show="createAccFlow.currentPos === createAccFlow.getPos('ACC_PASS')"></ng-include>
+    <ng-include src="'views/auth/_acc_password_form.html'" ng-show="createAccFlow.currentPos === createAccFlow.getPos('ACC_PASS_FORM')"></ng-include>
+    <div class="auth-intro-nav-btn">
+      <span class="auth-intro-nav-btn-i"
+        ng-repeat="state in createAccFlow.states"
+        ng-click="createAccFlow.setPos(state)"
+        ng-class="{active: createAccFlow.currentPos === createAccFlow.getPos(state)}"></span>
+    </div>
+  </div>
+  <div class="form-f">
+    <div class="form-f-b no-border">
+      Already have an account? <a ui-sref="app.account({currentPage: 'login'})">Login</a>
     </div>
   </div>
   <ng-include src="'views/auth/loader.html'" ng-show="isAuthLoading"></ng-include>

@@ -16,8 +16,11 @@ window.safeLauncher = angular
   function($rootScope, $state, $stateParams, $timeout, $interval, CONSTANTS) {
     $rootScope.$state = $state;
     $rootScope.userInfo = {};
+    $rootScope.user = {};
     $rootScope.keys = Object.keys;
     $rootScope.appVersion = require('./package.json').version;
+    $rootScope.ACCOUNT_STATES = [ 'login', 'register', 'authIntro' ];
+    $rootScope.accountLastState = null;
     $rootScope.$loader = {
       status: false,
       description: '',
@@ -34,10 +37,10 @@ window.safeLauncher = angular
       $rootScope.isAuthenticated = false;
       $rootScope.isAuthLoading = false;
       $rootScope.currentAppDetails = {
-        logs: {}
+        logs: []
       };
       $rootScope.appList = {};
-      $rootScope.logList = {};
+      $rootScope.logList = [];
       $rootScope.intervals = [];
       $rootScope.retryCount = 1;
     };
@@ -68,6 +71,25 @@ window.safeLauncher = angular
       if ($rootScope.isAuthLoading) {
         event.preventDefault();
         return;
+      }
+      if ((toState.name === 'app.account') && (fromParams.currentPage === 'login') && (toParams.currentPage === 'register')) {
+        $rootScope.user = {};
+        toParams.currentState = null;
+      }
+      if (fromState.name === 'app.account' && toState.name !== 'app.account') {
+        if (fromParams.currentPage && ($rootScope.ACCOUNT_STATES.indexOf(fromParams.currentPage) !== -1)) {
+          $rootScope.accountLastState = fromParams;
+        }
+      }
+      if (fromState.name !== 'app.account' && toState.name === 'app.account') {
+        if ($rootScope.accountLastState) {
+          toParams.currentPage = $rootScope.accountLastState.currentPage || toParams.currentPage;
+          toParams.currentState = $rootScope.accountLastState.currentState || toParams.currentState;
+        }
+      }
+      if ((toState.name === 'app.account') && (toParams.currentPage === 'login')) {
+        $rootScope.user = {};
+        toParams.currentState = null;
       }
     });
     var Queuing = function() {

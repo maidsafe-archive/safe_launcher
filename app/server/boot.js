@@ -60,13 +60,12 @@ export default class RESTServer {
     let EVENT_TYPE = this.app.get('EVENT_TYPE');
     let eventEmitter = this.app.get('eventEmitter');
 
-    app.use(bodyParser.json({strict: false}));
-
-    app.use(setSessionHeaderAndParseBody);
 
     app.use(bodyParser.urlencoded({
       extended: false
     }));
+
+    app.use(setSessionHeaderAndParseBody);
 
     app.use('/health', function(req, res) {
       res.sendStatus(200);
@@ -91,7 +90,7 @@ export default class RESTServer {
     app.use(function(err, req, res) {
       if (res.headersSent) {
         return;
-      }      
+      }
       res.status(404).send('Not Found');
     });
 
@@ -139,6 +138,7 @@ export default class RESTServer {
   }
 
   authRejected(payload) {
+    updateAppActivity(payload.request, payload.response);
     payload.response.status(401).send('Unauthorised');
   }
 }
