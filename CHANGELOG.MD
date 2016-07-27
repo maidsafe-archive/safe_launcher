@@ -6,6 +6,7 @@
     - until SequentialEncryptor can handle accepting offsets
 - Persist user settings through sessions
 - Log tab should have content ordered
+- Create account UI updated
 - Various bug fixes and UX updates
 
 ##[0.6.0]
