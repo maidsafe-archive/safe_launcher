@@ -146,7 +146,11 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
         }
         $rootScope.logList.unshift(data.activity);
         if ($rootScope.currentAppDetails) {
-          $rootScope.currentAppDetails['logs'] = data.activity;
+          if (!isNew) {
+            var currentAppLogIndex = $rootScope.currentAppDetails.logs.map(function(obj) { return obj.activityId; }).indexOf(data.activity.activityId);
+            $rootScope.currentAppDetails.logs.splice(currentAppLogIndex, 1);
+          }
+          $rootScope.currentAppDetails.logs.unshift(data.activity);
         }
         if (data.app && $rootScope.appList[data.app]) {
             $rootScope.appList[data.app].status = data.activity;

@@ -5,12 +5,12 @@
     </div>
   </div>
   <div class="app-details-cnt">
-    <h3 class="title">{{currentAppDetails.name}} - <span class="version">v {{currentAppDetails.version}}</span></h3>
+    <h3 class="title">{{currentAppDetails.app.name}} - <span class="version">v {{currentAppDetails.app.version}}</span></h3>
     <div class="permissions">
       <h4 class="permissions-title">Permissions:</h4>
       <ul>
-        <li ng-show="!currentAppDetails.permissions || currentAppDetails.permissions.length === 0">None</li>
-        <li class="icn safe-drive" ng-show="currentAppDetails.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1">SAFE Drive Access</li>
+        <li ng-show="!currentAppDetails.app.permissions || currentAppDetails.app.permissions.length === 0">None</li>
+        <li class="icn safe-drive" ng-show="currentAppDetails.app.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1">SAFE Drive Access</li>
       </ul>
     </div>
     <div class="table-view without-pad">
@@ -39,7 +39,7 @@
     </div>
     <div class="opt">
       <div class="opt-i">
-        <button type="button" name="revoke" class="btn flat danger" ng-click="removeSession(currentAppDetails.id)">Revoke Access</button>
+        <button type="button" name="revoke" class="btn flat danger" ng-click="removeSession(currentAppDetails.app.id)">Revoke Access</button>
       </div>
     </div>
   </div>

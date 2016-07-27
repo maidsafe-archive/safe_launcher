@@ -26,6 +26,10 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       setPos: function(state) {
         if (this.states.indexOf(state) > this.states.indexOf('ACC_SECRET_FORM')) {
           if (($scope.user.accountSecret !== $scope.user.confirmAccountSecret) || !$scope.secretValid) {
+            var errorTarget = $('#errorTarget');
+            errorTarget.addClass('error');
+            errorTarget.children('.msg').text('Invalid entries.');
+            errorTarget.children('input').focus();
             return;
           }
         }

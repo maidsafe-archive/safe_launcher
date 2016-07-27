@@ -12,7 +12,7 @@ window.safeLauncher.directive('validateAccountSecret', [ 'CONSTANTS', 'MESSAGES'
 
       var resetField = function() {
         isValid = false;
-        // parent.removeClass('vweak weak somewhat-secure secure');
+        parent.removeClass('error');
         ctrl.$setValidity('fieldValidator', true);
         strengthEle.width('0');
         statusEle.removeClass('icn');
@@ -23,7 +23,9 @@ window.safeLauncher.directive('validateAccountSecret', [ 'CONSTANTS', 'MESSAGES'
         value = e.target.value;
         resetField();
         if (!value) {
-          return;
+          return scope.isPasswordValid({
+            result: isValid
+          });
         }
         var log10 = zxcvbn(value).guesses_log10;
         statusEle.removeClass('icn');

@@ -9,13 +9,13 @@ window.safeLauncher.directive('fieldMatchValidator', [ 'CONSTANTS', 'MESSAGES',
       var targetVal = targetEle.val();
       var value = '';
       var resetField = function() {
-        parent.removeClass('error');
+        // parent.removeClass('error');
         ctrl.$setValidity('fieldValidator', true);
         return msgEle.text('');
       }
       ele.bind('keyup', function(e) {
         ctrl.$setValidity('fieldValidator', false);
-        parent.addClass('error');
+        // parent.addClass('error');
         value = e.target.value;
         if (!value) {
           return resetField();
@@ -31,7 +31,7 @@ window.safeLauncher.directive('fieldMatchValidator', [ 'CONSTANTS', 'MESSAGES',
           return;
         }
         ctrl.$setValidity('fieldValidator', false);
-        parent.addClass('error');
+        // parent.addClass('error');
         if (value !== targetVal) {
           return msgEle.text($msg.ENTRIES_DONT_MATCH);
         }

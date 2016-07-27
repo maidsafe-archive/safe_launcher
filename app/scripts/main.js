@@ -37,7 +37,7 @@ window.safeLauncher = angular
       $rootScope.isAuthenticated = false;
       $rootScope.isAuthLoading = false;
       $rootScope.currentAppDetails = {
-        logs: {}
+        logs: []
       };
       $rootScope.appList = {};
       $rootScope.logList = [];

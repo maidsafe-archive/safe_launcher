@@ -165,6 +165,14 @@
       .msg {
         color: #FFF;
       }
+      &.error {
+        .msg {
+          color: @error-red-form;
+        }
+        .strength {
+          background-color: @error-red-form;
+        }
+      }
       .opt-i {
         margin: 3px 0;
         .eye {
@@ -372,11 +380,11 @@
               color: @primary-blue;
             }
             &:disabled {
-              background-color: #6497C4;
+              background-color: #FFFFFF;
               color: @primary-blue;
-              opacity: 1;
-              &:hover, &.active {
-                background-color: #6497C4;
+              opacity: 0.25;
+              &:hover, &:active {
+                background-color: #FFFFFF;
                 color: @primary-blue;
               }
             }
