@@ -261,23 +261,31 @@
   .app-details-h {
     width: 100%;
     background-color: @primary-blue;
-    padding: 11px 16px;
+    height: 46px;
     .back {
-      height: 24px;
+      display: inline-block;
+      float: left;
       button {
-        width: 24px;
-        height: 24px;
+        width: 46px;
+        height: 46px;
         background-color: transparent;
         border: 0;
         outline: 0;
         color: #FFF;
         background-image: url(../images/back_arrow.svg);
-        background-size: cover;
+        background-size: 24px;
         background-repeat: no-repeat;
         background-position: center;
         cursor: pointer;
+        &:hover {
+          background-color: @primary-blue-hover;
+        }
+        &:active {
+          background-color: @primary-blue-action;
+        }
       }
     }
+    .clearfix();
   }
   .app-details-cnt {
     max-height: @tab-cnt-ht;

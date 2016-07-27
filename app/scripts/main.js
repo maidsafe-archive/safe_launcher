@@ -72,9 +72,12 @@ window.safeLauncher = angular
         event.preventDefault();
         return;
       }
-      if ((toState.name === 'app.account') && (fromParams.currentPage === 'login') && (toParams.currentPage === 'register')) {
-        $rootScope.user = {};
-        toParams.currentState = null;
+      // clear user data when state from 'login' to 'register'
+      if (toState.name === 'app.account') {
+        if ((!fromParams.currentPage || fromParams.currentPage === 'login') && (toParams.currentPage === 'register')) {
+          $rootScope.user = {};
+          toParams.currentState = null;
+        }
       }
       if (fromState.name === 'app.account' && toState.name !== 'app.account') {
         if (fromParams.currentPage && ($rootScope.ACCOUNT_STATES.indexOf(fromParams.currentPage) !== -1)) {
