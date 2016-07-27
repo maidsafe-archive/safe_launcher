@@ -13,8 +13,12 @@ export default class SessionInfo {
   }
 
   addActivity(activity) {
-    this['activities'].push(activity);
-    this['activities'] = this['activities'].slice(0, 500)
+    if (this['activities'].length < 500) {
+      this['activities'].push(activity);
+    } else {
+      this['activities'].splice(this['activities'].length - 1, 0, activity);
+      this['activities'].pop();
+    }
   }
 
   updateActivity(activity) {

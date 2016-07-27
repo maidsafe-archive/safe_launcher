@@ -15,8 +15,11 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
 
     // remove session
     $scope.removeSession = function(id) {
-      $rootScope.currentAppDetails = null;
-      $rootScope.logList[id] = {
+      $rootScope.currentAppDetails = {
+        logs: []
+      };
+      var logIndex = $rootScope.logList.map(function(obj) { return obj.activityId; }).indexOf(id);
+      $rootScope.logList[logIndex] = {
         appName: $rootScope.appList[id].name,
         activityName: 'Revoke app',
         activityStatus: 1,
@@ -40,23 +43,36 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
 
     $scope.toggleAppDetails = function(id) {
       if (!id) {
-        return $rootScope.currentAppDetails = null;
+        return $rootScope.currentAppDetails = {
+          logs: []
+        };
       }
       for(var i in $rootScope.appList) {
         if ($rootScope.appList[i].id === id) {
-          $rootScope.currentAppDetails = $rootScope.appList[i];
+          $rootScope.currentAppDetails['app'] = $rootScope.appList[i];
           break;
         }
       }
       if ($rootScope.currentAppDetails) {
-        server.getAppActivityList($rootScope.currentAppDetails.id, function(data) {
-          $rootScope.currentAppDetails['logs'] = {};
+        server.getAppActivityList($rootScope.currentAppDetails.app.id, function(data) {
+          $rootScope.currentAppDetails.logs = [];
           for(var i in data) {
-            $rootScope.currentAppDetails.logs[data[i].activityId] = data[i];
-            $rootScope.currentAppDetails.logs[data[i].activityId]['name'] = $rootScope.currentAppDetails.appName;
+            data[i]['name'] = $rootScope.currentAppDetails.app.appName;
+            $rootScope.currentAppDetails.logs.unshift(data[i]);
           }
         });
       }
+    };
+
+    $scope.logout = function() {
+      window.msl.clearAllSessions();
+      $rootScope.clearIntervals();
+      $rootScope.resetStats();
+      $rootScope.resetAppStates();
+      server.reconnectNetwork();
+      $state.go('app.account', {
+        currentPage: 'login'
+      });
     };
   }
 ]);

@@ -16,39 +16,83 @@ window.safeLauncher = angular
   function($rootScope, $state, $stateParams, $timeout, $interval, CONSTANTS) {
     $rootScope.$state = $state;
     $rootScope.userInfo = {};
+    $rootScope.user = {};
     $rootScope.keys = Object.keys;
-    $rootScope.isAuthenticated = false;
-    $rootScope.isPasswordValid = false;
-    $rootScope.isAuthLoading = false;
-    $rootScope.currentAppDetails = null;
     $rootScope.appVersion = require('./package.json').version;
-    $rootScope.appList = {};
-    $rootScope.logList = {};
-    $rootScope.intervals = [];
-    $rootScope.retryCount = 1;
-    $rootScope.dashData = {
-      accountInfo: {
-        used: 0,
-        available: 0
+    $rootScope.ACCOUNT_STATES = [ 'login', 'register', 'authIntro' ];
+    $rootScope.accountLastState = null;
+    $rootScope.$loader = {
+      status: false,
+      description: '',
+      show: function(description) {
+        this.status = true;
+        this.description = description || '';
       },
-      accountInfoLoading: false,
-      accountInfoTime: new Date(),
-      accountInfoTimeString: window.moment().fromNow(),
-      accountInfoUpdateEnabled: true,
-      accountInfoUpdateTimeLeft: '00:00',
-      getsCount: 0,
-      deletesCount: 0,
-      postsCount: 0,
-      putsCount: 0,
-      unAuthGET: [],
-      upload: 0,
-      download: 0,
-      authHTTPMethods: []
+      hide: function() {
+        this.status = false;
+        this.description = '';
+      }
     };
+    $rootScope.resetAppStates = function () {
+      $rootScope.isAuthenticated = false;
+      $rootScope.isAuthLoading = false;
+      $rootScope.currentAppDetails = {
+        logs: []
+      };
+      $rootScope.appList = {};
+      $rootScope.logList = [];
+      $rootScope.intervals = [];
+      $rootScope.retryCount = 1;
+    };
+
+    $rootScope.resetStats = function() {
+      $rootScope.dashData = {
+        accountInfo: {
+          used: 0,
+          available: 0
+        },
+        accountInfoLoading: false,
+        accountInfoTime: new Date(),
+        accountInfoTimeString: window.moment().fromNow(),
+        accountInfoUpdateEnabled: true,
+        accountInfoUpdateTimeLeft: '00:00',
+        getsCount: 0,
+        deletesCount: 0,
+        postsCount: 0,
+        putsCount: 0,
+        unAuthGET: [],
+        upload: 0,
+        download: 0,
+        authHTTPMethods: []
+      };
+    };
+
     $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
       if ($rootScope.isAuthLoading) {
         event.preventDefault();
         return;
+      }
+      // clear user data when state from 'login' to 'register'
+      if (toState.name === 'app.account') {
+        if ((!fromParams.currentPage || fromParams.currentPage === 'login') && (toParams.currentPage === 'register')) {
+          $rootScope.user = {};
+          toParams.currentState = null;
+        }
+      }
+      if (fromState.name === 'app.account' && toState.name !== 'app.account') {
+        if (fromParams.currentPage && ($rootScope.ACCOUNT_STATES.indexOf(fromParams.currentPage) !== -1)) {
+          $rootScope.accountLastState = fromParams;
+        }
+      }
+      if (fromState.name !== 'app.account' && toState.name === 'app.account') {
+        if ($rootScope.accountLastState) {
+          toParams.currentPage = $rootScope.accountLastState.currentPage || toParams.currentPage;
+          toParams.currentState = $rootScope.accountLastState.currentState || toParams.currentState;
+        }
+      }
+      if ((toState.name === 'app.account') && (toParams.currentPage === 'login')) {
+        $rootScope.user = {};
+        toParams.currentState = null;
       }
     });
     var Queuing = function() {
@@ -101,23 +145,26 @@ window.safeLauncher = angular
     };
     $rootScope.$networkStatus = {
       status: window.NETWORK_STATE.CONNECTING,
-      retry: function() {
-        this.status = window.NETWORK_STATE.CONNECTING;
-        window.msl.reconnect();
-      }
+      // retry: function() {
+      //   this.status = window.NETWORK_STATE.CONNECTING;
+      //   window.msl.reconnect();
+      // }
+    };
+    $rootScope.networkStatusMsg = {
+      0: 'Connecting to SAFE Network',
+      1: 'Connected to SAFE Network',
+      2: 'Connection to SAFE Network Disconnected'
     };
     $rootScope.showNetworkStatus = function(status) {
-      var nwStatusMsg = {
-        0: 'Connecting to SAFE Network',
-        1: 'Connected to SAFE Network',
-        2: 'Connection to SAFE Network Disconnected'
-      };
       var isError = (status === window.NETWORK_STATE.DISCONNECTED);
       $rootScope.$toaster.show({
-        msg: nwStatusMsg[status],
+        msg: $rootScope.networkStatusMsg[status],
         hasOption: false,
         isError: isError
       }, function(err, data) {});
     };
+
+    $rootScope.resetAppStates();
+    $rootScope.resetStats();
   }
 ]);

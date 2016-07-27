@@ -158,6 +158,10 @@ export var createFile = function(req, res, next) {
   if (typeof rootPath === 'undefined') {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
   }
+  if (!req.headers['content-length'] || isNaN(req.headers['content-length'])) {
+    return next(new ResponseError(400, 'Content-Length header is not present'));
+  }
+  let length = parseInt(req.headers['content-length']);
   let metadata = req.headers['metadata'] || '';
   if (typeof metadata !== 'string') {
     return next(new ResponseError(400, MSG_CONSTANTS.FAILURE.REQUIRED_PARAMS_MISSING));
@@ -168,9 +172,9 @@ export var createFile = function(req, res, next) {
     if (err) {
       return responseHandler(err);
     }
-    var writer = new NfsWriter(req, writerId, responseHandler);
-    req.on('end', function() {
-      writer.onClose();
+    var writer = new NfsWriter(req, writerId, responseHandler, length);
+    req.on('aborted', function() {
+      next(new ResponseError(400, 'Request aborted by client'));
     });
     req.pipe(writer);
   };
@@ -262,8 +266,8 @@ export var getFile = function(req, res, next) {
       "Content-Range": "bytes " + start + "-" + end + "/" + total,
       "Accept-Ranges": "bytes",
       "Content-Length": chunksize,
-      "Created-On": new Date(fileStats.createdOn).toUTCString(),
-      "Last-Modified": new Date(fileStats.modifiedOn).toUTCString(),
+      "Created-On": new Date(fileStats.createdTimeSec || fileStats.createdOn).toUTCString(),
+      "Last-Modified": new Date(fileStats.modifiedTimeSec || fileStats.modifiedOn).toUTCString(),
       "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
     };
     if (fileStats.metadata) {

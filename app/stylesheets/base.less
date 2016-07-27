@@ -46,10 +46,13 @@ a {
     top: 0;
     left: 0;
     .splash-media {
-      width: 432px;
-      height: 324px;
-      margin: 0 auto;
+      width: 100%;
+      height: 280px;
+      margin: 60px auto 0;
       background-image: url(../images/not_connected.svg);
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
     }
     .splash-i {
       display: block;
@@ -79,7 +82,7 @@ a {
 
 .help {
   background-color: #FFF;
-  height: @tab-cnt-ht + 3;
+  height: 100%;
   overflow-y: auto;
   a {
     color: @primary-blue;
@@ -175,7 +178,7 @@ a {
   font: 10px sans-serif;
   path, line {
     fill: none;
-    stroke: #000;    
+    stroke: #000;
     shape-rendering: crispEdges;
   }
 }

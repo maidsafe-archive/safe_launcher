@@ -13,6 +13,9 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
         var showPrompt = function(appData, callback) {
           $rootScope.$authReq.show(appData, function(err, status) {
             server.confirmResponse(appData, status);
+            if (status) {
+              $rootScope.$loader.show('Preparing application root directory.');
+            }
             callback();
           });
           $rootScope.$applyAsync();
@@ -48,7 +51,7 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
       // handle auth request
       server.onAuthRequest(function(data) {
         if (!$rootScope.isAuthenticated) {
-          return auth.confirmAuthorisation(data, false);
+          return server.confirmResponse(data, false);
         }
         server.focusWindow();
         queue.push(data);
@@ -131,18 +134,25 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
     };
 
     var activityEvents = function() {
-      var updateActivity = function(data) {
-        var logKeys = Object.keys($rootScope.logList);
-        if (logKeys.length >= CONSTANTS.LOG_LIST_LIMIT) {
-          var lastkey = logKeys.pop();
-          delete $rootScope.logList[lastkey];
+      var updateActivity = function(data, isNew) {
+        data.activity['appName'] = data.appName || 'Anonymous Application';
+        if (isNew) {
+          if ($rootScope.logList.length > CONSTANTS.LOG_LIST_LIMIT) {
+            $rootScope.logList.pop();
+          }
+        } else {
+          var activityIndex = $rootScope.logList.map(function(obj) { return obj.activityId; }).indexOf(data.activity.activityId);
+          $rootScope.logList.splice(activityIndex, 1);
         }
-        data.activity['appName'] = data.app ? $rootScope.appList[data.app].name : 'Anonymous Application';
-        $rootScope.logList[data.activity.activityId] = data.activity;
+        $rootScope.logList.unshift(data.activity);
         if ($rootScope.currentAppDetails) {
-          $rootScope.currentAppDetails['logs'][data.activity.activityId] = data.activity;
+          if (!isNew) {
+            var currentAppLogIndex = $rootScope.currentAppDetails.logs.map(function(obj) { return obj.activityId; }).indexOf(data.activity.activityId);
+            $rootScope.currentAppDetails.logs.splice(currentAppLogIndex, 1);
+          }
+          $rootScope.currentAppDetails.logs.unshift(data.activity);
         }
-        if (data.app) {
+        if (data.app && $rootScope.appList[data.app]) {
             $rootScope.appList[data.app].status = data.activity;
         }
         $rootScope.$applyAsync();
@@ -152,14 +162,14 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
         if (!data) {
           return;
         }
-        updateActivity(data);
+        updateActivity(data, true);
       });
 
       server.onUpdatedAppActivity(function(data) {
         if (!data) {
           return;
         }
-        updateActivity(data);
+        updateActivity(data, false);
       });
     };
 
@@ -183,9 +193,14 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
           version: session.info.appVersion,
           vendor: session.info.vendor,
           permissions: session.info.permissions.list,
-          status: {},
-          lastActive: null
+          status: {
+            beginTime: new Date(),
+            activityName: 'Authorisation',
+            activityStatus: 1
+          },
+          lastActive: window.moment().fromNow()
         };
+        $rootScope.$loader.hide();
         $rootScope.$applyAsync();
       });
 

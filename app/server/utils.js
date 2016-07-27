@@ -72,6 +72,9 @@ export let ResponseHandler = function (req, res) {
     }
     updateAppActivity(req, res, true);
     let successStatus = 200;
+    if (res.headersSent) {
+        return;
+    }
     if (data) {
       res.status(successStatus).send(formatResponse(data));
       req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').DATA_DOWNLOADED, data.length);
@@ -182,8 +185,10 @@ export var formatResponse = function(data) {
 
 export let addAppActivity = function(req, activityName) {
   let activity = new Activity(req.id, activityName, Date.now());
+  let sessionInfo = req.headers.sessionId ? sessionManager.get(req.headers.sessionId) : null;
   req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').ACTIVITY_NEW, {
     app: req.headers.sessionId,
+    appName: sessionInfo ? sessionInfo.appName : null,
     activity: activity
   });
   if (req.headers.sessionId) {
@@ -196,11 +201,12 @@ export let updateAppActivity = function(req, res, isSuccess) {
   let activity = req.activity;
   activity.endTime = Date.now();
   activity.activityStatus = isSuccess ? ActivityStatus.SUCCESS : ActivityStatus.FAILURE;
+  let sessionInfo = req.headers.sessionId ? sessionManager.get(req.headers.sessionId) : null;
   req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').ACTIVITY_UPDATE, {
     app: req.headers.sessionId,
+    appName: sessionInfo ? sessionInfo.appName : null,
     activity: activity
   });
-  let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (req.headers.sessionId && sessionInfo) {
     sessionManager.get(req.headers.sessionId).updateActivity(activity);
   }

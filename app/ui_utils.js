@@ -42,14 +42,14 @@ export default class UIUtils {
   }
 
   // login
-  login(passPhrase, callback) {
-    this.api.auth.login(passPhrase, callback);
+  login(location, password, callback) {
+    this.api.auth.login(location, password, callback);
   }
 
   // register
-  register(passPhrase, callback) {
+  register(location, password, callback) {
     var self = this;
-    this.api.auth.register(passPhrase, function(err) {
+    this.api.auth.register(location, password, function(err) {
       if (err) {
         return callback(err);
       }
@@ -116,6 +116,10 @@ export default class UIUtils {
     this.restServer.removeSession(id);
   }
 
+  clearAllSessions() {
+    this.restServer.clearAllSessions();
+  }
+
   // focus window
   focusWindow() {
     var browserWindow = this.remote.getCurrentWindow();
@@ -160,11 +164,11 @@ export default class UIUtils {
     this.onNetworkStateChange = callback;
   }
 
-  reconnect(passPhrase) {
+  reconnect(user) {
     var self = this;
     this.api.reset();
-    if (passPhrase) {
-      this.api.auth.login(passPhrase, function(err) {
+    if (user) {
+      this.api.auth.login(user.accountSecret, user.accountPassword, function(err) {
         if (!self.onNetworkStateChange) {
           return;
         }

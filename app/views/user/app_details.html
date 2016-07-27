@@ -5,26 +5,33 @@
     </div>
   </div>
   <div class="app-details-cnt">
-    <h3 class="title">{{currentAppDetails.name}} - <span class="version">v {{currentAppDetails.version}}</span></h3>
+    <h3 class="title">{{currentAppDetails.app.name}} - <span class="version">v {{currentAppDetails.app.version}}</span></h3>
     <div class="permissions">
       <h4 class="permissions-title">Permissions:</h4>
       <ul>
-        <li ng-show="!currentAppDetails.permissions || currentAppDetails.permissions.length === 0">None</li>
-        <li class="icn safe-drive" ng-show="currentAppDetails.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1">SAFE Drive Access</li>
+        <li ng-show="!currentAppDetails.app.permissions || currentAppDetails.app.permissions.length === 0">None</li>
+        <li class="icn safe-drive" ng-show="currentAppDetails.app.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1">SAFE Drive Access</li>
       </ul>
     </div>
     <div class="table-view without-pad">
-      <div class="table-filter">
+      <div class="table-filter" ng-class="{disabled: (keys(currentAppDetails.logs).length === 0)}">
         <div class="table-filter-i checkbox in-progress" ng-init="logFilterInProgress = logFilterComplete = logFilterError = true;">
-          <input id="inProgress" type="checkbox" name="inProgress" value="" ng-model="logFilterInProgress" ng-change="toggleFilter('IN_PROGRESS')" checked="{{logFilterInProgress}}">
+          <input id="inProgress" type="checkbox" name="inProgress" value="" ng-model="logFilterInProgress"
+            ng-change="toggleFilter('IN_PROGRESS')"
+            checked="{{logFilterInProgress}}"
+            ng-disabled="(keys(currentAppDetails.logs).length === 0)">
           <label for="inProgress">In Progress</label>
         </div>
         <div class="table-filter-i checkbox completed">
-          <input id="completed" type="checkbox" name="completed" value="" ng-model="logFilterComplete" ng-change="toggleFilter('SUCCESS')" checked="{{logFilterComplete}}">
+          <input id="completed" type="checkbox" name="completed" value="" ng-model="logFilterComplete"
+            ng-change="toggleFilter('SUCCESS')" checked="{{logFilterComplete}}"
+            ng-disabled="(keys(currentAppDetails.logs).length === 0)">
           <label for="completed">Completed</label>
         </div>
         <div class="table-filter-i checkbox error">
-          <input id="error" type="checkbox" name="error" value="" ng-model="logFilterError" ng-change="toggleFilter('FAILURE')" checked="{{logFilterError}}">
+          <input id="error" type="checkbox" name="error" value="" ng-model="logFilterError"
+            ng-change="toggleFilter('FAILURE')" checked="{{logFilterError}}"
+            ng-disabled="(keys(currentAppDetails.logs).length === 0)">
           <label for="error">Error</label>
         </div>
       </div>
@@ -32,7 +39,7 @@
     </div>
     <div class="opt">
       <div class="opt-i">
-        <button type="button" name="revoke" class="btn flat danger" ng-click="removeSession(currentAppDetails.id)">Revoke Access</button>
+        <button type="button" name="revoke" class="btn flat danger" ng-click="removeSession(currentAppDetails.app.id)">Revoke Access</button>
       </div>
     </div>
   </div>

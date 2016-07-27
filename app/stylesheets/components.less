@@ -27,6 +27,10 @@
       width: 100%;
       height: @header-ht;
       background-color: @primary-blue;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 9;
       ul {
         padding: 0;
         margin: 0;
@@ -88,6 +92,9 @@
           }
           &.disabled {
             opacity: 0.5;
+            a {
+              cursor: default !important;
+            }
             &:hover {
               background-color: @primary-blue;
             }
@@ -130,6 +137,14 @@
         }
         .clearfix();
       }
+    }
+    .tab-cnt {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding-top: 46px;
     }
   }
 }
@@ -246,28 +261,35 @@
   .app-details-h {
     width: 100%;
     background-color: @primary-blue;
-    padding: 11px 16px;
+    height: 46px;
     .back {
-      height: 24px;
+      display: inline-block;
+      float: left;
       button {
-        width: 24px;
-        height: 24px;
+        width: 46px;
+        height: 46px;
         background-color: transparent;
         border: 0;
         outline: 0;
         color: #FFF;
         background-image: url(../images/back_arrow.svg);
-        background-size: cover;
+        background-size: 24px;
         background-repeat: no-repeat;
         background-position: center;
         cursor: pointer;
+        &:hover {
+          background-color: @primary-blue-hover;
+        }
+        &:active {
+          background-color: @primary-blue-action;
+        }
       }
     }
+    .clearfix();
   }
   .app-details-cnt {
     max-height: @tab-cnt-ht;
     padding: 24px;
-    overflow-y: auto;
     position: relative;
     .title {
       font-size: 24px;
@@ -430,11 +452,18 @@
             display: block;
             border-bottom: 1px solid transparent;
             cursor: pointer;
+            position: relative;
             &:hover {
               background-color: #EEE;
             }
-            &.none:hover {
-              background-color: transparent;
+            &.none {
+              cursor: default;
+              &:hover {
+                background-color: transparent;
+              }
+              &:after {
+                display: none;
+              }
             }
             &:after {
               content: '';
@@ -676,7 +705,7 @@
 // dash
 .dash {
   padding: 16px;
-  height: @tab-cnt-ht;
+  height: 100%;
   ovleflow-y: auto;
   .dash-b {
     .dash-cnt {
@@ -728,9 +757,6 @@
 
 .bar-chart {
   padding: 16px 16px 9px;
-  &:hover {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.26);
-  }
   .bar-chart-b {
     display: block;
     float: left;
@@ -1086,6 +1112,9 @@
   .table-filter {
     width: 100%;
     margin-bottom: 16px;
+    &.disabled {
+      opacity: 0.5;
+    }
     .table-filter-i {
       display: inline-block;
       margin-right: 8px;
@@ -1093,44 +1122,55 @@
     .clearfix();
   }
   .table-inner-b {
-    height: 360px;
+    height: 370px;
     overflow-y: auto;
-  }
-  table {
-    width: 100%;
-    font-size: 14px;
     &.four-col {
-      tr {
-        th:nth-child(1) {
-          width: 40%;
-        }
-        th:nth-child(2) {
-          width: 30%;
-        }
-        th:nth-child(3) {
-          width: 15%;
-        }
-        th:nth-child(4) {
-          width: 15%;
+      table {
+        tr {
+          th:nth-child(1) {
+            width: 40%;
+          }
+          th:nth-child(2) {
+            width: 30%;
+          }
+          th:nth-child(3) {
+            width: 15%;
+          }
+          th:nth-child(4) {
+            width: 15%;
+          }
         }
       }
     }
     &.three-col {
-      tr {
-        th:nth-child(1), td:first-child {
-          display: none;
-        }
-        th:nth-child(2) {
-          width: 60%;
-        }
-        th:nth-child(3) {
-          width: 20%;
-        }
-        th:nth-child(4) {
-          width: 20%;
+      height: 260px;
+      table {
+        tr {
+          &.default-row {
+            td:first-child {
+              display: table-cell !important;
+              text-transform: none;
+            }
+          }
+          th:nth-child(1), td:first-child {
+            display: none;
+          }
+          th:nth-child(2) {
+            width: 60%;
+          }
+          th:nth-child(3) {
+            width: 20%;
+          }
+          th:nth-child(4) {
+            width: 20%;
+          }
         }
       }
     }
+  }
+  table {
+    width: 100%;
+    font-size: 14px;
     th {
       text-align: left;
       font-weight: 600;
@@ -1138,6 +1178,14 @@
       padding: 3px;
     }
     tr {
+      &.default-row {
+        td {
+          color: #212121;
+          background-color: transparent !important;
+          opacity: 0.7;
+          text-transform: none;
+        }
+      }
       td {
         background-color: #EEE;
         padding: 3px;
@@ -1176,7 +1224,7 @@
     bottom: 0;
   }
   .toaster-b {
-    min-width: 260px;
+    min-width: 280px;
     max-width: 640px;
     height: inherit;
     display: inline-block;
@@ -1275,6 +1323,31 @@
   right: 0;
   z-index: 97;
   cursor: pointer;
+  .network-status-tooltip {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    display: none;
+    padding: 8px;
+    background-color: #FFF;
+    color: @primary-blue;
+    font-size: 14px;
+    font-weight: normal;
+    border-radius: 3px;
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+    z-index: 99;
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -10px;
+      right: 18px;
+      border-width: 5px;
+      border-color: transparent transparent #FFF;
+      border-style: solid;
+    }
+  }
   &:after {
     content: '';
     width: 100%;
@@ -1289,9 +1362,17 @@
   }
   &:hover {
     background-color: @primary-blue-hover;
+    .network-status-tooltip {
+      display: inline-block;
+    }
   }
   &:active {
     background-color: @primary-blue-action;
+  }
+  &.splash-screen {
+    &:hover, &:active {
+      background-color: transparent !important;
+    }
   }
   &.connecting:after {
     background-image: url(../images/loading.svg);

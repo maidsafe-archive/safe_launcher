@@ -1,7 +1,7 @@
 import util from 'util';
 import { Writable } from 'stream';
 
-export var NfsWriter = function (req, writerId, responseHandler, offset) {
+export var NfsWriter = function (req, writerId, responseHandler, size, offset) {
   Writable.call(this);
   var self = this;
   this.req = req;
@@ -9,6 +9,7 @@ export var NfsWriter = function (req, writerId, responseHandler, offset) {
   this.curOffset = parseInt(offset || 0);
   this.responseHandler = responseHandler;
   this.isReadStreamClosed = false;
+  this.maxSize = size;
   return this;
 };
 
@@ -20,18 +21,13 @@ NfsWriter.prototype._write = function(data, enc, next) {
   var uploadEvent = self.req.app.get('EVENT_TYPE').DATA_UPLOADED;
   this.req.app.get('api').nfs.write(this.writerId, this.curOffset, data, function(err) {
     if (err) {
-      next(err);      
       return self.responseHandler(err);
     }
     eventEmitter.emit(uploadEvent, data.length);
     self.curOffset += data.length;
-    if (self.isReadStreamClosed) {
+    if (self.curOffset === self.maxSize) {
       return self.req.app.get('api').nfs.closeWriter(self.writerId, self.responseHandler);
     }
     next();
   });
-};
-
-NfsWriter.prototype.onClose = function() {
-  this.isReadStreamClosed = true;
 };

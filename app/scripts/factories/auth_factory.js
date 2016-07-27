@@ -1,22 +1,18 @@
 /**
  * Authentication Factory
  */
-window.safeLauncher.factory('authFactory', [ 'serverFactory',
-  function(server) {
+window.safeLauncher.factory('authFactory', [function() {
     var self = this;
 
     // Login
-    self.login = function(passPhrase, callback) {
-      window.msl.login(passPhrase, callback);
+    self.login = function(location, password, callback) {
+      window.msl.login(location, password, callback);
     };
 
     // Register
-    self.register = function(passPhrase, callback) {
-      window.msl.register(passPhrase, callback);
+    self.register = function(location, password, callback) {
+      window.msl.register(location, password, callback);
     };
-
-    self.onAuthorisationReq = server.onAuthRequest;
-    self.confirmAuthorisation = server.confirmResponse;
 
     return self;
   }
