@@ -135,7 +135,7 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
 
     var activityEvents = function() {
       var updateActivity = function(data, isNew) {
-        data.activity['appName'] = data.app ? $rootScope.appList[data.app].name : 'Anonymous Application';
+        data.activity['appName'] = data.appName || 'Anonymous Application';
         if (isNew) {
           if ($rootScope.logList.length > CONSTANTS.LOG_LIST_LIMIT) {
             $rootScope.logList.pop();
@@ -148,7 +148,7 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
         if ($rootScope.currentAppDetails) {
           $rootScope.currentAppDetails['logs'] = data.activity;
         }
-        if (data.app) {
+        if (data.app && $rootScope.appList[data.app]) {
             $rootScope.appList[data.app].status = data.activity;
         }
         $rootScope.$applyAsync();
