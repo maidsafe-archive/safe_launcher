@@ -1,3 +1,5 @@
+import { errorCodeLookup } from './server/error_code_lookup';
+
 class ProxyListener {
   constructor() {
     this.errorCb = null;
@@ -39,6 +41,7 @@ export default class UIUtils {
     this.proxy = proxy;
     this.proxyListener = new ProxyListener();
     this.onNetworkStateChange = null;
+    this.errorCodeLookup = errorCodeLookup;
   }
 
   // login

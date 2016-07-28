@@ -32,7 +32,7 @@ window.safeLauncher.config(function($stateProvider, $urlRouterProvider) {
     }
   })
   .state('app.account', {
-    'url': '/account?:currentPage&:currentState?',
+    'url': '/account?:currentPage&:currentState?&:errorMsg?',
     'views': {
       'tab': {
         'templateUrl': 'views/tab/account.html'
