@@ -1,5 +1,10 @@
 # SAFE Launcher Change Log
 
+##[0.7.1]
+- Mapping registration and login with messages based on error codes
+- Fetching app root directory failure case handled
+- Stop proxy server on logout until unauthorised client is created
+
 ##[0.7.0]
 - Authorisation now uses secret and password
 - NFS modify file API is temporarily disabled
