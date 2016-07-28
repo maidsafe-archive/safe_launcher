@@ -96,6 +96,10 @@ export default class UIUtils {
     this.restServer.addEventListener(this.restServer.EVENT_TYPE.SESSION_CREATED, callback);
   }
 
+  onSessionCreationFailed(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.SESSION_CREATION_FAILED, callback);
+  }
+
   // handle session removed
   onSessionRemoved(callback) {
     this.restServer.addEventListener(this.restServer.EVENT_TYPE.SESSION_REMOVED, callback);

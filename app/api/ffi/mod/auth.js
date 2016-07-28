@@ -50,7 +50,7 @@ var unregisteredClient = function(lib, observer) {
   });
 };
 
-var setSafeDriveKey = function(lib) {
+var setSafeDriveKey = function(lib, callback) {
   var sizePtr = ref.alloc(int);
   var capacityPtr = ref.alloc(int);
   var resultPtr = ref.alloc(int);
@@ -61,7 +61,7 @@ var setSafeDriveKey = function(lib) {
     var result = resultPtr.deref();
     if (result !== 0) {
       util.sendLog('ERROR', 'FFI/mod/auth.js - get SafeDrive Dir Key with code ' + result);
-      return new Error('Failed with error code ' + result);
+      return callback(result);
     }
     var size = sizePtr.deref();
     var capacity = capacityPtr.deref();
@@ -69,6 +69,7 @@ var setSafeDriveKey = function(lib) {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     lib.drop_vector.async(pointer, size, capacity, function() {});
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    return callback(0);
   });
 };
 
@@ -87,12 +88,13 @@ var register = function(lib, request, observer) {
     }
     registeredClientHandle = regClient.deref();
     registerObserver(lib, registeredClientHandle, observer);
-    var safeDriveError = setSafeDriveKey(lib);
-    if (safeDriveError) {
-      return util.sendError(request.id, 999, safeDriveError.toString());
-    }
-    util.send(request.id);
-    util.sendConnectionStatus(0, true);
+    setSafeDriveKey(lib, function(safeDriveError) {
+      if (safeDriveError !== 0) {
+        return util.sendError(request.id, safeDriveError, 'Fetching safe drive failed');
+      }
+      util.send(request.id);
+      util.sendConnectionStatus(0, true);
+    });
   });
 };
 
@@ -111,12 +113,13 @@ var login = function(lib, request, observer) {
     registeredClientHandle = regClient.deref();
     // dropUnregisteredClient(lib);
     registerObserver(lib, registeredClientHandle, observer);
-    var safeDriveError = setSafeDriveKey(lib);
-    if (safeDriveError) {
-      return util.sendError(request.id, 999, safeDriveError.toString());
-    }
-    util.send(request.id);
-    util.sendConnectionStatus(0, true);
+    setSafeDriveKey(lib, function(err) {
+      if (err !== 0) {
+        return util.sendError(request.id, err, 'Fetching safe drive failed');
+      }
+      util.send(request.id);
+      util.sendConnectionStatus(0, true);
+    });
   });
 };
 
@@ -136,7 +139,6 @@ exports.getUnregisteredClient = function(lib, observer) {
 };
 
 var getAppDirectoryKey = function(lib, request) {
-
   if (!registeredClientHandle) {
     return util.sendError(request.id, 999, 'Client Handle not available');
   }
@@ -158,7 +160,7 @@ var getAppDirectoryKey = function(lib, request) {
         var result = resultPtr.deref();
         if (result !== 0) {
           util.sendLog('ERROR', 'FFI/mod/auth.js - Getting App Root Dir Key failed with code ' + result);
-          return util.sendError(request.id, 999, 'Failed with error code ' + result);
+          return util.sendError(request.id, result, 'Failed with error code ' + result);
         }
         var size = sizePtr.deref();
         var capacity = capacityPtr.deref();

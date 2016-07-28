@@ -204,6 +204,11 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
         $rootScope.$applyAsync();
       });
 
+      window.msl.onSessionCreationFailed(function() {
+        $rootScope.$loader.hide();
+        $rootScope.$applyAsync();
+      });
+
       // handle session removed
       server.onSessionRemoved(function(id) {
         console.log('Session removed :: ' + id);

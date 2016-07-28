@@ -17,10 +17,16 @@ export let CreateSession = function(data) {
   let res = data.response;
   log.debug('Waiting for directory key for creating an session');
 
+  var emitSessionCreationFailed = function() {
+    let eventType = req.app.get('EVENT_TYPE').SESSION_CREATION_FAILED;
+    req.app.get('eventEmitter').emit(eventType);
+  };
+
   this.onDirKey = function(err, dirKey) {
     let authReq = req.body;
     if (err) {
       log.error('Creating session :: ' + JSON.stringify(err));
+      emitSessionCreationFailed();
       return req.next(new ResponseError(500, err));
     }
     log.debug('Directory key for creating an session obtained');
@@ -56,6 +62,7 @@ export let CreateSession = function(data) {
         permissions: authReq.permissions
       });
     } catch (e) {
+      emitSessionCreationFailed();
       req.next(new ResponseError(500, e.message));
     }
   };

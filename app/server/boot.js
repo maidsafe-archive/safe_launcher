@@ -26,6 +26,7 @@ export default class RESTServer {
       ACTIVITY_UPDATE: 'activity_update',
       SESSION_CREATED: 'sesssion_created',
       SESSION_REMOVED: 'session_removed',
+      SESSION_CREATION_FAILED: 'session_creation_failed',
       DATA_UPLOADED: 'data_uploaded',
       DATA_DOWNLOADED: 'data_downloaded'
     };
