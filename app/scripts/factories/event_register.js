@@ -87,14 +87,7 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
       // handle proxy start
       server.onProxyStart(function(msg) {
         $rootScope.$proxyServer = true;
-        $rootScope.setProxy(true);
-        $rootScope.$toaster.show({
-          msg: 'Proxy Server started',
-          hasOption: false,
-          isError: false
-        }, function(err, data) {
-          console.log('Proxy Server started');
-        });
+        $rootScope.setProxy(true);        
       });
 
       // handle proxy stop
