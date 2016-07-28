@@ -6,13 +6,19 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
   function($scope, $state, $rootScope, $timeout, auth, CONSTANTS, MESSAGES) {
     var REQUEST_TIMEOUT = 90 * 1000;
     var FIELD_FOCUS_DELAY = 100;
-
     var showErrorField = function(targetId, msg) {
       var errorTarget = $('#' + targetId);
       errorTarget.addClass('error');
       errorTarget.children('.msg').text(msg);
       errorTarget.children('input').focus();
     };
+
+    var removeErrorMsg = function(targetId) {
+      var errorTarget = $('#' + targetId);
+      errorTarget.removeClass('error');
+      errorTarget.children('.msg').text('');
+      errorTarget.children('input').focus();
+    }
 
     // user create account
     var createAccount = function() {
@@ -30,6 +36,13 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         auth.register($scope.user.accountSecret, $scope.user.accountPassword, done);
       });
     };
+
+    $scope.checkStateErrors = function() {
+      if ($state.params.errorMsg) {
+        showErrorField('AccountSecret', $state.params.errorMsg);
+      }
+    };
+    
     $scope.secretValid = false;
     $scope.passwordValid = false;
     $scope.createAccFlow = {
@@ -48,6 +61,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         return this.states.indexOf(state);
       },
       setPos: function(state) {
+        removeErrorMsg('AccountSecret');
         if (this.states.indexOf(state) > this.states.indexOf('ACC_SECRET_FORM')) {
           if (!$scope.secretValid) {
             return showErrorField('AccountSecret', MESSAGES.ACC_SECRET_MUST_STRONGER);
@@ -56,7 +70,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
             return showErrorField('AccountSecretConfirm', MESSAGES.ENTRIES_DONT_MATCH);
           }
         }
-        $state.go('app.account', {currentPage: $state.params.currentPage, currentState: state}, {notify: false});
+        $state.go('app.account', {currentPage: $state.params.currentPage, currentState: state, errorMsg: $state.params.errorMsg}, {notify: false});
         this.currentPos = state ? this.states.indexOf(state) : 0;
       },
       continue: function() {
@@ -77,13 +91,12 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         if (this.currentPos > 0) {
           this.currentPos--;
         }
-        $state.go('app.account', {currentPage: $state.params.currentPage, currentState: this.states[this.currentPos]}, {notify: false});
+        $state.go('app.account', {currentPage: $state.params.currentPage, currentState: this.states[this.currentPos], errorMsg: null}, {notify: false});
       }
     };
     var Request = function(callback) {
       var self = this;
       var alive = true;
-      var timer;
 
       var onResponse = function(err) {
         if (!alive) {
@@ -91,7 +104,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         }
         alive = false;
         callback(err);
-        $timeout.cancel(timer);
       };
 
       self.cancel = function() {
@@ -100,10 +112,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       };
 
       self.execute = function(func) {
-        timer = $timeout(function() {
-          onResponse(new Error('Operation timed out'));
-          alive = false;
-        }, REQUEST_TIMEOUT);
         func(onResponse);
       };
     };
@@ -114,24 +122,54 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       $rootScope.userInfo = $scope.user;
       $scope.user = {};
       if (err) {
+        var errMsg = window.msl.errorCodeLookup(err.errorCode || 0);
         if ($state.params.currentPage === 'register') {
-          $state.go('app.account', {currentPage: 'register', currentState: $scope.createAccFlow.states[2]}, {reload: true});
+          switch (errMsg) {
+            case 'CoreError::RequestTimeout':
+              errMsg = 'Request timed out';
+              break;
+            case 'CoreError::MutationFailure::MutationError::AccountExists':
+              errMsg = 'This account is already taken.';
+              break;
+            default:
+              errMsg = errMsg.replace('CoreError::', '');
+          }
+          $state.go('app.account', {
+            currentPage: 'register',
+            currentState: $scope.createAccFlow.states[2],
+            errorMsg: errMsg
+          }, { reload: true });
           $rootScope.user= {};
           return $rootScope.$toaster.show({
-            msg: 'Failed to create account',
+            msg: errMsg,
             isError: true
           }, function() {});
         }
+        switch (errMsg) {
+          case 'CoreError::RequestTimeout':
+            errMsg = 'Request timed out';
+            break;
+          case 'CoreError::GetFailure::GetError::NoSuchAccount':
+          case 'CoreError::GetFailure::GetError::NoSuchData':
+            errMsg = 'Account not found';
+            break;
+          case 'CoreError::SymmetricDecipherFailure':
+            errMsg = 'Invalid password';
+            break;
+          default:
+            errMsg = errMsg.replace('CoreError::', '');
+        }
+        errMsg = 'Login failed. ' + errMsg;
         var errorTarget = $('#errorTarget');
         errorTarget.addClass('error');
-        errorTarget.children('.msg').text('Invalid entries, account does not exist.');
+        errorTarget.children('.msg').text(errMsg);
         errorTarget.children('input').focus();
         errorTarget.children('input').bind('keyup', function(e) {
           errorTarget.children('.msg').text('');
           errorTarget.removeClass('error');
         });
         return $rootScope.$toaster.show({
-          msg: 'Authentication failed, invalid entries',
+          msg: errMsg,
           isError: true
         }, function() {});
       }
