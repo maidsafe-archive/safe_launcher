@@ -36,6 +36,13 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         auth.register($scope.user.accountSecret, $scope.user.accountPassword, done);
       });
     };
+
+    $scope.checkStateErrors = function() {
+      if ($state.params.errorMsg) {
+        showErrorField('AccountSecret', $state.params.errorMsg);
+      }
+    };
+    
     $scope.secretValid = false;
     $scope.passwordValid = false;
     $scope.createAccFlow = {
@@ -63,10 +70,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
             return showErrorField('AccountSecretConfirm', MESSAGES.ENTRIES_DONT_MATCH);
           }
         }
-        if ($state.params.errorMsg) {
-          showErrorField('AccountSecret', $state.params.errorMsg);
-        }
-        $state.go('app.account', {currentPage: $state.params.currentPage, currentState: state, errorMsg: null}, {notify: false});
+        $state.go('app.account', {currentPage: $state.params.currentPage, currentState: state, errorMsg: $state.params.errorMsg}, {notify: false});
         this.currentPos = state ? this.states.indexOf(state) : 0;
       },
       continue: function() {
@@ -136,9 +140,6 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
             errorMsg: errMsg
           }, { reload: true });
           $rootScope.user= {};
-          setTimeout(function() {
-            showErrorField('AccountSecret', errMsg);
-          }, 500);
           return $rootScope.$toaster.show({
             msg: errMsg,
             isError: true
