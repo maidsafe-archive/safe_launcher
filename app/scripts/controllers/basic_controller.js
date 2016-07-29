@@ -245,7 +245,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
             console.log(data);
           });
         }
-        $rootScope.$networkStatus.status = state;
+        $rootScope.$networkStatus.status = state;        
       } else if (state === window.NETWORK_STATE.DISCONNECTED) {
         $rootScope.$networkStatus.status = state;
         $rootScope.clearIntervals();
@@ -269,6 +269,8 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
             $scope.reconnectNetwork($rootScope.userInfo);
           });
         }
+      } else if (state === window.NETWORK_STATE.CONNECTING) {
+        $rootScope.$networkStatus.status = state;
       }
       console.log('Network status :: ' + state);
       $rootScope.$applyAsync();

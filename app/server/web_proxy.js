@@ -86,6 +86,7 @@ var server = http.createServer(function(req, res) {
 });
 
 proxy.on('error', function(err, req, res) {});
+
 server.listen(args.proxyPort, function() {
   process.send(JSON.stringify({
     type: 'connection',
