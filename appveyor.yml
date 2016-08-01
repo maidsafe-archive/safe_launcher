@@ -34,7 +34,7 @@ install:
   - npm --version
   - set npm_config_arch=%PLATFORM:x86=ia32%
   - npm install -g json
-  - ps: $env:PACKAGE_NAME = $(cat $APPVEYOR_BUILD_FOLDER | json productName)
+  - ps: $env:PACKAGE_NAME = $(cat $env:APPVEYOR_BUILD_FOLDER\app\package.json | json productName)
   - cd %APPVEYOR_BUILD_FOLDER%
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
@@ -68,13 +68,15 @@ before_deploy:
       }
   - npm run package
   - ps: |
-      New-Item -ItemType directory -Path config
-      git clone -q "https://$env:GH_TOKEN@github.com/maidsafe/release_config" config  2>&1 | Out-Null
-      Move-Item config\safe_launcher\safe_launcher.crust.config config\safe_launcher\$env:PACKAGE_NAME.crust.config
-      Copy-Item config\safe_launcher\* app_dist\$env:PACKAGE_NAME-v$env:PROJECT_VERSION-win32-$env:PLATFORM
+      New-Item -ItemType directory -Path releaseConfig
+      git clone -q "https://$env:GH_TOKEN@github.com/maidsafe/release_config" releaseConfig  2>&1 | Out-Null
+      cd releaseConfig\safe_launcher
+      Rename-Item -Path "safe_launcher.crust.config" -NewName "$env:PACKAGE_NAME.crust.config"
+      cd $env:APPVEYOR_BUILD_FOLDER
+      Move-Item releaseConfig\safe_launcher\* app_dist\$env:PACKAGE_NAME-v$env:PROJECT_VERSION-win32-$env:PLATFORM
       $NAME = "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM"
-      Rename-Item -Path app_dist\$env:PROJECT_NAME-v$env:PROJECT_VERSION-win32-$env:PLATFORM -NewName $NAME
       cd app_dist
+      Rename-Item -Path $env:PACKAGE_NAME-v$env:PROJECT_VERSION-win32-$env:PLATFORM -NewName $NAME
       7z a ../$NAME.zip *
       Push-AppveyorArtifact ../$NAME.zip
 deploy:
