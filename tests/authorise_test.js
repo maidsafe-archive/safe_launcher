@@ -6,8 +6,10 @@ describe('Authorisation', function() {
 
   before(function(done) {
     utils.register(function(regKeys) {
+      console.log('register');
       utils.setRegisteredKeys(regKeys);
       utils.login(true, function() {
+        console.log('login');
         utils.startLauncher(function() {
           done();
         });

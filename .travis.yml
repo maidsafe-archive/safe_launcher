@@ -35,7 +35,6 @@ addons:
 
 before_install:
   - export PROJECT_VERSION=$(git log -1 | grep -i "version change to" | sed "s/.*[vV]ersion change to v\{0,1\}//")
-  - export PACKAGE_NAME="$PROJECT_NAME-v$PROJECT_VERSION-$PLATFORM_NAME-x64"
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libnotify4; sudo apt-get install libgconf-2-4; fi
 install:
   - export DISPLAY=':99.0'
@@ -65,6 +64,11 @@ script:
 
 before_deploy:
   - cd $TRAVIS_BUILD_DIR
+  - npm install -g json
+  - export PRODUCT_NAME=$(cat app/package.json | json productName)
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PACKAGE_NAME="$PROJECT_NAME-v$PROJECT_VERSION-$PLATFORM_NAME-x64"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export PACKAGE_NAME="$PRODUCT_NAME-v$PROJECT_VERSION-$PLATFORM_NAME-x64"; fi
+  - export RELEASE_HELPER_PATH="${PRODUCT_NAME} Helper"
   - cd safe_core
   - cargo build --release
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
@@ -76,12 +80,12 @@ before_deploy:
   - if [ -z $(git tag -l "$PROJECT_VERSION") ]; then git tag $PROJECT_VERSION -am "Version $PROJECT_VERSION" $TRAVIS_COMMIT; git push https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} tag $PROJECT_VERSION > /dev/null 2>&1; fi
   - npm run package
   - git clone https://${GH_TOKEN}@github.com/maidsafe/release_config
-  - ls
-  - ls app_dist
-  - ls app_dist/$PACKAGE_NAME/
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/safe_launcher.crust.config release_config/safe_launcher/safe_launcher\ Helper.crust.config; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher\ Helper.app/Contents/MacOS/; fi
+  - cd release_config/safe_launcher
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv safe_launcher.crust.config "${PRODUCT_NAME}.crust.config"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv safe_launcher.crust.config "${RELEASE_HELPER_PATH}.crust.config"; fi
+  - cd $TRAVIS_BUILD_DIR
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/* "app_dist/${PACKAGE_NAME}/"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* "app_dist/${PACKAGE_NAME}/${PRODUCT_NAME}.app/Contents/Frameworks/${RELEASE_HELPER_PATH}.app/Contents/MacOS/"; fi
   - pushd ./app_dist
   - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
   - popd
