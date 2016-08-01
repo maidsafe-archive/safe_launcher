@@ -81,11 +81,12 @@ before_deploy:
   - npm run package
   - git clone https://${GH_TOKEN}@github.com/maidsafe/release_config
   - cd release_config/safe_launcher
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv safe_launcher.crust.config "${PRODUCT_NAME}.crust.config"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv safe_launcher.crust.config "${PROJECT_NAME}.crust.config"; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv safe_launcher.crust.config "${RELEASE_HELPER_PATH}.crust.config"; fi
   - cd $TRAVIS_BUILD_DIR
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/* "app_dist/${PACKAGE_NAME}/"; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* "app_dist/${PACKAGE_NAME}/${PRODUCT_NAME}.app/Contents/Frameworks/${RELEASE_HELPER_PATH}.app/Contents/MacOS/"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv "app_dist/${PACKAGE_NAME}" "app_dist/${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}"; fi
   - pushd ./app_dist
   - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
   - popd

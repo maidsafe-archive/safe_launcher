@@ -71,8 +71,9 @@ before_deploy:
       New-Item -ItemType directory -Path config
       git clone -q "https://$env:GH_TOKEN@github.com/maidsafe/release_config" config  2>&1 | Out-Null
       Move-Item config\safe_launcher\safe_launcher.crust.config config\safe_launcher\$env:PACKAGE_NAME.crust.config
-      Copy-Item config\safe_launcher\* app_dist\$env:PACKAGE_NAME-v$env:PROJECT_VERSION-win32-x64
+      Copy-Item config\safe_launcher\* app_dist\$env:PACKAGE_NAME-v$env:PROJECT_VERSION-win32-$env:PLATFORM
       $NAME = "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM"
+      Rename-Item -Path app_dist\$env:PROJECT_NAME-v$env:PROJECT_VERSION-win32-$env:PLATFORM -NewName $NAME
       cd app_dist
       7z a ../$NAME.zip *
       Push-AppveyorArtifact ../$NAME.zip
