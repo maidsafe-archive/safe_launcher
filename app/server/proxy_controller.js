@@ -7,9 +7,9 @@ import { remote } from 'electron';
 class ProxyController {
 
   constructor() {
-    this.process = null; 
+    this.process = null;
   }
-  
+
   start(proxyListener) {
     if (this.process) {
       log.warn('Trying to start proxy server which is already running');
@@ -38,7 +38,7 @@ class ProxyController {
             remote.getGlobal('cleanUp').proxy = self.process.pid;
             return proxyListener.onStart(event.msg.data);
           }
-          proxyListener.onError(event.msg.data);
+          proxyListener.onError(event.msg);
           break;
         case 'log':
           log.error(event.msg.log);

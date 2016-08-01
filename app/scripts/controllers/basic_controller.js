@@ -241,11 +241,9 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
             msg: 'Network connected',
             hasOption: false,
             isError: false
-          }, function(err, data) {
-            console.log(data);
-          });
+          }, function(err, data) {});
         }
-        $rootScope.$networkStatus.status = state;        
+        $rootScope.$networkStatus.status = state;
       } else if (state === window.NETWORK_STATE.DISCONNECTED) {
         $rootScope.$networkStatus.status = state;
         $rootScope.clearIntervals();
