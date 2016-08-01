@@ -208,52 +208,6 @@ describe('NFS File', function() {
     });
   });
 
-  describe('Update file content', function() {
-    var filePath = dirPath + '/test.txt';
-    var fileContent = 'Hi this is test content';
-
-    before(function(done) {
-      utils.createFile(utils.getToken(), filePath, function(status) {
-        if (status !== 200) {
-          console.error('Unable to create file :: ' + status);
-          return process.exit(0);
-        }
-        done();
-      });
-    });
-
-    after(function(done) {
-      utils.deleteFile(utils.getToken(), filePath, function(status) {
-        if (status !== 200) {
-          console.error('Unable to delete file :: ' + status);
-          return process.exit(0);
-        }
-        done();
-      });
-    });
-
-    it('should be able to update file content', function(done) {
-      utils.updateFileContent(utils.getToken(), fileContent, filePath, function(status) {
-        (status).should.be.equal(200);
-        done();
-      });
-    });
-
-    it('should throw 401 unauthorised', function(done) {
-      utils.updateFileContent(Math.floor(Math.random() * 1000000000), fileContent, filePath, function(status) {
-        (status).should.be.equal(401);
-        done();
-      });
-    });
-
-    it('should throw 404 file path not found', function(done) {
-      utils.updateFileContent(utils.getToken(), fileContent, ('/test_' + (new Date().getTime()) + '/test.txt'), function(status) {
-        (status).should.be.equal(404);
-        done();
-      });
-    });
-  });
-
   describe('Move File', function() {
     var fileName = '/test.txt';
     var filePath = dirPath + fileName;

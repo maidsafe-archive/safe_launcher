@@ -2,7 +2,7 @@ var should = require('should');
 var utils = require('./test_utils');
 
 describe("DNS", function() {
-  var dirPath = '/test_' + (new Date().getTime());
+  var dirPath = 'test_' + (new Date().getTime());
   before(function(done) {
     var createDirCb = function(status) {
       if (status !== 200) {
@@ -414,9 +414,9 @@ describe("DNS", function() {
       });
     });
 
-    it('should throw 404 DNS not found', function(done) {
+    it('should throw 400 DNS not found', function(done) {
       utils.getServices(utils.getToken(), ('/test_' + (new Date().getTime())), function(status) {
-        (status).should.be.equal(404);
+        (status).should.be.equal(400);
         done();
       });
     });

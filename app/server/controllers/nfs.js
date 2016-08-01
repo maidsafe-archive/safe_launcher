@@ -97,7 +97,6 @@ export var createDirectory = function(req, res, next) {
   if (typeof reqBody.isPrivate !== 'boolean') {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'isPrivate')));
   }
-  let appDirKey = sessionInfo.appDirKey;
   log.debug('NFS - Invoking create directory request');
   let responseHandler = new ResponseHandler(req, res);
   req.app.get('api').nfs.createDirectory(dirPath, reqBody.isPrivate, false,
