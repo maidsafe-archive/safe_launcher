@@ -52,16 +52,17 @@ var runApp = function() {
     stdio: 'inherit'
   });
 
-  app.on('close', function(code) {
+  /*app.on('close', function(code) {
     // User closed the app. Kill the host process.
     kill(watch.pid, 'SIGKILL', function() {
       process.exit();
     });
-  });
+  });*/
+  
 };
 
 runBuild()
   .then(function() {
-    runGulpWatch();
+    //runGulpWatch();
     runApp();
   });

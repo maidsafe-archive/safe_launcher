@@ -5,7 +5,7 @@ import env from './env';
 import UIUtils from './ui_utils';
 import * as api from './api/safe';
 import RESTServer from './server/boot';
-import ProxyController from './server/proxy_controller';
+import { proxyController } from './server/proxy_controller';
 import childProcess from 'child_process';
 import { formatResponse } from './server/utils';
 import { log } from './logger/log';
@@ -13,13 +13,6 @@ import { log } from './logger/log';
 log.debug('Application starting');
 
 let restServer = new RESTServer(api, env.serverPort);
-let proxyServer = new ProxyController();
-
-window.onbeforeunload = function(e) {
-  proxyServer.stop();
-  api.close();
-  e.returnValue = true;
-};
 
 window.NETWORK_STATE = {
   CONNECTING: 0,
@@ -28,10 +21,10 @@ window.NETWORK_STATE = {
   RETRY: 3
 };
 
-window.msl = new UIUtils(api, remote, restServer, proxyServer);
+window.msl = new UIUtils(api, remote, restServer, proxyController);
 
 var onFfiProcessTerminated = function(title, msg) {
-  require('remote').dialog.showMessageBox({
+  remote.dialog.showMessageBox({
     type: 'error',
     buttons: [ 'Ok' ],
     title: title,

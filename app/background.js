@@ -4,6 +4,7 @@
 // window from here.
 
 import env from './env';
+import kill from 'killprocess';
 import { app, BrowserWindow, remote } from 'electron';
 import { setAppMenu } from './vendor/electron_boilerplate/menu_helper';
 
@@ -11,6 +12,10 @@ const Menu = remote.Menu;
 const MenuItem = remote.MenuItem;
 
 var mainWindow;
+
+global.cleanUp = {
+  proxy: null
+};
 
 app.on('ready', function() {
   mainWindow = new BrowserWindow({
@@ -33,7 +38,10 @@ app.on('ready', function() {
 });
 
 app.on('window-all-closed', function() {
-  app.quit();
+ if (global.cleanUp.proxy) {
+  kill(global.cleanUp.proxy);
+ }
+ app.quit();
 });
 
 let shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
@@ -50,3 +58,7 @@ let shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) 
 if (shouldQuit) {
   app.quit();
 }
+
+process.on('uncaughtException', function(e) {
+ console.log(e);
+});

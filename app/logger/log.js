@@ -3,7 +3,7 @@ import path from 'path';
 import util from 'util';
 import env from '../env';
 import fse from 'fs-extra';
-// import FFILogWatcher from './ffi_log_watcher';
+import { remote } from 'electron';
 
 class Logger {
 
@@ -35,7 +35,7 @@ class Logger {
           date.getMilliseconds());
       return util.format('%s %s - %s', log.level.toUpperCase(), timeStamp, log.message);
     };
-    let executablePath = require('remote').app.getPath('exe');
+    let executablePath = remote.app.getPath('exe');
     let executableDirPath = path.dirname(executablePath);
     let logFilePath = path.resolve(executableDirPath, path.basename(executablePath).split('.')[0] + '_ui.log');
 
