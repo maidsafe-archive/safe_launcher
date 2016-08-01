@@ -2,6 +2,7 @@ import childProcess from 'child_process';
 import { log } from './../../logger/log';
 import uuid from 'uuid';
 import path from 'path';
+import { remote } from 'electron';
 
 var workerProcess;
 var workerPath = __dirname;
@@ -19,7 +20,7 @@ var addToCallbackPool = function(id, callback) {
 
 var startWorker = function() {
   log.debug('Starting FFI worker client');
-  let executableDirPath = path.dirname(require('remote').app.getPath('exe'));
+  let executableDirPath = path.dirname(remote.app.getPath('exe'));
   workerProcess = childProcess.fork(workerPath, [], {cwd: executableDirPath});
   workerProcess.on('close', function() {
     if (isClosed) {
