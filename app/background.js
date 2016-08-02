@@ -17,10 +17,15 @@ app.on('ready', function() {
     'width': 750  + (process.platform === 'win32' ? 20 : 0),
     'height': 550 + (process.platform === 'win32' ? 30 : 0),
     'resizable': false,
-    'icon': __dirname + '/images/app_icon.png'
+    'icon': __dirname + '/images/app_icon.png',
+    'show': false
   });
   mainWindow.loadURL('file://' + __dirname + '/app.html');
-
+  mainWindow.webContents.on('did-finish-load', function() {
+    setTimeout(function(){
+      mainWindow.show();
+    }, 40);
+  });
 
   if (env.name !== 'production') {
     setAppMenu(false);
