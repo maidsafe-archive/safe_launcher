@@ -75,6 +75,9 @@ let move = function(req, res, isFile, next) {
     req.app.get('api').nfs.moveFile(reqBody.srcPath, srcRootPath, reqBody.destPath, destRootPath,
       action, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler);
   } else {
+    if (action === false && reqBody.srcPath === '/') {
+      return next(new ResponseError(400, 'Cannot move root directory'));   
+    }
     log.debug('NFS - Invoking move directory request');
     req.app.get('api').nfs.moveDir(reqBody.srcPath, srcRootPath, reqBody.destPath, destRootPath,
       action, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler);
