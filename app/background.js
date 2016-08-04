@@ -37,11 +37,14 @@ app.on('ready', function() {
   mainWindow.setMenuBarVisibility(false);
 });
 
-app.on('window-all-closed', function() {
- if (global.cleanUp.proxy) {
-  kill(global.cleanUp.proxy);
- }
- app.quit();
+app.on('window-all-closed', function() {  
+  app.quit();  
+});
+
+app.on('before-quit', function() {
+  if (global.cleanUp.proxy) {
+    kill(global.cleanUp.proxy);
+  }
 });
 
 let shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {

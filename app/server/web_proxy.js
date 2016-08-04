@@ -96,6 +96,7 @@ server.listen(args.proxyPort, function() {
     }
   }));
 });
+
 server.on('error', function(err) {
   process.send(JSON.stringify({
     type: 'connection',

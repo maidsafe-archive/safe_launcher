@@ -54,7 +54,7 @@ router.post('/nfs/movefile', jsonParser,
 
 // DNS API
 router.post('/dns', jsonParser, new ActivityMiddleware('Register long name and service'), DNS.register);
-router.post('/dns/:longName', jsonParser, new ActivityMiddleware('Create long name'), DNS.createPublicId);
+router.post('/dns/:longName', new ActivityMiddleware('Create long name'), DNS.createPublicId);
 router.put('/dns', jsonParser, new ActivityMiddleware('Add new service'), DNS.addService);
 router.delete('/dns/:longName', new ActivityMiddleware('Delete DNS Record'), DNS.deleteDns);
 router.delete('/dns/:serviceName/:longName', new ActivityMiddleware('Delete service'), DNS.deleteService);
