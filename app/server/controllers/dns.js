@@ -1,6 +1,6 @@
 import mime from 'mime';
 import sessionManager from '../session_manager';
-import { formatResponse, ResponseError, ResponseHandler } from '../utils';
+import { formatDirectoryResponse, formatResponse, ResponseError, ResponseHandler } from '../utils';
 import { log } from './../../logger/log';
 import { DnsReader } from '../stream/dns_reader';
 import { errorCodeLookup } from './../error_code_lookup';
@@ -63,7 +63,13 @@ export var getHomeDirectory = function(req, res, next) {
   let responseHandler = new ResponseHandler(req, res);
   log.debug('DNS - Invoking getHomeDirectory API for ' + longName + ', ' + serviceName);
   req.app.get('api').dns.getHomeDirectory(longName, serviceName, hasSafeDriveAccess, appDirKey,
-    responseHandler);
+    function(err, dir) {
+        if (err) {
+          return responseHandler(err);
+        }
+        dir = formatDirectoryResponse(JSON.parse(dir));
+        responseHandler(null, dir);
+      });
 };
 
 export var getFile = function(req, res, next) {

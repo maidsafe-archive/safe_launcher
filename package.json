@@ -38,6 +38,7 @@
     "build": "gulp build",
     "release": "gulp release --env=production",
     "start": "node ./tasks/start",
+    "start-dev": "node ./tasks/start --proxy_unsafe_mode",
     "test": "gulp test",
     "package": "gulp package --env=production",
     "msvc_rebuild": "gulp msvc_rebuild --env=production"

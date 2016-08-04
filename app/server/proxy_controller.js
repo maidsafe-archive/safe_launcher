@@ -17,12 +17,17 @@ class ProxyController {
     }
     let self = this;
     log.info('Starting proxy server');
-    this.process = childProcess.fork(path.resolve(__dirname, 'server/web_proxy.js'), [
+    var args = [
       '--proxyPort',
       env.proxyPort,
       '--serverPort',
       env.serverPort
-    ]);
+    ];    
+    if (remote.getGlobal('proxyUnsafeMode')) {
+      args.push('--unsafe_mode');
+      args.push('true');
+    }    
+    this.process = childProcess.fork(path.resolve(__dirname, 'server/web_proxy.js'), args);
     this.process.on('exit', function() {
       log.info('Proxy server stopped');
       remote.getGlobal('cleanUp').proxy = null;
@@ -41,7 +46,11 @@ class ProxyController {
           proxyListener.onError(event.msg.data);
           break;
         case 'log':
-          log.error(event.msg.log);
+          if (event.msg.level === 'INFO') {
+			log.info(event.msg.log);
+          } else {
+          	log.error(event.msg.log);
+          }  
           break;
         default:
           log.warn('Invalid event type from proxy');
