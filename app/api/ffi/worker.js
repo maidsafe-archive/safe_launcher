@@ -22,3 +22,4 @@ var BeforeExit = function(handler) {
 };
 process.on('message', onMessage);
 process.on('beforeExit', new BeforeExit(handler));
+

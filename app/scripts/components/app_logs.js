@@ -21,8 +21,8 @@ var AppLogs = React.createClass({
       '-1': 'FAILURE'
     };
 
-    var tableHead = React.DOM.thead(null,
-      React.DOM.tr(null,
+    var tableHead = React.DOM.thead({key: 'table-head'},
+      React.DOM.tr({key: 'table-head-row'},
         React.DOM.th(null, 'App Name'),
         React.DOM.th(null, 'Request'),
         React.DOM.th(null, 'Status'),
@@ -34,7 +34,7 @@ var AppLogs = React.createClass({
       return React.DOM.div({key: 'inner-b', className: 'table-inner-b'}, [
         React.DOM.table({key: 'table', className: this.props.table}, [
           tableHead,
-          React.DOM.tbody(null, [
+          React.DOM.tbody({key: 'table-row'}, [
             React.DOM.tr({key: 'default-row', className: 'default-row'}, [
               React.DOM.td({key: 'default-col', colSpan:'100%'}, 'No requests made yet.')
             ])
@@ -54,7 +54,7 @@ var AppLogs = React.createClass({
       if ((self.props.filter.length === 0) || (self.props.filter.indexOf(list.status) === -1)) {
         return;
       }
-      row = React.DOM.tr({key: i, className: STATUS_CLASS[list.status]}, [
+      row = React.DOM.tr({key: 'table-row-' + i, className: STATUS_CLASS[list.status]}, [
         React.DOM.td({key: 'td-name-' + i}, list.appName),
         React.DOM.td({key: 'td-req-' + i}, list.activityName),
         React.DOM.td({key: 'td-status-' + i}, list.status.replace(/_/g, ' ')),

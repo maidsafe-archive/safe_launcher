@@ -2,10 +2,10 @@
 import { remote } from 'electron'; // native electron module
 // import jetpack from 'fs-jetpack'; // module loaded from npm
 import env from './env';
-import path from 'path';
 import UIUtils from './ui_utils';
 import * as api from './api/safe';
 import RESTServer from './server/boot';
+import { proxyController } from './server/proxy_controller';
 import childProcess from 'child_process';
 import { formatResponse } from './server/utils';
 import { log } from './logger/log';
@@ -13,58 +13,6 @@ import { log } from './logger/log';
 log.debug('Application starting');
 
 let restServer = new RESTServer(api, env.serverPort);
-let proxyServer = {
-  process: null,
-  start: function(proxyListener) {
-    if (this.process) {
-      log.warn('Trying to start proxy server which is already running');
-      return;
-    }
-    log.info('Starting proxy server');
-    this.process = childProcess.fork(path.resolve(__dirname, 'server/web_proxy.js'), [
-      '--proxyPort',
-      env.proxyPort,
-      '--serverPort',
-      env.serverPort
-    ]);
-    this.process.on('exit', function() {
-      log.info('Proxy server stopped');
-      proxyListener.onExit('Proxy server closed');
-    });
-    this.process.on('message', function(event) {
-      log.debug('Proxy Server - onMessage event - received - ' + event);
-      event = JSON.parse(event);
-      switch (event.type) {
-        case 'connection':
-          if (event.msg.status) {
-            log.info('Proxy server started');
-            return proxyListener.onStart(event.msg.data);
-          }
-          proxyListener.onError(event.msg.data);
-          break;
-        case 'log':
-          log.error(event.msg.log);
-          break;
-        default:
-          log.warn('Invalid event type from proxy');
-      }
-    });
-  },
-  stop: function() {
-    if (!this.process) {
-      return;
-    }
-    log.info('Stopping proxy server');
-    this.process.kill();
-    this.process = null;
-  }
-};
-
-window.onbeforeunload = function(e) {
-  proxyServer.stop();
-  api.close();
-  e.returnValue = true;
-};
 
 window.NETWORK_STATE = {
   CONNECTING: 0,
@@ -73,10 +21,10 @@ window.NETWORK_STATE = {
   RETRY: 3
 };
 
-window.msl = new UIUtils(api, remote, restServer, proxyServer);
+window.msl = new UIUtils(api, remote, restServer, proxyController);
 
 var onFfiProcessTerminated = function(title, msg) {
-  require('remote').dialog.showMessageBox({
+  remote.dialog.showMessageBox({
     type: 'error',
     buttons: [ 'Ok' ],
     title: title,

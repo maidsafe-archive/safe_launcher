@@ -4,6 +4,7 @@
 // window from here.
 
 import env from './env';
+import kill from 'killprocess';
 import { app, BrowserWindow, remote } from 'electron';
 import { setAppMenu } from './vendor/electron_boilerplate/menu_helper';
 
@@ -11,6 +12,10 @@ const Menu = remote.Menu;
 const MenuItem = remote.MenuItem;
 
 var mainWindow;
+
+global.cleanUp = {
+  proxy: null
+};
 
 app.on('ready', function() {
   mainWindow = new BrowserWindow({
@@ -32,8 +37,14 @@ app.on('ready', function() {
   mainWindow.setMenuBarVisibility(false);
 });
 
-app.on('window-all-closed', function() {
-  app.quit();
+app.on('window-all-closed', function() {  
+  app.quit();  
+});
+
+app.on('before-quit', function() {
+  if (global.cleanUp.proxy) {
+    kill(global.cleanUp.proxy);
+  }
 });
 
 let shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
@@ -49,4 +60,16 @@ let shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) 
 
 if (shouldQuit) {
   app.quit();
+}
+
+process.on('uncaughtException', function(e) {
+ console.log(e);
+});
+
+for (var i in process.argv) {
+  console.log(process.argv[i]);
+  if (process.argv[i] === '--proxy_unsafe_mode') {
+    global.proxyUnsafeMode = true;
+    break;    
+  }
 }

@@ -31,7 +31,7 @@ var AppList = React.createClass({
         ),
         React.DOM.span({key: 'status-bar-msg-' + i, className: 'msg'}, this.props.list[i].status.activityName),
         React.DOM.span({key: 'status-bar-status-' + i, className: 'status'}, 'Status: ' +
-          (ACTIVITY_STATUS[this.props.list[i].status.activityStatus] || 'Unknown')) 
+          (ACTIVITY_STATUS[this.props.list[i].status.activityStatus] || 'Unknown'))
       ]);
       option = React.DOM.div({key: 'option-' + i, className: 'opt'},
         React.DOM.div({key: 'option-item-' + i, className: 'opt-i'},
@@ -42,7 +42,7 @@ var AppList = React.createClass({
       listItem = React.DOM.div({key: i, className: 'app-li-i', 'data-id': this.props.list[i].id, onClick: this.showAppDetails},[
         React.DOM.h3({key: 'title-' + i, className: 'title'}, [
           this.props.list[i].name + ' - ',
-          React.DOM.span({ kery: 'version-' + i, className: 'version' }, 'v ' + this.props.list[i].version)
+          React.DOM.span({ key: 'version-' + i, className: 'version' }, 'v ' + this.props.list[i].version)
         ]),
         React.DOM.h4({key: 'sub-title-' + i, className: 'sub-title'}, 'Last Active: ' + (this.props.list[i].lastActive || '')),
         statusBar,
@@ -50,7 +50,7 @@ var AppList = React.createClass({
       ]);
       listItems.push(listItem);
     }
-    return React.DOM.div({className: 'app-li-cnt'}, listItems);
+    return React.DOM.div({key: 'appListCont', className: 'app-li-cnt'}, listItems);
   }
 });
 

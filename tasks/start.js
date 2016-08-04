@@ -48,7 +48,11 @@ var runGulpWatch = function() {
 };
 
 var runApp = function() {
-  var app = childProcess.spawn(electron, ['./build'], {
+  var args = [ './build' ]
+  if (!utils.isProxyUnsafeMode()) {
+    args.push('--proxy_unsafe_mode');
+  }  
+  var app = childProcess.spawn(electron, args, {
     stdio: 'inherit'
   });
 
@@ -58,6 +62,7 @@ var runApp = function() {
       process.exit();
     });
   });
+  
 };
 
 runBuild()

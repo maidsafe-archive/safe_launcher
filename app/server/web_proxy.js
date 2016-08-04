@@ -35,6 +35,8 @@ var sendLog = function(level, msg) {
 
 var args = initialiseArguments(process.argv);
 
+var unSafeMode = args.hasOwnProperty('unsafe_mode'); 
+
 var server = http.createServer(function(req, res) {
   try {
     var urlServe = url.parse(req.url);
@@ -44,24 +46,26 @@ var server = http.createServer(function(req, res) {
       return res.end();
     }
     var origin = req.headers['origin'];
-    if (origin && !safenetPath.test(origin)) {
+    if (!unSafeMode && origin && !safenetPath.test(origin)) {
       res.writeHead(403);
       res.write('Invalid request origin - ' + (origin || 'No origin found') +
           '. Origin can only be from sites with .safenet TLD');
       return res.end();
     }
     // Setting CSP Headers
-    res.setHeader('Content-Security-Policy', 'default-src self *.safenet; object-src none; base-uri self;\
-    form-action http://api.safenet; frame-ancestors self;X-Frame-Options : SAMEORIGIN');
-    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-    if (safenetApiPath.test(urlServe.host)) {
+    if (!unSafeMode) {
+      res.setHeader('Content-Security-Policy', 'default-src self *.safenet; object-src none; base-uri self;\
+        form-action http://api.safenet; frame-ancestors self;X-Frame-Options : SAMEORIGIN');
+      res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    }
+    if (unSafeMode || safenetApiPath.test(urlServe.host)) {
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Access-Control-Allow-Credentials", "true");
       res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,DELETE");
-      res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers,\
-        Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method,\
-        Access-Control-Request-Headers");
-      return proxy.web(req, res, {
+      res.setHeader("Access-Control-Allow-Headers", "Authorization, Access-Control-Allow-Headers,\
+        Origin, Accept, X-Requested-With, Content-Type, Content-Length, Metadata, Range, Access-Control-Request-Method,\
+        Access-Control-Request-Headers, Metadata");
+      return proxy.web(req, res, {        
         target: 'http://localhost:' + args.serverPort + '/'
       });
     }
@@ -86,6 +90,7 @@ var server = http.createServer(function(req, res) {
 });
 
 proxy.on('error', function(err, req, res) {});
+
 server.listen(args.proxyPort, function() {
   process.send(JSON.stringify({
     type: 'connection',
@@ -94,7 +99,11 @@ server.listen(args.proxyPort, function() {
       msg: 'Proxy started'
     }
   }));
+  if (unSafeMode) {
+    sendLog('INFO', 'Proxy started in unsafe mode');
+  }
 });
+
 server.on('error', function(err) {
   process.send(JSON.stringify({
     type: 'connection',

@@ -108,7 +108,7 @@ gulp.task('testMsvcRebuild', [ 'installPackages' ], function() {
   	err: true, // default = true, false means don't write err
   	stderr: true, // default = true, false means don't write stderr
   	stdout: true // default = true, false means don't write stdout
-  }
+  };
   return gulp.src(path.resolve(__dirname, '..'))
   .pipe(exec('cd <%= file.path %> && gulp msvc_rebuild --env=test'))
   .pipe(exec.reporter(reportOptions));

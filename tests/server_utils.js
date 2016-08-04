@@ -10,6 +10,7 @@ exports.start = function(port, callback) {
 };
 
 exports.stop = function() {
+  server.clearAllSessions();
   server.stop();
 };
 
@@ -26,10 +27,10 @@ exports.removeAllEventListener = function() {
   server.removeAllEventListener(server.EVENT_TYPE.AUTH_REQUEST);
 };
 
-exports.login = function(pin, keyword, password, callback) {
-  api.auth.login(String(pin), keyword, password, callback)
+exports.login = function(secret, password, callback) {
+  api.auth.login(secret, password, callback)
 };
 
-exports.register = function(pin, keyword, password, callback) {
-  api.auth.register(String(pin), keyword, password, callback);
+exports.register = function(secret, password, callback) {
+  api.auth.register(secret, password, callback);
 };
