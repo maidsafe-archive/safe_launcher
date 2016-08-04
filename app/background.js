@@ -65,3 +65,11 @@ if (shouldQuit) {
 process.on('uncaughtException', function(e) {
  console.log(e);
 });
+
+for (var i in process.argv) {
+  console.log(process.argv[i]);
+  if (process.argv[i] === '--proxy_unsafe_mode') {
+    global.proxyUnsafeMode = true;
+    break;    
+  }
+}

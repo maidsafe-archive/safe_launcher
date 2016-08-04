@@ -37,6 +37,14 @@ export var getSessionIdFromRequest = function(req) {
   }
 };
 
+export var formatDirectoryResponse = function(dir) {
+  delete dir.info.is_versioned;
+  dir.sub_directories.forEach(function(info) {
+    delete info.is_versioned;
+  });
+  return dir;
+}
+
 export class ResponseError {
   constructor(status, message) {
     message = message || MSG_CONSTANTS.ERROR_CODE[status];    
@@ -153,19 +161,19 @@ export var formatResponse = function(data) {
       obj.createdOn = computeTime(obj.created_time_sec, obj.created_time_nsec);
       delete obj.created_time_sec;
       delete obj.created_time_nsec;
+    } else if (obj.hasOwnProperty('creation_time_sec')) {
+      obj.createdOn = computeTime(obj.creation_time_sec, obj.creation_time_nsec);
+      delete obj.creation_time_sec;
+      delete obj.creation_time_nsec;  
     }
     if (obj.hasOwnProperty('modified_time_sec')) {
       obj.modifiedOn = computeTime(obj.modified_time_sec, obj.modified_time_nsec);
       delete obj.modified_time_sec;
       delete obj.modified_time_nsec;
-    }    
-    if (obj.hasOwnProperty('creation_time')) {
-      obj.createdOn = obj.creation_time;
-      delete obj.creation_time;  
-    }
-    if (obj.hasOwnProperty('modification_time')) {
-      obj.modifiedOn = obj.modification_time;
-      delete obj.modification_time;
+    } else if (obj.hasOwnProperty('modification_time_sec')) {
+      obj.modifiedOn = computeTime(obj.modification_time_sec, obj.modification_time_nsec);
+      delete obj.modification_time_sec;
+      delete obj.modification_time_nsec;
     }
     if (obj.hasOwnProperty('user_metadata')) {
       obj.metadata = obj.user_metadata;
