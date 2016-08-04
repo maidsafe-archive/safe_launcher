@@ -29,9 +29,12 @@ let deleteOrGetDirectory = function(req, res, isDelete, next) {
   if (typeof rootPath === 'undefined') {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
   }
-  let dirPath = req.params['0'];
+  let dirPath = req.params['0'] || '/';
   let responseHandler = new ResponseHandler(req, res);
   if (isDelete) {
+    if (dirPath === '/') {
+      return next(new ResponseError(400, 'Cannot delete root directory'))
+    }
     log.debug('NFS - Invoking delete directory request');
     req.app.get('api').nfs.deleteDirectory(dirPath, rootPath,
       sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler);
@@ -89,6 +92,9 @@ export var createDirectory = function(req, res, next) {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
   }
   let dirPath = req.params['0'];
+  if (!dirPath || dirPath === '/') {
+    return next(new ResponseError(400, 'Directory path specified is not valid'));
+  }
   reqBody.metadata = reqBody.metadata || '';
   reqBody.isPrivate = reqBody.isPrivate || false;
   if (typeof reqBody.metadata !== 'string') {
@@ -125,6 +131,9 @@ export var modifyDirectory = function(req, res, next) {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
   }
   let dirPath = req.params['0'];
+  if (!dirPath || dirPath === '/') {
+    return next(new ResponseError(400, 'Directory path specified is not valid'));
+  }
   reqBody.name = reqBody.name || '';
   reqBody.metadata = reqBody.metadata || '';
 
@@ -266,12 +275,12 @@ export var getFile = function(req, res, next) {
       "Content-Range": "bytes " + start + "-" + end + "/" + total,
       "Accept-Ranges": "bytes",
       "Content-Length": chunksize,
-      "Created-On": new Date(fileStats.createdTimeSec || fileStats.createdOn).toUTCString(),
-      "Last-Modified": new Date(fileStats.modifiedTimeSec || fileStats.modifiedOn).toUTCString(),
+      "Created-On": fileStats.createdOn,
+      "Last-Modified": fileStats.modifiedOn,
       "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
     };
     if (fileStats.metadata) {
-      headers.metadata = fileStats.metadata;
+      headers.metadata = new Buffer(fileStats.metadata, 'base64').toString('base64');
     }
     res.writeHead(range ? 206 : 200, headers);
     if (chunksize === 0) {
@@ -303,9 +312,9 @@ export var getFileMetadata = function(req, res, next) {
       }
       res.writeHead(200, {
         "Accept-Ranges": "bytes",
-        "Created-On": new Date(fileStats.createdOn).toUTCString(),
-        "Last-Modified": new Date(fileStats.modifiedOn).toUTCString(),
-        "Metadata": fileStats.metadata,
+        "Created-On": fileStats.createdOn,
+        "Last-Modified": fileStats.modifiedOn,
+        "Metadata": new Buffer(fileStats.metadata, 'base64').toString('base64'),
         "Content-Type": mime.lookup(filePath) || 'application/octet-stream',
         "Content-Length": fileStats.size
       });

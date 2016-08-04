@@ -7,7 +7,12 @@ import { errorCodeLookup } from './../error_code_lookup';
 import util from 'util';
 import { MSG_CONSTANTS } from './../message_constants';
 
-var domainCheck = /^[a-z0-9][a-z0-9-]{1,60}[a-z0-9](?:)+$/;
+const domainCheck = /^[a-z0-9][a-z0-9-]{1,60}[a-z0-9](?:)+$/;
+
+const ROOT_PATH = {
+  app: false,
+  drive: true
+};
 
 var registerOrAddService = function(req, res, isRegister, next) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -24,22 +29,28 @@ var registerOrAddService = function(req, res, isRegister, next) {
   if (!reqBody.serviceHomeDirPath) {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_EMPTY, 'serviceHomeDirPath')));
   }
+  if (!reqBody.rootPath) {
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_EMPTY, 'rootPath')));
+  }
   if (!domainCheck.test(reqBody.longName)) {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'longName')));
   }
   if (!domainCheck.test(reqBody.serviceName)) {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'serviceName')));
   }
-  reqBody.isPathShared = reqBody.isPathShared || false;
+  if (!ROOT_PATH.hasOwnProperty(reqBody.rootPath)) {
+    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
+  }
+  let isPathShared = ROOT_PATH[reqBody.rootPath];
   let responseHandler = new ResponseHandler(req, res);
   if (isRegister) {
     log.debug('DNS - Invoking register API for ' + JSON.stringify(reqBody));
     req.app.get('api').dns.register(reqBody.longName, reqBody.serviceName, reqBody.serviceHomeDirPath,
-      reqBody.isPathShared, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler);
+      isPathShared, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler);
   } else {
     log.debug('DNS - Invoking add service API for ' + JSON.stringify(reqBody));
     req.app.get('api').dns.addService(reqBody.longName, reqBody.serviceName, reqBody.serviceHomeDirPath,
-      reqBody.isPathShared, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler);
+      isPathShared, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler);
   }
 };
 
@@ -100,12 +111,12 @@ export var getFile = function(req, res, next) {
       "Content-Range": "bytes " + start + "-" + end + "/" + total,
       "Accept-Ranges": "bytes",
       "Content-Length": chunksize,
-      "Created-On": new Date(fileStats.createdTimeSec || fileStats.createdOn).toUTCString(),
-      "Last-Modified": new Date(fileStats.modifiedTimeSec || fileStats.modifiedOn).toUTCString(),
+      "Created-On": fileStats.createdOn,
+      "Last-Modified": fileStats.modifiedOn,
       "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
     };
     if (fileStats.metadata) {
-      headers.metadata = fileStats.metadata;
+      headers.metadata = new Buffer(fileStats.metadata, 'base64').tostring('base64');
     }
     res.writeHead(range ? 206 : 200, headers);
     if (chunksize === 0) {
