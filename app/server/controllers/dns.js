@@ -112,7 +112,7 @@ export var getFile = function(req, res, next) {
     if (chunksize < 0 || end > total) {
       return next(new ResponseError(416));
     }
-    log.debug('DNS - Ready to stream file for range' + start + "-" + end + "/" + total);
+    log.debug('DNS - Ready to stream file for range' + start + "-" + end + "/" + total);    
     var headers = {
       "Content-Range": "bytes " + start + "-" + end + "/" + total,
       "Accept-Ranges": "bytes",
@@ -121,7 +121,7 @@ export var getFile = function(req, res, next) {
       "Last-Modified": fileStats.modifiedOn,
       "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
     };
-    if (fileStats.metadata) {
+    if (fileStats.metadata && fileStats.metadata.length > 0) {
       headers.metadata = new Buffer(fileStats.metadata, 'base64').tostring('base64');
     }
     res.writeHead(range ? 206 : 200, headers);
