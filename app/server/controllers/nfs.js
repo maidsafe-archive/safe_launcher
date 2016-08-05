@@ -287,7 +287,7 @@ export var getFile = function(req, res, next) {
       "Last-Modified": fileStats.modifiedOn,
       "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
     };
-    if (fileStats.metadata) {
+    if (fileStats.metadata && fileStats.metadata.length > 0) {
       headers.metadata = new Buffer(fileStats.metadata, 'base64').toString('base64');
     }
     res.writeHead(range ? 206 : 200, headers);
@@ -318,14 +318,18 @@ export var getFileMetadata = function(req, res, next) {
       if (err) {
         return next(new ResponseError(400, err));
       }
-      res.writeHead(200, {
+      let headers = {
         "Accept-Ranges": "bytes",
         "Created-On": fileStats.createdOn,
         "Last-Modified": fileStats.modifiedOn,
         "Metadata": new Buffer(fileStats.metadata, 'base64').toString('base64'),
         "Content-Type": mime.lookup(filePath) || 'application/octet-stream',
         "Content-Length": fileStats.size
-      });
+      };
+      if (fileStats.metadata && fileStats.metadata.length > 0) {
+        headers.metadata = new Buffer(fileStats.metadata, 'base64').toString('base64');
+      }
+      res.writeHead(200, headers);
       res.end();
     };
     log.debug('NFS - Invoking get file metadata request');

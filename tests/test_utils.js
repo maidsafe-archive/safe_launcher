@@ -357,7 +357,7 @@ var registerDns = function(token, longName, serviceName, dirPath, callback) {
     longName: longName,
     serviceName: serviceName,
     serviceHomeDirPath: dirPath,
-    isPathShared: false
+    rootPath: 'app'
   };
   request({
     method: 'POST',
@@ -412,7 +412,7 @@ var addService = function(token, longName, serviceName, dirPath, callback) {
     longName: longName,
     serviceName: serviceName,
     serviceHomeDirPath: dirPath,
-    isPathShared: false
+    rootPath: 'app'
   };
   request({
     method: 'PUT',
