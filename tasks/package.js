@@ -90,7 +90,7 @@ var packageApp = function() {
   return gulp.src('./')
       .pipe(exec(packagerPath + ' build \"' + config.packageName + '\" --icon=' + config.icon + ' --platform=' + config.platform +
           ' --asar --asar-unpack=' + config.unpack + ' --out=' + OUT_FOLDER + ' --arch=' + os.arch() + ' --version=' + electronVersion +
-          ' --overwrite ' + config.packagePreference))
+          ' --app-version=' + appVersion + ' --app-copyright=\"' + packageConfig.copyright + '\" --prune --overwrite ' + config.packagePreference))
       .pipe(exec.reporter(reportOptions));
 };
 gulp.task('packageApp', ['build'], packageApp);

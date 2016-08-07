@@ -5,7 +5,7 @@
   "description": "SAFE Launcher Application",
   "version": "0.7.1",
   "author": "MaidSafe",
-  "copyright": "",
+  "copyright": "© 2016, MaidSafe.net Ltd",
   "main": "background.js",
   "dependencies": {
     "angular": "^1.5.7",
