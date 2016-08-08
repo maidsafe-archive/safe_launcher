@@ -64,7 +64,7 @@ api.setNetworkStateListener(function(state, isRegisteredClient) {
       break;
 
     default:
-      onFfiProcessTerminated('FFI process terminated', 'FFI library could not be loaded.');
+      onFfiProcessTerminated('FFI process terminated', 'FFI library could not be loaded. Error code :: ' +  state);
       break;
   }
 });

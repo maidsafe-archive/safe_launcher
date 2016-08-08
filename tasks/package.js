@@ -14,24 +14,10 @@ var packageConfig = require('./../app/package.json');
 var util = require('util');
 
 var OUT_FOLDER = 'app_dist';
-var plistFilePath = pathUtil.resolve('.', 'Info.plist');
 var packagerPath = pathUtil.resolve('./node_modules/.bin/electron-packager');
 if (process.platform === 'win32') {
   packagerPath += '.cmd';
 }
-
-if (process.platform === 'darwin') {
-  var info = fse.readFileSync('./resources/osx/Info.plist').toString();
-  info = utils.replace(info, {
-    productName: packageConfig.productName,
-    identifier: packageConfig.identifier,
-    version: packageConfig.version,
-    copyright: packageConfig.copyright
-  });
-  fse.writeFileSync(plistFilePath, info);
-}
-
-console.log(plistFilePath);
 
 // Notes for OSX
 // - app-category-type is from https://developer.apple.com/library/ios/documentation/General/Reference/InfoPlistKeyReference/Articles/LaunchServicesKeys.html#//apple_ref/doc/uid/TP40009250-SW8
@@ -43,7 +29,7 @@ var packageForOs = {
     platform: 'darwin',
     packageName: packageConfig.productName,
     packagePreference: '--app-bundle-id=' + packageConfig.identifier + ' --app-category-type=public.app-category.utilities ' +
-    '--helper-bundle-id=' + packageConfig.identifier + 'helper ' + '--extend-info=' + plistFilePath
+    '--helper-bundle-id=' + packageConfig.identifier + 'helper '
   },
   linux: {
     icon: 'resources/icon.png',
