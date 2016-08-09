@@ -19,8 +19,8 @@
   }" ng-click="showNetworkStatus($networkStatus.status)">
     <span class="network-status-tooltip">{{networkStatusMsg[$networkStatus.status]}}</span>
   </span>
-  <alert ng-show="$prompt.isProcessing" payload="$prompt.payload" callback="$prompt.callback()"></alert>
-  <toaster payload="$toaster.payload" callback="$toaster.callback()"></toaster>
+  <alert ng-show="$prompt.isProcessing" payload="$prompt.payload" callback="$prompt.callback(err, data)"></alert>
+  <toaster payload="$toaster.payload" callback="$toaster.callback(err, data)"></toaster>
   <authorise-req ng-show="$authReq.isProcessing" payload="$authReq.payload" callback="$authReq.callback(err, data)"></authorise-req>
   <ng-include src="'views/common/spinner.html'" ng-show="$loader.status"></ng-include>
   <script>

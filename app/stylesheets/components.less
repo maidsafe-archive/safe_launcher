@@ -187,6 +187,7 @@
     padding: 16px;
     margin-bottom: 12px;
     position: relative;
+    border: 1px solid transparent;
     cursor: pointer;
     a {
       text-decoration: none;
@@ -218,10 +219,12 @@
       right: 8px;
       z-index: 9;
       .opt-i {
-        button.danger:hover {
-          background-color: rgba(227, 100, 101, 0.2) !important;
+        button.danger {
           height: 32px;
           line-height: normal;
+          &:hover {
+            background-color: rgba(227, 100, 101, 0.2) !important;
+          }
         }
       }
     }
@@ -1318,6 +1321,9 @@
     .opt {
       text-align: right;
       margin-top: 16px;
+      .opt-i {
+        display: inline-block;
+      }
     }
   }
 }

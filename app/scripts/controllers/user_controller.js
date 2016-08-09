@@ -65,15 +65,25 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
     };
 
     $scope.logout = function() {
-      window.msl.clearAllSessions();
-      $rootScope.clearIntervals();
-      $rootScope.resetStats();
-      $rootScope.resetAppStates();
-      server.stopProxyServer();
-      window.msl.networkStateChange(0);
-      server.reconnectNetwork();      
-      $state.go('app.account', {
-        currentPage: 'login'
+      $rootScope.$prompt.show({
+        title: 'Are you sure?',
+        msg: 'Logging out will cause authenticated network actions to cancel, e.g. uploading files to the network.',
+        opt2: 'Cancel',
+        opt1: 'Logout'
+      }, function(err, data) {
+        if (!data) {
+          return;
+        }
+        window.msl.clearAllSessions();
+        $rootScope.clearIntervals();
+        $rootScope.resetStats();
+        $rootScope.resetAppStates();
+        server.stopProxyServer();
+        window.msl.networkStateChange(0);
+        server.reconnectNetwork();
+        $state.go('app.account', {
+          currentPage: 'login'
+        });
       });
     };
   }
