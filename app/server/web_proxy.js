@@ -54,8 +54,8 @@ var server = http.createServer(function(req, res) {
     }
     // Setting CSP Headers
     if (!unSafeMode) {
-      res.setHeader('Content-Security-Policy', 'default-src self *.safenet; object-src none; base-uri self;\
-        form-action http://api.safenet; frame-ancestors self;X-Frame-Options : SAMEORIGIN');
+      res.setHeader('Content-Security-Policy', 'default-src \'self\' *.safenet; object-src \'none\'; base-uri \'self\';\
+        form-action http://api.safenet; frame-ancestors *.safenet; child-src *.safenet');
       res.setHeader('X-Frame-Options', 'SAMEORIGIN');
     }
     if (unSafeMode || safenetApiPath.test(urlServe.host)) {

@@ -35,8 +35,7 @@
   },
   "scripts": {
     "postinstall": "cd app && npm install && bower install",
-    "build": "gulp build",
-    "release": "gulp release --env=production",
+    "build": "gulp build",    
     "start": "node ./tasks/start",
     "start-dev": "node ./tasks/start --proxy_unsafe_mode",
     "test": "gulp test",

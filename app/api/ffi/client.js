@@ -45,6 +45,19 @@ var startWorker = function() {
       return;
     } else if (msg.id === 0 && networkStateListener) {
       return networkStateListener(msg.data.state, msg.data.registeredClient);
+    } else if (msg.id === 'logFilePath') {      
+      if (msg.errorCode !== 0) {
+        return networkStateListener(msg.errorCode);
+      }
+      if (msg.data) {
+        log.setFileLogger(msg.data);
+      } else {
+        log.debug('Config file path not found');
+      }
+      log.debug('Sending FFI initialisation request');
+      send({
+        'module': 'connect'
+      });
     } else if (!callbackPool[msg.id]) {
       log.warn('Callback not found :: ' + msg.id);
       return;
@@ -65,10 +78,17 @@ var startWorker = function() {
       }
     }
   });
-  log.debug('Sending FFI initialisation request');
-  send({
-    'module': 'connect'
-  });
+  if (!log.logFilePath) {
+    console.log('sending log path request')
+    send({
+      'module': 'get-log-path'
+    });  
+  } else {
+    log.debug('Sending FFI initialisation request');
+    send({
+      'module': 'connect'
+    });
+  }  
 };
 
 export var send = function(message, callback) {

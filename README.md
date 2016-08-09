@@ -1,5 +1,10 @@
 # safe_launcher
 
+|Linux/OS X|Windows|
+|:---:|:--------:|
+|[![Build Status](https://travis-ci.org/maidsafe/safe_launcher.svg?branch=master)](https://travis-ci.org/maidsafe/safe_launcher)|[![Build status](https://ci.appveyor.com/api/projects/status/c61jthx04us5j57j/branch/master?svg=true)](https://ci.appveyor.com/project/MaidSafe-QA/safe-launcher/branch/master)|
+
+
 # Quick start
 The development dependency of this project is [Node.js v5.5](https://nodejs.org/download/release/v5.5.0/).
 Build [safe_core](https://github.com/maidsafe/safe_core) with the mock Routing feature:
@@ -56,32 +61,6 @@ To make ready for distribution package use command based on the platform:
 npm run package
 ```
 this will generate the package files in the `app_dist` folder
-
-
-# Making a release
-
-To make ready for distribution installer use command:
-```
-npm run release
-```
-It will start the packaging process for operating system you are running this command on. Ready for distribution file will be outputted to `releases` directory.
-
-You can create Windows installer only when running on Windows, the same is true for Linux and OSX. So to generate all three installers you need all three operating systems.
-
-## Mac only
-
-#### App signing
-
-The Mac release supports [code signing](https://developer.apple.com/library/mac/documentation/Security/Conceptual/CodeSigningGuide/Procedures/Procedures.html). To sign the `.app` in the release image, include the certificate ID in the command as so,
-```
-npm run release -- --sign A123456789
-```
-
-## Windows only
-
-#### Installer
-
-The installer is built using [NSIS](http://nsis.sourceforge.net). You have to install NSIS version 3.0, and add its folder to PATH in Environment Variables.
 
 # License
 

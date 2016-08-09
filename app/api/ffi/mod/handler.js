@@ -21,7 +21,7 @@ module.exports = function(libPath) {
 
   var lib;
   var self = this;
-  var LIB_LOAD_ERROR = -2;
+  var LIB_LOAD_ERROR = -9999;
 
   var methodsToRegister = function() {
     return {
@@ -44,6 +44,7 @@ module.exports = function(libPath) {
       'nfs_create_file': [ int, [ cString, voidPtrPtr, voidPtrPtr ] ],
       'nfs_stream_close': [ int, [ voidPtrPtr ] ],
       'nfs_stream_write': [ int, [ voidPtrPtr, refUin8Array, size_t ] ],
+      'output_log_path': [ 'pointer', [ cString, intPtr, intPtr, intPtr] ],
       'register_network_event_observer': [ 'void', [ voidPtrPtr, 'pointer' ] ]
     };
   };
@@ -89,18 +90,22 @@ module.exports = function(libPath) {
     try {
       lib = ffi.Library(libPath, methodsToRegister());
       /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-      return lib.init_logging() === 0;
+      return lib.init_logging();
       /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     } catch (e) {
       util.sendLog('ERROR', 'FFI load error' + e.message);
     }
-    return false;
+    return LIB_LOAD_ERROR;
   };
 
   var dispatcher = function(message) {
     try {
-      if (!lib && !loadLibrary()) {
-        return unRegisteredClientObserver(LIB_LOAD_ERROR);
+      if (!lib) {
+        var code = loadLibrary();
+        if (code !== 0) {
+          lib == null;
+          return util.sendError('logFilePath', code);
+        }        
       }
       switch (message.module) {
         case 'auth':
@@ -134,6 +139,10 @@ module.exports = function(libPath) {
         case 'client-stats':
           message.client = getClientHandle(message);
           clientStats.execute(lib, message);
+          break;
+
+        case 'get-log-path':  
+          util.getLogFilePath(lib);
           break;
         default:
           util.sendException(message.id, 'Module not found');

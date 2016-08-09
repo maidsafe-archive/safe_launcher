@@ -14,7 +14,6 @@ var packageConfig = require('./../app/package.json');
 var util = require('util');
 
 var OUT_FOLDER = 'app_dist';
-
 var packagerPath = pathUtil.resolve('./node_modules/.bin/electron-packager');
 if (process.platform === 'win32') {
   packagerPath += '.cmd';
@@ -30,7 +29,7 @@ var packageForOs = {
     platform: 'darwin',
     packageName: packageConfig.productName,
     packagePreference: '--app-bundle-id=' + packageConfig.identifier + ' --app-category-type=public.app-category.utilities ' +
-    '--helper-bundle-id=' + packageConfig.identifier + 'helper'
+    '--helper-bundle-id=' + packageConfig.identifier + 'helper '
   },
   linux: {
     icon: 'resources/icon.png',
@@ -65,7 +64,7 @@ var onPackageCompleted = function() {
   filesToRemove.forEach(function(fileName) {
     fileName = pathUtil.resolve(packagePath, fileName);
     try {
-      fs.unlinkSync(fileName);
+      fse.removeSync(fileName);
     } catch (e) {
       if (e.code === 'ENOENT') {
         gutil.log('%s file not present to be deleted', fileName);
@@ -75,7 +74,7 @@ var onPackageCompleted = function() {
     }
   });
   gutil.log('Updating version file');
-  fs.writeFileSync(versionFilePath, appVersion);
+  fse.writeFileSync(versionFilePath, appVersion);
   fs.renameSync(pathUtil.resolve(OUT_FOLDER, packageFolderName),
       pathUtil.resolve(OUT_FOLDER, packageNameWithVersion));
 };
@@ -90,7 +89,7 @@ var packageApp = function() {
   return gulp.src('./')
       .pipe(exec(packagerPath + ' build \"' + config.packageName + '\" --icon=' + config.icon + ' --platform=' + config.platform +
           ' --asar --asar-unpack=' + config.unpack + ' --out=' + OUT_FOLDER + ' --arch=' + os.arch() + ' --version=' + electronVersion +
-          ' --overwrite ' + config.packagePreference))
+          ' --app-version=' + appVersion + ' --app-copyright=\"' + packageConfig.copyright + '\" --prune --overwrite ' + config.packagePreference))
       .pipe(exec.reporter(reportOptions));
 };
 gulp.task('packageApp', ['build'], packageApp);
