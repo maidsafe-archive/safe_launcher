@@ -6,8 +6,11 @@
         {{ payload.msg }}
       </p>
       <div class="opt">
+        <div class="opt-i" ng-show="payload.opt2">
+          <button type="button" class="btn flat primary" name="cancel" ng-click="callback({ err: null, data: false })">{{ payload.opt2 || 'Cancel' }}</button>
+        </div>
         <div class="opt-i">
-          <button type="button" class="btn flat primary" name="okay" ng-click="callback({ err: null, data: true })">Okay</button>
+          <button type="button" class="btn flat primary" name="okay" ng-click="callback({ err: null, data: true })">{{ payload.opt1 || 'Okay' }}</button>
         </div>
       </div>
     </div>
