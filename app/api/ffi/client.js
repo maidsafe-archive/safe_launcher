@@ -46,10 +46,14 @@ var startWorker = function() {
     } else if (msg.id === 0 && networkStateListener) {
       return networkStateListener(msg.data.state, msg.data.registeredClient);
     } else if (msg.id === 'logFilePath') {      
-      if (msg.errorCode !== 0) {        
+      if (msg.errorCode !== 0) {
         return networkStateListener(msg.errorCode);
       }
-      log.setFileLogger(msg.data);
+      if (msg.data) {
+        log.setFileLogger(msg.data);
+      } else {
+        log.debug('Config file path not found');
+      }
       log.debug('Sending FFI initialisation request');
       send({
         'module': 'connect'
