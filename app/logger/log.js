@@ -59,33 +59,31 @@ class Logger {
   info(msg) {  
     try {
       this.winston.info(msg);
-    } catch(e) {
-      this.winston.debug('EX ' + e.message);
-    }
+    } catch(e) {}
   }
 
   warn(msg) {
     try {
       this.winston.warn(msg);
-    } catch(e) {
-      this.winston.debug('EX ' + e.message);
-    }
+    } catch(e) {}
   }
 
   error(msg) {
     try {
       this.winston.error(msg);
-    } catch(e) {
-      this.winston.debug('EX ' + e.message);
-    }
+    } catch(e) {}
   }
 
   debug(msg) {
-    this.winston.debug(msg);
+    try {
+      this.winston.debug(msg);
+    } catch(e) {}
   }
 
   verbose(msg) {
-    this.winston.verbose(msg);
+    try {
+      this.winston.verbose(msg);
+    } catch(e) {}
   }
 
 }
