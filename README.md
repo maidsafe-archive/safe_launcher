@@ -60,7 +60,13 @@ To make ready for distribution package use command based on the platform:
 ```
 npm run package
 ```
+
 this will generate the package files in the `app_dist` folder
+
+Additional `arch` argument can be passed to the `package` command. If this argument is not specified,
+the current nodejs platform architecture will be used. Accepted values are `x86` and `x64`.
+
+Example usage `npm run package -- --arch=x64`
 
 # License
 

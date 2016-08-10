@@ -5,7 +5,6 @@ var utils = require('./utils');
 var gutil = require('gulp-util');
 var fs = require('fs');
 var fse = require('fs-extra');
-var os = require('os');
 var childProcess = require('child_process');
 var pathUtil = require('path');
 var electronVersion = require(pathUtil.resolve('./node_modules/electron-prebuilt/package.json')).version;
@@ -18,6 +17,15 @@ var packagerPath = pathUtil.resolve('./node_modules/.bin/electron-packager');
 if (process.platform === 'win32') {
   packagerPath += '.cmd';
 }
+
+var arch = utils.getArch();
+if (arch !== 'x86' && arch !== 'x64') {
+  return console.log('Packaging failed. Invalid architecture specified');
+}
+
+console.log('Packaging application for %s architecture', arch);
+
+var electronArch = (arch === 'x86') ? 'ia32' : arch;
 
 // Notes for OSX
 // - app-category-type is from https://developer.apple.com/library/ios/documentation/General/Reference/InfoPlistKeyReference/Articles/LaunchServicesKeys.html#//apple_ref/doc/uid/TP40009250-SW8
@@ -51,8 +59,8 @@ var packageForOs = {
 var config = packageForOs[utils.os()];
 
 var appVersion = packageConfig.version;
-var packageFolderName = util.format('%s-%s-%s', config.packageName, config.platform, os.arch());
-var packageNameWithVersion = util.format('%s-v%s-%s-%s', config.packageName, appVersion, config.platform, os.arch());
+var packageFolderName = util.format('%s-%s-%s', config.packageName, config.platform, electronArch);
+var packageNameWithVersion = util.format('%s-v%s-%s-%s', config.packageName, appVersion, config.platform, arch);
 
 var onPackageCompleted = function() {
   var packagePath = pathUtil.resolve('.', OUT_FOLDER, packageFolderName);
@@ -88,7 +96,7 @@ var packageApp = function() {
   }
   return gulp.src('./')
       .pipe(exec(packagerPath + ' build \"' + config.packageName + '\" --icon=' + config.icon + ' --platform=' + config.platform +
-          ' --asar --asar-unpack=' + config.unpack + ' --out=' + OUT_FOLDER + ' --arch=' + os.arch() + ' --version=' + electronVersion +
+          ' --asar --asar-unpack=' + config.unpack + ' --out=' + OUT_FOLDER + ' --arch=' + electronArch + ' --version=' + electronVersion +
           ' --app-version=' + appVersion + ' --app-copyright=\"' + packageConfig.copyright + '\" --prune --overwrite ' + config.packagePreference))
       .pipe(exec.reporter(reportOptions));
 };
