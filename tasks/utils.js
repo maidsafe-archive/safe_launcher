@@ -28,6 +28,10 @@ module.exports.getEnvName = function() {
   return argv.env || 'development';
 };
 
+module.exports.getArch = function() {
+  return argv.arch || os.arch();
+};
+
 module.exports.getSigningId = function() {
   return argv.sign;
 };
