@@ -221,12 +221,23 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       server.reconnectNetwork(user);
     };
 
+    var appInitialCheck = function() {
+      if ($rootScope.getProxy() && $rootScope.getProxy().hasOwnProperty('status')) {
+        if ($rootScope.showIntroPage) {
+          $state.go('app.account', { currentPage: 'register' });
+        } else {
+          $state.go('app');
+        }
+      } else {
+        $state.go('initProxy');
+      }
+      return;
+    };
+
     window.msl.setNetworkStateChangeListener(function(state) {
       if (state === window.NETWORK_STATE.CONNECTED) {
         if ($state.current.name === 'splash' || $state.current.name === '') {
-          return $rootScope.getProxy() && $rootScope.getProxy().hasOwnProperty('status') ?
-            ($rootScope.showIntroPage ? $state.go('app.account', { currentPage: 'register' }) :
-            $state.go('app')) : $state.go('initProxy');
+          appInitialCheck();
         }
         if ($rootScope.isAuthenticated) {
           $rootScope.clearIntervals();

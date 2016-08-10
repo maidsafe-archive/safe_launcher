@@ -105,9 +105,9 @@ module.exports = function(libPath) {
   var dispatcher = function(message) {
     try {
       if (!lib) {
-        var code = loadLibrary();        
+        var code = loadLibrary();
         if (code !== 0) {
-          // lib = null;
+          lib = null;
           return util.sendError('logFilePath', code);
         }
       }

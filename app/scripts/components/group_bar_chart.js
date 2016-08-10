@@ -60,13 +60,14 @@ var GroupBarChart = React.createClass({
   add: function(d) {
     var self = this;
     var data = [];
+    var i = null;
     if (d !== null) {
       var temp = d3.entries(d);
-      for (let i in temp) {
+      for (i in temp) {
         this.actualData[this.groups.indexOf(temp[i].key)].splice(0, 0, temp[i].value);
       }
       if ((this.actualData[0].length * this.groups.length) > this.MAX_BARS) {
-        for (let i in this.groups) {
+        for (i in this.groups) {
           this.actualData[i].pop();
         }
       }
@@ -74,14 +75,14 @@ var GroupBarChart = React.createClass({
     var MAX_VALUE = d3.max(this.actualData, function(d) {
       return d3.max(d);
     }) || 0;
-    for (let i in this.actualData) {
+    for (i in this.actualData) {
       data[i] = [];
       for (var j in this.actualData[i]) {
         data[i].push(this.actualData[i][j]);
       }
     }
     while ((data[0].length * this.groups.length) < this.MAX_BARS) {
-      for (let i in this.groups) {
+      for (i in this.groups) {
         data[i].push(0);
       }
     }
