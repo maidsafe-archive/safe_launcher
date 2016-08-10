@@ -3,8 +3,7 @@ import { updateAppActivity } from './../utils.js';
 var Readable = require('stream').Readable;
 var util = require('util');
 
-export var NfsReader = function (req, res,
-  filePath, isPathShared, start, end, hasSafeDriveAccess, appDirKey) {
+export var NfsReader = function(req, res, filePath, isPathShared, start, end, hasSafeDriveAccess, appDirKey) {
   Readable.call(this);
   this.req = req;
   this.res = res;
@@ -21,6 +20,7 @@ export var NfsReader = function (req, res,
 
 util.inherits(NfsReader, Readable);
 
+/*jscs:disable disallowDanglingUnderscores*/
 NfsReader.prototype._read = function() {
   let self = this;
   if (self.curOffset === self.end) {
@@ -46,3 +46,4 @@ NfsReader.prototype._read = function() {
       eventEmitter.emit(eventType, data.length);
     });
 };
+/*jscs:enable disallowDanglingUnderscores*/

@@ -35,7 +35,7 @@ var sendLog = function(level, msg) {
 
 var args = initialiseArguments(process.argv);
 
-var unSafeMode = args.hasOwnProperty('unsafe_mode'); 
+var unSafeMode = args.hasOwnProperty('unsafe_mode');
 
 var server = http.createServer(function(req, res) {
   try {
@@ -45,7 +45,7 @@ var server = http.createServer(function(req, res) {
       res.write('Only \'.safenet\' pages can be accessed');
       return res.end();
     }
-    var origin = req.headers['origin'];
+    var origin = req.headers.origin;
     if (!unSafeMode && origin && !safenetPath.test(origin)) {
       res.writeHead(403);
       res.write('Invalid request origin - ' + (origin || 'No origin found') +
@@ -54,18 +54,18 @@ var server = http.createServer(function(req, res) {
     }
     // Setting CSP Headers
     if (!unSafeMode) {
-      res.setHeader('Content-Security-Policy', 'default-src \'self\' *.safenet; object-src \'none\'; base-uri \'self\';\
-        form-action http://api.safenet; frame-ancestors *.safenet; child-src *.safenet');
+      res.setHeader('Content-Security-Policy', 'default-src \'self\' *.safenet; object-src \'none\';' +
+        ' base-uri \'self\'; form-action http://api.safenet; frame-ancestors *.safenet; child-src *.safenet');
       res.setHeader('X-Frame-Options', 'SAMEORIGIN');
     }
     if (unSafeMode || safenetApiPath.test(urlServe.host)) {
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      res.setHeader("Access-Control-Allow-Credentials", "true");
-      res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,DELETE");
-      res.setHeader("Access-Control-Allow-Headers", "Authorization, Access-Control-Allow-Headers,\
-        Origin, Accept, X-Requested-With, Content-Type, Content-Length, Metadata, Range, Access-Control-Request-Method,\
-        Access-Control-Request-Headers, Metadata");
-      return proxy.web(req, res, {        
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT,DELETE');
+      res.setHeader('Access-Control-Allow-Headers', 'Authorization, Access-Control-Allow-Headers, ' +
+        'Origin, Accept, X-Requested-With, Content-Type, Content-Length, Metadata, Range,' +
+        'Access-Control-Request-Method, Access-Control-Request-Headers, Metadata');
+      return proxy.web(req, res, {
         target: 'http://localhost:' + args.serverPort + '/'
       });
     }
@@ -84,7 +84,7 @@ var server = http.createServer(function(req, res) {
       changeOrigin: true,
       target: 'http://localhost:' + args.serverPort
     });
-  } catch(e) {
+  } catch (e) {
     sendLog('error', e.message);
   }
 });

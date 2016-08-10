@@ -77,7 +77,6 @@ export default class DNS {
     }, callback);
   }
 
-
   getFileMetadata(longName, serviceName, filePath, hasSafeDriveAccess, appDirKey, callback) {
     log.debug('Invoking API DNS::getFile - FFI::' + this.MODULE + '::get-file');
     this.send({

@@ -15,7 +15,7 @@ var matchWords = {
 var grepData = [];
 
 var destFile = './app/server/error_code_lookup.js';
-var template = 'export function errorCodeLookup(errCode) \{\n';
+var template = 'export var errorCodeLookup = function(errCode) \{\n';
 
 // restyle the code
 var restyleFiles = function(fileArr, done) {

@@ -33,7 +33,7 @@ window.safeLauncher = angular
         this.description = '';
       }
     };
-    $rootScope.resetAppStates = function () {
+    $rootScope.resetAppStates = function() {
       $rootScope.isAuthenticated = false;
       $rootScope.isAuthLoading = false;
       $rootScope.currentAppDetails = {
@@ -118,7 +118,7 @@ window.safeLauncher = angular
       }, 500);
     };
     Queuing.prototype.show = function(payload, callback) {
-      this.queue.push({payload: payload, callback: callback});
+      this.queue.push({ payload: payload, callback: callback });
       this.process();
     };
     Queuing.prototype.process = function() {
@@ -139,12 +139,12 @@ window.safeLauncher = angular
     $rootScope.$proxyServer = false;
     $rootScope.clearIntervals = function() {
       for (var i in $rootScope.intervals) {
-        $interval.cancel($rootScope.intervals[i])
+        $interval.cancel($rootScope.intervals[i]);
       }
       $rootScope.intervals = [];
     };
     $rootScope.$networkStatus = {
-      status: window.NETWORK_STATE.CONNECTING,
+      status: window.NETWORK_STATE.CONNECTING
       // retry: function() {
       //   this.status = window.NETWORK_STATE.CONNECTING;
       //   window.msl.reconnect();

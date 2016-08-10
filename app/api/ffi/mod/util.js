@@ -17,25 +17,25 @@ var getLogFilePath = function(lib) {
   var sizePtr = ref.alloc(int);
   var capacityPtr = ref.alloc(int);
   var resultPtr = ref.alloc(int);
-  var requestId = 'logFilePath';  
+  var requestId = 'logFilePath';
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  lib.output_log_path.async('launcher_ui.log', sizePtr, capacityPtr, resultPtr, function (err, pointer) {
+  lib.output_log_path.async('launcher_ui.log', sizePtr, capacityPtr, resultPtr, function(err, pointer) {
     if (err) {
       return sendException(requestId, err);
     }
-    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/    
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     var result = resultPtr.deref();
     if (pointer.isNull() || result !== 0) {
       return sendError(requestId, result);
     }
     var size = sizePtr.deref();
     var capacity = capacityPtr.deref();
-    var response = ref.reinterpret(pointer, size).toString();    
+    var response = ref.reinterpret(pointer, size).toString();
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     lib.drop_vector.async(pointer, size, capacity, function() {});
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     send(requestId, response);
-  });  
+  });
 };
 
 var executeForContent = function(lib, client, requestId, payload) {
@@ -43,7 +43,8 @@ var executeForContent = function(lib, client, requestId, payload) {
   var capacityPtr = ref.alloc(int);
   var resultPtr = ref.alloc(int);
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  lib.execute_for_content.async(JSON.stringify(payload), sizePtr, capacityPtr, resultPtr, client, function (err, pointer) {
+  lib.execute_for_content.async(JSON.stringify(payload), sizePtr, capacityPtr, resultPtr, client,
+  function(err, pointer) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     var result = resultPtr.deref();
     if (pointer.isNull() || result !== 0) {
@@ -67,7 +68,7 @@ var send = function(id, response) {
   });
 };
 
-var sendConnectionStatus = function (status, isRegisteredClient) {
+var sendConnectionStatus = function(status, isRegisteredClient) {
   send(0, {
     type: 'status',
     state: status,

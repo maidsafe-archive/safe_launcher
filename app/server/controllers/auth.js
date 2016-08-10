@@ -1,5 +1,3 @@
-'use strict';
-
 import util from 'util';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
@@ -8,7 +6,7 @@ import SessionInfo from '../model/session_info';
 import Permission from '../model/permission';
 import {
   ResponseError, ResponseHandler
-} from '../utils'
+} from '../utils';
 import { log } from './../../logger/log';
 import { MSG_CONSTANTS } from './../message_constants';
 
@@ -105,7 +103,7 @@ export var authorise = function(req, res, next) {
 
 export var revoke = function(req, res, next) {
   log.debug('Revoke authorisation request received');
-  let sessionId = req.headers['sessionId'];
+  let sessionId = req.headers.sessionId;
   if (!sessionId) {
     log.debug('Revoke authorisation request - Session not found - ' + sessionId);
     return next(new ResponseError(401));
@@ -118,7 +116,7 @@ export var revoke = function(req, res, next) {
 };
 
 export var isTokenValid = function(req, res, next) {
-  if (!req.headers['sessionId']) {
+  if (!req.headers.sessionId) {
     return next(new ResponseError(401));
   }
   return new ResponseHandler(req, res)();

@@ -8,7 +8,7 @@ export default class NFS {
   }
 
   createDirectory(dirPath, isPrivate, isVersioned, userMetadata, isPathShared,
-    hasSafeDriveAccess, appDirKey, callback) {
+  hasSafeDriveAccess, appDirKey, callback) {
     log.debug('Invoking API NFS::createDirectory - FFI::' + this.MODULE + '::create-dir');
     this.send({
       module: this.MODULE,
@@ -42,227 +42,227 @@ export default class NFS {
   }
 
   deleteDirectory(dirPath, isPathShared, hasSafeDriveAccess, appDirKey, callback) {
-      log.debug('Invoking API NFS::deleteDirectory - FFI::' + this.MODULE + '::delete-dir');
-      this.send({
-        module: this.MODULE,
-        action: 'delete-dir',
-        isAuthorised: true,
-        appDirKey: appDirKey,
-        hasSafeDriveAccess: hasSafeDriveAccess,
-        params: {
-          dirPath: dirPath,
-          isPathShared: isPathShared
-        }
-      }, callback);
-    }
-
-    modifyDirectory(name, userMetadata, dirPath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
-      log.debug('Invoking API NFS::modifyDirectory - FFI::' + this.MODULE + '::modify-dir');
-      var payload = {
-        module: this.MODULE,
-        action: 'modify-dir',
-        isAuthorised: true,
-        appDirKey: appDirKey,
-        hasSafeDriveAccess: hasSafeDriveAccess,
-        params: {
-          dirPath: dirPath,
-          newValues: {},
-          isPathShared: isPathShared
-        }
-      };
-      if (typeof name === 'string' && name) {
-        payload.params.newValues.name = name;
+    log.debug('Invoking API NFS::deleteDirectory - FFI::' + this.MODULE + '::delete-dir');
+    this.send({
+      module: this.MODULE,
+      action: 'delete-dir',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: hasSafeDriveAccess,
+      params: {
+        dirPath: dirPath,
+        isPathShared: isPathShared
       }
-      if (typeof userMetadata === 'string') {
-        payload.params.newValues.userMetadata = userMetadata;
+    }, callback);
+  }
+
+  modifyDirectory(name, userMetadata, dirPath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+    log.debug('Invoking API NFS::modifyDirectory - FFI::' + this.MODULE + '::modify-dir');
+    var payload = {
+      module: this.MODULE,
+      action: 'modify-dir',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: hasSafeDriveAccess,
+      params: {
+        dirPath: dirPath,
+        newValues: {},
+        isPathShared: isPathShared
       }
-      this.send(payload, callback);
+    };
+    if (typeof name === 'string' && name) {
+      payload.params.newValues.name = name;
     }
-
-    createFile(filePath, userMetadata, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
-      log.debug('Invoking API NFS::createFile - FFI::' + this.MODULE + '::create-file');
-      this.send({
-        module: this.MODULE,
-        action: 'create-file',
-        isAuthorised: true,
-        appDirKey: appDirKey,
-        hasSafeDriveAccess: hasSafeDriveAccess,
-        params: {
-          filePath: filePath,
-          userMetadata: userMetadata,
-          isPathShared: isPathShared
-        }
-      }, callback);
+    if (typeof userMetadata === 'string') {
+      payload.params.newValues.userMetadata = userMetadata;
     }
+    this.send(payload, callback);
+  }
 
-    deleteFile(filePath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
-      log.debug('Invoking API NFS::deleteFile - FFI::' + this.MODULE + '::delete-file');
-      this.send({
-        module: this.MODULE,
-        action: 'delete-file',
-        isAuthorised: true,
-        appDirKey: appDirKey,
-        hasSafeDriveAccess: hasSafeDriveAccess,
-        params: {
-          filePath: filePath,
-          isPathShared: isPathShared
-        }
-      }, callback);
-    }
-
-    modifyFileMeta(name, userMetadata, filePath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
-      log.debug('Invoking API NFS::modifyFileMeta - FFI::' + this.MODULE + '::modify-file-meta');
-      var payload = {
-        module: this.MODULE,
-        action: 'modify-file-meta',
-        isAuthorised: true,
-        appDirKey: appDirKey,
-        hasSafeDriveAccess: hasSafeDriveAccess,
-        params: {
-          filePath: filePath,
-          newValues: {},
-          isPathShared: isPathShared
-        }
-      };
-      if (typeof name === 'string' && name) {
-        payload.params.newValues.name = name;
+  createFile(filePath, userMetadata, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+    log.debug('Invoking API NFS::createFile - FFI::' + this.MODULE + '::create-file');
+    this.send({
+      module: this.MODULE,
+      action: 'create-file',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: hasSafeDriveAccess,
+      params: {
+        filePath: filePath,
+        userMetadata: userMetadata,
+        isPathShared: isPathShared
       }
-      if (typeof userMetadata === 'string') {
-        payload.params.newValues.userMetadata = userMetadata;
+    }, callback);
+  }
+
+  deleteFile(filePath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+    log.debug('Invoking API NFS::deleteFile - FFI::' + this.MODULE + '::delete-file');
+    this.send({
+      module: this.MODULE,
+      action: 'delete-file',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: hasSafeDriveAccess,
+      params: {
+        filePath: filePath,
+        isPathShared: isPathShared
       }
-      this.send(payload, callback);
-    }
+    }, callback);
+  }
 
-    modifyFileContent(contentBytes, offset, filePath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
-      log.debug('Invoking API NFS::modifyFileContent - FFI::' + this.MODULE + '::modify-file-content');
-      var payload = {
-        module: this.MODULE,
-        action: 'modify-file-content',
-        isAuthorised: true,
-        appDirKey: appDirKey,
-        hasSafeDriveAccess: hasSafeDriveAccess,
-        params: {
-          filePath: filePath,
-          newValues: {
-            content: {
-              bytes: contentBytes,
-              offset: offset
-            }
-          },
-          isPathShared: isPathShared
-        }
-      };
-      this.send(payload, callback);
+  modifyFileMeta(name, userMetadata, filePath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+    log.debug('Invoking API NFS::modifyFileMeta - FFI::' + this.MODULE + '::modify-file-meta');
+    var payload = {
+      module: this.MODULE,
+      action: 'modify-file-meta',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: hasSafeDriveAccess,
+      params: {
+        filePath: filePath,
+        newValues: {},
+        isPathShared: isPathShared
+      }
+    };
+    if (typeof name === 'string' && name) {
+      payload.params.newValues.name = name;
     }
+    if (typeof userMetadata === 'string') {
+      payload.params.newValues.userMetadata = userMetadata;
+    }
+    this.send(payload, callback);
+  }
 
-    getFile(filePath, isPathShared, offset, length, hasSafeDriveAccess, appDirKey, callback) {
-      log.debug('Invoking API NFS::getFile - FFI::' + this.MODULE + '::get-file');
-      this.send({
-        module: this.MODULE,
-        action: 'get-file',
-        isAuthorised: true,
-        appDirKey: appDirKey,
-        hasSafeDriveAccess: hasSafeDriveAccess,
-        params: {
-          filePath: filePath,
-          isPathShared: isPathShared,
-          offset: offset || 0,
-          length: length || 0,
-          includeMetadata: true
-        }
-      }, callback);
-    }
+  modifyFileContent(contentBytes, offset, filePath, isPathShared, appDirKey, hasSafeDriveAccess, callback) {
+    log.debug('Invoking API NFS::modifyFileContent - FFI::' + this.MODULE + '::modify-file-content');
+    var payload = {
+      module: this.MODULE,
+      action: 'modify-file-content',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: hasSafeDriveAccess,
+      params: {
+        filePath: filePath,
+        newValues: {
+          content: {
+            bytes: contentBytes,
+            offset: offset
+          }
+        },
+        isPathShared: isPathShared
+      }
+    };
+    this.send(payload, callback);
+  }
 
-    getFileMetadata(filePath, isPathShared, hasSafeDriveAccess, appDirKey, callback) {
-      log.debug('Invoking API NFS::getFileMetadata - FFI::' + this.MODULE + '::get-file');
-      this.send({
-        module: this.MODULE,
-        action: 'get-file-metadata',
-        isAuthorised: true,
-        appDirKey: appDirKey,
-        hasSafeDriveAccess: hasSafeDriveAccess,
-        params: {
-          filePath: filePath,
-          isPathShared: isPathShared
-        }
-      }, callback);
-    }
+  getFile(filePath, isPathShared, offset, length, hasSafeDriveAccess, appDirKey, callback) {
+    log.debug('Invoking API NFS::getFile - FFI::' + this.MODULE + '::get-file');
+    this.send({
+      module: this.MODULE,
+      action: 'get-file',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: hasSafeDriveAccess,
+      params: {
+        filePath: filePath,
+        isPathShared: isPathShared,
+        offset: offset || 0,
+        length: length || 0,
+        includeMetadata: true
+      }
+    }, callback);
+  }
 
-    moveDir(srcPath, isSrcPathShared, destPath, isDestPathShared, retainSource,
-      hasSafeDriveAccess, appDirKey, callback) {
-      this.send({
-        module: this.MODULE,
-        action: 'move-dir',
-        isAuthorised: true,
-        appDirKey: appDirKey,
-        hasSafeDriveAccess: hasSafeDriveAccess,
-        params: {
-          srcPath: srcPath,
-          isSrcPathShared: isSrcPathShared,
-          destPath: destPath,
-          isDestPathShared: isDestPathShared,
-          retainSource: retainSource
-        }
-      }, callback);
-    }
+  getFileMetadata(filePath, isPathShared, hasSafeDriveAccess, appDirKey, callback) {
+    log.debug('Invoking API NFS::getFileMetadata - FFI::' + this.MODULE + '::get-file');
+    this.send({
+      module: this.MODULE,
+      action: 'get-file-metadata',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: hasSafeDriveAccess,
+      params: {
+        filePath: filePath,
+        isPathShared: isPathShared
+      }
+    }, callback);
+  }
 
-    moveFile(srcPath, isSrcPathShared, destPath, isDestPathShared, retainSource,
-      hasSafeDriveAccess, appDirKey, callback) {
-      this.send({
-        module: this.MODULE,
-        action: 'move-file',
-        isAuthorised: true,
-        appDirKey: appDirKey,
-        hasSafeDriveAccess: hasSafeDriveAccess,
-        params: {
-          srcPath: srcPath,
-          isSrcPathShared: isSrcPathShared,
-          destPath: destPath,
-          isDestPathShared: isDestPathShared,
-          retainSource: retainSource
-        }
-      }, callback);
-    }
+  moveDir(srcPath, isSrcPathShared, destPath, isDestPathShared, retainSource,
+  hasSafeDriveAccess, appDirKey, callback) {
+    this.send({
+      module: this.MODULE,
+      action: 'move-dir',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: hasSafeDriveAccess,
+      params: {
+        srcPath: srcPath,
+        isSrcPathShared: isSrcPathShared,
+        destPath: destPath,
+        isDestPathShared: isDestPathShared,
+        retainSource: retainSource
+      }
+    }, callback);
+  }
 
-    getWriter(filePath, isPathShared, hasSafeDriveAccess, appDirKey, callback) {
-      this.send({
-        module: this.MODULE,
-        action: 'get-writer',
-        isAuthorised: true,
-        appDirKey: appDirKey,
-        hasSafeDriveAccess: hasSafeDriveAccess,
-        params: {
-          filePath: filePath,
-          isPathShared: isPathShared
-        }
-      }, callback);
-    }
+  moveFile(srcPath, isSrcPathShared, destPath, isDestPathShared, retainSource,
+  hasSafeDriveAccess, appDirKey, callback) {
+    this.send({
+      module: this.MODULE,
+      action: 'move-file',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: hasSafeDriveAccess,
+      params: {
+        srcPath: srcPath,
+        isSrcPathShared: isSrcPathShared,
+        destPath: destPath,
+        isDestPathShared: isDestPathShared,
+        retainSource: retainSource
+      }
+    }, callback);
+  }
 
-    write(writerId, offset, data, callback) {
-      this.send({
-        module: this.MODULE,
-        action: 'write',
-        isAuthorised: true,
-        appDirKey: '',
-        hasSafeDriveAccess: false,
-        params: {
-          writerId: writerId,
-          // offset: offset,
-          data: data.toString('base64')
-        }
-      }, callback);
-    }
+  getWriter(filePath, isPathShared, hasSafeDriveAccess, appDirKey, callback) {
+    this.send({
+      module: this.MODULE,
+      action: 'get-writer',
+      isAuthorised: true,
+      appDirKey: appDirKey,
+      hasSafeDriveAccess: hasSafeDriveAccess,
+      params: {
+        filePath: filePath,
+        isPathShared: isPathShared
+      }
+    }, callback);
+  }
 
-    closeWriter(writerId, callback) {
-      this.send({
-        module: this.MODULE,
-        action: 'close-writer',
-        isAuthorised: true,
-        appDirKey: '',
-        hasSafeDriveAccess: false,
-        params: {
-          writerId: writerId
-        }
-      }, callback);
-    }
+  write(writerId, offset, data, callback) {
+    this.send({
+      module: this.MODULE,
+      action: 'write',
+      isAuthorised: true,
+      appDirKey: '',
+      hasSafeDriveAccess: false,
+      params: {
+        writerId: writerId,
+        // offset: offset,
+        data: data.toString('base64')
+      }
+    }, callback);
+  }
+
+  closeWriter(writerId, callback) {
+    this.send({
+      module: this.MODULE,
+      action: 'close-writer',
+      isAuthorised: true,
+      appDirKey: '',
+      hasSafeDriveAccess: false,
+      params: {
+        writerId: writerId
+      }
+    }, callback);
+  }
 }

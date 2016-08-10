@@ -18,7 +18,9 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
       $rootScope.currentAppDetails = {
         logs: []
       };
-      var logIndex = $rootScope.logList.map(function(obj) { return obj.activityId; }).indexOf(id);
+      var logIndex = $rootScope.logList.map(function(obj) {
+        return obj.activityId;
+      }).indexOf(id);
       $rootScope.logList[logIndex] = {
         appName: $rootScope.appList[id].name,
         activityName: 'Revoke app',
@@ -35,7 +37,7 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
 
     $scope.toggleFilter = function(name) {
       var index = $scope.logFilter.indexOf(name);
-      if ( index !== -1) {
+      if (index !== -1) {
         return $scope.logFilter.splice(index, 1);
       }
       $scope.logFilter.unshift(name);
@@ -43,21 +45,22 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
 
     $scope.toggleAppDetails = function(id) {
       if (!id) {
-        return $rootScope.currentAppDetails = {
+        $rootScope.currentAppDetails = {
           logs: []
         };
+        return;
       }
-      for(var i in $rootScope.appList) {
+      for (var i in $rootScope.appList) {
         if ($rootScope.appList[i].id === id) {
-          $rootScope.currentAppDetails['app'] = $rootScope.appList[i];
+          $rootScope.currentAppDetails.app = $rootScope.appList[i];
           break;
         }
       }
       if ($rootScope.currentAppDetails) {
         server.getAppActivityList($rootScope.currentAppDetails.app.id, function(data) {
           $rootScope.currentAppDetails.logs = [];
-          for(var i in data) {
-            data[i]['name'] = $rootScope.currentAppDetails.app.appName;
+          for (var i in data) {
+            data[i].name = $rootScope.currentAppDetails.app.appName;
             $rootScope.currentAppDetails.logs.unshift(data[i]);
           }
         });
@@ -71,7 +74,7 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
       $rootScope.resetAppStates();
       server.stopProxyServer();
       window.msl.networkStateChange(0);
-      server.reconnectNetwork();      
+      server.reconnectNetwork();
       $state.go('app.account', {
         currentPage: 'login'
       });

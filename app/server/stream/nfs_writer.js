@@ -1,7 +1,7 @@
 import util from 'util';
 import { Writable } from 'stream';
 
-export var NfsWriter = function (req, writerId, responseHandler, size, offset) {
+export var NfsWriter = function(req, writerId, responseHandler, size, offset) {
   Writable.call(this);
   var self = this;
   this.req = req;
@@ -15,6 +15,7 @@ export var NfsWriter = function (req, writerId, responseHandler, size, offset) {
 
 util.inherits(NfsWriter, Writable);
 
+/*jscs:disable disallowDanglingUnderscores*/
 NfsWriter.prototype._write = function(data, enc, next) {
   var self = this;
   var eventEmitter = self.req.app.get('eventEmitter');
@@ -31,3 +32,4 @@ NfsWriter.prototype._write = function(data, enc, next) {
     next();
   });
 };
+/*jscs:enable disallowDanglingUnderscores*/

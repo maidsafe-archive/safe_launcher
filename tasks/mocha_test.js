@@ -126,14 +126,14 @@ gulp.task('mocha', [ 'testMsvcRebuild' ], function() {
   }))
 });
 
-// var executeTest = function() {
-//   gulp.src(['./app/*.js', './app/api/**/**/*.js', './app/scripts/**/*js', './app/server/**/*js'])
-//     .pipe(jshint({
-//       esnext: true
-//     })) // hint (optional)
-//   .pipe(jscs()) // enforce style guide
-//   .pipe(stylish.combineWithHintResults()) // combine with jshint results
-//   .pipe(jshint.reporter('jshint-stylish'));
-// };
+var executeTest = function() {
+  gulp.src(['./app/*.js', './app/api/**/**/*.js', './app/scripts/**/*js', './app/server/**/*js'])
+    .pipe(jshint({
+      esnext: true
+    })) // hint (optional)
+  .pipe(jscs()) // enforce style guide
+  .pipe(stylish.combineWithHintResults()) // combine with jshint results
+  .pipe(jshint.reporter('jshint-stylish'));
+};
 
-gulp.task('test', [ 'testClean', 'babelApi', 'babelServer', 'babelLogger', 'babelRoot', 'testCopy', 'testFinalise', 'mocha' ]);
+gulp.task('test', [ 'testClean', 'babelApi', 'babelServer', 'babelLogger', 'babelRoot', 'testCopy', 'testFinalise', 'mocha' ], executeTest);
