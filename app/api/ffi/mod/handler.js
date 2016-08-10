@@ -26,6 +26,7 @@ module.exports = function(libPath) {
   var LIB_LOAD_ERROR = -9999;
 
   var methodsToRegister = function() {
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     return {
       'client_issued_deletes': [ int, [ voidPtrPtr ] ],
       'client_issued_gets': [ int, [ voidPtrPtr ] ],
@@ -45,12 +46,11 @@ module.exports = function(libPath) {
       'log_in': [ int, [ cString, cString, voidPtrPtr ] ],
       'nfs_create_file': [ int, [ cString, voidPtrPtr, voidPtrPtr ] ],
       'nfs_stream_close': [ int, [ voidPtrPtr ] ],
-      /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
       'nfs_stream_write': [ int, [ voidPtrPtr, refUin8Array, size_t ] ],
-      /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
       'output_log_path': [ 'pointer', [ cString, intPtr, intPtr, intPtr ] ],
       'register_network_event_observer': [ 'void', [ voidPtrPtr, 'pointer' ] ]
     };
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   };
 
   var unRegisteredClientObserver = ffi.Callback('void', [ int ], function(state) {
@@ -105,9 +105,9 @@ module.exports = function(libPath) {
   var dispatcher = function(message) {
     try {
       if (!lib) {
-        var code = loadLibrary();
+        var code = loadLibrary();        
         if (code !== 0) {
-          lib = null;
+          // lib = null;
           return util.sendError('logFilePath', code);
         }
       }
