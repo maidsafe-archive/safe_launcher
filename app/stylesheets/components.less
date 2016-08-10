@@ -187,6 +187,7 @@
     padding: 16px;
     margin-bottom: 12px;
     position: relative;
+    border: 1px solid transparent;
     cursor: pointer;
     a {
       text-decoration: none;
@@ -217,6 +218,15 @@
       top: 8px;
       right: 8px;
       z-index: 9;
+      .opt-i {
+        button.danger {
+          height: 32px;
+          line-height: normal;
+          &:hover {
+            background-color: rgba(227, 100, 101, 0.2) !important;
+          }
+        }
+      }
     }
     .status-bar {
       padding: 0 8px;
@@ -244,7 +254,8 @@
       .clearfix();
     }
     &:hover {
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.26);
+      box-shadow: 0 5px 7px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(0,0,0,0.2);
     }
   }
 }
@@ -1310,6 +1321,9 @@
     .opt {
       text-align: right;
       margin-top: 16px;
+      .opt-i {
+        display: inline-block;
+      }
     }
   }
 }

@@ -61,7 +61,6 @@ export default class RESTServer {
     let EVENT_TYPE = this.app.get('EVENT_TYPE');
     let eventEmitter = this.app.get('eventEmitter');
 
-
     app.use(bodyParser.urlencoded({
       extended: false
     }));
@@ -92,7 +91,10 @@ export default class RESTServer {
       if (res.headersSent) {
         return;
       }
-      res.status(404).send('Not Found');
+      if (typeof res === 'function') {
+        return req.status(404).send({errorCode: 404, description: 'Endpoint Not Found'});
+      }
+      res.status(500).send(err);
     });
 
     app.set('port', this.port);

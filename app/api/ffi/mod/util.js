@@ -13,6 +13,31 @@ var execute = function(lib, client, requestId, payload) {
   });
 };
 
+var getLogFilePath = function(lib) {
+  var sizePtr = ref.alloc(int);
+  var capacityPtr = ref.alloc(int);
+  var resultPtr = ref.alloc(int);
+  var requestId = 'logFilePath';  
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+  lib.output_log_path.async('launcher_ui.log', sizePtr, capacityPtr, resultPtr, function (err, pointer) {
+    if (err) {
+      return sendException(requestId, err);
+    }
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/    
+    var result = resultPtr.deref();
+    if (pointer.isNull() || result !== 0) {
+      return sendError(requestId, result);
+    }
+    var size = sizePtr.deref();
+    var capacity = capacityPtr.deref();
+    var response = ref.reinterpret(pointer, size).toString();    
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+    lib.drop_vector.async(pointer, size, capacity, function() {});
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+    send(requestId, response);
+  });  
+};
+
 var executeForContent = function(lib, client, requestId, payload) {
   var sizePtr = ref.alloc(int);
   var capacityPtr = ref.alloc(int);
@@ -78,6 +103,7 @@ var sendLog = function(level, logMsg) {
 
 exports.execute = execute;
 exports.executeForContent = executeForContent;
+exports.getLogFilePath = getLogFilePath;
 exports.send = send;
 exports.sendConnectionStatus = sendConnectionStatus;
 exports.sendException = sendException;

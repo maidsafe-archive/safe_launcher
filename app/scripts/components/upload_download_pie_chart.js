@@ -22,15 +22,15 @@ var UploadDownloadPieChart = React.createClass({
   },
   render: function() {
     this.dataAvailable = ((this.props.download !== 0) || (this.props.upload !== 0));
-    return React.DOM.span({className: 'pie-chart-b'}, [
-      React.DOM.div({className: 'legends'}, [
-        React.DOM.div({className: 'legends-i download'}, [
-          React.DOM.div({className: 'legends-i-name'}, 'Total Data Downloaded:'),
-          React.DOM.div({className: 'legends-i-val'}, (this.dataAvailable ? this.bytesToSize(this.props.download) : 'No data yet.'))
+    return React.DOM.span({key: 'pieChart', className: 'pie-chart-b'}, [
+      React.DOM.div({key: 'pieChartLegends', className: 'legends'}, [
+        React.DOM.div({key: 'pieChartLegendsDwn', className: 'legends-i download'}, [
+          React.DOM.div({key: 'pieChartLegendsDwnName', className: 'legends-i-name'}, 'Total Data Downloaded:'),
+          React.DOM.div({key: 'pieChartLegendsDwnVal', className: 'legends-i-val'}, (this.dataAvailable ? this.bytesToSize(this.props.download) : 'No data yet.'))
         ]),
-        React.DOM.div({className: 'legends-i upload'}, [
-          React.DOM.div({className: 'legends-i-name'}, 'Total Data Upload:'),
-          React.DOM.div({className: 'legends-i-val'}, (this.dataAvailable ? this.bytesToSize(this.props.upload) : 'No data yet.'))
+        React.DOM.div({key: 'pieChartLegendsUpl', className: 'legends-i upload'}, [
+          React.DOM.div({key: 'pieChartLegendsUplName', className: 'legends-i-name'}, 'Total Data Upload:'),
+          React.DOM.div({key: 'pieChartLegendsUplVal', className: 'legends-i-val'}, (this.dataAvailable ? this.bytesToSize(this.props.upload) : 'No data yet.'))
         ])
       ])
     ]);

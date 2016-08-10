@@ -35,7 +35,6 @@ addons:
 
 before_install:
   - export PROJECT_VERSION=$(git log -1 | grep -i "version change to" | sed "s/.*[vV]ersion change to v\{0,1\}//")
-  - export PACKAGE_NAME="$PROJECT_NAME-v$PROJECT_VERSION-$PLATFORM_NAME-x64"
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libnotify4; sudo apt-get install libgconf-2-4; fi
 install:
   - export DISPLAY=':99.0'
@@ -62,39 +61,4 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm install -g electron-prebuilt; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm install -g gulp-electron-mocha; fi
   - npm test
-
-before_deploy:
-  - cd $TRAVIS_BUILD_DIR
-  - cd safe_core
-  - cargo build --release
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
-  - cd $TRAVIS_BUILD_DIR
-  - git config --global user.name MaidSafe-QA
-  - git config --global user.email qa@maidsafe.net
-  - git fetch --tags
-  - if [ -z $(git tag -l "$PROJECT_VERSION") ]; then git tag $PROJECT_VERSION -am "Version $PROJECT_VERSION" $TRAVIS_COMMIT; git push https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} tag $PROJECT_VERSION > /dev/null 2>&1; fi
-  - npm run package
-  - git clone https://${GH_TOKEN}@github.com/maidsafe/release_config
-  - ls
-  - ls app_dist
-  - ls app_dist/$PACKAGE_NAME/
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/safe_launcher.crust.config release_config/safe_launcher/safe_launcher\ Helper.crust.config; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher\ Helper.app/Contents/MacOS/; fi
-  - pushd ./app_dist
-  - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
-  - popd
-  - cd $TRAVIS_BUILD_DIR
-
-deploy:
-  provider: releases
-  api_key: ${GH_TOKEN}
-  file: "${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz"
-  skip_cleanup: true
-  tag_name: "${PROJECT_VERSION}"
-  draft: true
-  on:
-    all_branches: true
-    condition: |
-      (-n "$PROJECT_VERSION") && (-n "$PLATFORM")
+  

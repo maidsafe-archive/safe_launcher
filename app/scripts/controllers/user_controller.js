@@ -70,6 +70,7 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
       $rootScope.resetStats();
       $rootScope.resetAppStates();
       server.stopProxyServer();
+      window.msl.networkStateChange(0);
       server.reconnectNetwork();      
       $state.go('app.account', {
         currentPage: 'login'

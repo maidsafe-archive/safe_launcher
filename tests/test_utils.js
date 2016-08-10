@@ -4,17 +4,15 @@ var config = require('../config/env_development.json');
 
 var SERVER_URL = 'http://localhost:' + config.serverPort;
 var authToken = null;
-var keys = {
-  pub: null,
-  pvt: null,
-  nonce: null,
-  symKey: null,
-  symNonce: null
-};
-var registeredKeys = {
-  pin: 1111,
-  keyword: '1111aa',
-  password: '1111aa'
+var registeredKeys = {};
+
+var generateRandomStr = function() {
+  var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for( var i=0; i < 10; i++ ) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
 };
 
 var setToken = function(token) {
@@ -30,32 +28,15 @@ var setRegisteredKeys = function(keys) {
 };
 
 var generateAuthKeys = function() {
-  var pin_len = 4;
-  var keyword_len = 6;
-  var password_len = 6;
-  var loginKeys = {
-    pin: null,
-    keyword: null,
-    password: null
-  };
-  loginKeys.pin = Math.floor(Math.random() * 10000).toString();
-  loginKeys.keyword = Math.floor(Math.random() * 1000000).toString();
-  loginKeys.password = Math.floor(Math.random() * 1000000).toString();
-  while (loginKeys.pin.length < pin_len) {
-    loginKeys.pin += '0';
-  }
-  while (loginKeys.keyword.length < keyword_len) {
-    loginKeys.keyword += '0';
-  }
-  while (loginKeys.password.length < password_len) {
-    loginKeys.password += '0';
-  }
+  var loginKeys = {};
+  loginKeys['secret'] = generateRandomStr();
+  loginKeys['password'] = generateRandomStr();
   return loginKeys;
 };
 
 var login = function(registered, callback) {
   var loginKeys = registered ? registeredKeys : generateAuthKeys();
-  server.login(loginKeys.pin, loginKeys.keyword, loginKeys.password, function(err) {
+  server.login(loginKeys.secret, loginKeys.password, function(err) {
     if (err) {
       console.error(err);
       return process.exit(0);
@@ -66,7 +47,7 @@ var login = function(registered, callback) {
 
 var register = function(callback) {
   var regKeys = generateAuthKeys();
-  server.register(regKeys.pin, regKeys.keyword, regKeys.password, function(err) {
+  server.register(regKeys.secret, regKeys.password, function(err) {
     if (err) {
       console.error(err);
       return process.exit(0);
@@ -244,23 +225,32 @@ var moveOrCopyDir = function(token, srcPath, destPath, toMove, callback) {
 };
 
 var createFile = function(token, filePath, callback) {
-  var payload = {
-    metadata: '',
-  };
-  request({
+  var authKey = 'bearer';
+  var fs = require('fs');
+  var mime = require('mime');
+  var localPath = './tests/file_to_create.txt';
+  var fileStream = fs.createReadStream(localPath);
+  var chunkSend = 0;
+  fileStream.on('data', function(chunk) {
+    chunkSend += chunk.length;
+  });
+  var writeStream =  request({
     method: 'POST',
     url: SERVER_URL + '/nfs/file/APP/' + filePath,
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Length': fs.statSync(localPath).size,
+      'Content-Type': mime.lookup(filePath),
+      'metadata': '',
       'authorization': token
-    },
-    body: JSON.stringify(payload)
+    }
   }, function(err, res, body) {
     if (err) {
       return process.exit(0);
     }
     callback(res.statusCode);
   });
+  fileStream.pipe(writeStream);
+  return writeStream;
 };
 
 var deleteFile = function(token, filePath, callback) {
@@ -286,13 +276,12 @@ var getFile = function(token, filePath, callback) {
     headers: {
       'Content-Type': 'text/plain',
       'authorization': token,
-      'range': 'bytes=0-100'
+      'range': 'bytes=0-'
     }
   }, function(err, res, body) {
     if (err) {
       return process.exit(0);
     }
-    console.log(body);
     callback(res.statusCode);
   })
 };
@@ -318,24 +307,24 @@ var updateFileMeta = function(token, newFileName, filePath, callback) {
 };
 
 // TODO: Change api to v0.5
-var updateFileContent = function(token, fileContent, filePath, callback) {
-  var query ='?offset=' + 0;
-  request({
-    method: 'PUT',
-    url: SERVER_URL + '/nfs/file/APP/' + filePath + query,
-    headers: {
-      'Content-Type': 'text/plain',
-      'authorization': token
-    },
-    body: fileContent
-  }, function(err, res, body) {
-    if (err) {
-      return process.exit(0);
-    }
-    console.log(body);
-    callback(res.statusCode);
-  });
-};
+// var updateFileContent = function(token, fileContent, filePath, callback) {
+//   var query ='?offset=' + 0;
+//   request({
+//     method: 'PUT',
+//     url: SERVER_URL + '/nfs/file/APP/' + filePath + query,
+//     headers: {
+//       'Content-Type': 'text/plain',
+//       'authorization': token
+//     },
+//     body: fileContent
+//   }, function(err, res, body) {
+//     if (err) {
+//       return process.exit(0);
+//     }
+//     console.log(body);
+//     callback(res.statusCode);
+//   });
+// };
 
 var moveOrCopyFile = function(token, srcPath, destPath, toMove, callback) {
   var action = toMove ?  'MOVE' : 'COPY'
@@ -362,16 +351,14 @@ var moveOrCopyFile = function(token, srcPath, destPath, toMove, callback) {
   });
 };
 
-
 // DNS
 var registerDns = function(token, longName, serviceName, dirPath, callback) {
   var payload = {
     longName: longName,
     serviceName: serviceName,
     serviceHomeDirPath: dirPath,
-    isPathShared: false
+    rootPath: 'app'
   };
-  console.log(longName, serviceName, dirPath);
   request({
     method: 'POST',
     url: SERVER_URL + '/dns',
@@ -384,7 +371,6 @@ var registerDns = function(token, longName, serviceName, dirPath, callback) {
     if (err) {
       return process.exit(0);
     }
-    console.log(body);
     callback(res.statusCode);
   });
 };
@@ -426,7 +412,7 @@ var addService = function(token, longName, serviceName, dirPath, callback) {
     longName: longName,
     serviceName: serviceName,
     serviceHomeDirPath: dirPath,
-    isPathShared: false
+    rootPath: 'app'
   };
   request({
     method: 'PUT',
@@ -544,7 +530,7 @@ module.exports = {
   deleteFile: deleteFile,
   getFile: getFile,
   updateFileMeta: updateFileMeta,
-  updateFileContent: updateFileContent,
+  // updateFileContent: updateFileContent,
   moveOrCopyFile: moveOrCopyFile,
   moveOrCopyDir: moveOrCopyDir,
   registerDns: registerDns,

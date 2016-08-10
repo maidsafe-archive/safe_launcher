@@ -2,6 +2,7 @@ import childProcess from 'child_process';
 import { log } from './../../logger/log';
 import uuid from 'uuid';
 import path from 'path';
+import { remote } from 'electron';
 
 var workerProcess;
 var workerPath = __dirname;
@@ -19,7 +20,7 @@ var addToCallbackPool = function(id, callback) {
 
 var startWorker = function() {
   log.debug('Starting FFI worker client');
-  let executableDirPath = path.dirname(require('remote').app.getPath('exe'));
+  let executableDirPath = path.dirname(remote.app.getPath('exe'));
   workerProcess = childProcess.fork(workerPath, [], {cwd: executableDirPath});
   workerProcess.on('close', function() {
     if (isClosed) {
@@ -44,6 +45,19 @@ var startWorker = function() {
       return;
     } else if (msg.id === 0 && networkStateListener) {
       return networkStateListener(msg.data.state, msg.data.registeredClient);
+    } else if (msg.id === 'logFilePath') {      
+      if (msg.errorCode !== 0) {
+        return networkStateListener(msg.errorCode);
+      }
+      if (msg.data) {
+        log.setFileLogger(msg.data);
+      } else {
+        log.debug('Config file path not found');
+      }
+      log.debug('Sending FFI initialisation request');
+      send({
+        'module': 'connect'
+      });
     } else if (!callbackPool[msg.id]) {
       log.warn('Callback not found :: ' + msg.id);
       return;
@@ -64,10 +78,17 @@ var startWorker = function() {
       }
     }
   });
-  log.debug('Sending FFI initialisation request');
-  send({
-    'module': 'connect'
-  });
+  if (!log.logFilePath) {
+    console.log('sending log path request')
+    send({
+      'module': 'get-log-path'
+    });  
+  } else {
+    log.debug('Sending FFI initialisation request');
+    send({
+      'module': 'connect'
+    });
+  }  
 };
 
 export var send = function(message, callback) {
