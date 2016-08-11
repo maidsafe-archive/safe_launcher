@@ -1,4 +1,4 @@
-export function errorCodeLookup(errCode) {
+export var errorCodeLookup = function(errCode) {
   let CLIENT_ERROR_START_RANGE = -1;
   let NFS_ERROR_START_RANGE = CLIENT_ERROR_START_RANGE - 500;
   let DNS_ERROR_START_RANGE = NFS_ERROR_START_RANGE - 500;

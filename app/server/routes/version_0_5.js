@@ -7,16 +7,14 @@ import * as Auth from '../controllers/auth';
 
 var router = express.Router();
 
-var jsonParser = bodyParser.json({strict: false});
+var jsonParser = bodyParser.json({ strict: false });
 
 var ActivityMiddleware = function(activityName) {
-
-    this.onRequest = function(req, res, next) {
-        addAppActivity(req, activityName);
-        next();
-    };
-
-    return this.onRequest;
+  this.onRequest = function(req, res, next) {
+    addAppActivity(req, activityName);
+    next();
+  };
+  return this.onRequest;
 };
 
 router.post('/auth', jsonParser,
@@ -63,4 +61,6 @@ router.get('/dns/:serviceName/:longName/*', new ActivityMiddleware('Read public 
 router.get('/dns', new ActivityMiddleware('List long names'), DNS.listLongNames);
 router.get('/dns/:longName', new ActivityMiddleware('List services'), DNS.listServices);
 
+/*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
 export { router as router_0_5 };
+/*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/

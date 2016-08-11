@@ -21,7 +21,7 @@ var addToCallbackPool = function(id, callback) {
 var startWorker = function() {
   log.debug('Starting FFI worker client');
   let executableDirPath = path.dirname(remote.app.getPath('exe'));
-  workerProcess = childProcess.fork(workerPath, [], {cwd: executableDirPath});
+  workerProcess = childProcess.fork(workerPath, [], { cwd: executableDirPath });
   workerProcess.on('close', function() {
     if (isClosed) {
       log.warn('FFI worker client closed already');
@@ -45,7 +45,7 @@ var startWorker = function() {
       return;
     } else if (msg.id === 0 && networkStateListener) {
       return networkStateListener(msg.data.state, msg.data.registeredClient);
-    } else if (msg.id === 'logFilePath') {      
+    } else if (msg.id === 'logFilePath') {
       if (msg.errorCode !== 0) {
         return networkStateListener(msg.errorCode);
       }
@@ -79,16 +79,16 @@ var startWorker = function() {
     }
   });
   if (!log.logFilePath) {
-    console.log('sending log path request')
+    console.log('sending log path request');
     send({
       'module': 'get-log-path'
-    });  
+    });
   } else {
     log.debug('Sending FFI initialisation request');
     send({
       'module': 'connect'
     });
-  }  
+  }
 };
 
 export var send = function(message, callback) {

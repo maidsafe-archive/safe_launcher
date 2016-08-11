@@ -3,8 +3,7 @@ import { updateAppActivity } from './../utils.js';
 var Readable = require('stream').Readable;
 var util = require('util');
 
-export var DnsReader = function (req, res,
-  longName, serviceName, filePath, start, end, hasSafeDriveAccess, appDirKey) {
+export var DnsReader = function(req, res, longName, serviceName, filePath, start, end, hasSafeDriveAccess, appDirKey) {
   Readable.call(this);
   this.req = req;
   this.res = res;
@@ -22,6 +21,7 @@ export var DnsReader = function (req, res,
 
 util.inherits(DnsReader, Readable);
 
+/*jscs:disable disallowDanglingUnderscores*/
 DnsReader.prototype._read = function() {
   let self = this;
   if (self.curOffset === self.end) {
@@ -47,3 +47,4 @@ DnsReader.prototype._read = function() {
       eventEmitter.emit(eventType, data.length);
     });
 };
+/*jscs:enable disallowDanglingUnderscores*/

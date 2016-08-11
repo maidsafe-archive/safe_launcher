@@ -5,14 +5,15 @@ window.safeLauncher.directive('fieldMatchValidator', [ 'CONSTANTS', 'MESSAGES',
     var onChange = function(scope, ele, attr, ctrl) {
       var msgEle = $(ele).siblings('.msg');
       var parent = $(ele).parent();
-      var targetEle = angular.element(document.getElementsByName(ctrl.$$parentForm.$name)).find('input[name='+attr.target+']');
+      var targetEle = angular.element(document.getElementsByName(ctrl.$$parentForm.$name))
+        .find('input[name=' + attr.target + ']');
       var targetVal = targetEle.val();
       var value = '';
       var resetField = function() {
         parent.removeClass('error');
         // ctrl.$setValidity('fieldValidator', true);
         return msgEle.text('');
-      }
+      };
       ele.bind('keyup', function(e) {
         resetField();
         // ctrl.$setValidity('fieldValidator', false);

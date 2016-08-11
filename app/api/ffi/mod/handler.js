@@ -9,7 +9,9 @@ module.exports = function(libPath) {
   var Void = ref.types.void;
   var voidPtr = ref.refType(Void);
   var voidPtrPtr = ref.refType(voidPtr);
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   var size_t = ref.types.size_t;
+  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   var uint8 = ref.types.uint8;
   var Uint8Array = ArrayType(uint8);
   var refUin8Array = ref.refType(Uint8Array);
@@ -24,6 +26,7 @@ module.exports = function(libPath) {
   var LIB_LOAD_ERROR = -9999;
 
   var methodsToRegister = function() {
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     return {
       'client_issued_deletes': [ int, [ voidPtrPtr ] ],
       'client_issued_gets': [ int, [ voidPtrPtr ] ],
@@ -44,9 +47,10 @@ module.exports = function(libPath) {
       'nfs_create_file': [ int, [ cString, voidPtrPtr, voidPtrPtr ] ],
       'nfs_stream_close': [ int, [ voidPtrPtr ] ],
       'nfs_stream_write': [ int, [ voidPtrPtr, refUin8Array, size_t ] ],
-      'output_log_path': [ 'pointer', [ cString, intPtr, intPtr, intPtr] ],
+      'output_log_path': [ 'pointer', [ cString, intPtr, intPtr, intPtr ] ],
       'register_network_event_observer': [ 'void', [ voidPtrPtr, 'pointer' ] ]
     };
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   };
 
   var unRegisteredClientObserver = ffi.Callback('void', [ int ], function(state) {
@@ -103,9 +107,9 @@ module.exports = function(libPath) {
       if (!lib) {
         var code = loadLibrary();
         if (code !== 0) {
-          lib == null;
+          lib = null;
           return util.sendError('logFilePath', code);
-        }        
+        }
       }
       switch (message.module) {
         case 'auth':
@@ -141,7 +145,7 @@ module.exports = function(libPath) {
           clientStats.execute(lib, message);
           break;
 
-        case 'get-log-path':  
+        case 'get-log-path':
           util.getLogFilePath(lib);
           break;
         default:

@@ -1,10 +1,8 @@
 /**
  * Authentication Factory
  */
-window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverFactory',
-  'CONSTANTS',
+window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverFactory', 'CONSTANTS',
   function($rootScope, server, CONSTANTS) {
-
     var onAuthRequest = function() {
       var ConfirmationQueue = function() {
         var requestQueue = [];
@@ -30,7 +28,8 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
           var run = function() {
             showPrompt(requestQueue.shift(), function() {
               if (requestQueue.length === 0) {
-                return isAuthReqProcessing = false;
+                isAuthReqProcessing = false;
+                return;
               }
               run();
             });
@@ -42,9 +41,8 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
           requestQueue.push(data);
           show();
         };
-
         return this;
-      }
+      };
 
       var queue = new ConfirmationQueue();
 
@@ -80,14 +78,13 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
         // $rootScope.$loader.hide();
         console.log('Server Stopped');
       });
-
     };
 
     var proxyServerEvents = function() {
       // handle proxy start
       server.onProxyStart(function(msg) {
         $rootScope.$proxyServer = true;
-        $rootScope.setProxy(true);        
+        $rootScope.setProxy(true);
       });
 
       // handle proxy stop
@@ -128,26 +125,30 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
 
     var activityEvents = function() {
       var updateActivity = function(data, isNew) {
-        data.activity['appName'] = data.appName || 'Anonymous Application';
-        if (isNew) {          
+        data.activity.appName = data.appName || 'Anonymous Application';
+        if (isNew) {
           if ($rootScope.logList.length >= CONSTANTS.LOG_LIST_LIMIT) {
             $rootScope.logList.pop();
           }
         } else {
-          var activityIndex = $rootScope.logList.map(function(obj) { return obj.activityId; }).indexOf(data.activity.activityId);
+          var activityIndex = $rootScope.logList.map(function(obj) {
+            return obj.activityId;
+          }).indexOf(data.activity.activityId);
           $rootScope.logList.splice(activityIndex, 1);
         }
-        $rootScope.logList.unshift(data.activity);  
+        $rootScope.logList.unshift(data.activity);
         if ($rootScope.currentAppDetails) {
           if (!isNew) {
-            var currentAppLogIndex = $rootScope.currentAppDetails.logs.map(function(obj) { return obj.activityId; }).indexOf(data.activity.activityId);
+            var currentAppLogIndex = $rootScope.currentAppDetails.logs.map(function(obj) {
+              return obj.activityId;
+            }).indexOf(data.activity.activityId);
             $rootScope.currentAppDetails.logs.splice(currentAppLogIndex, 1);
           }
           $rootScope.currentAppDetails.logs.unshift(data.activity);
         }
         if (data.app && $rootScope.appList[data.app]) {
-            $rootScope.appList[data.app].status = data.activity;
-        }        
+          $rootScope.appList[data.app].status = data.activity;
+        }
       };
 
       server.onNewAppActivity(function(data) {
@@ -166,7 +167,6 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
     };
 
     var appSessionEvents = function() {
-
       var removeApplication = function(id) {
         for (var i in $rootScope.appList) {
           if ($rootScope.appList[i].id === id) {

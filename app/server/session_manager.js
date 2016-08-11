@@ -30,9 +30,9 @@ class SessionManager {
     for (var key in this.sessionPool) {
       app = this.sessionPool[key];
       if (app.appId === appData.id && app.appName === appData.name &&
-          app.appVersion === appData.version && app.vendor === appData.vendor
-          && app.permissions.isEqual(appData.permissions)) {
-          return key;
+      app.appVersion === appData.version && app.vendor === appData.vendor &&
+      app.permissions.isEqual(appData.permissions)) {
+        return key;
       }
     }
     return null;

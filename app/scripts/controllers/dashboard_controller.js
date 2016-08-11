@@ -12,7 +12,7 @@ window.safeLauncher.controller('dashboardController', [ '$scope', '$state', '$ro
     ];
     $scope.toggleFilter = function(name) {
       var index = $scope.logFilter.indexOf(name);
-      if ( index !== -1) {
+      if (index !== -1) {
         return $scope.logFilter.splice(index, 1);
       }
       $scope.logFilter.unshift(name);

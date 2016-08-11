@@ -92,7 +92,7 @@ export var getFile = function(req, res, next) {
     }
     fileStats = formatResponse(fileStats);
     let range = req.get('range');
-    let positions = [0];
+    let positions = [ 0 ];
     if (range) {
       range = range.toLowerCase();
       if (!/^bytes=/.test(range)) {
@@ -112,14 +112,14 @@ export var getFile = function(req, res, next) {
     if (chunksize < 0 || end > total) {
       return next(new ResponseError(416));
     }
-    log.debug('DNS - Ready to stream file for range' + start + "-" + end + "/" + total);    
+    log.debug('DNS - Ready to stream file for range' + start + '-' + end + '/' + total);
     var headers = {
-      "Content-Range": "bytes " + start + "-" + end + "/" + total,
-      "Accept-Ranges": "bytes",
-      "Content-Length": chunksize,
-      "Created-On": fileStats.createdOn,
-      "Last-Modified": fileStats.modifiedOn,
-      "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
+      'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunksize,
+      'Created-On': fileStats.createdOn,
+      'Last-Modified': fileStats.modifiedOn,
+      'Content-Type': mime.lookup(filePath) || 'application/octet-stream'
     };
     if (fileStats.metadata && fileStats.metadata.length > 0) {
       headers.metadata = new Buffer(fileStats.metadata, 'base64').tostring('base64');
@@ -152,7 +152,7 @@ export var deleteDns = function(req, res, next) {
   }
   let params = req.params;
   let responseHandler = new ResponseHandler(req, res);
-  if (!(typeof params.longName === 'string')) {
+  if (typeof params.longName !== 'string') {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'longName')));
   }
   log.debug('DNS - Invoking deleteDns API for ' + params.longName);
@@ -167,10 +167,10 @@ export var deleteService = function(req, res, next) {
   }
   let params = req.params;
 
-  if (!(typeof params.serviceName === 'string')) {
+  if (typeof params.serviceName !== 'string') {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'serviceName')));
   }
-  if (!(typeof params.longName === 'string')) {
+  if (typeof params.longName !== 'string') {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'longName')));
   }
   let responseHandler = new ResponseHandler(req, res);

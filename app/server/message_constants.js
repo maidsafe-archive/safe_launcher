@@ -8,7 +8,7 @@ let CONSTANTS = {
     APP_DIR_CREATION: 'Failed to fetch/create app root directory',
     FIELD_EMPTY: 'Invalid request. \'%s\' is empty or not present',
     FIELD_NOT_VALID: 'Invalid request. \'%s\' not a valid input',
-    REQUIRED_PARAMS_MISSING: 'Invalid request. Required parameters are missing',
+    REQUIRED_PARAMS_MISSING: 'Invalid request. Required parameters are missing'
   }
 };
 

@@ -27,7 +27,7 @@ app.on('ready', function() {
   });
   mainWindow.loadURL('file://' + __dirname + '/app.html');
   mainWindow.webContents.on('did-finish-load', function() {
-    setTimeout(function(){
+    setTimeout(function() {
       mainWindow.show();
     }, 40);
   });
@@ -42,8 +42,8 @@ app.on('ready', function() {
   mainWindow.setMenuBarVisibility(false);
 });
 
-app.on('window-all-closed', function() {  
-  app.quit();  
+app.on('window-all-closed', function() {
+  app.quit();
 });
 
 app.on('before-quit', function() {
@@ -68,13 +68,13 @@ if (shouldQuit) {
 }
 
 process.on('uncaughtException', function(e) {
- console.log(e);
+  console.log(e);
 });
 
 for (var i in process.argv) {
   console.log(process.argv[i]);
   if (process.argv[i] === '--proxy_unsafe_mode') {
     global.proxyUnsafeMode = true;
-    break;    
+    break;
   }
 }

@@ -17,7 +17,7 @@ window.safeLauncher.directive('validateAccountSecret', [ 'CONSTANTS', 'MESSAGES'
         strengthEle.width('0');
         statusEle.removeClass('icn');
         return msgEle.text('');
-      }
+      };
       ele.bind('keyup', function(e) {
         ctrl.$setValidity('fieldValidator', false);
         value = e.target.value;
@@ -27,7 +27,9 @@ window.safeLauncher.directive('validateAccountSecret', [ 'CONSTANTS', 'MESSAGES'
             result: isValid
           });
         }
+        /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
         var log10 = zxcvbn(value).guesses_log10;
+        /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
         statusEle.removeClass('icn');
         switch (true) {
           case (log10 < 4):
@@ -54,7 +56,7 @@ window.safeLauncher.directive('validateAccountSecret', [ 'CONSTANTS', 'MESSAGES'
             break;
           default:
         }
-        strengthEle.width(Math.min((log10/16)*100, 100) + '%');
+        strengthEle.width(Math.min((log10 / 16) * 100, 100) + '%');
         ctrl.$setValidity('fieldValidator', isValid);
         scope.isPasswordValid({
           result: isValid

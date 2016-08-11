@@ -22,11 +22,11 @@ class ProxyController {
       env.proxyPort,
       '--serverPort',
       env.serverPort
-    ];    
+    ];
     if (remote.getGlobal('proxyUnsafeMode')) {
       args.push('--unsafe_mode');
       args.push('true');
-    }    
+    }
     this.process = childProcess.fork(path.resolve(__dirname, 'server/web_proxy.js'), args);
     this.process.on('exit', function() {
       log.info('Proxy server stopped');
@@ -47,10 +47,10 @@ class ProxyController {
           break;
         case 'log':
           if (event.msg.level === 'INFO') {
-			log.info(event.msg.log);
+            log.info(event.msg.log);
           } else {
-          	log.error(event.msg.log);
-          }  
+            log.error(event.msg.log);
+          }
           break;
         default:
           log.warn('Invalid event type from proxy');

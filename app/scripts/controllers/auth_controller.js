@@ -18,7 +18,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
       errorTarget.removeClass('error');
       errorTarget.children('.msg').text('');
       errorTarget.children('input').focus();
-    }
+    };
 
     // user create account
     var createAccount = function() {
@@ -42,7 +42,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         showErrorField('AccountSecret', $state.params.errorMsg);
       }
     };
-    
+
     $scope.secretValid = false;
     $scope.passwordValid = false;
     $scope.createAccFlow = {
@@ -70,7 +70,8 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
             return showErrorField('AccountSecretConfirm', MESSAGES.ENTRIES_DONT_MATCH);
           }
         }
-        $state.go('app.account', {currentPage: $state.params.currentPage, currentState: state, errorMsg: $state.params.errorMsg}, {notify: false});
+        $state.go('app.account', { currentPage: $state.params.currentPage,
+          currentState: state, errorMsg: $state.params.errorMsg }, { notify: false });
         this.currentPos = state ? this.states.indexOf(state) : 0;
       },
       continue: function() {
@@ -91,7 +92,8 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
         if (this.currentPos > 0) {
           this.currentPos--;
         }
-        $state.go('app.account', {currentPage: $state.params.currentPage, currentState: this.states[this.currentPos], errorMsg: null}, {notify: false});
+        $state.go('app.account', { currentPage: $state.params.currentPage,
+          currentState: this.states[this.currentPos], errorMsg: null }, { notify: false });
       }
     };
     var Request = function(callback) {
@@ -139,7 +141,7 @@ window.safeLauncher.controller('authController', [ '$scope', '$state', '$rootSco
             currentState: $scope.createAccFlow.states[2],
             errorMsg: errMsg
           }, { reload: true });
-          $rootScope.user= {};
+          $rootScope.user = {};
           return $rootScope.$toaster.show({
             msg: errMsg,
             isError: true
