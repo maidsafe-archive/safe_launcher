@@ -14,7 +14,7 @@
       <!-- /app list header -->
       <!-- app list container -->
       <div class="default" ng-show="keys(appList).length === 0">
-        No authorised apps. Get the <a href="#" ng-click="openExternal($event, 'http://maidsafe.net/alpha_release.html#demo_app')">demo app</a> to store and publish data, as well as create your SAFE public ID.<br/>        
+        No authorised apps. Get the <a href="#" ng-click="openExternal($event, 'http://maidsafe.net/alpha.html#demo_app')">demo app</a> to store and publish data, as well as create your SAFE public ID.<br/>        
       </div>
       <react-component name="AppList" props="{list: appList, revokeApp: removeSession, toggleAppDetails: toggleAppDetails}">
       </react-component>
