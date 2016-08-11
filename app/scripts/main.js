@@ -12,8 +12,8 @@ window.safeLauncher = angular
     delete $httpProvider.defaults.headers.common['X-Requested-With'];
   }
 ])
-.run([ '$rootScope', '$state', '$stateParams', '$timeout', '$interval', 'CONSTANTS',
-  function($rootScope, $state, $stateParams, $timeout, $interval, CONSTANTS) {
+.run([ '$rootScope', '$state', '$stateParams', '$timeout', '$interval', 'CONSTANTS', 'logListComponent',
+  function($rootScope, $state, $stateParams, $timeout, $interval, CONSTANTS, logListComponent) {
     $rootScope.$state = $state;
     $rootScope.userInfo = {};
     $rootScope.user = {};
@@ -33,14 +33,15 @@ window.safeLauncher = angular
         this.description = '';
       }
     };
+    $rootScope.logListComponent = logListComponent;
     $rootScope.resetAppStates = function() {
       $rootScope.isAuthenticated = false;
       $rootScope.isAuthLoading = false;
-      $rootScope.currentAppDetails = {
-        logs: []
-      };
-      $rootScope.appList = {};
-      $rootScope.logList = [];
+      // $rootScope.currentAppDetails = {
+      //   logs: []
+      // };
+      // $rootScope.appList = {};
+      // $rootScope.logList = [];
       $rootScope.intervals = [];
       $rootScope.retryCount = 1;
     };

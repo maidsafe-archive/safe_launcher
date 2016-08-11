@@ -3,6 +3,9 @@
  */
 window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverFactory', 'CONSTANTS',
   function($rootScope, server, CONSTANTS) {
+    var factory = this;
+    factory.appList = {};
+
     var onAuthRequest = function() {
       var ConfirmationQueue = function() {
         var requestQueue = [];
@@ -123,54 +126,66 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
       });
     };
 
+    factory.logList = [];
+    factory.appLastLog = {};
+    factory.currentAppDetails = null;
+
     var activityEvents = function() {
       var updateActivity = function(data, isNew) {
         data.activity.appName = data.appName || 'Anonymous Application';
         if (isNew) {
-          if ($rootScope.logList.length >= CONSTANTS.LOG_LIST_LIMIT) {
-            $rootScope.logList.pop();
+          if (factory.logList.length >= CONSTANTS.LOG_LIST_LIMIT) {
+            factory.logList.pop();
           }
         } else {
-          var activityIndex = $rootScope.logList.map(function(obj) {
+          var activityIndex = factory.logList.map(function(obj) {
             return obj.activityId;
           }).indexOf(data.activity.activityId);
-          $rootScope.logList.splice(activityIndex, 1);
+          factory.logList.splice(activityIndex, 1);
         }
-        $rootScope.logList.unshift(data.activity);
-        if ($rootScope.currentAppDetails) {
+        factory.logList.unshift(data.activity);
+        if (factory.currentAppDetails) {
           if (!isNew) {
-            var currentAppLogIndex = $rootScope.currentAppDetails.logs.map(function(obj) {
+            var currentAppLogIndex = factory.currentAppDetails.logs.map(function(obj) {
               return obj.activityId;
             }).indexOf(data.activity.activityId);
-            $rootScope.currentAppDetails.logs.splice(currentAppLogIndex, 1);
+            factory.currentAppDetails.logs.splice(currentAppLogIndex, 1);
           }
-          $rootScope.currentAppDetails.logs.unshift(data.activity);
+          factory.currentAppDetails.logs.unshift(data.activity);
         }
-        if (data.app && $rootScope.appList[data.app]) {
-          $rootScope.appList[data.app].status = data.activity;
+        if (data.app && factory.appList[data.app]) {
+          factory.appList[data.app].status = data.activity;
+        } else if (!factory.appList[data.app]) {
+          delete factory[data.app];
         }
+        $rootScope.logListComponent.update(factory.currentAppDetails ?
+          factory.currentAppDetails.logs : factory.logList);
       };
 
       server.onNewAppActivity(function(data) {
         if (!data) {
           return;
         }
-        updateActivity(data, true);
+        setTimeout(function() {
+          updateActivity(data, true);
+        }, 1);
       });
 
       server.onUpdatedAppActivity(function(data) {
         if (!data) {
           return;
         }
-        updateActivity(data, false);
+        setTimeout(function() {
+          updateActivity(data, false);
+        }, 1);
       });
     };
 
     var appSessionEvents = function() {
       var removeApplication = function(id) {
-        for (var i in $rootScope.appList) {
-          if ($rootScope.appList[i].id === id) {
-            delete $rootScope.appList[i];
+        for (var i in factory.appList) {
+          if (factory.appList[i].id === id) {
+            delete factory.appList[i];
             break;
           }
         }
@@ -179,7 +194,7 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
       // handle session creation
       server.onSessionCreated(function(session) {
         console.log('Session created :: ');
-        $rootScope.appList[session.id] = {
+        factory.appList[session.id] = {
           id: session.id,
           name: session.info.appName,
           version: session.info.appVersion,
@@ -205,7 +220,7 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
       server.onSessionRemoved(function(id) {
         console.log('Session removed :: ' + id);
         $rootScope.$toaster.show({
-          msg: 'Revoked access ' + ($rootScope.appList[id] ? ('for ' + $rootScope.appList[id].name) : ''),
+          msg: 'Revoked access ' + (factory.appList[id] ? ('for ' + factory.appList[id].name) : ''),
           hasOption: false,
           isError: false
         }, function(err, data) {

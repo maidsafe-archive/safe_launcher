@@ -19,7 +19,7 @@ var getLogFilePath = function(lib) {
   var resultPtr = ref.alloc(int);
   var requestId = 'logFilePath';
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
-  lib.output_log_path.async('launcher_ui.log', sizePtr, capacityPtr, resultPtr, function(err, pointer) {
+  lib.output_log_path.async('Client_ui.log', sizePtr, capacityPtr, resultPtr, function(err, pointer) {
     if (err) {
       return sendException(requestId, err);
     }

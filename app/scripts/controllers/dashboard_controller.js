@@ -2,7 +2,7 @@
  * Dashboard Controller
  */
 window.safeLauncher.controller('dashboardController', [ '$scope', '$state', '$rootScope', 'serverFactory',
-  function($scope, $state, $rootScope, server) {
+  'eventRegistrationFactory', function($scope, $state, $rootScope, server, eventFactory) {
     var currentTime = 0;
     var dateDiff = 0;
     $scope.logFilter = [
@@ -17,5 +17,6 @@ window.safeLauncher.controller('dashboardController', [ '$scope', '$state', '$ro
       }
       $scope.logFilter.unshift(name);
     };
+    $scope.logList = eventFactory.logList;
   }
 ]);

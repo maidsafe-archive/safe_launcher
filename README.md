@@ -2,7 +2,7 @@
 
 |Linux/OS X|Windows|
 |:---:|:--------:|
-|[![Build Status](https://travis-ci.org/maidsafe/safe_launcher.svg?branch=master)](https://travis-ci.org/maidsafe/safe_launcher)|[![Build status](https://ci.appveyor.com/api/projects/status/c61jthx04us5j57j/branch/master?svg=true)](https://ci.appveyor.com/project/MaidSafe-QA/safe-launcher/branch/master)|
+|[![Build Status](https://travis-ci.org/maidsafe/safe_launcher.svg?branch=master)](https://travis-ci.org/maidsafe/safe_launcher)|[![Build status](https://ci.appveyor.com/api/projects/status/xnsjhx27snoh4lmy?svg=true)](https://ci.appveyor.com/project/MaidSafe-QA/safe-launcher/branch/master)|
 
 
 # Quick start
