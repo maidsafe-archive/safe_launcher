@@ -19,11 +19,9 @@ if (process.platform === 'win32') {
 }
 
 var arch = utils.getArch();
-if (arch !== 'x86' && arch !== 'x64') {
+if (arch !== 'x86' && arch !== 'x64' && arch !== 'ia32') {
   return console.log('Packaging failed. Invalid architecture specified');
 }
-
-console.log('Packaging application for %s architecture', arch);
 
 var electronArch = (arch === 'x86') ? 'ia32' : arch;
 
@@ -60,7 +58,7 @@ var config = packageForOs[utils.os()];
 
 var appVersion = packageConfig.version;
 var packageFolderName = util.format('%s-%s-%s', config.packageName, config.platform, electronArch);
-var packageNameWithVersion = util.format('%s-v%s-%s-%s', config.packageName, appVersion, config.platform, arch);
+var packageNameWithVersion = util.format('%s-v%s-%s-%s', config.packageName, appVersion, config.platform, electronArch);
 
 var onPackageCompleted = function() {
   var packagePath = pathUtil.resolve('.', OUT_FOLDER, packageFolderName);
@@ -88,6 +86,7 @@ var onPackageCompleted = function() {
 };
 
 var packageApp = function() {
+  console.log('Packaging application for %s architecture', arch);
   fse.removeSync(pathUtil.resolve(OUT_FOLDER));
   var reportOptions = {
     err: true, // default = true, false means don't write err
