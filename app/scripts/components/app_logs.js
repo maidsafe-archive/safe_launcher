@@ -2,9 +2,21 @@
 var React = window.React;
 var AppLogs = React.createClass({
   propTypes: {
-    list: React.PropTypes.array,
+    bridge: React.PropTypes.object,
     filter: React.PropTypes.array,
-    table: React.PropTypes.string
+    table: React.PropTypes.string,
+    app: React.PropTypes.bool
+  },
+  getInitialState: function() {
+    return {
+      list: []
+    };
+  },
+  componentWillMount: function() {
+    this.props.bridge.register(this, this.props.app);
+  },
+  componentWillUnmount: function() {
+    this.props.bridge.unregister();
   },
   render: function() {
     var self = this;
@@ -30,7 +42,7 @@ var AppLogs = React.createClass({
       )
     );
 
-    if (this.props.list.length === 0) {
+    if (this.state.list.length === 0) {
       return React.DOM.div({ key: 'inner-b', className: 'table-inner-b' }, [
         React.DOM.table({ key: 'table', className: this.props.table }, [
           tableHead,
@@ -43,13 +55,13 @@ var AppLogs = React.createClass({
       ]);
     }
 
-    this.props.list.sort(function(a, b) {
+    this.state.list.sort(function(a, b) {
       var aTime = a.endTime ? new Date(a.endTime) : new Date(a.beginTime);
       var bTime = b.endTime ? new Date(b.endTime) : new Date(b.beginTime);
       return bTime - aTime;
     });
 
-    this.props.list.map(function(list, i) {
+    this.state.list.map(function(list, i) {
       list.status = STATUS_CODE[list.activityStatus];
       if ((self.props.filter.length === 0) || (self.props.filter.indexOf(list.status) === -1)) {
         return;

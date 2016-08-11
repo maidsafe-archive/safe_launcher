@@ -5,10 +5,7 @@ os: unstable
 environment:
   nodejs_version: "5.5.0"
   global:
-    GH_TOKEN:
-      secure: l+aIZyW2V4zjmC5fMMNNTVXtRf812RiOYtqac8p4/qSPdA+PrSRv4sBEosdNkrJs
     Features: "use-mock-routing"
-    PROJECT_NAME: safe_launcher
     RUST_BACKTRACE: 1
 cache:
   - node_modules
@@ -16,25 +13,15 @@ cache:
 install:
   - ps: |
         $url = "https://github.com/maidsafe/QA/raw/master/Powershell%20Scripts/AppVeyor"
-        Start-FileDownload "$url/Install%20Rust.ps1" -FileName "Install Rust.ps1"
-        Start-FileDownload "$url/Install%20MinGW.ps1" -FileName "Install MinGW.ps1"
-        Start-FileDownload "$url/Install%20libsodium.ps1" -FileName "Install libsodium.ps1"
+        Start-FileDownload "$url/Install%20Rustup.ps1" -FileName "Install Rustup.ps1"
         Start-FileDownload "$url/Build.ps1" -FileName "Build.ps1"
         Start-FileDownload "$url/Run%20Tests.ps1" -FileName "Run Tests.ps1"
-        . ".\Install Rust.ps1"
-        . ".\Install MinGW.ps1"
-        . ".\Install libsodium.ps1"
-        Install-Product node $env:nodejs_version $env:PLATFORM
+        . ".\Install Rustup.ps1"
 
-        if ($env:APPVEYOR_REPO_COMMIT_MESSAGE -match "[vV]ersion change to v?(.*)") {
-          $env:PROJECT_VERSION = $matches[1]
-          $env:DEPLOY = "true"
-        }
   - node --version
   - npm --version
   - set npm_config_arch=%PLATFORM:x86=ia32%
   - npm install -g json
-  - ps: $env:PACKAGE_NAME = $(cat $env:APPVEYOR_BUILD_FOLDER\app\package.json | json productName)
   - cd %APPVEYOR_BUILD_FOLDER%
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing

@@ -161,9 +161,9 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
           onComplete('PUT', $rootScope.dashData.putsCount, data);
           $rootScope.dashData.putsCount = data;
         });
-        for (var i in $rootScope.appList) {
-          var item = $rootScope.appList[i];
-          $rootScope.appList[i].lastActive = window.moment(item.status.endTime || item.status.beginTime).fromNow();
+        for (var i in eventRegistry.appList) {
+          var item = eventRegistry.appList[i];
+          eventRegistry.appList[i].lastActive = window.moment(item.status.endTime || item.status.beginTime).fromNow();
         }
         $rootScope.dashData.accountInfoTimeString = window.moment($rootScope.dashData.accountInfoTime).fromNow();
         $rootScope.$applyAsync();

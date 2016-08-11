@@ -2,7 +2,7 @@
  * User Controller
  */
 window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootScope', 'serverFactory',
-  function($scope, $state, $rootScope, server) {
+  'eventRegistrationFactory', function($scope, $state, $rootScope, server, eventFactory) {
     $scope.LIST_ORDER_BY = {
       NAME: 'name',
       LAST_ACTIVE: 'last_active'
@@ -13,16 +13,21 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
       'FAILURE'
     ];
 
+    $scope.currentAppDetails = {
+      logs: []
+    };
+    $scope.logList = eventFactory.logList;
+    $scope.appList = eventFactory.appList;
     // remove session
     $scope.removeSession = function(id) {
-      $rootScope.currentAppDetails = {
+      $scope.currentAppDetails = {
         logs: []
       };
-      var logIndex = $rootScope.logList.map(function(obj) {
+      var logIndex = eventFactory.logList.map(function(obj) {
         return obj.activityId;
       }).indexOf(id);
-      $rootScope.logList[logIndex] = {
-        appName: $rootScope.appList[id].name,
+      eventFactory.logList[logIndex] = {
+        appName: $scope.appList[id].name,
         activityName: 'Revoke app',
         activityStatus: 1,
         beginTime: (new Date()).getTime()
@@ -45,24 +50,29 @@ window.safeLauncher.controller('userController', [ '$scope', '$state', '$rootSco
 
     $scope.toggleAppDetails = function(id) {
       if (!id) {
-        $rootScope.currentAppDetails = {
+        $scope.currentAppDetails = {
           logs: []
         };
+        eventFactory.currentAppDetails = null;
         return;
       }
-      for (var i in $rootScope.appList) {
-        if ($rootScope.appList[i].id === id) {
-          $rootScope.currentAppDetails.app = $rootScope.appList[i];
+      $scope.currentAppDetails = eventFactory.currentAppDetails = {
+        logs: []
+      };
+      for (var i in $scope.appList) {
+        if ($scope.appList[i].id === id) {
+          $scope.currentAppDetails.app = $scope.appList[i];
           break;
         }
       }
-      if ($rootScope.currentAppDetails) {
-        server.getAppActivityList($rootScope.currentAppDetails.app.id, function(data) {
-          $rootScope.currentAppDetails.logs = [];
+      if ($scope.currentAppDetails) {
+        server.getAppActivityList($scope.currentAppDetails.app.id, function(data) {
+          $scope.currentAppDetails.logs = [];
           for (var i in data) {
-            data[i].name = $rootScope.currentAppDetails.app.appName;
-            $rootScope.currentAppDetails.logs.unshift(data[i]);
+            data[i].name = $scope.currentAppDetails.app.appName;
+            $scope.currentAppDetails.logs.unshift(data[i]);
           }
+          $rootScope.logListComponent.update($scope.currentAppDetails.logs);
         });
       }
     };
