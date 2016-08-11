@@ -66,7 +66,6 @@ var getFile = function(lib, request) {
   }
 };
 
-
 var getFileMetadata = function(lib, request) {
   try {
     var payload = createPayload('get-file-metadata', request);

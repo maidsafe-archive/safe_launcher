@@ -16,10 +16,9 @@ var BeforeExit = function(handler) {
   this.cleanUp = function() {
     try {
       self.handler.cleanUp();
-    } catch(e) {}
+    } catch (e) {}
   };
   return this.cleanUp;
 };
 process.on('message', onMessage);
 process.on('beforeExit', new BeforeExit(handler));
-

@@ -193,7 +193,7 @@ export default class UIUtils {
   }
 
   fetchGetsCount(callback) {
-   this.api.clientStats.fetchGetsCount(callback);
+    this.api.clientStats.fetchGetsCount(callback);
   }
 
   fetchDeletesCount(callback) {
@@ -233,7 +233,7 @@ export default class UIUtils {
   }
 
   openExternal(url) {
-    require("shell").openExternal(url);
+    require('shell').openExternal(url);
   }
 
 }

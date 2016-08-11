@@ -216,7 +216,7 @@ var write = function(lib, request) {
   lib.nfs_stream_write.async(writerHandlePool[writerId], data, data.length, function(err, result) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     if (err) {
-     return util.sendException(request.id, e);
+      return util.sendException(request.id, e);
     }
     if (result === 0) {
       return util.send(request.id);

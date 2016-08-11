@@ -40,7 +40,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
 
     // handle proxy localy
     $rootScope.setProxy = function(status) {
-      window.localStorage.setItem(LOCAL_STORAGE_KEYS.PROXY, JSON.stringify({status: Boolean(status)}));
+      window.localStorage.setItem(LOCAL_STORAGE_KEYS.PROXY, JSON.stringify({ status: Boolean(status) }));
     };
 
     $rootScope.getProxy = function() {
@@ -56,7 +56,8 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       var dateDiff = 0;
       updateAccountInfoTimer = $interval(function() {
         currentTime = new Date();
-        dateDiff = window.moment.duration(window.moment(currentTime).diff($rootScope.dashData.accountInfoTime)).asSeconds();
+        dateDiff = window.moment.duration(window.moment(currentTime)
+          .diff($rootScope.dashData.accountInfoTime)).asSeconds();
         dateDiff = Math.floor(dateDiff);
         if (dateDiff <= 120) {
           var secondsLeft = 120 - dateDiff;
@@ -76,8 +77,8 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     };
 
     var onComplete = function(target, oldVal, newVal) {
-      collectedData[target]['oldVal'] = oldVal;
-      collectedData[target]['newVal'] = newVal;
+      collectedData[target].oldVal = oldVal;
+      collectedData[target].newVal = newVal;
       var temp = {};
       if (completeCount === 4) {
         temp.GET = collectedData.GET.newVal - collectedData.GET.oldVal;
@@ -96,7 +97,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     var loadProxybasedOnSettings = function() {
       var proxy = $rootScope.getProxy();
       if (!(proxy && proxy.hasOwnProperty('status'))) {
-        return
+        return;
       }
       if (proxy.status === $rootScope.$proxyServer) {
         return;
@@ -109,7 +110,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     };
 
     $scope.fetchStatsForUnauthorisedClient = function() {
-      $rootScope.intervals.push($interval(function () {
+      $rootScope.intervals.push($interval(function() {
         server.fetchGetsCount(function(err, data) {
           if (err) {
             return;
@@ -125,7 +126,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
     };
 
     $scope.fetchStatsForAuthorisedClient = function() {
-      $rootScope.intervals.push($interval(function () {
+      $rootScope.intervals.push($interval(function() {
         server.fetchGetsCount(function(err, data) {
           if (err) {
             return;
@@ -162,14 +163,14 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         });
         for (var i in $rootScope.appList) {
           var item = $rootScope.appList[i];
-          $rootScope.appList[i].lastActive = window.moment(item.status.endTime || item.status.beginTime).fromNow()
+          $rootScope.appList[i].lastActive = window.moment(item.status.endTime || item.status.beginTime).fromNow();
         }
         $rootScope.dashData.accountInfoTimeString = window.moment($rootScope.dashData.accountInfoTime).fromNow();
         $rootScope.$applyAsync();
       }, CONSTANTS.FETCH_DELAY));
     };
 
-    $scope.updateUserAccount = function () {
+    $scope.updateUserAccount = function() {
       startAccountUpdateTimer();
       $rootScope.accountInfoLoading = true;
       server.getAccountInfo(function(err, data) {
@@ -185,7 +186,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
         $timeout(function() {
           $rootScope.dashData.accountInfoUpdateEnabled = true;
           $rootScope.$applyAsync();
-        }, CONSTANTS.ACCOUNT_INFO_UPDATE_TIMEOUT)
+        }, CONSTANTS.ACCOUNT_INFO_UPDATE_TIMEOUT);
       });
     };
 
@@ -202,7 +203,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       server.startProxyServer(proxyListener);
     };
 
-    $scope.openExternal= function(e, url) {
+    $scope.openExternal = function(e, url) {
       e.preventDefault();
       server.openExternal(url);
     };
@@ -212,7 +213,7 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       if (status) {
         $scope.toggleProxyServer();
       }
-      return $state.go('app.account', {currentPage: 'register'});
+      return $state.go('app.account', { currentPage: 'register' });
     };
 
     $scope.reconnectNetwork = function(user) {
@@ -220,11 +221,23 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
       server.reconnectNetwork(user);
     };
 
+    var appInitialCheck = function() {
+      if ($rootScope.getProxy() && $rootScope.getProxy().hasOwnProperty('status')) {
+        if ($rootScope.showIntroPage) {
+          $state.go('app.account', { currentPage: 'register' });
+        } else {
+          $state.go('app');
+        }
+      } else {
+        $state.go('initProxy');
+      }
+      return;
+    };
+
     window.msl.setNetworkStateChangeListener(function(state) {
       if (state === window.NETWORK_STATE.CONNECTED) {
         if ($state.current.name === 'splash' || $state.current.name === '') {
-          $rootScope.getProxy() && $rootScope.getProxy().hasOwnProperty('status') ?
-            ($rootScope.showIntroPage ? $state.go('app.account', {currentPage: 'register'}) : $state.go('app')) : $state.go('initProxy');
+          appInitialCheck();
         }
         if ($rootScope.isAuthenticated) {
           $rootScope.clearIntervals();
@@ -252,9 +265,10 @@ window.safeLauncher.controller('basicController', [ '$scope', '$state', '$rootSc
             msg: 'Network Disconnected. Retrying in ',
             hasOption: true,
             isError: true,
-            autoCallbackIn: Math.min(CONSTANTS.RETRY_NETWORK_INIT_COUNT * $rootScope.retryCount, CONSTANTS.RETRY_NETWORK_MAX_COUNT),
+            autoCallbackIn: Math.min(CONSTANTS.RETRY_NETWORK_INIT_COUNT * $rootScope.retryCount,
+              CONSTANTS.RETRY_NETWORK_MAX_COUNT),
             opt: {
-              name: "Retry Now"
+              name: 'Retry Now'
             }
           }, function(err, data) {
             $rootScope.retryCount *= 2;

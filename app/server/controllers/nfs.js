@@ -8,7 +8,6 @@ import { errorCodeLookup } from './../error_code_lookup';
 import util from 'util';
 import { MSG_CONSTANTS } from './../message_constants';
 
-
 const ROOT_PATH = {
   app: false,
   drive: true
@@ -33,7 +32,7 @@ let deleteOrGetDirectory = function(req, res, isDelete, next) {
   let responseHandler = new ResponseHandler(req, res);
   if (isDelete) {
     if (dirPath === '/') {
-      return next(new ResponseError(400, 'Cannot delete root directory'))
+      return next(new ResponseError(400, 'Cannot delete root directory'));
     }
     log.debug('NFS - Invoking delete directory request');
     req.app.get('api').nfs.deleteDirectory(dirPath, rootPath,
@@ -82,7 +81,7 @@ let move = function(req, res, isFile, next) {
       action, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler);
   } else {
     if (action === false && reqBody.srcPath === '/') {
-      return next(new ResponseError(400, 'Cannot move root directory'));   
+      return next(new ResponseError(400, 'Cannot move root directory'));
     }
     log.debug('NFS - Invoking move directory request');
     req.app.get('api').nfs.moveDir(reqBody.srcPath, srcRootPath, reqBody.destPath, destRootPath,
@@ -179,7 +178,7 @@ export var createFile = function(req, res, next) {
     return next(new ResponseError(400, 'Content-Length header is not present'));
   }
   let length = parseInt(req.headers['content-length']);
-  let metadata = req.headers['metadata'] || '';
+  let metadata = req.headers.metadata || '';
   if (typeof metadata !== 'string') {
     return next(new ResponseError(400, MSG_CONSTANTS.FAILURE.REQUIRED_PARAMS_MISSING));
   }
@@ -258,7 +257,7 @@ export var getFile = function(req, res, next) {
     }
     fileStats = formatResponse(fileStats);
     let range = req.get('range');
-    let positions = [0];
+    let positions = [ 0 ];
     if (range) {
       range = range.toLowerCase();
       if (!/^bytes=/.test(range)) {
@@ -278,14 +277,14 @@ export var getFile = function(req, res, next) {
     if (chunksize < 0 || end > total) {
       return next(new ResponseError(416));
     }
-    log.debug('NFS - Ready to stream file for range' + start + "-" + end + "/" + total);
+    log.debug('NFS - Ready to stream file for range' + start + '-' + end + '/' + total);
     var headers = {
-      "Content-Range": "bytes " + start + "-" + end + "/" + total,
-      "Accept-Ranges": "bytes",
-      "Content-Length": chunksize,
-      "Created-On": fileStats.createdOn,
-      "Last-Modified": fileStats.modifiedOn,
-      "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
+      'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunksize,
+      'Created-On': fileStats.createdOn,
+      'Last-Modified': fileStats.modifiedOn,
+      'Content-Type': mime.lookup(filePath) || 'application/octet-stream'
     };
     if (fileStats.metadata && fileStats.metadata.length > 0) {
       headers.metadata = new Buffer(fileStats.metadata, 'base64').toString('base64');
@@ -315,26 +314,26 @@ export var getFileMetadata = function(req, res, next) {
   }
   let onFileMetadataReceived = function(err, fileStats) {
     log.debug('NFS - File metatda for reading - ' + fileStats);
-      if (err) {
-        return next(new ResponseError(400, err));
-      }
-      let headers = {
-        "Accept-Ranges": "bytes",
-        "Created-On": fileStats.createdOn,
-        "Last-Modified": fileStats.modifiedOn,
-        "Metadata": new Buffer(fileStats.metadata, 'base64').toString('base64'),
-        "Content-Type": mime.lookup(filePath) || 'application/octet-stream',
-        "Content-Length": fileStats.size
-      };
-      if (fileStats.metadata && fileStats.metadata.length > 0) {
-        headers.metadata = new Buffer(fileStats.metadata, 'base64').toString('base64');
-      }
-      res.writeHead(200, headers);
-      res.end();
+    if (err) {
+      return next(new ResponseError(400, err));
+    }
+    let headers = {
+      'Accept-Ranges': 'bytes',
+      'Created-On': fileStats.createdOn,
+      'Last-Modified': fileStats.modifiedOn,
+      'Metadata': new Buffer(fileStats.metadata, 'base64').toString('base64'),
+      'Content-Type': mime.lookup(filePath) || 'application/octet-stream',
+      'Content-Length': fileStats.size
     };
-    log.debug('NFS - Invoking get file metadata request');
-    req.app.get('api').nfs.getFileMetadata(filePath, rootPath,
-    sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, onFileMetadataReceived);
+    if (fileStats.metadata && fileStats.metadata.length > 0) {
+      headers.metadata = new Buffer(fileStats.metadata, 'base64').toString('base64');
+    }
+    res.writeHead(200, headers);
+    res.end();
+  };
+  log.debug('NFS - Invoking get file metadata request');
+  req.app.get('api').nfs.getFileMetadata(filePath, rootPath,
+  sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, onFileMetadataReceived);
 };
 
 export var modifyFileContent = function(req, res, next) {
@@ -361,18 +360,17 @@ export var modifyFileContent = function(req, res, next) {
   }
   log.debug('NFS - Invoking modify file content request');
   req.app.get('api').nfs.getWriter(filePath, isPathShared,
-      sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, function (err, writerId) {
-      var responseHandler = new ResponseHandler(req, res);
-      if (err) {
-        return responseHandler(err);
-      }
-      var writer = new NfsWriter(req, writerId, responseHandler, offset);
-      req.on('end', function() {
-        writer.onClose();
-      });
-      req.pipe(writer);
+    sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, function(err, writerId) {
+    var responseHandler = new ResponseHandler(req, res);
+    if (err) {
+      return responseHandler(err);
+    }
+    var writer = new NfsWriter(req, writerId, responseHandler, offset);
+    req.on('end', function() {
+      writer.onClose();
+    });
+    req.pipe(writer);
   });
-
 };
 
 export var moveFile = function(req, res, next) {

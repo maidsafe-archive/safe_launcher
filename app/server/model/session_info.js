@@ -1,36 +1,35 @@
 import crypto from 'crypto';
-
 export default class SessionInfo {
   constructor(appId, appName, appVersion, vendor, permissions, appDirKey) {
-    this['appIdentifier'] = appId;
-    this['appDisplayName'] = appName;
-    this['version'] = appVersion;
-    this['appVendor'] = vendor;
-    this['appPermissions'] = permissions || [];
-    this['appSigningKey'] = crypto.randomBytes(32);
-    this['appRootDirKey'] = appDirKey;
-    this['activities'] = [];
+    this.appIdentifier = appId;
+    this.appDisplayName = appName;
+    this.version = appVersion;
+    this.appVendor = vendor;
+    this.appPermissions = permissions || [];
+    this.appSigningKey = crypto.randomBytes(32);
+    this.appRootDirKey = appDirKey;
+    this.activities = [];
   }
 
   addActivity(activity) {
-    if (this['activities'].length < 500) {
-      this['activities'].push(activity);
+    if (this.activities.length < 500) {
+      this.activities.push(activity);
     } else {
-      this['activities'].splice(this['activities'].length - 1, 0, activity);
-      this['activities'].pop();
+      this.activities.splice(this.activities.length - 1, 0, activity);
+      this.activities.pop();
     }
   }
 
   updateActivity(activity) {
-    let index = this['activities'].indexOf(activity);
+    let index = this.activities.indexOf(activity);
     if (index < 0) {
       return;
     }
-    this['activities'][index] = activity;
+    this.activities[index] = activity;
   }
 
   get activityList() {
-    return this['activities'];
+    return this.activities;
   }
 
   hasSafeDriveAccess() {
@@ -38,30 +37,30 @@ export default class SessionInfo {
   }
 
   get appId() {
-    return this['appIdentifier'];
+    return this.appIdentifier;
   }
 
   get appName() {
-    return this['appDisplayName'];
+    return this.appDisplayName;
   }
 
   get appVersion() {
-    return this['version'];
+    return this.version;
   }
 
   get vendor() {
-    return this['appVendor'];
+    return this.appVendor;
   }
 
   get permissions() {
-    return this['appPermissions'];
+    return this.appPermissions;
   }
 
   get signingKey() {
-    return this['appSigningKey'];
+    return this.appSigningKey;
   }
 
   get appDirKey() {
-    return this['appRootDirKey'];
+    return this.appRootDirKey;
   }
 }

@@ -121,47 +121,47 @@ window.safeLauncher.factory('serverFactory', [
 
     self.fetchGetsCount = function(callback) {
       window.msl.fetchGetsCount(callback);
-    }
+    };
 
     self.fetchDeletesCount = function(callback) {
       window.msl.fetchDeletesCount(callback);
-    }
+    };
 
     self.fetchPostsCount = function(callback) {
       window.msl.fetchPostsCount(callback);
-    }
+    };
 
     self.fetchPutsCount = function(callback) {
       window.msl.fetchPutsCount(callback);
-    }
+    };
 
     self.onNewAppActivity = function(callback) {
       window.msl.onNewAppActivity(callback);
-    }
+    };
 
     self.onUpdatedAppActivity = function(callback) {
       window.msl.onUpdatedAppActivity(callback);
-    }
+    };
 
     self.onUploadEvent = function(callback) {
       window.msl.onUploadEvent(callback);
-    }
+    };
 
     self.onDownloadEvent = function(callback) {
       window.msl.onDownloadEvent(callback);
-    }
+    };
 
     self.getAccountInfo = function(callback) {
       window.msl.getAccountInfo(callback);
-    }
+    };
 
     self.getAppActivityList = function(id, callback) {
       callback(window.msl.getAppActivityList(id));
-    }
+    };
 
     self.openExternal = function(url) {
       window.msl.openExternal(url);
-    }
+    };
 
     return self;
   }

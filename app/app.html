@@ -8,8 +8,8 @@
   <link href="./stylesheets/main.css" rel="stylesheet" type="text/css">
 </head>
 
-<body ng-app="safeLauncher">
-  <div class="root" ui-view="root" ng-controller="basicController">
+<body ng-app="safeLauncher" ng-controller="basicController">
+  <div class="root" ui-view="root">
   </div>
   <span class="network-status" ng-class="{
     error: $networkStatus.status === -1 || $networkStatus.status === 2,

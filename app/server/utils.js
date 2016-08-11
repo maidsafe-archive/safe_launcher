@@ -38,16 +38,18 @@ export var getSessionIdFromRequest = function(req) {
 };
 
 export var formatDirectoryResponse = function(dir) {
+  /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   delete dir.info.is_versioned;
   dir.sub_directories.forEach(function(info) {
     delete info.is_versioned;
   });
+  /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
   return dir;
-}
+};
 
 export class ResponseError {
   constructor(status, message) {
-    message = message || MSG_CONSTANTS.ERROR_CODE[status];    
+    message = message || MSG_CONSTANTS.ERROR_CODE[status];
     if (typeof message === 'object' && message.hasOwnProperty('errorCode')) {
       message.description = errorCodeLookup(message.errorCode);
       if (message.description.toLowerCase().indexOf('notfound') > -1 ||
@@ -61,28 +63,28 @@ export class ResponseError {
         description: message
       };
     }
-    this['errStatus'] = status;
-    this['msg'] = message;
+    this.errStatus = status;
+    this.msg = message;
   }
 
   get status() {
-    return this['errStatus'];
-  };
+    return this.errStatus;
+  }
+
   get message() {
-    return this['msg'];
-  };
+    return this.msg;
+  }
 }
 
-export let ResponseHandler = function (req, res) {
-
+export let ResponseHandler = function(req, res) {
   this.onResponse = function(err, data) {
-    if (err) {      
+    if (err) {
       return req.next(new ResponseError(400, err));
     }
     updateAppActivity(req, res, true);
     let successStatus = 200;
     if (res.headersSent) {
-        return;
+      return;
     }
     if (data) {
       res.status(successStatus).send(formatResponse(data));
@@ -110,7 +112,7 @@ export var setSessionHeaderAndParseBody = function(req, res, next) {
     log.warn('Session ID not found');
     return res.sendStatus(401);
   }
-  req.headers['sessionId'] = sessionId;
+  req.headers.sessionId = sessionId;
   if (req.body && req.body.length > 0) {
     req.body = ((req.body instanceof Buffer) ? JSON.parse(req.body.toString()) : req.body);
     if (typeof req.body !== 'object') {
@@ -158,13 +160,14 @@ export var formatResponse = function(data) {
       return new Date((seconds * 1000) + Math.floor(nanoSeconds / 1000000)).toISOString();
     };
     if (obj.hasOwnProperty('created_time_sec')) {
+      /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
       obj.createdOn = computeTime(obj.created_time_sec, obj.created_time_nsec);
       delete obj.created_time_sec;
       delete obj.created_time_nsec;
     } else if (obj.hasOwnProperty('creation_time_sec')) {
       obj.createdOn = computeTime(obj.creation_time_sec, obj.creation_time_nsec);
       delete obj.creation_time_sec;
-      delete obj.creation_time_nsec;  
+      delete obj.creation_time_nsec;
     }
     if (obj.hasOwnProperty('modified_time_sec')) {
       obj.modifiedOn = computeTime(obj.modified_time_sec, obj.modified_time_nsec);
@@ -179,6 +182,7 @@ export var formatResponse = function(data) {
       obj.metadata = obj.user_metadata;
       delete obj.user_metadata;
     }
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     if (obj.hasOwnProperty('metadata') && typeof obj.metadata === 'string' && obj.metadata) {
       obj.metadata = (obj.metadata && obj.metadata[0] === '{') ? JSON.parse(obj.metadata) : obj.metadata;
     }

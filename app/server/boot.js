@@ -1,15 +1,18 @@
+/*jslint nomen: true */
 import path from 'path';
 import http from 'http';
 import express from 'express';
 import EventEmitter from 'events';
 import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
+/*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
 import { router_0_5 } from './routes/version_0_5';
+/*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
 import { CreateSession } from './controllers/auth';
 import { formatResponse, ResponseError, setSessionHeaderAndParseBody, updateAppActivity } from './utils';
 import { log } from './../logger/log';
 
-class ServerEventEmitter extends EventEmitter {};
+class ServerEventEmitter extends EventEmitter {}
 
 export default class RESTServer {
   constructor(api, port, callback) {
@@ -34,27 +37,28 @@ export default class RESTServer {
     this.app.set('eventEmitter', new ServerEventEmitter());
     this.app.set('EVENT_TYPE', this.EVENT_TYPE);
   }
-
+  /* jscs:disable disallowDanglingUnderscores*/
   _onError(type, eventEmitter) {
-      return function(error) {
-          if (error.syscall !== 'listen') {
-            throw error;
-          }
-          eventEmitter.emit(type, error);
+    return function(error) {
+      if (error.syscall !== 'listen') {
+        throw error;
       }
+      eventEmitter.emit(type, error);
+    };
   }
 
   _onClose(type, eventEmitter) {
     return function() {
-        eventEmitter.emit(type);
-    }
+      eventEmitter.emit(type);
+    };
   }
 
   _onListening(type, eventEmitter) {
     return function() {
-        eventEmitter.emit(type);
-    }
+      eventEmitter.emit(type);
+    };
   }
+  /* jscs:enable disallowDanglingUnderscores*/
 
   start() {
     let app = this.app;
@@ -73,8 +77,10 @@ export default class RESTServer {
     app.get('/pac-file', function(req, res) {
       res.download(path.resolve(__dirname, 'server/web_proxy.pac'));
     });
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     app.use('/', router_0_5);
     app.use('/0.5', router_0_5);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
 
     // API Error handling
     app.use(function(err, req, res, next) {
@@ -92,7 +98,7 @@ export default class RESTServer {
         return;
       }
       if (typeof res === 'function') {
-        return req.status(404).send({errorCode: 404, description: 'Endpoint Not Found'});
+        return req.status(404).send({ errorCode: 404, description: 'Endpoint Not Found' });
       }
       res.status(500).send(err);
     });
@@ -101,9 +107,11 @@ export default class RESTServer {
     this.server = http.createServer(app);
     this.server.timeout = 0;
     this.server.listen(this.port, this.callback);
+    /* jscs:disable disallowDanglingUnderscores*/
     this.server.on('error', this._onError(this.EVENT_TYPE.ERROR, eventEmitter));
     this.server.on('close', this._onClose(this.EVENT_TYPE.STOPPED, eventEmitter));
     this.server.on('listening', this._onListening(this.EVENT_TYPE.STARTED, eventEmitter));
+    /* jscs:enable disallowDanglingUnderscores*/
   }
 
   stop() {

@@ -104,7 +104,7 @@ var login = function(lib, request, observer) {
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   lib.log_in.async(params.location, params.password, regClient, function(err, res) {
     /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
-    if(err) {
+    if (err) {
       return util.sendException(request.id, err.message);
     }
     if (res !== 0) {
@@ -152,7 +152,7 @@ var getAppDirectoryKey = function(lib, request) {
   util.sendLog('DEBUG', 'FFI/mod/auth.js - Getting App Root Dir Key');
   /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
   lib.get_app_dir_key.async(appName, appId, vendor, sizePtr, capacityPtr, resultPtr,
-      registeredClientHandle, function (err, pointer) {
+      registeredClientHandle, function(err, pointer) {
         /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
         if (err) {
           util.sendException(request.id, err);

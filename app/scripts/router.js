@@ -70,5 +70,5 @@ window.safeLauncher.config(function($stateProvider, $urlRouterProvider) {
         'templateUrl': 'views/tab/help.html'
       }
     }
-  })
+  });
 });
