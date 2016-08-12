@@ -1,17 +1,5 @@
 # SAFE Launcher Change Log
 
-##[0.8.0]
-- Set UI log file path from config handler
-- DNS API - removed isPrivate param and replaced with rootPath
-- NFS API - restrict root directory deletion
-- Start up grey screen fixed
-- Log list rendering optimisation
-- API - ISO time format fix
-- CSP header errors resolved
-- Proxy hanging on application crash resolved
-- Packaging fixes
-- Minor style fixes
-
 ##[0.7.1]
 - Mapping registration and login with messages based on error codes
 - Fetching app root directory failure case handled
