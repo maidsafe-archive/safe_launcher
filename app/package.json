@@ -3,7 +3,7 @@
   "productName": "SAFE Launcher",
   "identifier": "com.maidsafe.safelauncher",
   "description": "SAFE Launcher Application",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "author": "MaidSafe",
   "copyright": "© 2016, MaidSafe.net Ltd",
   "main": "background.js",
