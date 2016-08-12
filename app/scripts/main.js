@@ -13,7 +13,8 @@ window.safeLauncher = angular
   }
 ])
 .run([ '$rootScope', '$state', '$stateParams', '$timeout', '$interval', 'CONSTANTS', 'logListComponent',
-  function($rootScope, $state, $stateParams, $timeout, $interval, CONSTANTS, logListComponent) {
+  'eventRegistrationFactory',
+  function($rootScope, $state, $stateParams, $timeout, $interval, CONSTANTS, logListComponent, eventRegistry) {
     $rootScope.$state = $state;
     $rootScope.userInfo = {};
     $rootScope.user = {};
@@ -37,11 +38,9 @@ window.safeLauncher = angular
     $rootScope.resetAppStates = function() {
       $rootScope.isAuthenticated = false;
       $rootScope.isAuthLoading = false;
-      // $rootScope.currentAppDetails = {
-      //   logs: []
-      // };
-      // $rootScope.appList = {};
-      // $rootScope.logList = [];
+      eventRegistry.currentAppDetails = null;
+      eventRegistry.appList = {};
+      eventRegistry.logList = [];
       $rootScope.intervals = [];
       $rootScope.retryCount = 1;
     };
