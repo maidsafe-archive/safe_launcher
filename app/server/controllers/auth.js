@@ -34,7 +34,7 @@ export let CreateSession = function(data) {
       let sessionId = sessionManager.hasSessionForApp(app);
       let sessionInfo;
       if (sessionId) {
-        log.debug('Usings existing session');
+        log.debug('Using existing session');
         sessionInfo = sessionManager.get(sessionId);
       } else {
         log.debug('Creating session');
@@ -53,6 +53,8 @@ export let CreateSession = function(data) {
           id: sessionId,
           info: sessionInfo
         });
+      } else {
+        emitSessionCreationFailed();
       }
       log.debug('Session for app created');
       new ResponseHandler(req, res)(null, {
