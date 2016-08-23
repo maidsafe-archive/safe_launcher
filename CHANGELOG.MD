@@ -1,5 +1,12 @@
 # SAFE Launcher Change Log
 
+##[0.8.1]
+- Package identifier updated to match correct reverse DNS identifier
+- Updated the forum link
+- Fixed empty file handling in NFS
+- Fixed ffi process crash during unauthorised access
+- Fixed fetch file with metadata via DNS
+
 ##[0.8.0]
 - Set UI log file path from config handler
 - DNS API - removed isPrivate param and replaced with rootPath
