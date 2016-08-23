@@ -33,3 +33,8 @@ NfsWriter.prototype._write = function(data, enc, next) {
   });
 };
 /*jscs:enable disallowDanglingUnderscores*/
+
+
+NfsWriter.prototype.closeWriter = function() {
+  this.req.app.get('api').nfs.closeWriter(this.writerId, this.responseHandler);
+};
