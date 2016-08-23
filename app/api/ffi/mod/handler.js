@@ -25,6 +25,29 @@ module.exports = function(libPath) {
   var self = this;
   var LIB_LOAD_ERROR = -9999;
 
+  /* Creating a `Callback` with this function will ensure NodeJS event loop
+   * doesn't exit while we wait for the callback to be called.
+   *
+   * WARNING: Only call this function to create new callbacks (i.e. do not store
+   * "global" callbacks that get reused). Do not pass the same callback returned
+   * by this function to two different unrelated calls. The params have the same
+   * meaning as `ffi.Callback`. */
+  var SafeCallback = function(retType, argTypes, abi, func) {
+    if (typeof abi === 'function') {
+      func = abi;
+      abi = void(0);
+    }
+
+    var timeout = setInterval(function() {}, 500);
+
+    var wrapper = function(res) {
+      clearInterval(timeout);
+      func(res);
+    };
+
+    return ffi.Callback(retType, argTypes, abi, wrapper);
+  };
+
   var methodsToRegister = function() {
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     return {
