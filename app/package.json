@@ -1,7 +1,7 @@
 {
   "name": "safe-launcher",
   "productName": "SAFE Launcher",
-  "identifier": "com.maidsafe.safelauncher",
+  "identifier": "net.maidsafe.safelauncher",
   "description": "SAFE Launcher Application",
   "version": "0.8.0",
   "author": "MaidSafe",
