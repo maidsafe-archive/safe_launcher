@@ -43,6 +43,8 @@ window.safeLauncher = angular
       eventRegistry.logList = [];
       $rootScope.intervals = [];
       $rootScope.retryCount = 1;
+      $rootScope.userInfo = {};
+      $rootScope.user = {};
     };
 
     $rootScope.resetStats = function() {

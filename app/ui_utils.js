@@ -174,7 +174,7 @@ export default class UIUtils {
   reconnect(user) {
     var self = this;
     this.api.reset();
-    if (user) {
+    if (user && Object.keys(user).length !== 0) {
       this.api.auth.login(user.accountSecret, user.accountPassword, function(err) {
         if (!self.onNetworkStateChange) {
           return;
