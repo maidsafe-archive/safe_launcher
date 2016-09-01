@@ -1,0 +1,5 @@
+export const CONSTANT = {
+  FETCH_DELAY: 60000,
+  ACCOUNT_FETCH_INTERVAL: 15 * 60000,
+  ACCOUNT_UPDATE_TIMEOUT: 120 // in seconds
+};

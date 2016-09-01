@@ -1,85 +1,185 @@
-# safe_launcher
+# electron-react-boilerplate
 
-|Linux/OS X|Windows|
-|:---:|:--------:|
-|[![Build Status](https://travis-ci.org/maidsafe/safe_launcher.svg?branch=master)](https://travis-ci.org/maidsafe/safe_launcher)|[![Build status](https://ci.appveyor.com/api/projects/status/xnsjhx27snoh4lmy?svg=true)](https://ci.appveyor.com/project/MaidSafe-QA/safe-launcher/branch/master)|
+[![NPM version][npm-image]][npm-url]
+[![Build Status][travis-image]][travis-url]
+[![Appveyor Build Status][appveyor-image]][appveyor-url]
+[![Dependency Status][david_img]][david_site]
 
+![](./erb-logo.png)
 
-# Quick start
-The development dependency of this project is [Node.js v5.5](https://nodejs.org/download/release/v5.5.0/).
-Build [safe_core](https://github.com/maidsafe/safe_core) with the mock Routing feature:
- 
-```
-cargo build --release --features use-mock-routing
-```
- 
-then copy the resulting shared library (`safe_core.dll` for Windows, `libsafe_core.so` for Linux or `libsafe_core.dylib` for OS X) to the `app/api/ffi` folder of this project.
+> Live editing development on desktop app
 
-The launcher can be developed/tested only with ffi with mock feature or by running a local network only.
+[Electron](http://electron.atom.io/) application boilerplate based on [React](https://facebook.github.io/react/), [Redux](https://github.com/reactjs/redux), [React Router](https://github.com/reactjs/react-router), [Webpack](http://webpack.github.io/docs/), [React Transform HMR](https://github.com/gaearon/react-transform-hmr) for rapid application development
 
-So just make sure you have it installed.
-Then type few commands known to every Node developer...
-```
-npm install
-npm start
-```
+## Screenshot
 
-# Development
+![](https://cloud.githubusercontent.com/assets/3382565/10557547/b1f07a4e-74e3-11e5-8d27-79ab6947d429.gif)
 
-#### Installation
+## Install
 
-```
-npm install
-```
-It will also download Electron runtime, and install dependencies for second `package.json` & `bower.json` file inside `app` folder.
+First, clone the repo via git:
 
-#### Starting the app
-
-```
-npm start
+```bash
+git clone https://github.com/chentsulin/electron-react-boilerplate.git your-project-name
 ```
 
-#### Adding npm modules to your app
+And then install dependencies.
 
-Remember to add your dependency to `app/package.json` file, so do:
-```
-cd app
-npm install name_of_npm_module --save
+```bash
+$ cd your-project-name && npm install
 ```
 
-#### Unit tests
 
-To run it go with standard:
-```
-npm test
-```
+## Run
 
-# Making a distributable package
+Run this two commands __simultaneously__ in different console tabs.
 
-To make ready for distribution package use command based on the platform:
-```
-npm run package
+```bash
+$ npm run hot-server
+$ npm run start-hot
 ```
 
-this will generate the package files in the `app_dist` folder
+or run two servers with one command
 
-Additional `arch` argument can be passed to the `package` command. If this argument is not specified,
-the current nodejs platform architecture will be used. Accepted values are `x86` and `x64`.
+```bash
+$ npm run dev
+```
 
-Example usage `npm run package -- --arch=x64`
+*Note: requires a node version >= 4 and an npm version >= 2.*
 
-# License
 
-Licensed under either of
+## DevTools
 
-* the MaidSafe.net Commercial License, version 1.0 or later ([LICENSE](LICENSE))
-* the General Public License (GPL), version 3 ([COPYING](COPYING) or http://www.gnu.org/licenses/gpl-3.0.en.html)
+#### Toggle Chrome DevTools
 
-at your option.
+- OS X: <kbd>Cmd</kbd> <kbd>Alt</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
+- Linux: <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
+- Windows: <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
 
-# Contribution
+*See [electron-debug](https://github.com/sindresorhus/electron-debug) for more information.*
 
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the
-work by you, as defined in the MaidSafe Contributor Agreement, version 1.1 ([CONTRIBUTOR]
-(CONTRIBUTOR)), shall be dual licensed as above, and you agree to be bound by the terms of the
-MaidSafe Contributor Agreement, version 1.1.
+#### DevTools extension
+
+This boilerplate is included following DevTools extensions:
+
+* [Devtron](https://github.com/electron/devtron) - Install via [electron-debug](https://github.com/sindresorhus/electron-debug).
+* [React Developer Tools](https://github.com/facebook/react-devtools) - Install via [electron-devtools-installer](https://github.com/GPMDP/electron-devtools-installer).
+* [Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension) - Install via [electron-devtools-installer](https://github.com/GPMDP/electron-devtools-installer).
+
+You can find the tabs on Chrome DevTools.
+
+If you want to update extensions version, please set `UPGRADE_EXTENSIONS` env, just run:
+
+```bash
+$ UPGRADE_EXTENSIONS=1 npm run dev
+
+# For Windows
+$ set UPGRADE_EXTENSIONS=1 && npm run dev
+```
+
+## Externals
+
+If you use any 3rd party libraries which can't be built with webpack, you must list them in your `webpack.config.base.js`：
+
+```javascript
+externals: [
+  // put your node 3rd party libraries which can't be built with webpack here (mysql, mongodb, and so on..)
+]
+```
+
+You can find those lines in the file.
+
+
+## CSS Modules
+
+This boilerplate out of the box is configured to use [css-modules](https://github.com/css-modules/css-modules).
+
+All `.css` file extensions will use css-modules unless it has `.global.css`.
+
+If you need global styles, stylesheets with `.global.css` will not go through the
+css-modules loader. e.g. `app.global.css`
+
+
+## Package
+
+```bash
+$ npm run package
+```
+
+To package apps for all platforms:
+
+```bash
+$ npm run package-all
+```
+
+#### Options
+
+- --name, -n: Application name (default: ElectronReact)
+- --version, -v: Electron version (default: latest version)
+- --asar, -a: [asar](https://github.com/atom/asar) support (default: false)
+- --icon, -i: Application icon
+- --all: pack for all platforms
+
+Use `electron-packager` to pack your app with `--all` options for darwin (osx), linux and win32 (windows) platform. After build, you will find them in `release` folder. Otherwise, you will only find one for your os.
+
+`test`, `tools`, `release` folder and devDependencies in `package.json` will be ignored by default.
+
+#### Default Ignore modules
+
+We add some module's `peerDependencies` to ignore option as default for application size reduction.
+
+- `babel-core` is required by `babel-loader` and its size is ~19 MB
+- `node-libs-browser` is required by `webpack` and its size is ~3MB.
+
+> **Note:** If you want to use any above modules in runtime, for example: `require('babel/register')`, you should move them from `devDependencies` to `dependencies`.
+
+#### Building windows apps from non-windows platforms
+
+Please checkout [Building windows apps from non-windows platforms](https://github.com/maxogden/electron-packager#building-windows-apps-from-non-windows-platforms).
+
+## Dispatching redux actions from main process
+
+see discusses in [#118](https://github.com/chentsulin/electron-react-boilerplate/issues/118) and [#108](https://github.com/chentsulin/electron-react-boilerplate/issues/108)
+
+## How hot-reloading works on Electron
+
+We use [webpack-target-electron-renderer](https://github.com/chentsulin/webpack-target-electron-renderer) to provide a build target for electron renderer process. Read more information [here](https://github.com/chentsulin/webpack-target-electron-renderer#how-this-module-works).
+
+> Note: webpack >= 1.12.15 has built-in support for `electron-main` and `electron-renderer` targets.
+
+## How to keep the boilerplate updated
+
+If your application is a fork from this repo, you can add this repo to another git remote:
+
+```sh
+git remote add upstream https://github.com/chentsulin/electron-react-boilerplate.git
+```
+
+Then, use git to merge some latest commits:
+
+```sh
+git pull upstream master
+```
+
+## Native-like UI
+
+If you want to have native-like User Interface (OS X El Capitan and Windows 10), [react-desktop](https://github.com/gabrielbull/react-desktop) may perfect suit for you.
+
+
+## Maintainers
+
+- [C. T. Lin](https://github.com/chentsulin)
+- [Jhen-Jie Hong](https://github.com/jhen0409)
+
+
+## License
+MIT © [C. T. Lin](https://github.com/chentsulin)
+
+[npm-image]: https://img.shields.io/npm/v/electron-react-boilerplate.svg?style=flat-square
+[npm-url]: https://npmjs.org/package/electron-react-boilerplate
+[travis-image]: https://travis-ci.org/chentsulin/electron-react-boilerplate.svg?branch=master
+[travis-url]: https://travis-ci.org/chentsulin/electron-react-boilerplate
+[appveyor-image]: https://ci.appveyor.com/api/projects/status/github/chentsulin/electron-react-boilerplate?svg=true
+[appveyor-url]: https://ci.appveyor.com/project/chentsulin/electron-react-boilerplate/branch/master
+[david_img]: https://img.shields.io/david/chentsulin/electron-react-boilerplate.svg
+[david_site]: https://david-dm.org/chentsulin/electron-react-boilerplate

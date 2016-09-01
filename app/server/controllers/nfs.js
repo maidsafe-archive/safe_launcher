@@ -189,9 +189,6 @@ export var createFile = function(req, res, next) {
       return responseHandler(err);
     }
     var writer = new NfsWriter(req, writerId, responseHandler, length);
-    if (length === 0) {
-      writer.closeWriter();
-    }
     req.on('aborted', function() {
       next(new ResponseError(400, 'Request aborted by client'));
     });

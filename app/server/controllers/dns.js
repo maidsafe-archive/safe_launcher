@@ -122,7 +122,7 @@ export var getFile = function(req, res, next) {
       'Content-Type': mime.lookup(filePath) || 'application/octet-stream'
     };
     if (fileStats.metadata && fileStats.metadata.length > 0) {
-      headers.metadata = new Buffer(fileStats.metadata, 'base64').toString('base64');
+      headers.metadata = new Buffer(fileStats.metadata, 'base64').tostring('base64');
     }
     res.writeHead(range ? 206 : 200, headers);
     if (chunksize === 0) {
