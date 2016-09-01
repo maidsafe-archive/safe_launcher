@@ -1,4 +1,5 @@
 import { errorCodeLookup } from './server/error_code_lookup';
+import { shell } from 'electron';
 
 class ProxyListener {
   constructor() {
@@ -174,7 +175,7 @@ export default class UIUtils {
   reconnect(user) {
     var self = this;
     this.api.reset();
-    if (user && Object.keys(user).length !== 0) {
+    if (user) {
       this.api.auth.login(user.accountSecret, user.accountPassword, function(err) {
         if (!self.onNetworkStateChange) {
           return;
@@ -233,7 +234,6 @@ export default class UIUtils {
   }
 
   openExternal(url) {
-    require('shell').openExternal(url);
+    shell.openExternal(url);
   }
-
 }
