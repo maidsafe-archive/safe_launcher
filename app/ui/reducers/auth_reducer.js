@@ -27,7 +27,7 @@ const auth = (state = initialState, action) => {
       if (!state.authProcessing) {
         return state;
       }
-      return { ...state, error: action.error, authProcessing: false, registerState: 2 }
+      return { ...state, error: action.error, user: null, authProcessing: false, registerState: 2 }
       break;
     case ActionTypes.AUTH_PROCESSING:
       return { ...state, authProcessing: true }

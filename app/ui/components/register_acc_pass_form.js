@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import $ from 'jquery';
 import zxcvbn from 'zxcvbn';
+import { MESSAGES } from '../constant';
 
 export default class RegisterAccPassForm extends Component {
   constructor() {
@@ -13,7 +14,8 @@ export default class RegisterAccPassForm extends Component {
 
   handleAccPassForm(e) {
     if (this.props.networkStatus !== 1) {
-      console.log('Network not connected yet!');
+      this.props.showToaster(MESSAGES.NETWORK_NOT_CONNECTED, { autoHide: true });
+      console.log(MESSAGES.NETWORK_NOT_CONNECTED);
       return;
     }
     let accountPasswordVal = accountPassword.value.trim();

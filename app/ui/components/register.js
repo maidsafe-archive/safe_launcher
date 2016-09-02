@@ -41,23 +41,9 @@ export default class Register extends Component {
   }
 
   render() {
-    const { registerState, authProcessing, error, registerStateNext, registerStateBack, setRegisterState } = this.props;
+    const { registerState, authProcessing, error, egisterStateNext, registerStateBack, setRegisterState, showToaster } = this.props;
     if (authProcessing) {
       return <AuthLoader { ...this.props }/>
-    }
-    this.errMsg = null;
-    if (error) {
-      this.errMsg = window.msl.errorCodeLookup(error.errorCode || 0);
-      switch (this.errMsg) {
-        case 'CoreError::RequestTimeout':
-          this.errMsg = 'Request timed out';
-          break;
-        case 'CoreError::MutationFailure::MutationError::AccountExists':
-          this.errMsg = 'This account is already taken.';
-          break;
-        default:
-          this.errMsg = errMsg.replace('CoreError::', '');
-      }
     }
 
     let currentState = null;

@@ -1,17 +1,19 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import className from 'classnames';
+import $ from 'jquery';
 import { openExternal } from '../utils/app_utils';
 import AuthLoader from './auth_loader';
+import { MESSAGES } from '../constant';
 
 export default class Settings extends Component {
 
   constructor() {
     super();
     this.handleLogin = this.handleLogin.bind(this);
-    this.onFocus = this.onFocus.bind(this);
     this.checkAuthenticated = this.checkAuthenticated.bind(this);
     this.showPassword = this.showPassword.bind(this);
+    this.clearErrMsg = this.clearErrMsg.bind(this);
   }
 
   static propTypes = {
@@ -45,8 +47,15 @@ export default class Settings extends Component {
     targetEle.setAttribute('type', 'text');
   }
 
-  onFocus() {
-    this.errMsg = null;
+  clearErrMsg(e) {
+    let ele = $(e.currentTarget);
+    let parentEle = ele.parent();
+    if (!parentEle.hasClass('error')) {
+      return;
+    }
+    let msgEle = ele.siblings('.msg');
+    parentEle.removeClass('error');
+    msgEle.text('');
   }
 
   componentWillMount() {
@@ -55,35 +64,8 @@ export default class Settings extends Component {
   }
 
   componentWillUpdate(nextProps) {
+    const { error, showToaster } = nextProps;
     this.checkAuthenticated(nextProps);
-  }
-
-  handleLogin(e) {
-    e.preventDefault();
-    const { networkStatus, userLogin } = this.props;
-
-    if (networkStatus !== 1) {
-      console.log('Network not connected yet!');
-      return;
-    }
-
-    let accountSecretVal = accountSecret.value.trim()
-    let accountPasswordVal = accountPassword.value.trim();
-    if (!accountSecretVal || !accountPasswordVal) {
-      return;
-    }
-    this.isLoading = true;
-    userLogin({
-      accountSecret: accountSecretVal,
-      accountPassword: accountPasswordVal
-    });
-  }
-
-  render() {
-    const { error, user, authenticated, authProcessing } = this.props;
-    if (authProcessing) {
-      return <AuthLoader { ...this.props }/>
-    }
     this.errMsg = null;
     if (error) {
       this.errMsg = window.msl.errorCodeLookup(error.errorCode || 0);
@@ -102,6 +84,36 @@ export default class Settings extends Component {
           this.errMsg = this.errMsg.replace('CoreError::', '');
       }
       this.errMsg = 'Login failed. ' + this.errMsg;
+      showToaster(this.errMsg, { autoHide: true, error: true });
+    }
+  }
+
+  handleLogin(e) {
+    e.preventDefault();
+    const { networkStatus, userLogin } = this.props;
+
+    if (networkStatus !== 1) {
+      this.props.showToaster(MESSAGES.NETWORK_NOT_CONNECTED, { autoHide: true });
+      console.log(MESSAGES.NETWORK_NOT_CONNECTED);
+      return;
+    }
+
+    let accountSecretVal = accountSecret.value.trim()
+    let accountPasswordVal = accountPassword.value.trim();
+    if (!accountSecretVal || !accountPasswordVal) {
+      return;
+    }
+    this.isLoading = true;
+    userLogin({
+      accountSecret: accountSecretVal,
+      accountPassword: accountPasswordVal
+    });
+  }
+
+  render() {
+    const { error, user, authenticated, authProcessing, showToaster } = this.props;
+    if (authProcessing) {
+      return <AuthLoader { ...this.props }/>
     }
 
     let inputGrpClassNames = className(
@@ -113,7 +125,7 @@ export default class Settings extends Component {
       <div className="form-b">
         <form className="form" name="loginForm" onSubmit={this.handleLogin}>
           <div id="errorTarget" className={inputGrpClassNames}>
-            <input id="accountSecret" type="password" ref="accountSecret" required="true" onFocus={ this.onFocus } autoFocus />
+            <input id="accountSecret" type="password" ref="accountSecret" required="true" onFocus={ this.onFocus } onKeyUp={this.clearErrMsg} autoFocus />
             <label htmlFor="accountSecret">Account Secret</label>
             <div className="msg">{ this.errMsg ? this.errMsg : '' }</div>
             <div className="opt">

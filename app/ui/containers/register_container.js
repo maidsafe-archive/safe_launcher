@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import Register from '../components/register';
 import { setRegisterStateNext, setRegisterStateBack, setRegisterState, register, cancelAuthReq } from '../actions/auth_action';
+import { showToaster } from '../actions/toaster_action';
 
 const mapStateToProps = function(state) {
   return {
@@ -8,6 +9,7 @@ const mapStateToProps = function(state) {
     registerState: state.auth.registerState,
     authProcessing: state.auth.authProcessing,
     user: state.auth.user,
+    error: state.auth.error,
     authenticated: state.auth.authenticated
   };
 }
@@ -28,6 +30,9 @@ const mapDispatchToProps = function(dispatch) {
     },
     cancelAuthReq: () => {
       dispatch(cancelAuthReq())
+    },
+    showToaster: (message, options) => {
+      dispatch(showToaster(message, options));
     }
   };
 }

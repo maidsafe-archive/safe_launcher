@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import Login from '../components/login';
 import { login, cancelAuthReq, resetUser } from '../actions/auth_action';
+import { showToaster } from '../actions/toaster_action';
 
 const mapStateToProps = function(state) {
   return {
@@ -22,6 +23,9 @@ const mapDispatchToProps = function(dispatch) {
     },
     resetUser: () => {
       dispatch(resetUser())
+    },
+    showToaster: (message, options) => {
+      dispatch(showToaster(message, options));
     }
   };
 }

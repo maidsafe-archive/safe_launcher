@@ -1,4 +1,5 @@
 import ActionTypes from './action_types';
+import { showToaster } from './toaster_action';
 
 export const toggleProxy = () => {
   return {

@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import $ from 'jquery';
+import className from 'classnames';
 import zxcvbn from 'zxcvbn';
 
 export default class RegisterAccSecretForm extends Component {
@@ -46,6 +47,7 @@ export default class RegisterAccSecretForm extends Component {
     let ele = $(e.currentTarget);
     let msgEle = ele.siblings('.msg');
     msgEle.text('');
+    $('#AccountSecret').removeClass('error');
   }
 
   handleInputChange(e) {
@@ -60,6 +62,7 @@ export default class RegisterAccSecretForm extends Component {
       'PASS_SECURE': 'Secure'
     };
     let ele = $(e.currentTarget);
+    let parentEle = ele.parent();
     let statusEle = ele.siblings('.status');
     let strengthEle = ele.siblings('.strength');
     let msgEle = ele.siblings('.msg');
@@ -68,6 +71,8 @@ export default class RegisterAccSecretForm extends Component {
     let resetField = function() {
       strengthEle.width('0');
       statusEle.removeClass('icn');
+      self.errMsg = '';
+      parentEle.removeClass('error')
       msgEle.text('');
       self.passwordStrengthValid = false;
       return;
@@ -100,10 +105,31 @@ export default class RegisterAccSecretForm extends Component {
     strengthEle.width(Math.min((log10 / 16) * 100, 100) + '%');
   }
 
+  componentWillMount() {
+    const { error, showToaster } = this.props;
+    this.errMsg = null;
+    if (error) {
+      this.errMsg = window.msl.errorCodeLookup(error.errorCode || 0);
+      switch (this.errMsg) {
+        case 'CoreError::RequestTimeout':
+          this.errMsg = 'Request timed out';
+          break;
+        case 'CoreError::MutationFailure::MutationError::AccountExists':
+          this.errMsg = 'This account is already taken.';
+          break;
+        default:
+          this.errMsg = errMsg.replace('CoreError::', '');
+      }
+      showToaster(this.errMsg, { autoHide: true, error: true });
+    }
+  }
+
   componentDidMount() {
     let user = this.props.user ? this.props.user.accountSecret : '';
     accountSecret.value = user;
     confirmAccountSecret.value = user;
+    accountSecret.dispatchEvent(new Event('keyup', {bubbles: true}));
+
   }
 
   showPassword(e) {
@@ -121,6 +147,15 @@ export default class RegisterAccSecretForm extends Component {
   }
 
   render() {
+    const { error, showToaster } = this.props;
+
+    let inputGrpClassNames = className(
+      'inp-grp',
+      'validate-field',
+      'light-theme',
+      { 'error': error }
+    );
+
     return (
       <div className="auth-intro-cnt">
         <h3 className="title">Account Secret</h3>
@@ -129,10 +164,10 @@ export default class RegisterAccSecretForm extends Component {
         </div>
         <div className="form-b">
           <form id="accountSecretForm" className="form" name="accountSecretForm">
-            <div id="AccountSecret" className="inp-grp validate-field light-theme">
+            <div id="AccountSecret" className={inputGrpClassNames}>
               <input id="accountSecret" type="password" ref="accountSecret" required="true" onKeyUp={this.handleInputChange} autoFocus />
               <label htmlFor="accountSecret">Account Secret</label>
-              <div className="msg"></div>
+              <div className="msg">{ this.errMsg ? this.errMsg : '' }</div>
               <div className="opt">
                 <div className="opt-i">
                     <span className="eye" data-target="accountSecret" onClick={this.showPassword}></span>

@@ -1,10 +1,11 @@
 import { setNetworkDisconnected, setNetworkConnected, setNetworkConnecting } from './actions/network_status_action';
 import { setProxy } from './actions/proxy_action';
+import { showToaster } from './actions/toaster_action';
 import { showAuthRequest, addApplication, addActivity, updateActivity, setDownloadData, setUploadData,
   setUnAuthStateData, setAuthStateData, setDashGetCount, setDashPostCount, setDashDeleteCount, setDashPutCount, updateAccountStorage,
   fetchingAccountStorage } from './actions/app_action';
 
-import { CONSTANT } from './constant';
+import { CONSTANT, MESSAGES } from './constant';
 
 export default class EventRegistry {
   constructor(store) {
@@ -126,7 +127,6 @@ export default class EventRegistry {
           self.dispatch(setNetworkConnecting());
           break;
         case 1:{
-          self.dispatch(setProxy());
           if (!self.state().auth.authenticated) {
             self.fetchStatsForUnauthorisedClient();
           } else {
@@ -136,10 +136,12 @@ export default class EventRegistry {
             self.fetchAccountStorage();
           }
           self.dispatch(setNetworkConnected());
+          self.dispatch(showToaster(MESSAGES.NETWORK_CONNECTED, { autoHide: true }));
           break;
         }
         case 2:
           self.dispatch(setNetworkDisconnected());
+          self.dispatch(showToaster(MESSAGES.NETWORK_DISCONNECTED, { type: CONSTANT.TOASTER_OPTION_TYPES.NETWORK_RETRY, autoHide: false, error: true }));
           break;
         default:
       }
@@ -163,11 +165,14 @@ export default class EventRegistry {
   }
 
   handleProxyServer() {
+    let self = this;
+
     window.msl.onProxyStart(() => {
       return console.log('Proxy Server Started');
     });
 
     window.msl.onProxyError((err) => {
+      self.dispatch(showToaster(MESSAGES.PROXY_SERVER_ERROR, { autoHide: true, error: true }));
       return console.error('Proxy Server Error :: ', err);
     });
 
@@ -188,6 +193,7 @@ export default class EventRegistry {
     });
 
     window.msl.onSessionRemoved((data) => {
+      self.dispatch(showToaster(MESSAGES.APP_REVOKED, { autoHide: true }));
       return console.error('Removed App Session :: ', data);
     });
   }
@@ -236,6 +242,7 @@ export default class EventRegistry {
 
 
   run() {
+    this.dispatch(setProxy());
     this.handleNetworkEvents();
     this.handleAPIServer();
     this.handleProxyServer();
