@@ -3,6 +3,7 @@ import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import merge from 'webpack-merge';
 import baseConfig from './webpack.config.base';
 import path from 'path';
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const config = merge(baseConfig, {
   devtool: 'cheap-module-source-map',
@@ -15,7 +16,10 @@ const config = merge(baseConfig, {
   output: {
     publicPath: '../dist/'
   },
-
+  externals: {
+    'buffer': 'buffer',
+    'winston': 'winston'
+  },
   module: {
     loaders: [
       {
@@ -51,7 +55,13 @@ const config = merge(baseConfig, {
         warnings: false
       }
     }),
-    new ExtractTextPlugin('style.css', { allChunks: true })
+    new ExtractTextPlugin('style.css', { allChunks: true }),
+    new CopyWebpackPlugin([
+      { from: 'app/api', to: 'api' },
+      { from: 'app/server', to: 'server' },
+      { from: 'app/app.html' },
+      { from: 'app/ui/images', to: 'ui/images' }
+    ])
   ],
 
   target: 'electron-renderer'

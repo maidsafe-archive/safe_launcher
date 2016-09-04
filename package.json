@@ -1,9 +1,10 @@
 {
-  "name": "electron-react-boilerplate",
-  "productName": "ElectronReact",
-  "version": "0.10.0",
-  "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
-  "main": "main.js",
+  "name": "safe-launcher",
+  "productName": "SAFE Launcher",
+  "version": "0.8.0",
+  "description": "SAFE Launcher Application",
+  "copyright": "© 2016, MaidSafe.net Ltd",
+  "main": "dist/main.js",
   "scripts": {
     "test": "cross-env NODE_ENV=test mocha --compilers js:babel-register --recursive --require ./test/setup.js test/**/*.spec.js",
     "test-watch": "npm test -- --watch",
@@ -25,16 +26,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chentsulin/electron-react-boilerplate.git"
+    "url": "git+https://github.com/maidsafe/safe_launcher.git"
   },
   "author": {
-    "name": "C. T. Lin",
-    "email": "chentsulin@gmail.com",
-    "url": "https://github.com/chentsulin"
+    "name": "MaidSafe",
+    "email": "qa@maidsafe.net",
+    "url": "https://maidsafe.net"
   },
-  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/chentsulin/electron-react-boilerplate/issues"
+    "url": "https://github.com/maidsafe/safe_launcher/issues"
   },
   "keywords": [
     "electron",
@@ -45,7 +45,7 @@
     "webpack",
     "react-hot"
   ],
-  "homepage": "https://github.com/chentsulin/electron-react-boilerplate#readme",
+  "homepage": "https://github.com/maidsafe/safe_launcher#safe_launcher",
   "devDependencies": {
     "asar": "^0.12.1",
     "babel-cli": "^6.11.4",
@@ -100,7 +100,8 @@
     "webpack": "^1.13.1",
     "webpack-dev-middleware": "^1.6.1",
     "webpack-hot-middleware": "^2.12.1",
-    "webpack-merge": "^0.14.0"
+    "webpack-merge": "^0.14.0",
+    "webpack-target-electron-renderer": "^0.4.0"
   },
   "dependencies": {
     "axios": "^0.13.1",
@@ -116,7 +117,7 @@
     "fs-jetpack": "^0.9.2",
     "http-proxy": "^1.14.0",
     "jquery": "^3.1.0",
-    "jsonwebtoken": "^7.1.9",
+    "jsonwebtoken": "7.1.6",
     "mime": "^1.3.4",
     "moment": "^2.14.1",
     "open-sans-fontface": "^1.4.0",

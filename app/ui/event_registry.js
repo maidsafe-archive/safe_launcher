@@ -188,8 +188,8 @@ export default class EventRegistry {
       self.dispatch(addApplication(appData));
     });
 
-    window.msl.onSessionCreationFailed((err) => {
-      return console.error('Failed to create App Session :: ', err);
+    window.msl.onSessionCreationFailed(() => {
+      return console.error('Failed to create App Session');
     });
 
     window.msl.onSessionRemoved((data) => {

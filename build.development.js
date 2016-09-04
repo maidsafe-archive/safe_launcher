@@ -6,7 +6,10 @@ let build = () => {
   const destDir = 'dist';
   const filesToMove = [
     'server',
-    'api'
+    'api',
+    'logger',
+    'ui/images',
+    'app.html'
   ];
   filesToMove.map((file) => {
     fse.copySync(path.resolve('.', srcDir, file), path.resolve('.', destDir, file));

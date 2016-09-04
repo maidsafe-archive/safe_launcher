@@ -11,11 +11,6 @@ export const updateAccountStorageSuccess = (data) => {
   }
 };
 
-//
-// export const updateAccountStorageFailure = (err) => {
-//
-// };
-
 export const showAppDetailPage = (appId) => {
   let currentAppLogs = window.msl.getAppActivityList(appId);
   return {

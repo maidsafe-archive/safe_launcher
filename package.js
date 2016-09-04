@@ -18,16 +18,39 @@ const devDeps = Object.keys(pkg.devDependencies);
 const appName = argv.name || argv.n || pkg.productName;
 const shouldUseAsar = argv.asar || argv.a || false;
 const shouldBuildAll = argv.all || false;
+const appCopyright = pkg.copyright;
 
+const packageForOs = {
+  darwin: {
+    icon: 'resources/osx/icon',
+    unpack: '*.dylib',
+  },
+  linux: {
+    icon: 'resources/icon',
+    unpack: '*.so',
+  },
+  win32: {
+    icon: 'resources/windows/icon',
+    unpack: '*.dll',
+  }
+};
+
+const optionForOs = packageForOs[os.platform()]
 
 const DEFAULT_OPTS = {
   dir: './',
   name: appName,
-  asar: shouldUseAsar,
+  asar: {
+    unpack: optionForOs.unpack
+  },
+  'app-copyright': appCopyright,
   ignore: [
+    '^app',
     '^/test($|/)',
     '^/release($|/)',
-    '^/main.development.js'
+    '^/resources($|/)',
+    '^/main.development.js',
+    '^/build.development.js'
   ].concat(devDeps.map(name => `/node_modules/${name}($|/)`))
   .concat(
     deps.filter(name => !electronCfg.externals.includes(name))
@@ -35,7 +58,7 @@ const DEFAULT_OPTS = {
   )
 };
 
-const icon = argv.icon || argv.i || 'app/app';
+const icon = argv.icon || argv.i || optionForOs.icon;
 
 if (icon) {
   DEFAULT_OPTS.icon = icon;
@@ -110,7 +133,6 @@ function pack(plat, arch, cb) {
       return extension;
     })()
   };
-
   const opts = Object.assign({}, DEFAULT_OPTS, iconObj, {
     platform: plat,
     arch,

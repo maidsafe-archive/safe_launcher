@@ -20,7 +20,9 @@ export default merge(baseConfig, {
   output: {
     publicPath: 'http://localhost:3000/dist/',
   },
-
+  externals: {
+    'winston': 'winston'
+  },
   module: {
     loaders: [
       {
@@ -48,15 +50,11 @@ export default merge(baseConfig, {
   },
 
   plugins: [
-    new CopyWebpackPlugin([
-      { from: './app/api/ffi/worker.js', to: './dist/api/ffi/worker.js' }
-    ]),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('development')
     })
   ],
-
   target: 'electron-renderer'
 });

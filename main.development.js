@@ -41,7 +41,11 @@ app.on('ready', async () => {
     height: 550 + (process.platform === 'win32' ? 30 : 0),
   });
 
-  mainWindow.loadURL(`file://${__dirname}/app/app.html`);
+  if (process.env.NODE_ENV === 'development') {
+      mainWindow.loadURL(`file://${__dirname}/dist/app.html`);
+  } else {
+    mainWindow.loadURL(`file://${__dirname}/app.html`);
+  }
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.show();

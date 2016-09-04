@@ -42,9 +42,9 @@ export let CreateSession = function(data) {
         sessionInfo = new SessionInfo(app.id, app.name, app.version, app.vendor, data.permissions, dirKey);
         isNewSession = true;
       }
-      let payload = JSON.stringify({
+      let payload = {
         id: sessionId
-      });
+      };
       let token = jwt.sign(payload, new Buffer(sessionInfo.signingKey));
       sessionManager.put(sessionId, sessionInfo);
       let eventType = req.app.get('EVENT_TYPE').SESSION_CREATED;
