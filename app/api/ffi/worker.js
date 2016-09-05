@@ -3,7 +3,7 @@ var Handler = require('./mod/handler.js');
 
 var rootFolder = __dirname;
 if (rootFolder.indexOf('app.asar') > 0) {
-  rootFolder = path.resolve(rootFolder, '../../../', 'app.asar.unpacked/api/ffi/');
+  rootFolder = path.resolve(rootFolder, '../../../../', 'app.asar.unpacked/dist/api/ffi/');
 }
 var libPath = path.resolve(rootFolder, (process.platform === 'win32' ? 'safe_core' : 'libsafe_core'));
 var handler = new Handler(libPath);

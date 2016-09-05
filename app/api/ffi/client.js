@@ -3,10 +3,12 @@ import { log } from './../../logger/log';
 import uuid from 'uuid';
 import path from 'path';
 import { remote } from 'electron';
+import fs from 'fs-extra';
+import fso from 'fs';
 
 var workerProcess;
-var workerPath = __dirname;
-workerPath += workerPath.indexOf('ffi') === -1 ? '/api/ffi/worker.js' : '/worker.js';
+var workerPath = ((process.env.NODE_ENV === 'production') ? remote.app.getAppPath() : process.cwd()) + '/dist/api/ffi/worker.js';
+// workerPath += workerPath.indexOf('ffi') === -1 ? 'dist/api/ffi/worker.js' : './worker.js';
 var callbackPool = {};
 var isClosed = false;
 var networkStateListener;
@@ -92,7 +94,6 @@ var startWorker = function() {
 };
 
 export var send = function(message, callback) {
-  let strMessage = JSON.stringify(message);
   let id = uuid.v4();
   log.debug('Sending message to FFI - ' + id + ' - ' + message.module + ' - ' +
     (message.action || ''));

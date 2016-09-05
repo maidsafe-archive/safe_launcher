@@ -3,6 +3,7 @@ import path from 'path';
 import util from 'util';
 import env from '../env';
 import fse from 'fs-extra';
+import winston from 'winston';
 
 class Logger {
 
@@ -11,13 +12,13 @@ class Logger {
     self.logFilePath = null;
     // TODO pass log id that can used for the log visualiser
     // let id = 'uid_' + 1001;
-    self.winston = require('winston');
+    self.winston = winston;
     let pad = function(value) {
       return ('0' + value).slice(-2);
     };
 
     let transports = [];
-    self.logLevel = (env && env.log) ? (env.log.level ? env.log.level : 'warn') : 'warn';    
+    self.logLevel = (env && env.log) ? (env.log.level ? env.log.level : 'warn') : 'warn';
     self.logFormatter = function(log) {
       let date = new Date();
       let timeStamp = util.format('%s:%s:%s.%d', pad(date.getHours()), pad(date.getMinutes()), pad(date.getSeconds()),
@@ -38,12 +39,12 @@ class Logger {
   }
 
   setFileLogger(path) {
-    var self = this;    
+    var self = this;
     try {
       self.logFilePath = path;
       fse.ensureFileSync(self.logFilePath);
       self.winston.add(self.winston.transports.File, {
-        filename: self.logFilePath,       
+        filename: self.logFilePath,
         json: false,
         options: {
           flags: 'w'
@@ -56,7 +57,7 @@ class Logger {
     }
   }
 
-  info(msg) {  
+  info(msg) {
     try {
       this.winston.info(msg);
     } catch(e) {}
