@@ -4,6 +4,8 @@ let menu;
 let template;
 let mainWindow = null;
 
+const appWidth = 750 + (process.platform === 'win32' ? 20 : 0);
+const appHeight = 550 + (process.platform === 'win32' ? 30 : 0);
 
 if (process.env.NODE_ENV === 'development') {
   require('electron-debug')(); // eslint-disable-line global-require
@@ -37,12 +39,12 @@ app.on('ready', async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 750  + (process.platform === 'win32' ? 20 : 0),
-    height: 550 + (process.platform === 'win32' ? 30 : 0),
+    width: appWidth,
+    height: appHeight,
   });
 
   if (process.env.NODE_ENV === 'development') {
-      mainWindow.loadURL(`file://${__dirname}/dist/app.html`);
+    mainWindow.loadURL(`file://${__dirname}/dist/app.html`);
   } else {
     mainWindow.loadURL(`file://${__dirname}/app.html`);
   }

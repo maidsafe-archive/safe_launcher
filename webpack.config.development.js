@@ -1,9 +1,8 @@
 /* eslint max-len: 0 */
 import webpack from 'webpack';
 import merge from 'webpack-merge';
-import baseConfig from './webpack.config.base';
 import path from 'path';
-import CopyWebpackPlugin from 'copy-webpack-plugin';
+import baseConfig from './webpack.config.base';
 
 export default merge(baseConfig, {
   debug: true,
@@ -21,15 +20,15 @@ export default merge(baseConfig, {
     publicPath: 'http://localhost:3000/dist/',
   },
   externals: {
-    'winston': 'winston'
+    winston: 'winston'
   },
   module: {
     loaders: [
       {
-       test: /\.js$/,
-       loaders: ['react-hot', 'babel'],
-       include: path.join(__dirname, 'app'),
-       exclude: [path.join(__dirname, 'app', 'api'), path.join(__dirname, 'app', 'server')]
+        test: /\.js$/,
+        loaders: ['react-hot', 'babel'],
+        include: path.join(__dirname, 'app'),
+        exclude: [path.join(__dirname, 'app', 'api'), path.join(__dirname, 'app', 'server')]
       },
       {
         test: /\.global\.css$/,

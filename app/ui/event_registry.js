@@ -1,9 +1,25 @@
-import { setNetworkDisconnected, setNetworkConnected, setNetworkConnecting } from './actions/network_status_action';
-import { setProxy } from './actions/proxy_action';
+import {
+  setNetworkDisconnected,
+  setNetworkConnected,
+  setNetworkConnecting
+} from './actions/network_status_action';
+import { setProxy, setProxyError } from './actions/proxy_action';
 import { showToaster } from './actions/toaster_action';
-import { showAuthRequest, addApplication, addActivity, updateActivity, setDownloadData, setUploadData,
-  setUnAuthStateData, setAuthStateData, setDashGetCount, setDashPostCount, setDashDeleteCount, setDashPutCount, updateAccountStorage,
-  fetchingAccountStorage } from './actions/app_action';
+import {
+  showAuthRequest,
+  addApplication,
+  addActivity,
+  updateActivity,
+  setDownloadData,
+  setUploadData,
+  setUnAuthStateData,
+  setAuthStateData,
+  setDashGetCount,
+  setDashPostCount,
+  setDashDeleteCount,
+  setDashPutCount,
+  updateAccountStorage
+} from './actions/app_action';
 
 import { CONSTANT, MESSAGES } from './constant';
 
@@ -34,45 +50,41 @@ export default class EventRegistry {
   }
 
   clearIntervals() {
-    this.intervals.map(interval => {
-      window.clearInterval(interval)
-    })
+    this.intervals.map(interval => window.clearInterval(interval));
   }
 
   onAuthFetchComplete(target, oldVal, newVal) {
-    let self = this;
+    const self = this;
     self.authorisedData[target].oldVal = oldVal;
     self.authorisedData[target].newVal = newVal;
-    console.log(target, oldVal, newVal);
-    let temp = {};
+    const temp = {};
     if (self.completeCount === 4) {
       temp.GET = self.authorisedData.GET.newVal - self.authorisedData.GET.oldVal;
       temp.POST = self.authorisedData.POST.newVal - self.authorisedData.POST.oldVal;
       temp.PUT = self.authorisedData.PUT.newVal - self.authorisedData.PUT.oldVal;
       temp.DELETE = self.authorisedData.DELETE.newVal - self.authorisedData.DELETE.oldVal;
-        self.completeCount = 0;
+      self.completeCount = 0;
       self.dispatch(setAuthStateData(temp));
     }
   }
 
   fetchStatsForUnauthorisedClient() {
-    let self = this;
-
-    self.intervals.push(window.setInterval(function () {
-      window.msl.fetchGetsCount(function(err, data) {
+    const self = this;
+    self.intervals.push(window.setInterval(() => {
+      window.msl.fetchGetsCount((err, data) => {
         if (err) {
           return;
         }
         self.dispatch(setUnAuthStateData(data));
       });
-    }, CONSTANT.FETCH_DELAY))
+    }, CONSTANT.FETCH_DELAY));
   }
 
   fetchStatsForAuthorisedClient() {
-    let self = this;
+    const self = this;
 
-    self.intervals.push(window.setInterval(function () {
-      window.msl.fetchGetsCount(function(err, data) {
+    self.intervals.push(window.setInterval(() => {
+      window.msl.fetchGetsCount((err, data) => {
         if (err) {
           return;
         }
@@ -80,7 +92,7 @@ export default class EventRegistry {
         self.onAuthFetchComplete('GET', self.state().user.dashData.getsCount, data);
         self.dispatch(setDashGetCount(data));
       });
-      window.msl.fetchDeletesCount(function(err, data) {
+      window.msl.fetchDeletesCount((err, data) => {
         if (err) {
           return;
         }
@@ -88,7 +100,7 @@ export default class EventRegistry {
         self.onAuthFetchComplete('DELETE', self.state().user.dashData.deletesCount, data);
         self.dispatch(setDashDeleteCount(data));
       });
-      window.msl.fetchPostsCount(function(err, data) {
+      window.msl.fetchPostsCount((err, data) => {
         if (err) {
           return;
         }
@@ -96,7 +108,7 @@ export default class EventRegistry {
         self.onAuthFetchComplete('POST', self.state().user.dashData.postsCount, data);
         self.dispatch(setDashPostCount(data));
       });
-      window.msl.fetchPutsCount(function(err, data) {
+      window.msl.fetchPutsCount((err, data) => {
         if (err) {
           return;
         }
@@ -112,36 +124,34 @@ export default class EventRegistry {
   }
 
   fetchAccountStorage() {
-    let self = this;
-    self.intervals.push(window.setInterval(() => {
-      self.updateAccountStorage();
+    this.intervals.push(window.setInterval(() => {
+      this.updateAccountStorage();
     }, CONSTANT.ACCOUNT_FETCH_INTERVAL));
   }
 
   handleNetworkEvents() {
-    let self = this;
-
     window.msl.setNetworkStateChangeListener((status) => {
       switch (status) {
         case 0:
-          self.dispatch(setNetworkConnecting());
+          this.dispatch(setNetworkConnecting());
           break;
-        case 1:{
-          if (!self.state().auth.authenticated) {
-            self.fetchStatsForUnauthorisedClient();
+        case 1: {
+          if (!this.state().auth.authenticated) {
+            this.fetchStatsForUnauthorisedClient();
           } else {
-            self.clearIntervals();
-            self.fetchStatsForAuthorisedClient();
-            self.updateAccountStorage();
-            self.fetchAccountStorage();
+            this.clearIntervals();
+            this.fetchStatsForAuthorisedClient();
+            this.updateAccountStorage();
+            this.fetchAccountStorage();
           }
-          self.dispatch(setNetworkConnected());
-          self.dispatch(showToaster(MESSAGES.NETWORK_CONNECTED, { autoHide: true }));
+          this.dispatch(setNetworkConnected());
+          this.dispatch(showToaster(MESSAGES.NETWORK_CONNECTED, { autoHide: true }));
           break;
         }
         case 2:
-          self.dispatch(setNetworkDisconnected());
-          self.dispatch(showToaster(MESSAGES.NETWORK_DISCONNECTED, { type: CONSTANT.TOASTER_OPTION_TYPES.NETWORK_RETRY, autoHide: false, error: true }));
+          this.dispatch(setNetworkDisconnected());
+          this.dispatch(showToaster(MESSAGES.NETWORK_DISCONNECTED,
+            { type: CONSTANT.TOASTER_OPTION_TYPES.NETWORK_RETRY, autoHide: false, error: true }));
           break;
         default:
       }
@@ -151,92 +161,72 @@ export default class EventRegistry {
   handleAPIServer() {
     window.msl.startServer();
 
-    window.msl.onServerError((err) => {
-      return console.error('API Server Error :: ', err);
-    });
+    window.msl.onServerError((err) => console.error('API Server Error :: ', err));
 
-    window.msl.onServerStarted(() => {
-      return console.log('API Server Started');
-    });
+    window.msl.onServerStarted(() => console.warn('API Server Started'));
 
-    window.msl.onServerShutdown((data) => {
-      return console.log('API Server Stopped :: ', data);
-    });
+    window.msl.onServerShutdown((data) => console.warn('API Server Stopped :: ', data));
   }
 
   handleProxyServer() {
-    let self = this;
+    window.msl.onProxyStart(() => console.warn('Proxy Server Started'));
 
-    window.msl.onProxyStart(() => {
-      return console.log('Proxy Server Started');
-    });
-
-    window.msl.onProxyError((err) => {
-      self.dispatch(showToaster(MESSAGES.PROXY_SERVER_ERROR, { autoHide: true, error: true }));
+    window.msl.onProxyError(err => {
+      this.dispatch(showToaster(MESSAGES.PROXY_SERVER_ERROR, { autoHide: true, error: true }));
+      this.dispatch(setProxyError());
       return console.error('Proxy Server Error :: ', err);
     });
 
-    window.msl.onProxyExit(() => {
-      return console.log('Proxy Server Stopped');
-    });
+    window.msl.onProxyExit(() => console.warn('Proxy Server Stopped'));
   }
 
   handleAppSession() {
-    let self = this;
+    window.msl.onSessionCreated(appData => this.dispatch(addApplication(appData)));
 
-    window.msl.onSessionCreated((appData) => {
-      self.dispatch(addApplication(appData));
-    });
+    window.msl.onSessionCreationFailed(() => console.error('Failed to create App Session'));
 
-    window.msl.onSessionCreationFailed(() => {
-      return console.error('Failed to create App Session');
-    });
-
-    window.msl.onSessionRemoved((data) => {
-      self.dispatch(showToaster(MESSAGES.APP_REVOKED, { autoHide: true }));
+    window.msl.onSessionRemoved(data => {
+      this.dispatch(showToaster(MESSAGES.APP_REVOKED, { autoHide: true }));
       return console.error('Removed App Session :: ', data);
     });
   }
 
   handleAuthRequest() {
-    let self = this;
-    window.msl.onAuthRequest((payload) => {
+    window.msl.onAuthRequest(payload => {
       window.msl.focusWindow();
-      self.dispatch(showAuthRequest(payload));
+      this.dispatch(showAuthRequest(payload));
     });
   }
 
   handleDataTransfer() {
-    let self = this;
-    window.msl.onUploadEvent(function(data) {
+    window.msl.onUploadEvent((data) => {
       if (!data) {
         return;
       }
-      self.dispatch(setUploadData(data));
+      this.dispatch(setUploadData(data));
     });
 
-    window.msl.onDownloadEvent(function(data) {
+    window.msl.onDownloadEvent((data) => {
       if (!data) {
         return;
       }
-      self.dispatch(setDownloadData(data));
+      this.dispatch(setDownloadData(data));
     });
   }
 
   handleActivityEvents() {
-    let self = this;
-    window.msl.onNewAppActivity((data) => {
+    window.msl.onNewAppActivity(data => {
       if (!data) {
         return;
       }
-      self.dispatch(addActivity(data));
+      this.dispatch(addActivity(data));
     });
 
-    window.msl.onUpdatedAppActivity((data) => {
+    window.msl.onUpdatedAppActivity(data => {
       if (!data) {
         return;
       }
-      self.dispatch(updateActivity(data));
+      this.dispatch(updateActivity(data));
     });
   }
 

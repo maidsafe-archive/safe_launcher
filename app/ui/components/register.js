@@ -8,28 +8,28 @@ import RegisterAccPassForm from './register_acc_pass_form.js';
 import AuthLoader from './auth_loader';
 
 export default class Register extends Component {
-
-  constructor() {
-    super();
-    this.checkAuthenticated = this.checkAuthenticated.bind(this);
-  }
-
   static propTypes = {
+    networkStatus: PropTypes.number.isRequired,
+    registerState: PropTypes.number.isRequired,
+    authProcessing: PropTypes.bool.isRequired,
+    user: PropTypes.object.isRequired,
+    error: PropTypes.object.isRequired,
+    authenticated: PropTypes.bool.isRequired,
     stateContinue: PropTypes.func.isRequired,
     stateBack: PropTypes.func.isRequired,
     setRegisterState: PropTypes.func.isRequired,
     cancelAuthReq: PropTypes.func.isRequired,
-    userRegister: PropTypes.func.isRequired
-  }
+    userRegister: PropTypes.func.isRequired,
+    showToaster: PropTypes.func.isRequired
+  };
 
   static contextTypes = {
     router: React.PropTypes.object.isRequired
-  }
+  };
 
-  checkAuthenticated(props) {
-    if (props.authenticated) {
-      return this.context.router.push('/account_app_list');
-    }
+  constructor() {
+    super();
+    this.checkAuthenticated = this.checkAuthenticated.bind(this);
   }
 
   componentWillMount() {
@@ -40,43 +40,54 @@ export default class Register extends Component {
     this.checkAuthenticated(nextProps);
   }
 
+  checkAuthenticated(props) {
+    if (props.authenticated) {
+      return this.context.router.push('/account_app_list');
+    }
+  }
+
   render() {
-    const { registerState, authProcessing, error, egisterStateNext, registerStateBack, setRegisterState, showToaster } = this.props;
+    const { registerState, authProcessing, setRegisterState } = this.props;
     if (authProcessing) {
-      return <AuthLoader { ...this.props }/>
+      return (<AuthLoader {...this.props} />);
     }
 
     let currentState = null;
     const TOTAL_STATES = 5;
     switch (registerState) {
       case 0:
-        currentState = <RegisterWelcome { ...this.props } />;
+        currentState = <RegisterWelcome {...this.props} />;
         break;
       case 1:
-        currentState = <RegisterAccSecretInfo { ...this.props } />;
+        currentState = <RegisterAccSecretInfo {...this.props} />;
         break;
       case 2:
-        currentState = <RegisterAccSecretForm { ...this.props } />;
+        currentState = <RegisterAccSecretForm {...this.props} />;
         break;
       case 3:
-        currentState = <RegisterAccPassInfo { ...this.props } />;
+        currentState = <RegisterAccPassInfo {...this.props} />;
         break;
       case 4:
-        currentState = <RegisterAccPassForm { ...this.props } />;
+        currentState = <RegisterAccPassForm {...this.props} />;
         break;
       default:
         throw new Error('Unkown Register State');
     }
-    let stateNavs = [];
+    const stateNavs = [];
     let navClassNames = null;
     for (let i = 0; i < TOTAL_STATES; i++) {
       navClassNames = className(
         'auth-intro-nav-btn-i',
-        { 'active': i === registerState }
-      )
-      stateNavs.push(<span key={i} className={navClassNames} onClick={e => {
-        setRegisterState(i)
-      }}></span>)
+        { active: (i === registerState) }
+      );
+      stateNavs.push(
+        <span
+          key={i}
+          className={navClassNames}
+          onClick={() => {
+            setRegisterState(i);
+          }}
+        >{' '}</span>);
     }
     return (
       <div className="auth-intro form-b">
@@ -88,13 +99,17 @@ export default class Register extends Component {
         </div>
         <div className="form-f">
           <div className="form-f-b no-border">
-            Already have an account? <a href="#" onClick={e => {
-              e.preventDefault();
-              this.context.router.push('/login');
-            }}>Login</a>
+            Already have an account?
+            <a
+              href={undefined}
+              onClick={e => {
+                e.preventDefault();
+                this.context.router.push('/login');
+              }}
+            >Login</a>
           </div>
         </div>
       </div>
-    )
+    );
   }
 }

@@ -1,5 +1,5 @@
-import { errorCodeLookup } from './server/error_code_lookup';
 import { shell } from 'electron';
+import { errorCodeLookup } from './server/error_code_lookup';
 
 class ProxyListener {
   constructor() {
@@ -52,8 +52,7 @@ export default class UIUtils {
 
   // register
   register(location, password, callback) {
-    var self = this;
-    this.api.auth.register(location, password, function(err) {
+    this.api.auth.register(location, password, (err) => {
       if (err) {
         return callback(err);
       }
@@ -130,10 +129,10 @@ export default class UIUtils {
 
   // focus window
   focusWindow() {
-    var browserWindow = this.remote.getCurrentWindow();
-    this.remote.getCurrentWindow().setAlwaysOnTop(true);
-    this.remote.getCurrentWindow().focus();
-    this.remote.getCurrentWindow().setAlwaysOnTop(false);
+    const browserWindow = this.remote.getCurrentWindow();
+    browserWindow.setAlwaysOnTop(true);
+    browserWindow.focus();
+    browserWindow.setAlwaysOnTop(false);
   }
 
   // start proxy server
@@ -173,20 +172,19 @@ export default class UIUtils {
   }
 
   reconnect(user) {
-    var self = this;
     this.api.reset();
     if (user) {
-      this.api.auth.login(user.accountSecret, user.accountPassword, function(err) {
-        if (!self.onNetworkStateChange) {
+      this.api.auth.login(user.accountSecret, user.accountPassword, (err) => {
+        if (!this.onNetworkStateChange) {
           return;
         }
-        var status;
+        let status = null;
         if (err) {
           status = window.NETWORK_STATE.DISCONNECTED;
         } else {
           status = window.NETWORK_STATE.CONNECTED;
         }
-        self.onNetworkStateChange(status);
+        this.onNetworkStateChange(status);
       });
     } else {
       this.api.connectWithUnauthorisedClient();

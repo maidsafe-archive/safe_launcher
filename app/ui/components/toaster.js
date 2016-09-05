@@ -3,6 +3,17 @@ import className from 'classnames';
 import { CONSTANT } from '../constant';
 
 export default class Toaster extends Component {
+  static propTypes = {
+    active: PropTypes.bool.isRequired,
+    hasNext: PropTypes.bool.isRequired,
+    message: PropTypes.string.isRequired,
+    options: PropTypes.object.isRequired,
+    retryCount: PropTypes.number.isRequired,
+    hideToaster: PropTypes.func.isRequired,
+    showNextToaster: PropTypes.func.isRequired,
+    retryNetwork: PropTypes.func.isRequired
+  };
+
   constructor() {
     super();
     this.timer = null;
@@ -17,41 +28,8 @@ export default class Toaster extends Component {
     this.setNetworkRetryTimer = this.setNetworkRetryTimer.bind(this);
   }
 
-  clearTimer() {
-    window.clearTimeout(this.timer);
-    this.timer = null;
-  }
-
-  setTimer(timeout) {
-    this.timer = window.setTimeout(() => {
-      this.clearTimer();
-      if (this.props.hasNext) {
-        return this.props.showNextToaster();
-      }
-      return this.props.hideToaster();
-    }, timeout || CONSTANT.TOSATER_TIMEOUT);
-  }
-
-  clearNetworkRetryTimer() {
-    clearTimeout(this.retryTimer);
-    this.retryTimer = null;
-  }
-
-  setNetworkRetryTimer() {
-    let self = this;
-    this.retryTimer = window.setInterval(() => {
-      self.refs.message.innerText = this.props.message + ' ' + self.initialRetryCount + ' sec';
-      if (self.initialRetryCount === 0) {
-        self.clearNetworkRetryTimer();
-        return self.props.retryNetwork();
-      }
-      self.initialRetryCount--;
-    }, 1000);
-  }
-
   componentDidUpdate() {
-    const { options, message, retryCount } = this.props;
-    let self = this;
+    const { options, retryCount } = this.props;
     this.initialRetryCount *= Math.pow(2, retryCount);
     if (options) {
       if (options.autoHide) {
@@ -69,7 +47,38 @@ export default class Toaster extends Component {
     this.clearNetworkRetryTimer();
   }
 
-  handleMouseEnter(e) {
+  setTimer(timeout) {
+    this.timer = window.setTimeout(() => {
+      this.clearTimer();
+      if (this.props.hasNext) {
+        return this.props.showNextToaster();
+      }
+      return this.props.hideToaster();
+    }, timeout || CONSTANT.TOSATER_TIMEOUT);
+  }
+
+  setNetworkRetryTimer() {
+    this.retryTimer = window.setInterval(() => {
+      this.message.innerText = `${this.props.message} ${this.initialRetryCount} sec`;
+      if (this.initialRetryCount === 0) {
+        this.clearNetworkRetryTimer();
+        return this.props.retryNetwork();
+      }
+      this.initialRetryCount--;
+    }, 1000);
+  }
+
+  clearNetworkRetryTimer() {
+    clearTimeout(this.retryTimer);
+    this.retryTimer = null;
+  }
+
+  clearTimer() {
+    window.clearTimeout(this.timer);
+    this.timer = null;
+  }
+
+  handleMouseEnter() {
     const { options } = this.props;
 
     if (options && !options.autoHide) {
@@ -78,7 +87,7 @@ export default class Toaster extends Component {
     this.clearTimer();
   }
 
-  handleMouseLeave(e) {
+  handleMouseLeave() {
     const { options } = this.props;
 
     if (options && !options.autoHide) {
@@ -88,30 +97,47 @@ export default class Toaster extends Component {
   }
 
   render() {
-    const { active, message, options, hasNext, retryNetwork } = this.props;
+    const { active, message, options, retryNetwork } = this.props;
     let option = null;
 
-    if (options) {
+    if (Object.keys(options).length > 0) {
       switch (options.type) {
         case CONSTANT.TOASTER_OPTION_TYPES.NETWORK_RETRY:
           option = (
             <div className="opt-i">
-              <button type="button" className="btn" name="retry" onClick={e => {
-                clearTimeout(self.retryTimer);
-                retryNetwork();
-              }}>RETRY</button>
+              <button
+                type="button"
+                className="btn"
+                name="retry"
+                onClick={() => {
+                  clearTimeout(self.retryTimer);
+                  retryNetwork();
+                }}
+              >RETRY</button>
             </div>
-          )
+          );
           break;
         default:
-
+          break;
       }
     }
 
     return (
-      <div className={className('toaster', { 'active': active })}>
-        <div className={className('toaster-b', { 'with-opt': (options && options.type), 'error': (options && options.error) })} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
-          <div className="msg" ref="message">
+      <div className={className('toaster', { active })}>
+        <div
+          className={
+            className(
+              'toaster-b',
+              {
+                'with-opt': (options && options.type),
+                error: (options && options.error)
+              }
+            )
+          }
+          onMouseEnter={this.handleMouseEnter}
+          onMouseLeave={this.handleMouseLeave}
+        >
+          <div className="msg" ref={c => { this.message = c; }}>
             { message }
           </div>
           <div className="opt">
@@ -119,6 +145,6 @@ export default class Toaster extends Component {
           </div>
         </div>
       </div>
-    )
+    );
   }
 }

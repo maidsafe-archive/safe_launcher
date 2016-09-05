@@ -1,9 +1,9 @@
 import webpack from 'webpack';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import merge from 'webpack-merge';
-import baseConfig from './webpack.config.base';
 import path from 'path';
-var CopyWebpackPlugin = require('copy-webpack-plugin');
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import baseConfig from './webpack.config.base';
 
 const config = merge(baseConfig, {
   devtool: 'cheap-module-source-map',
@@ -17,15 +17,15 @@ const config = merge(baseConfig, {
     publicPath: '../dist/'
   },
   externals: {
-    'buffer': 'buffer',
-    'winston': 'winston'
+    buffer: 'buffer',
+    winston: 'winston'
   },
   module: {
     loaders: [
       {
-       test: /\.js$/,
-       loaders: ['babel'],
-       exclude: [path.join(__dirname, 'app', 'api'), path.join(__dirname, 'app', 'server')]
+        test: /\.js$/,
+        loaders: ['babel'],
+        exclude: [path.join(__dirname, 'app', 'api'), path.join(__dirname, 'app', 'server')]
       },
       {
         test: /\.global\.css$/,

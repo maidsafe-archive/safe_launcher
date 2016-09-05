@@ -1,6 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 
 export default class RegisterAccPassInfo extends Component {
+  static propTypes = {
+    stateContinue: PropTypes.func.isRequired,
+    stateBack: PropTypes.func.isRequired
+  };
+
   render() {
     return (
       <div className="auth-intro-cnt">
@@ -13,17 +18,27 @@ export default class RegisterAccPassInfo extends Component {
         </div>
         <div className="opt">
           <div className="opt-i lt">
-            <button type="button" className="btn" name="back" onClick={e => {
-              this.props.stateBack()
-            }}>Back</button>
+            <button
+              type="button"
+              className="btn"
+              name="back"
+              onClick={() => {
+                this.props.stateBack();
+              }}
+            >Back</button>
           </div>
           <div className="opt-i">
-            <button type="button" className="btn" name="continue" onClick={e => {
-              this.props.stateContinue()
-            }}>Continue</button>
+            <button
+              type="button"
+              className="btn"
+              name="continue"
+              onClick={() => {
+                this.props.stateContinue();
+              }}
+            >Continue</button>
           </div>
         </div>
       </div>
-    )
+    );
   }
 }

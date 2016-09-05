@@ -35,7 +35,7 @@ const packageForOs = {
   }
 };
 
-const optionForOs = packageForOs[os.platform()]
+const optionForOs = packageForOs[os.platform()];
 
 const DEFAULT_OPTS = {
   dir: './',

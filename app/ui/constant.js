@@ -10,11 +10,11 @@ export const CONSTANT = {
 };
 
 export const MESSAGES = {
-  'NETWORK_CONNECTING': 'Connecting to SAFE Network',
-  'NETWORK_CONNECTED': 'Network connected',
-  'NETWORK_DISCONNECTED': 'Network Disconnected. Retrying in',
-  'NETWORK_RETRYING': 'Trying to reconnnect to the network',
-  'NETWORK_NOT_CONNECTED': 'Network not connected yet!',
-  'PROXY_SERVER_ERROR': 'Failed to connect Proxy Server',
-  'APP_REVOKED': 'Revoked access for ',
+  NETWORK_CONNECTING: 'Connecting to SAFE Network',
+  NETWORK_CONNECTED: 'Network connected',
+  NETWORK_DISCONNECTED: 'Network Disconnected. Retrying in',
+  NETWORK_RETRYING: 'Trying to reconnnect to the network',
+  NETWORK_NOT_CONNECTED: 'Network not connected yet!',
+  PROXY_SERVER_ERROR: 'Failed to connect Proxy Server',
+  APP_REVOKED: 'Revoked access for ',
 };

@@ -3,18 +3,18 @@ import Toaster from '../components/toaster';
 import { hideToaster, showNextToaster } from '../actions/toaster_action';
 import { retryNetwork } from '../actions/network_status_action';
 
-const mapStateToProps = function(state) {
-  return {
+const mapStateToProps = state => (
+  {
     active: state.toaster.active,
     message: state.toaster.message,
     options: state.toaster.options,
     hasNext: state.toaster.hasNext,
     retryCount: state.networkStatus.retryCount
-  };
-}
+  }
+);
 
-const mapDispatchToProps = function(dispatch) {
-  return {
+const mapDispatchToProps = dispatch => (
+  {
     hideToaster: () => {
       dispatch(hideToaster());
     },
@@ -25,7 +25,7 @@ const mapDispatchToProps = function(dispatch) {
       dispatch(hideToaster());
       dispatch(retryNetwork());
     }
-  };
-}
+  }
+);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Toaster);

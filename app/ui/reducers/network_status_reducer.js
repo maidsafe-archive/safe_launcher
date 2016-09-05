@@ -7,20 +7,15 @@ const networkStatus = (state = {
   switch (action.type) {
     case ActionTypes.TOAST_NETWORK_STATUS:
       return { ...state, showToaster: true };
-      break;
     case ActionTypes.RETRYING_NETWORK: {
-      return { ...state, networkStatus: 0, retryCount: state.retryCount + 1 }
-      break;
+      return { ...state, networkStatus: 0, retryCount: state.retryCount + 1 };
     }
     case ActionTypes.SET_NETWORK_CONNECTING:
-      return { ...state, networkStatus: 0 }
-      break;
+      return { ...state, networkStatus: 0 };
     case ActionTypes.SET_NETWORK_CONNECTED:
-      return { ...state, networkStatus: 1 }
-      break;
+      return { ...state, networkStatus: 1 };
     case ActionTypes.SET_NETWORK_DISCONNECTED:
-      return { ...state, networkStatus: 2 }
-      break;
+      return { ...state, networkStatus: 2 };
     default:
       return state;
   }

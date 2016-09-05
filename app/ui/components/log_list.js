@@ -1,64 +1,31 @@
 import React, { Component, PropTypes } from 'react';
 import className from 'classnames';
-
-const STATUS = {
-  0: {
-    className: 'in-progress',
-    code: 'IN_PROGRESS'
-  },
-  1: {
-    className: 'completed',
-    code: 'SUCCESS'
-  },
-  '-1': {
-    className: 'error',
-    code: 'FAILURE'
-  }
-};
-
-class Log extends Component {
-  constructor() {
-    super();
-  }
-
-  render() {
-    const { log } = this.props;
-
-    if (!log) {
-      return (
-        <tr className='default-row'>
-          <td colSpan='100%'>No requests made yet.</td>
-        </tr>
-      );
-    }
-
-    return (
-      <tr className={ STATUS[log.activityStatus].className }>
-        <td>{ log.appName || 'Anonymous Application' }</td>
-        <td>{ log.activityName }</td>
-        <td>{ STATUS[log.activityStatus].code.replace(/_/g, ' ') }</td>
-        <td>{ log.beginTime }</td>
-      </tr>
-    )
-  }
-}
+import Log from './log';
+import { LOG_STATUS as STATUS } from '../utils/app_utils';
 
 export default class LogList extends Component {
+  static propTypes = {
+    appLogs: PropTypes.array.isRequired,
+    logFilter: PropTypes.array.isRequired,
+    forSingleApp: PropTypes.bool.isRequired,
+    setLogsFilter: PropTypes.func.isRequired,
+  };
+
   constructor() {
     super();
     this.handleFilter = this.handleFilter.bind(this);
   }
 
-  handleFilter(e) {
+  handleFilter() {
     const { setLogsFilter } = this.props;
-    let filter = [];
-    if (inProgress.checked) {
+    const filter = [];
+    if (this.inProgress.checked) {
       filter.push(STATUS[0].code);
     }
-    if (completed.checked) {
+    if (this.completed.checked) {
       filter.push(STATUS[1].code);
     }
-    if (error.checked) {
+    if (this.error.checked) {
       filter.push(STATUS['-1'].code);
     }
     setLogsFilter(filter);
@@ -67,36 +34,56 @@ export default class LogList extends Component {
   render() {
     const { appLogs, logFilter, forSingleApp } = this.props;
 
-    let filterDisabled = (appLogs.length === 0);
+    const filterDisabled = (appLogs.length === 0);
 
-    let tableViewClassnames = className(
+    const tableViewClassnames = className(
       'table-view',
       { 'without-pad': forSingleApp }
     );
 
-    let tableInnerBaseClassnames = className(
+    const tableInnerBaseClassnames = className(
       'table-inner-b',
       { 'three-col': forSingleApp }
     );
 
-    let tableFilterClassnames = className(
+    const tableFilterClassnames = className(
       'table-filter',
-      { 'disabled': filterDisabled }
+      { disabled: filterDisabled }
     );
+
+    const emptyLog = {};
 
     return (
       <div className={tableViewClassnames}>
         <div className={tableFilterClassnames}>
           <div className="table-filter-i checkbox in-progress">
-            <input id="inProgress" type="checkbox" ref="inProgress" value="" onChange={this.handleFilter} disabled={filterDisabled ? 'disabled' : '' }/>
+            <input
+              id="inProgress"
+              type="checkbox"
+              ref={c => { this.inProgress = c; }}
+              onChange={this.handleFilter}
+              disabled={filterDisabled ? 'disabled' : ''}
+            />
             <label htmlFor="inProgress">In Progress</label>
           </div>
           <div className="table-filter-i checkbox completed">
-            <input id="completed" type="checkbox" ref="completed" value="" onChange={this.handleFilter} disabled={filterDisabled ? 'disabled' : '' } />
+            <input
+              id="completed"
+              type="checkbox"
+              ref={c => { this.completed = c; }}
+              onChange={this.handleFilter}
+              disabled={filterDisabled ? 'disabled' : ''}
+            />
             <label htmlFor="completed">Completed</label>
           </div>
           <div className="table-filter-i checkbox error">
-            <input id="error" type="checkbox" ref="error" value="" onChange={this.handleFilter} disabled={filterDisabled ? 'disabled' : '' } />
+            <input
+              id="error"
+              type="checkbox"
+              ref={c => { this.error = c; }}
+              onChange={this.handleFilter}
+              disabled={filterDisabled ? 'disabled' : ''}
+            />
             <label htmlFor="error">Error</label>
           </div>
         </div>
@@ -112,19 +99,20 @@ export default class LogList extends Component {
             </thead>
             <tbody>
               {
-                appLogs.length === 0 ? <Log /> : appLogs.map((log, i) => {
-                  if ((logFilter.length !== 0) && (logFilter.indexOf(STATUS[log.activityStatus].code) === -1)) {
-                    return;
+                appLogs.length === 0 ? <Log log={emptyLog} /> : appLogs.map((log, i) => {
+                  if ((logFilter.length !== 0) &&
+                    (logFilter.indexOf(STATUS[log.activityStatus].code) === -1)) {
+                    return null;
                   }
                   return (
                     <Log key={i} log={log} />
-                  )
+                  );
                 })
               }
             </tbody>
           </table>
         </div>
       </div>
-    )
+    );
   }
 }

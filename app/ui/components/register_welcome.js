@@ -1,6 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 
 export default class RegisterWelcome extends Component {
+  static propTypes = {
+    stateContinue: PropTypes.func.isRequired
+  };
+
   render() {
     return (
       <div className="auth-intro-cnt">
@@ -9,17 +13,23 @@ export default class RegisterWelcome extends Component {
           <img src="./ui/images/launcher_logo.svg" alt="Welcome to the Safe Launcher" />
         </div>
         <div className="desc">
-          Launcher will act as your gateway to the SAFE Network, you can use it to access data on the network and to
+          Launcher will act as your gateway to the SAFE Network,
+          you can use it to access data on the network and to
           authorise apps to connect on your behalf.
         </div>
         <div className="opt">
           <div className="opt-i">
-            <button type="button" className="btn" name="continue" onClick={e => {
-              this.props.stateContinue()
-            }}>Continue</button>
+            <button
+              type="button"
+              className="btn"
+              name="continue"
+              onClick={() => {
+                this.props.stateContinue();
+              }}
+            >Continue</button>
           </div>
         </div>
       </div>
-    )
+    );
   }
 }

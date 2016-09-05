@@ -1,7 +1,7 @@
 import fse from 'fs-extra';
 import path from 'path';
 
-let build = () => {
+const build = () => {
   const srcDir = 'app';
   const destDir = 'dist';
   const filesToMove = [
@@ -11,9 +11,10 @@ let build = () => {
     'ui/images',
     'app.html'
   ];
-  filesToMove.map((file) => {
-    fse.copySync(path.resolve('.', srcDir, file), path.resolve('.', destDir, file));
-  });
+  let filePath = null;
+  for (filePath of filesToMove) {
+    fse.copySync(path.resolve('.', srcDir, filePath), path.resolve('.', destDir, filePath));
+  }
 };
 
 build();

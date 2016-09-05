@@ -1,1 +1,5 @@
 main.js
+app/server/**/*
+app/logger
+app/api
+app/env.js

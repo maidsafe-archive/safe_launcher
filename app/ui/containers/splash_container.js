@@ -2,19 +2,17 @@ import { connect } from 'react-redux';
 import Splash from '../components/splash';
 import { retryNetwork } from '../actions/network_status_action';
 
-const mapStateToProps = function(state) {
-  return {
+const mapStateToProps = state => (
+  {
     status: state.networkStatus.networkStatus,
     initialSettings: state.proxy.initialSettings
-  };
-}
+  }
+);
 
-const mapDispatchToProps = function(dispatch) {
-  return {
-    networkRetry: () => {
-      return dispatch(retryNetwork());
-    }
-  };
-}
+const mapDispatchToProps = dispatch => (
+  {
+    networkRetry: () => (dispatch(retryNetwork()))
+  }
+);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Splash);

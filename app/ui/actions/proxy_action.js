@@ -1,20 +1,25 @@
 import ActionTypes from './action_types';
-import { showToaster } from './toaster_action';
 
-export const toggleProxy = () => {
-  return {
+export const toggleProxy = () => (
+  {
     type: ActionTypes.TOGGLE_PROXY
   }
-}
+);
 
-export const setProxy = () => {
-  return {
+export const setProxy = () => (
+  {
     type: ActionTypes.SET_PROXY
   }
-}
+);
 
-export const finishInitialProxySettings = () => {
-  return {
+export const finishInitialProxySettings = () => (
+  {
     type: ActionTypes.FINISH_INITIAL_PROXY_SETTINGS
   }
-}
+);
+
+export const setProxyError = () => (
+  {
+    type: ActionTypes.PROXY_ERROR
+  }
+);

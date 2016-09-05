@@ -1,7 +1,7 @@
 import webpack from 'webpack';
 import merge from 'webpack-merge';
-import baseConfig from './webpack.config.base';
 import path from 'path';
+import baseConfig from './webpack.config.base';
 
 export default merge(baseConfig, {
   devtool: 'source-map',
@@ -9,7 +9,7 @@ export default merge(baseConfig, {
   entry: ['babel-polyfill', './main.development'],
 
   output: {
-    path: __dirname + '/dist',
+    path: path.join(__dirname, '/dist'),
     filename: './main.js'
   },
 
@@ -42,10 +42,5 @@ export default merge(baseConfig, {
     'open-sans-fontface',
     'source-map-support',
     'winston'
-  ],
-  resolve: {
-    root: [
-      path.resolve('./dist')
-    ]
-  }
+  ]
 });

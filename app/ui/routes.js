@@ -15,17 +15,17 @@ import HelpPage from './containers/help_container';
 
 export default (
   <Route path="/" component={App}>
-    <IndexRoute component={Splash}/>
+    <IndexRoute component={Splash} />
     <Route path="/initial_settings" component={InitialSettingsPage} />
     <Route path="/home" component={HomePage}>
       <Route path="/account" component={AccountPage}>
-        <IndexRoute component={LoginPage}/>
+        <IndexRoute component={LoginPage} />
         <Route path="/login" component={LoginPage} />
         <Route path="/register" component={RegisterPage} />
-        <Route path="/account_app_list" component={AccountAppListPage}  />
+        <Route path="/account_app_list" component={AccountAppListPage} />
       </Route>
       <Route path="/dashboard" component={DashboardPage} />
-      <Route path="/app_logs" component={AppLogsPage}  />
+      <Route path="/app_logs" component={AppLogsPage} />
       <Route path="/settings" component={SettingsPage} />
       <Route path="/help" component={HelpPage} />
     </Route>

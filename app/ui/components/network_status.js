@@ -10,20 +10,23 @@ export default class NetworkStatus extends Component {
   render() {
     const { status, onNetworkStatusClick } = this.props;
 
-    let networkStatusClasses = className(
+    const networkStatusClasses = className(
       'network-status',
       {
-        'error': status === -1 || status === 2,
-        'connecting': status === 0,
-        'connected': status === 1,
+        error: status === -1 || status === 2,
+        connecting: status === 0,
+        connected: status === 1,
         'splash-screen': false
       }
     );
 
     return (
-      <span className={networkStatusClasses} onClick={() => {
-        onNetworkStatusClick(status)
-      }}></span>
-    )
+      <span
+        className={networkStatusClasses}
+        onClick={() => {
+          onNetworkStatusClick(status);
+        }}
+      >{' '}</span>
+    );
   }
 }

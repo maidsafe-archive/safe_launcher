@@ -1,12 +1,11 @@
 import ActionTypes from '../actions/action_types';
 
-let ToasterQueue = [];
-
-let initialState = {
+const ToasterQueue = [];
+const initialState = {
   active: false,
   hasNext: false,
-  message: null,
-  options: null
+  message: '',
+  options: {}
 };
 
 const toaster = (state = initialState, action) => {
@@ -16,20 +15,30 @@ const toaster = (state = initialState, action) => {
       if (state.active) {
         return { ...state, hasNext: true };
       }
-      let currentToast = ToasterQueue.pop();
-      return { ...state, active: true, message: currentToast.message, options: currentToast.options, hasNext: (ToasterQueue.length !== 0) };
-      break;
+      const currentToast = ToasterQueue.pop();
+      return {
+        ...state,
+        active: true,
+        message: currentToast.message,
+        options: currentToast.options,
+        hasNext: (ToasterQueue.length !== 0)
+      };
     }
-    case ActionTypes.SHOW_NEXT_TOASTER:
-      let currentToast = ToasterQueue.pop();
+    case ActionTypes.SHOW_NEXT_TOASTER: {
+      const currentToast = ToasterQueue.pop();
       if (!currentToast) {
         return state;
       }
-      return { ...state, active: true, message: currentToast.message, options: currentToast.options, hasNext: (ToasterQueue.length !== 0) };
-      break;
+      return {
+        ...state,
+        active: true,
+        message: currentToast.message,
+        options: currentToast.options,
+        hasNext: (ToasterQueue.length !== 0)
+      };
+    }
     case ActionTypes.HIDE_TOASTER: {
-      return { ...state, active: false, message: null, options: null };
-      break;
+      return { ...state, active: false, message: '', options: {} };
     }
     default:
       return state;

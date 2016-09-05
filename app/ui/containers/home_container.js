@@ -1,14 +1,12 @@
 import { connect } from 'react-redux';
 import Home from '../components/home';
 
-const mapStateToProps = function(state) {
-  return {
+const mapStateToProps = state => (
+  {
     authProcessing: state.auth.authProcessing
-  };
-}
+  }
+);
 
-const mapDispatchToProps = function(dispatch) {
-  return {};
-}
+const mapDispatchToProps = () => ({});
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

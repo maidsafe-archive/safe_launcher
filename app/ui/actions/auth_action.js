@@ -1,96 +1,80 @@
 import ActionTypes from './action_types';
 
-export const loginSuccess = (res) => {
-  return {
+export const loginSuccess = (res) => (
+  {
     type: ActionTypes.LOGIN_SUCCESS,
     user: res
-  };
-}
+  }
+);
 
-export const loginError = (err) => {
-  return {
+export const loginError = (err) => (
+  {
     type: ActionTypes.LOGIN_ERROR,
     error: err
-  };
-}
+  }
+);
 
-export const registerSuccess = (res) => {
-  return {
-    type: ActionTypes.REGISTER_SUCCESS,
-    user: res
-  };
-}
+export const registerSuccess = (res) => ({
+  type: ActionTypes.REGISTER_SUCCESS,
+  user: res
+});
 
-export const registerError = (err) => {
-  return {
-    type: ActionTypes.REGISTER_ERROR,
-    error: err
-  };
-}
+export const registerError = (err) => ({
+  type: ActionTypes.REGISTER_ERROR,
+  error: err
+});
 
-export const setAuthProcessing = () => {
-  return {
-    type: ActionTypes.AUTH_PROCESSING
-  };
-}
+export const setAuthProcessing = () => ({
+  type: ActionTypes.AUTH_PROCESSING
+});
 
-export const cancelAuthReq = () => {
-  return {
-    type: ActionTypes.AUTH_CANCEL
-  };
-}
+export const cancelAuthReq = () => ({
+  type: ActionTypes.AUTH_CANCEL
+});
 
-export const setRegisterStateNext = (user) => {
-  return {
-    type: ActionTypes.REGISTER_STATE_NEXT,
-    user: user
-  };
-}
+export const setRegisterStateNext = user => ({
+  type: ActionTypes.REGISTER_STATE_NEXT,
+  user
+});
 
-export const setRegisterStateBack = () => {
-  return {
-    type: ActionTypes.REGISTER_STATE_BACK
-  };
-}
+export const setRegisterStateBack = () => ({
+  type: ActionTypes.REGISTER_STATE_BACK
+});
 
-export const setRegisterState = (navState) => {
-  return {
-    type: ActionTypes.SET_REGISTER_STATE,
-    navState: navState
-  };
-}
+export const setRegisterState = navState => ({
+  type: ActionTypes.SET_REGISTER_STATE,
+  navState
+});
 
-export const resetUser = () => {
-  return {
-    type: ActionTypes.RESET_USER
-  };
-}
+export const resetUser = () => ({
+  type: ActionTypes.RESET_USER
+});
 
-export const login = (payload) => {
-  return dispatch => {
+export const login = payload => (
+  dispatch => {
     dispatch(setAuthProcessing());
-    window.msl.login(payload.accountSecret, payload.accountPassword, (err, res) => {
+    window.msl.login(payload.accountSecret, payload.accountPassword, (err) => {
       if (err) {
-        dispatch(loginError(err))
+        dispatch(loginError(err));
       } else {
-        dispatch(loginSuccess(payload))
+        dispatch(loginSuccess(payload));
       }
     });
   }
-}
+);
 
-export const register = (payload) => {
-  return dispatch => {
+export const register = payload => (
+  dispatch => {
     dispatch(setAuthProcessing());
-    window.msl.register(payload.accountSecret, payload.accountPassword, (err, res) => {
+    window.msl.register(payload.accountSecret, payload.accountPassword, (err) => {
       if (err) {
-        dispatch(registerError(err))
+        dispatch(registerError(err));
       } else {
-        dispatch(registerSuccess(payload))
+        dispatch(registerSuccess(payload));
       }
     });
   }
-}
+);
 
 export const logout = (userData) => {
   window.msl.clearAllSessions();
@@ -98,5 +82,5 @@ export const logout = (userData) => {
   window.msl.reconnect(userData);
   return {
     type: ActionTypes.LOGOUT
-  }
-}
+  };
+};

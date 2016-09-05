@@ -13,15 +13,15 @@ window.NETWORK_STATE = {
   RETRY: 3
 };
 
-let restServer = new RESTServer(api, env.serverPort);
+const restServer = new RESTServer(api, env.serverPort);
 
-let onFfiProcessTerminated = (title, msg) => {
+const onFfiProcessTerminated = (title, msg) => {
   remote.dialog.showMessageBox({
     type: 'error',
-    buttons: [ 'Ok' ],
-    title: title,
+    buttons: ['Ok'],
+    title,
     message: msg
-  }, function() {
+  }, () => {
     window.msl.closeWindow();
   });
 };
@@ -39,21 +39,22 @@ api.setNetworkStateListener((state, isRegisteredClient) => {
     case 0:
       if (isRegisteredClient) {
         // log.debug('Dropping unregistered client');
-        window.msl.dropUnregisteredClient(function() {});
+        window.msl.dropUnregisteredClient(() => {});
       }
-      window.msl.networkStateChange(NETWORK_STATE.CONNECTED);
+      window.msl.networkStateChange(window.NETWORK_STATE.CONNECTED);
       break;
 
     case 1:
-      window.msl.networkStateChange(NETWORK_STATE.DISCONNECTED);
+      window.msl.networkStateChange(window.NETWORK_STATE.DISCONNECTED);
       break;
 
     case 2:
-      window.msl.networkStateChange(NETWORK_STATE.DISCONNECTED);
+      window.msl.networkStateChange(window.NETWORK_STATE.DISCONNECTED);
       break;
 
     default:
-      onFfiProcessTerminated('FFI process terminated', 'FFI library could not be loaded. Error code :: ' +  state);
+      onFfiProcessTerminated('FFI process terminated',
+        `FFI library could not be loaded. Error code :: ${state}`);
       break;
   }
 });

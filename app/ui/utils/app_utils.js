@@ -1,34 +1,53 @@
+import pkg from '../../../package.json';
+
 const LOCAL_STORAGE_KEYS = {
   SAFE_LAUNCHER_PROXY: 'safe_launcher_proxy',
 };
 
-export const appVersion = require('../../../package.json').version;
+export const appVersion = pkg.version;
 
-export let getProxy = () => {
-  return JSON.parse(window.localStorage.getItem(LOCAL_STORAGE_KEYS.SAFE_LAUNCHER_PROXY));
+export const LOG_STATUS = {
+  0: {
+    className: 'in-progress',
+    code: 'IN_PROGRESS'
+  },
+  1: {
+    className: 'completed',
+    code: 'SUCCESS'
+  },
+  '-1': {
+    className: 'error',
+    code: 'FAILURE'
+  }
 };
 
-export let setProxy = (status) => {
+export const getProxy = () => (
+  JSON.parse(window.localStorage.getItem(LOCAL_STORAGE_KEYS.SAFE_LAUNCHER_PROXY))
+);
+
+export const setProxy = (status) => {
   if (status) {
     window.msl.startProxyServer();
   } else {
     window.msl.stopProxyServer();
   }
-  window.localStorage.setItem(LOCAL_STORAGE_KEYS.SAFE_LAUNCHER_PROXY, JSON.stringify({ 'status' : status }))
+  window.localStorage.setItem(LOCAL_STORAGE_KEYS.SAFE_LAUNCHER_PROXY,
+    JSON.stringify({ status }));
 };
 
-export let openExternal = (url) => {
+export const openExternal = (url) => {
   window.msl.openExternal(url);
 };
 
-export let bytesToSize = (bytes) => {
-  var sizes = [ 'Bytes', 'KB', 'MB', 'GB', 'TB' ];
+export const bytesToSize = (bytes) => {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   if (bytes === 0) {
-    return '0 ' + sizes[0];
+    return `0 ${sizes[0]}`;
   }
-  var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+  const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
   if (i === 0) {
-    return bytes + ' ' + sizes[i];
+    return `${bytes} ${sizes[i]}`;
   }
-  return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
-}
+  const resultStr = (bytes / Math.pow(1024, i)).toFixed(1);
+  return `${resultStr} ${sizes[i]}`;
+};

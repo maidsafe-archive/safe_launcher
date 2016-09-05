@@ -3,15 +3,15 @@ import NetworkStatus from '../components/network_status';
 import { showToaster } from '../actions/toaster_action';
 import { MESSAGES } from '../constant';
 
-const mapStateToProps = function(state) {
-  return {
+const mapStateToProps = state => (
+  {
     status: state.networkStatus.networkStatus
-  };
-}
+  }
+);
 
-const mapDispatchToProps = function(dispatch) {
-  return {
-    onNetworkStatusClick: (status) => {
+const mapDispatchToProps = dispatch => (
+  {
+    onNetworkStatusClick: status => {
       switch (status) {
         case 0:
           dispatch(showToaster(MESSAGES.NETWORK_CONNECTING, { autoHide: true }));
@@ -26,7 +26,7 @@ const mapDispatchToProps = function(dispatch) {
 
       }
     }
-  };
-}
+  }
+);
 
 export default connect(mapStateToProps, mapDispatchToProps)(NetworkStatus);

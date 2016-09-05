@@ -4,6 +4,14 @@ import className from 'classnames';
 import zxcvbn from 'zxcvbn';
 
 export default class RegisterAccSecretForm extends Component {
+  static propTypes = {
+    user: PropTypes.object.isRequired,
+    error: PropTypes.object.isRequired,
+    showToaster: PropTypes.func.isRequired,
+    stateContinue: PropTypes.func.isRequired,
+    stateBack: PropTypes.func.isRequired
+  };
+
   constructor() {
     super();
     this.handleAccSecretForm = this.handleAccSecretForm.bind(this);
@@ -12,12 +20,38 @@ export default class RegisterAccSecretForm extends Component {
     this.passwordStrengthValid = false;
   }
 
+  componentWillMount() {
+    const { error, showToaster } = this.props;
+    this.errMsg = null;
+    if (Object.keys(error).length > 0) {
+      this.errMsg = window.msl.errorCodeLookup(error.errorCode || 0);
+      switch (this.errMsg) {
+        case 'CoreError::RequestTimeout':
+          this.errMsg = 'Request timed out';
+          break;
+        case 'CoreError::MutationFailure::MutationError::AccountExists':
+          this.errMsg = 'This account is already taken.';
+          break;
+        default:
+          this.errMsg = this.errMsg.replace('CoreError::', '');
+      }
+      showToaster(this.errMsg, { autoHide: true, error: true });
+    }
+  }
+
+  componentDidMount() {
+    const user = (Object.keys(this.props.user).length > 0) ? this.props.user.accountSecret : '';
+    this.accountSecret.value = user;
+    this.confirmAccountSecret.value = user;
+    this.accountSecret.dispatchEvent(new Event('keyup', { bubbles: true }));
+  }
+
   handleAccSecretForm(e) {
-    let accountSecretVal = accountSecret.value.trim();
-    let confirmAccountSecretVal = confirmAccountSecret.value.trim();
-    let accountSecretMsgEle = $(accountSecret).siblings('.msg');
-    let confirmAccountSecretMsgEle = $(confirmAccountSecret).siblings('.msg');
-    let reset = () => {
+    const accountSecretVal = this.accountSecret.value.trim();
+    const confirmAccountSecretVal = this.confirmAccountSecret.value.trim();
+    const accountSecretMsgEle = $(this.accountSecret).siblings('.msg');
+    const confirmAccountSecretMsgEle = $(this.confirmAccountSecret).siblings('.msg');
+    const reset = () => {
       accountSecretMsgEle.text('');
       confirmAccountSecretMsgEle.text('');
     };
@@ -35,7 +69,7 @@ export default class RegisterAccSecretForm extends Component {
     }
 
     if (accountSecretVal !== confirmAccountSecretVal) {
-      return confirmAccountSecretMsgEle.text('Entries don\'t match.')
+      return confirmAccountSecretMsgEle.text('Entries don\'t match.');
     }
 
     this.props.stateContinue({
@@ -44,39 +78,39 @@ export default class RegisterAccSecretForm extends Component {
   }
 
   resetInput(e) {
-    let ele = $(e.currentTarget);
-    let msgEle = ele.siblings('.msg');
+    const ele = $(e.currentTarget);
+    const msgEle = ele.siblings('.msg');
     msgEle.text('');
     $('#AccountSecret').removeClass('error');
   }
 
   handleInputChange(e) {
-    if (e.keyCode == 13) {
+    if (e.keyCode === 13) {
       return;
     }
-    let self = this;
     const MSG = {
-      'PASS_VERY_WEEK': 'Very weak',
-      'PASS_WEEK': 'Weak',
-      'PASS_SOMEWHAT_SECURE': 'Somewhat secure',
-      'PASS_SECURE': 'Secure'
+      PASS_VERY_WEEK: 'Very weak',
+      PASS_WEEK: 'Weak',
+      PASS_SOMEWHAT_SECURE: 'Somewhat secure',
+      PASS_SECURE: 'Secure'
     };
-    let ele = $(e.currentTarget);
-    let parentEle = ele.parent();
-    let statusEle = ele.siblings('.status');
-    let strengthEle = ele.siblings('.strength');
-    let msgEle = ele.siblings('.msg');
-    let value = ele.val();
-    let log10 = zxcvbn(value).guesses_log10;
-    let resetField = function() {
+    const ele = $(e.currentTarget);
+    const parentEle = ele.parent();
+    const statusEle = ele.siblings('.status');
+    const strengthEle = ele.siblings('.strength');
+    const msgEle = ele.siblings('.msg');
+    const value = ele.val();
+    const log10 = zxcvbn(value).guesses_log10;
+    const resetField = () => {
       strengthEle.width('0');
       statusEle.removeClass('icn');
-      self.errMsg = '';
-      parentEle.removeClass('error')
+      this.errMsg = '';
+      parentEle.removeClass('error');
       msgEle.text('');
-      self.passwordStrengthValid = false;
+      this.passwordStrengthValid = false;
       return;
     };
+
     resetField();
     if (!value) {
       return;
@@ -84,52 +118,26 @@ export default class RegisterAccSecretForm extends Component {
     switch (true) {
       case (log10 < 4):
         msgEle.text(MSG.PASS_VERY_WEEK);
-        self.passwordStrengthValid = false;
+        this.passwordStrengthValid = false;
         break;
       case (log10 < 8):
         msgEle.text(MSG.PASS_WEEK);
-        self.passwordStrengthValid = false;
+        this.passwordStrengthValid = false;
         break;
       case (log10 < 10):
         statusEle.addClass('icn');
         msgEle.text(MSG.PASS_SOMEWHAT_SECURE);
-        self.passwordStrengthValid = true;
+        this.passwordStrengthValid = true;
         break;
       case (log10 >= 10):
         statusEle.addClass('icn');
         msgEle.text(MSG.PASS_SECURE);
-        self.passwordStrengthValid = true;
+        this.passwordStrengthValid = true;
         break;
       default:
     }
-    strengthEle.width(Math.min((log10 / 16) * 100, 100) + '%');
-  }
 
-  componentWillMount() {
-    const { error, showToaster } = this.props;
-    this.errMsg = null;
-    if (error) {
-      this.errMsg = window.msl.errorCodeLookup(error.errorCode || 0);
-      switch (this.errMsg) {
-        case 'CoreError::RequestTimeout':
-          this.errMsg = 'Request timed out';
-          break;
-        case 'CoreError::MutationFailure::MutationError::AccountExists':
-          this.errMsg = 'This account is already taken.';
-          break;
-        default:
-          this.errMsg = errMsg.replace('CoreError::', '');
-      }
-      showToaster(this.errMsg, { autoHide: true, error: true });
-    }
-  }
-
-  componentDidMount() {
-    let user = this.props.user ? this.props.user.accountSecret : '';
-    accountSecret.value = user;
-    confirmAccountSecret.value = user;
-    accountSecret.dispatchEvent(new Event('keyup', {bubbles: true}));
-
+    strengthEle.width(`${Math.min((log10 / 16) * 100, 100)}%`);
   }
 
   showPassword(e) {
@@ -139,7 +147,7 @@ export default class RegisterAccSecretForm extends Component {
     } else {
       currentTarget.classList.add('active');
     }
-    const targetEle = this.refs[currentTarget.dataset.target];
+    const targetEle = this[currentTarget.dataset.target];
     if (targetEle.getAttribute('type') === 'text') {
       return targetEle.setAttribute('type', 'password');
     }
@@ -147,13 +155,13 @@ export default class RegisterAccSecretForm extends Component {
   }
 
   render() {
-    const { error, showToaster } = this.props;
+    const { error } = this.props;
 
-    let inputGrpClassNames = className(
+    const inputGrpClassNames = className(
       'inp-grp',
       'validate-field',
       'light-theme',
-      { 'error': error }
+      { error }
     );
 
     return (
@@ -165,24 +173,45 @@ export default class RegisterAccSecretForm extends Component {
         <div className="form-b">
           <form id="accountSecretForm" className="form" name="accountSecretForm">
             <div id="AccountSecret" className={inputGrpClassNames}>
-              <input id="accountSecret" type="password" ref="accountSecret" required="true" onKeyUp={this.handleInputChange} autoFocus />
+              <input
+                id="accountSecret"
+                type="password"
+                ref={c => { this.accountSecret = c; }}
+                required="true"
+                onKeyUp={this.handleInputChange}
+                autoFocus
+              />
               <label htmlFor="accountSecret">Account Secret</label>
               <div className="msg">{ this.errMsg ? this.errMsg : '' }</div>
               <div className="opt">
                 <div className="opt-i">
-                    <span className="eye" data-target="accountSecret" onClick={this.showPassword}></span>
+                  <span
+                    className="eye"
+                    data-target="accountSecret"
+                    onClick={this.showPassword}
+                  >{' '}</span>
                 </div>
               </div>
-              <span className="strength"></span>
-              <span className="status" data-val="min"></span>
+              <span className="strength">{' '}</span>
+              <span className="status" data-val="min">{' '}</span>
             </div>
             <div id="AccountSecretConfirm" className="inp-grp light-theme">
-              <input id="confirmAccountSecret" type="password" ref="confirmAccountSecret" required="true" onChange={this.resetInput} />
+              <input
+                id="confirmAccountSecret"
+                type="password"
+                ref={c => { this.confirmAccountSecret = c; }}
+                required="true"
+                onChange={this.resetInput}
+              />
               <label htmlFor="confirmAccountSecret">Confirm Account Secret</label>
-              <div className="msg"></div>
+              <div className="msg">{' '}</div>
               <div className="opt">
                 <div className="opt-i">
-                    <span className="eye"  data-target="confirmAccountSecret" onClick={this.showPassword}></span>
+                  <span
+                    className="eye"
+                    data-target="confirmAccountSecret"
+                    onClick={this.showPassword}
+                  >{' '}</span>
                 </div>
               </div>
             </div>
@@ -190,15 +219,26 @@ export default class RegisterAccSecretForm extends Component {
         </div>
         <div className="opt">
           <div className="opt-i lt">
-            <button type="button" className="btn" name="back" onClick={e => {
-              this.props.stateBack()
-            }}>Back</button>
+            <button
+              type="button"
+              className="btn"
+              name="back"
+              onClick={() => {
+                this.props.stateBack();
+              }}
+            >Back</button>
           </div>
           <div className="opt-i">
-            <button type="submit" className="btn" name="continue" form="accountSecretForm" onClick={this.handleAccSecretForm}>Continue</button>
+            <button
+              type="submit"
+              className="btn"
+              name="continue"
+              form="accountSecretForm"
+              onClick={this.handleAccSecretForm}
+            >Continue</button>
           </div>
         </div>
       </div>
-    )
+    );
   }
 }
