@@ -5,68 +5,52 @@
 |[![Build Status](https://travis-ci.org/maidsafe/safe_launcher.svg?branch=master)](https://travis-ci.org/maidsafe/safe_launcher)|[![Build status](https://ci.appveyor.com/api/projects/status/xnsjhx27snoh4lmy?svg=true)](https://ci.appveyor.com/project/MaidSafe-QA/safe-launcher/branch/master)|
 
 
-# Quick start
-The development dependency of this project is [Node.js v5.5](https://nodejs.org/download/release/v5.5.0/).
+## Installation
+The development dependency of this project is [Node.js v6.0 or above](https://nodejs.org/download/release/v6.0.0/).
 Build [safe_core](https://github.com/maidsafe/safe_core) with the mock Routing feature:
  
 ```
 cargo build --release --features use-mock-routing
 ```
  
-then copy the resulting shared library (`safe_core.dll` for Windows, `libsafe_core.so` for Linux or `libsafe_core.dylib` for OS X) to the `app/api/ffi` folder of this project.
+then copy the resulting shared library (`safe_core.dll` for Windows, `libsafe_core.so` for Linux or `libsafe_core.dylib` for OS X) to the `app/ffi` folder of this project.
 
 The launcher can be developed/tested only with ffi with mock feature or by running a local network only.
 
-So just make sure you have it installed.
-Then type few commands known to every Node developer...
-```
-npm install
-npm start
-```
-
-# Development
-
-#### Installation
 
 ```
 npm install
 ```
-It will also download Electron runtime, and install dependencies for second `package.json` & `bower.json` file inside `app` folder.
 
-#### Starting the app
+### Rebuild native dependencies
+Native dependencies `ffi` and `ref` have be rebuilt using `electron-rebuild`
 
 ```
-npm start
+$ cd node_modules/ffi && ../.bin/electron-rebuild & cd ../..
+$ cd node_modules/ref && ../.bin/electron-rebuild & cd ../..
 ```
 
-#### Adding npm modules to your app
+## Starting the app
 
-Remember to add your dependency to `app/package.json` file, so do:
-```
-cd app
-npm install name_of_npm_module --save
-```
 
-#### Unit tests
-
-To run it go with standard:
+Run this two commands simultaneously in different console tabs.
 ```
-npm test
+$ node -r babel-register build.development.js && npm run hot-server
+$ npm run start-hot
+```
+or run two servers with one command
+```
+npm run dev
 ```
 
 # Making a distributable package
 
 To make ready for distribution package use command based on the platform:
 ```
-npm run package
+$ node -r babel-register build.development.js && npm run package
 ```
 
-this will generate the package files in the `app_dist` folder
-
-Additional `arch` argument can be passed to the `package` command. If this argument is not specified,
-the current nodejs platform architecture will be used. Accepted values are `x86` and `x64`.
-
-Example usage `npm run package -- --arch=x64`
+this will generate the package files in the `release` folder
 
 # License
 

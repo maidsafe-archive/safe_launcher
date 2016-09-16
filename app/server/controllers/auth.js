@@ -2,33 +2,30 @@ import util from 'util';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import sessionManager from '../session_manager';
+import App from '../../ffi/model/app';
 import SessionInfo from '../model/session_info';
-import Permission from '../model/permission';
+import Permission from '../../ffi/model/permission';
+import appManager from '../../ffi/util/app_manager';
 import {
   ResponseError, ResponseHandler
 } from '../utils';
 import { log } from './../../logger/log';
 import { MSG_CONSTANTS } from './../message_constants';
 
-export let CreateSession = function(data) {
-  let req = data.request;
-  let res = data.response;
-  log.debug('Waiting for directory key for creating an session');
+export let CreateSession = async (data) => {
+  const req = data.request;
+  const res = data.response;
+  const appInfo = data.payload.app;
+  const permissions = data.permissions;
 
-  var emitSessionCreationFailed = function() {
+  const emitSessionCreationFailed = () => {
     let eventType = req.app.get('EVENT_TYPE').SESSION_CREATION_FAILED;
     req.app.get('eventEmitter').emit(eventType);
   };
 
-  this.onDirKey = function(err, dirKey) {
+  const onRegistered = (app) => {
     let authReq = req.body;
-    if (err) {
-      log.error('Creating session :: ' + JSON.stringify(err));
-      emitSessionCreationFailed();
-      return req.next(new ResponseError(500, err));
-    }
     log.debug('Directory key for creating an session obtained');
-    let app = authReq.app;
     let isNewSession = false;
     try {
       let sessionId = sessionManager.hasSessionForApp(app);
@@ -39,12 +36,12 @@ export let CreateSession = function(data) {
       } else {
         log.debug('Creating session');
         sessionId = crypto.randomBytes(32).toString('base64');
-        sessionInfo = new SessionInfo(app.id, app.name, app.version, app.vendor, data.permissions, dirKey);
+        sessionInfo = new SessionInfo(app);
         isNewSession = true;
       }
-      let payload = JSON.stringify({
+      let payload = {
         id: sessionId
-      });
+      };
       let token = jwt.sign(payload, new Buffer(sessionInfo.signingKey));
       sessionManager.put(sessionId, sessionInfo);
       let eventType = req.app.get('EVENT_TYPE').SESSION_CREATED;
@@ -56,17 +53,27 @@ export let CreateSession = function(data) {
       } else {
         emitSessionCreationFailed();
       }
+      console.log(sessionId);
       log.debug('Session for app created');
       new ResponseHandler(req, res)(null, {
         token: token,
-        permissions: authReq.permissions
+        permissions: permissions.list
       });
     } catch (e) {
+      console.error(e);
       emitSessionCreationFailed();
       req.next(new ResponseError(500, e.message));
     }
   };
-  return this.onDirKey;
+  try {
+    const app = new App(appInfo.name, appInfo.id, appInfo.vendor, appInfo.version, permissions);
+    await appManager.registerApp(app);
+    onRegistered(app);
+  } catch(e) {
+    console.error(e);
+    emitSessionCreationFailed();
+    return req.next(new ResponseError(500, e));
+  }
 };
 
 export var authorise = function(req, res, next) {
@@ -86,19 +93,21 @@ export var authorise = function(req, res, next) {
     log.debug('Authorisation request - permissions field missing');
     return next(new ResponseError(400, 'Permission field is missing'));
   }
-  let permissions = new Permission(authReq.permissions);
-  if (!permissions.isValid()) {
+  let permissions;
+  try {
+    permissions = new Permission(authReq.permissions);
+  } catch(e) {
+    console.error(e);
     log.debug('Authorisation request - Invalid permissions requested');
     return next(new ResponseError(400, 'Invalid permissions requested'));
   }
-
-  let payload = {
+  const payload = {
     payload: authReq,
     request: req,
     response: res,
     permissions: permissions
   };
-  let eventType = req.app.get('EVENT_TYPE').AUTH_REQUEST;
+  const eventType = req.app.get('EVENT_TYPE').AUTH_REQUEST;
   log.debug('Emitting event for auth request received');
   req.app.get('eventEmitter').emit(eventType, payload);
 };

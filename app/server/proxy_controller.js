@@ -27,10 +27,11 @@ class ProxyController {
       args.push('--unsafe_mode');
       args.push('true');
     }
-    this.process = childProcess.fork(path.resolve(__dirname, 'server/web_proxy.js'), args);
+    const rootPath = (process.env.NODE_ENV === 'production') ? remote.app.getAppPath() : process.cwd();
+    this.process = childProcess.fork(path.resolve(rootPath, 'dist/server/web_proxy.js'), args);
     this.process.on('exit', function() {
       log.info('Proxy server stopped');
-      remote.getGlobal('cleanUp').proxy = null;
+      remote.getGlobal('proxy').pid = null;
       proxyListener.onExit('Proxy server closed');
     });
     this.process.on('message', function(event) {
@@ -40,7 +41,7 @@ class ProxyController {
         case 'connection':
           if (event.msg.status) {
             log.info('Proxy server started');
-            remote.getGlobal('cleanUp').proxy = self.process.pid;
+            remote.getGlobal('proxy').pid = self.process.pid;
             return proxyListener.onStart(event.msg.data);
           }
           proxyListener.onError(event.msg);

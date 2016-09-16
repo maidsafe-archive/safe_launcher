@@ -132,6 +132,34 @@ export var errorCodeLookup = function(errCode) {
       return 'FfiError::Unexpected';
     case FFI_ERROR_START_RANGE - 10:
       return 'FfiError::UnsuccessfulEncodeDecode';
+    case FFI_ERROR_START_RANGE - 11:
+      return 'FfiError::NulError';
+    case FFI_ERROR_START_RANGE - 12:
+      return 'FfiError::InvalidStructDataHandle';
+    case FFI_ERROR_START_RANGE - 13:
+      return 'FfiError::InvalidDataIdHandle';
+    case FFI_ERROR_START_RANGE - 14:
+      return 'FfiError::InvalidAppendableDataHandle';
+    case FFI_ERROR_START_RANGE - 15:
+      return 'FfiError::InvalidSelfEncryptorHandle';
+    case FFI_ERROR_START_RANGE - 16:
+      return 'FfiError::InvalidCipherOptHandle';
+    case FFI_ERROR_START_RANGE - 17:
+      return 'FfiError::InvalidEncryptKeyHandle';
+    case FFI_ERROR_START_RANGE - 18:
+      return 'FfiError::InvalidSignKeyHandle';
+    case FFI_ERROR_START_RANGE - 19:
+      return 'FfiError::OperationForbiddenForApp';
+    case FFI_ERROR_START_RANGE - 20:
+      return 'FfiError::InvalidStructuredDataTypeTag';
+    case FFI_ERROR_START_RANGE - 21:
+      return 'FfiError::InvalidVersionNumber';
+    case FFI_ERROR_START_RANGE - 22:
+      return 'FfiError::InvalidSelfEncryptorReadOffsets';
+    case FFI_ERROR_START_RANGE - 23:
+      return 'FfiError::InvalidIndex';
+    case FFI_ERROR_START_RANGE - 24:
+      return 'FfiError::UnsupportedOperation';            
     default:
       return 'Unexpected error';
   }

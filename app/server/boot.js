@@ -15,7 +15,7 @@ import { log } from './../logger/log';
 class ServerEventEmitter extends EventEmitter {}
 
 export default class RESTServer {
-  constructor(api, port, callback) {
+  constructor(port, callback) {
     this.port = port;
     this.app = express();
     this.server = null;
@@ -33,7 +33,6 @@ export default class RESTServer {
       DATA_UPLOADED: 'data_uploaded',
       DATA_DOWNLOADED: 'data_downloaded'
     };
-    this.app.set('api', api);
     this.app.set('eventEmitter', new ServerEventEmitter());
     this.app.set('EVENT_TYPE', this.EVENT_TYPE);
   }
@@ -84,6 +83,7 @@ export default class RESTServer {
 
     // API Error handling
     app.use(function(err, req, res, next) {
+      console.error(err);
       if (!(err instanceof ResponseError)) {
         return next();
       }
@@ -130,6 +130,10 @@ export default class RESTServer {
     sessionManager.clear();
   }
 
+  registerConnectedApps() {
+    return sessionManager.registerApps();
+  }
+
   addEventListener(event, listener) {
     this.app.get('eventEmitter').addListener(event, listener);
   }
@@ -139,8 +143,7 @@ export default class RESTServer {
   }
 
   authApproved(data) {
-    var app = data.payload.app;
-    this.app.get('api').auth.getAppDirectoryKey(app.id, app.name, app.vendor, new CreateSession(data));
+    new CreateSession(data)
   }
 
   getAppActivityList(sessionId) {

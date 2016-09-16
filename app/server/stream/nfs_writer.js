@@ -1,4 +1,5 @@
 import util from 'util';
+import nfs from '../../ffi/api/nfs';
 import { Writable } from 'stream';
 
 export var NfsWriter = function(req, writerId, responseHandler, size, offset) {
@@ -20,21 +21,17 @@ NfsWriter.prototype._write = function(data, enc, next) {
   var self = this;
   var eventEmitter = self.req.app.get('eventEmitter');
   var uploadEvent = self.req.app.get('EVENT_TYPE').DATA_UPLOADED;
-  this.req.app.get('api').nfs.write(this.writerId, this.curOffset, data, function(err) {
-    if (err) {
-      return self.responseHandler(err);
-    }
+  nfs.writeToFile(this.writerId, data)
+  .then(() => {
     eventEmitter.emit(uploadEvent, data.length);
     self.curOffset += data.length;
     if (self.curOffset === self.maxSize) {
-      return self.req.app.get('api').nfs.closeWriter(self.writerId, self.responseHandler);
+      nfs.closeWriter(self.writerId)
+      .then(self.responseHandler, self.responseHandler, self.responseHandler);
     }
     next();
-  });
+  }, (err) => {
+    self.responseHandler(err);
+  }, console.error);
 };
 /*jscs:enable disallowDanglingUnderscores*/
-
-
-NfsWriter.prototype.closeWriter = function() {
-  this.req.app.get('api').nfs.closeWriter(this.writerId, this.responseHandler);
-};

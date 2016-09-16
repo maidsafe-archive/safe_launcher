@@ -2,6 +2,7 @@ import mime from 'mime';
 import sessionManager from '../session_manager';
 import { formatDirectoryResponse, formatResponse, ResponseError, ResponseHandler } from '../utils';
 import { log } from './../../logger/log';
+import dns from '../../ffi/api/dns';
 import { DnsReader } from '../stream/dns_reader';
 import { errorCodeLookup } from './../error_code_lookup';
 import util from 'util';
@@ -14,8 +15,8 @@ const ROOT_PATH = {
   drive: true
 };
 
-var registerOrAddService = function(req, res, isRegister, next) {
-  let sessionInfo = sessionManager.get(req.headers.sessionId);
+const registerOrAddService = (req, res, isRegister, next) => {
+  const sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
@@ -45,52 +46,44 @@ var registerOrAddService = function(req, res, isRegister, next) {
   let responseHandler = new ResponseHandler(req, res);
   if (isRegister) {
     log.debug('DNS - Invoking register API for ' + JSON.stringify(reqBody));
-    req.app.get('api').dns.register(reqBody.longName, reqBody.serviceName, reqBody.serviceHomeDirPath,
-      isPathShared, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler);
+    dns.registerService(sessionInfo.app, reqBody.longName, reqBody.serviceName, reqBody.serviceHomeDirPath,
+      isPathShared).then(responseHandler, responseHandler);
   } else {
     log.debug('DNS - Invoking add service API for ' + JSON.stringify(reqBody));
-    req.app.get('api').dns.addService(reqBody.longName, reqBody.serviceName, reqBody.serviceHomeDirPath,
-      isPathShared, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler);
+    dns.addService(sessionInfo.app, reqBody.longName, reqBody.serviceName, reqBody.serviceHomeDirPath,
+      isPathShared).then(responseHandler, responseHandler);
   }
 };
 
-export var getHomeDirectory = function(req, res, next) {
-  let sessionInfo = req.headers.sessionId ? sessionManager.get(req.headers.sessionId) : null;
-  let appDirKey = sessionInfo ? sessionInfo.appDirKey : null;
-  let hasSafeDriveAccess = sessionInfo ? sessionInfo.hasSafeDriveAccess() : false;
-  let longName = req.params.longName;
-  let serviceName = req.params.serviceName;
-  let responseHandler = new ResponseHandler(req, res);
-  log.debug('DNS - Invoking getHomeDirectory API for ' + longName + ', ' + serviceName);
-  req.app.get('api').dns.getHomeDirectory(longName, serviceName, hasSafeDriveAccess, appDirKey,
-    function(err, dir) {
-        if (err) {
-          return responseHandler(err);
-        }
-        dir = formatDirectoryResponse(JSON.parse(dir));
-        responseHandler(null, dir);
-      });
+export const getHomeDirectory = async (req, res, next) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    const sessionInfo = req.headers.sessionId ? sessionManager.get(req.headers.sessionId) : null;
+    const app = sessionInfo ? sessionInfo.app : null;
+    let longName = req.params.longName;
+    let serviceName = req.params.serviceName;    
+    log.debug('DNS - Invoking getHomeDirectory API for ' + longName + ', ' + serviceName);
+    const directory = await dns.getServiceDirectory(app, longName, serviceName);
+    responseHandler(null, directory);
+  } catch(e) {
+    return responseHandler(e);
+  }
 };
 
-export var getFile = function(req, res, next) {
-  let sessionInfo = req.headers.sessionId ? sessionManager.get(req.headers.sessionId) : null;
-  let appDirKey = sessionInfo ? sessionInfo.appDirKey : null;
-  var reqParams = req.params;
-  let hasSafeDriveAccess = sessionInfo ? sessionInfo.hasSafeDriveAccess() : false;
-  let longName = reqParams.longName;
-  let serviceName = reqParams.serviceName;
-  let filePath = reqParams['0'];
+export const getFile = async (req, res, next) => {
+  try {
+    let sessionInfo = req.headers.sessionId ? sessionManager.get(req.headers.sessionId) : null;
+    let app = sessionInfo ? sessionInfo.app : null;
+    var reqParams = req.params;
+    let hasSafeDriveAccess = sessionInfo ? sessionInfo.hasSafeDriveAccess() : false;
+    let longName = reqParams.longName;
+    let serviceName = reqParams.serviceName;
+    let filePath = reqParams['0'];
 
-  if (!(longName && serviceName && filePath)) {
-    return next(new ResponseError(400, MSG_CONSTANTS.FAILURE.REQUIRED_PARAMS_MISSING));
-  }
-  let onFileMetadataReceived = function(err, fileStats) {
-    log.debug('DNS - File metadata for reading - ' + (fileStats || JSON.stringify(err)));
-    if (err) {
-      log.error(err);
-      return next(new ResponseError(400, err));
+    if (!(longName && serviceName && filePath)) {
+      return next(new ResponseError(400, MSG_CONSTANTS.FAILURE.REQUIRED_PARAMS_MISSING));
     }
-    fileStats = formatResponse(fileStats);
+    const fileStats = await dns.getFileMetadata(app, longName, serviceName, filePath);
     let range = req.get('range');
     let positions = [ 0 ];
     if (range) {
@@ -122,93 +115,117 @@ export var getFile = function(req, res, next) {
       'Content-Type': mime.lookup(filePath) || 'application/octet-stream'
     };
     if (fileStats.metadata && fileStats.metadata.length > 0) {
-      headers.metadata = new Buffer(fileStats.metadata, 'base64').toString('base64');
+      headers.metadata = new Buffer(fileStats.metadata, 'base64').tostring('base64');
     }
     res.writeHead(range ? 206 : 200, headers);
     if (chunksize === 0) {
       return res.end();
     }
     let dnsReader = new DnsReader(req, res, longName, serviceName,
-      filePath, start, end, hasSafeDriveAccess, appDirKey);
+      filePath, start, end, app);
     dnsReader.pipe(res);
-  };
-  log.debug('DNS - Invoking getFile API for ' + longName + ', ' + serviceName + ', ' + filePath);
-  req.app.get('api').dns.getFileMetadata(longName, serviceName, filePath, hasSafeDriveAccess, appDirKey,
-    onFileMetadataReceived);
+  } catch(e) {
+    new ResponseHandler(req, res)(e);
+  }
 };
 
-export var register = function(req, res, next) {
+export const register = function(req, res, next) {
   registerOrAddService(req, res, true, next);
 };
 
-export var addService = function(req, res, next) {
+export const addService = function(req, res, next) {
   registerOrAddService(req, res, false, next);
 };
 
-export var deleteDns = function(req, res, next) {
-  let sessionInfo = sessionManager.get(req.headers.sessionId);
-  if (!sessionInfo) {
-    return next(new ResponseError(401));
+export const deleteDns = async (req, res, next) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    let sessionInfo = sessionManager.get(req.headers.sessionId);
+    if (!sessionInfo) {
+      return next(new ResponseError(401));
+    }
+    let params = req.params;
+    if (typeof params.longName !== 'string') {
+      return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'longName')));
+    }
+    log.debug('DNS - Invoking deleteDns API for ' + params.longName);
+    await dns.deleteLongName(sessionInfo.app, params.longName);
+    responseHandler();
+  } catch(e) {
+    responseHandler(e);
   }
-  let params = req.params;
-  let responseHandler = new ResponseHandler(req, res);
-  if (typeof params.longName !== 'string') {
-    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'longName')));
-  }
-  log.debug('DNS - Invoking deleteDns API for ' + params.longName);
-  req.app.get('api').dns.deleteDns(params.longName, sessionInfo.hasSafeDriveAccess(),
-    sessionInfo.appDirKey, responseHandler);
 };
 
-export var deleteService = function(req, res, next) {
-  let sessionInfo = sessionManager.get(req.headers.sessionId);
-  if (!sessionInfo) {
-    return next(new ResponseError(401));
-  }
-  let params = req.params;
+export var deleteService = async (req, res, next) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    let sessionInfo = sessionManager.get(req.headers.sessionId);
+    if (!sessionInfo) {
+      return next(new ResponseError(401));
+    }
+    let params = req.params;
 
-  if (typeof params.serviceName !== 'string') {
-    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'serviceName')));
+    if (typeof params.serviceName !== 'string') {
+      return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'serviceName')));
+    }
+    if (typeof params.longName !== 'string') {
+      return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'longName')));
+    }
+    log.debug('DNS - Invoking deleteService API for ' + params.longName + ', ' + params.serviceName);
+    await dns.deleteService(sessionInfo.app, params.longName, params.serviceName);
+    responseHandler();
+  } catch(e) {
+    responseHandler(e);
   }
-  if (typeof params.longName !== 'string') {
-    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'longName')));
-  }
-  let responseHandler = new ResponseHandler(req, res);
-  log.debug('DNS - Invoking deleteService API for ' + params.longName + ', ' + params.serviceName);
-  req.app.get('api').dns.deleteService(params.longName, params.serviceName,
-    sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler);
 };
 
-export var listLongNames = function(req, res, next) {
-  let sessionInfo = sessionManager.get(req.headers.sessionId);
-  if (!sessionInfo) {
-    return next(new ResponseError(401));
+export const listLongNames = async (req, res, next) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    let sessionInfo = sessionManager.get(req.headers.sessionId);
+    if (!sessionInfo) {
+      return next(new ResponseError(401));
+    }
+
+    log.debug('DNS - Invoking listLongNames API');
+    const longNames = await dns.listLongNames(sessionInfo.app);
+    responseHandler(null, longNames);
+  } catch(e) {
+    responseHandler(e);
   }
-  let responseHandler = new ResponseHandler(req, res);
-  log.debug('DNS - Invoking listLongNames API');
-  req.app.get('api').dns.listLongNames(sessionInfo.appDirKey, responseHandler);
 };
 
-export var listServices = function(req, res, next) {
-  let sessionInfo = sessionManager.get(req.headers.sessionId);
-  if (!sessionInfo) {
-    return next(new ResponseError(401));
+export const listServices = async (req, res, next) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    let sessionInfo = sessionManager.get(req.headers.sessionId);
+    if (!sessionInfo) {
+      return next(new ResponseError(401));
+    }
+    log.debug('DNS - Invoking listServices API for ' + req.params.longName);
+    const services = await dns.listServices(sessionInfo.app, req.params.longName);
+    responseHandler(null, services);
+  } catch(e) {
+    responseHandler(e);
   }
-  let responseHandler = new ResponseHandler(req, res);
-  log.debug('DNS - Invoking listServices API for ' + req.params.longName);
-  req.app.get('api').dns.listServices(req.params.longName, sessionInfo.appDirKey, responseHandler);
 };
 
-export var createPublicId = function(req, res, next) {
-  let sessionInfo = sessionManager.get(req.headers.sessionId);
-  if (!sessionInfo) {
-    return next(new ResponseError(401));
-  }
+export var createPublicId = async (req, res, next) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    let sessionInfo = sessionManager.get(req.headers.sessionId);
+    if (!sessionInfo) {
+      return next(new ResponseError(401));
+    }
 
-  if (!domainCheck.test(req.params.longName)) {
-    return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'longName')));
+    if (!domainCheck.test(req.params.longName)) {
+      return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'longName')));
+    }
+
+    log.debug('DNS - Invoking createPublicId API for ' + req.params.longName);
+    await dns.registerLongName(sessionInfo.app, req.params.longName);
+    responseHandler();
+  } catch(e) {
+    responseHandler(e);
   }
-  let responseHandler = new ResponseHandler(req, res);
-  log.debug('DNS - Invoking createPublicId API for ' + req.params.longName);
-  req.app.get('api').dns.createPublicId(req.params.longName, sessionInfo.appDirKey, responseHandler);
 };

@@ -33,6 +33,7 @@ export var getSessionIdFromRequest = function(req) {
     jwt.verify(token, new Buffer(sessionInfo.signingKey));
     return payload.id;
   } catch (e) {
+    console.error(e);
     return;
   }
 };
@@ -50,6 +51,11 @@ export var formatDirectoryResponse = function(dir) {
 export class ResponseError {
   constructor(status, message) {
     message = message || MSG_CONSTANTS.ERROR_CODE[status];
+    if (!isNaN(message) && message < 0) {
+      message = {
+        errorCode: message
+      };
+    }
     if (typeof message === 'object' && message.hasOwnProperty('errorCode')) {
       message.description = errorCodeLookup(message.errorCode);
       if (message.description.toLowerCase().indexOf('notfound') > -1 ||
@@ -87,8 +93,18 @@ export let ResponseHandler = function(req, res) {
       return;
     }
     if (data) {
-      res.status(successStatus).send(formatResponse(data));
-      req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').DATA_DOWNLOADED, data.length);
+      res.status(successStatus).send(data);
+      try {
+        let length = 0;
+        if (data.hasOwnProperty(length)) {
+          length = data.length;
+        } else {
+          length = JSON.stringify(data).length;
+        }
+        req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').DATA_DOWNLOADED, length);
+      } catch(e) {
+        console.error(e);
+      }
     } else {
       res.sendStatus(successStatus);
     }
@@ -113,6 +129,7 @@ export var setSessionHeaderAndParseBody = function(req, res, next) {
     return res.sendStatus(401);
   }
   req.headers.sessionId = sessionId;
+  // TODO remove this manual parsing code - map parser in routes
   if (req.body && req.body.length > 0) {
     req.body = ((req.body instanceof Buffer) ? JSON.parse(req.body.toString()) : req.body);
     if (typeof req.body !== 'object') {

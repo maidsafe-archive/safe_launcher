@@ -1,5 +1,11 @@
-var sessionManager = null;
+import Permission from '../ffi/model/permission';
+import appManager from '../ffi/util/app_manager';
+import _ from 'lodash';
+
+let sessionManager = null;
+
 class SessionManager {
+
   constructor() {
     this.sessionPool = {};
   }
@@ -20,22 +26,40 @@ class SessionManager {
     return this.sessionPool[id];
   }
 
-  remove(id) {
-    delete this.sessionPool[id];
-    return !this.sessionPool.hasOwnProperty(id);
+  remove = async (id) => {
+    try {
+      await appManager.revokeApp(this.sessionPool[id].app);
+      delete this.sessionPool[id];
+      return !this.sessionPool.hasOwnProperty(id);
+    } catch(e) {
+      console.error(e);
+    }
   }
 
   hasSessionForApp(appData) {
     let app;
     for (var key in this.sessionPool) {
-      app = this.sessionPool[key];
-      if (app.appId === appData.id && app.appName === appData.name &&
-      app.appVersion === appData.version && app.vendor === appData.vendor &&
-      app.permissions.isEqual(appData.permissions)) {
+      app = this.sessionPool[key].app;
+      if (_.isEqual(app, appData)) {
         return key;
       }
     }
     return null;
+  }
+
+  registerApps = () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        for (let key in this.sessionPool) {
+          app = this.sessionPool[key].app;
+          await appManager.registerApp(app)
+        }
+        resolve();
+      } catch (e) {
+        console.error(e);
+        reject(e);
+      }
+    });
   }
 }
 
