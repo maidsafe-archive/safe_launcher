@@ -18,7 +18,7 @@ export default class InitialSettings extends Component {
     const { initialSettings } = nextProps;
     const { router } = this.context;
     if (initialSettings) {
-      return router.push('/home');
+      return router.push('/register');
     }
   }
 
