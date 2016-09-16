@@ -15,12 +15,12 @@ const pkg = require('./package.json');
 const deps = Object.keys(pkg.dependencies);
 const devDeps = Object.keys(pkg.devDependencies);
 
-const appName = argv.name || argv.n || pkg.productName;
 const shouldBuildAll = argv.all || false;
 const appCopyright = pkg.copyright;
 
 const packageForOs = {
   darwin: {
+    binaryName: pkg.productName,
     icon: 'resources/osx/icon',
     unpack: '*.dylib',
     preferences: {
@@ -30,11 +30,13 @@ const packageForOs = {
     }
   },
   linux: {
+    binaryName: pkg.name,
     icon: 'resources/icon',
     unpack: '*.so',
     preferences: {}
   },
   win32: {
+    binaryName: pkg.productName,
     icon: 'resources/windows/icon',
     unpack: '*.dll',
     preferences: {
@@ -47,11 +49,12 @@ const packageForOs = {
   }
 };
 
+
 const optionForOs = packageForOs[os.platform()];
 
 const DEFAULT_OPTS = {
   dir: './',
-  name: appName,
+  name: optionForOs.binaryName,
   asar: {
     unpack: optionForOs.unpack
   },

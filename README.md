@@ -26,8 +26,8 @@ npm install
 Native dependencies `ffi` and `ref` have be rebuilt using `electron-rebuild`
 
 ```
-$ cd node_modules/ffi && ../.bin/electron-rebuild & cd ../..
-$ cd node_modules/ref && ../.bin/electron-rebuild & cd ../..
+$ cd node_modules/ffi && ../.bin/electron-rebuild . & cd ../..
+$ cd node_modules/ref && ../.bin/electron-rebuild . & cd ../..
 ```
 
 ## Starting the app
