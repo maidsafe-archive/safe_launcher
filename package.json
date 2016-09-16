@@ -1,7 +1,7 @@
 {
   "name": "safe-launcher",
   "productName": "SAFE Launcher",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "description": "SAFE Launcher Application",
   "copyright": "© 2016, MaidSafe.net Ltd",
   "main": "dist/main.js",
@@ -20,7 +20,7 @@
     "package": "cross-env NODE_ENV=production node -r babel-register package.js",
     "package-all": "npm run package -- --all",
     "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
-    "dev": "concurrently --kill-others \"node -r babel-register build.development.js\" \"npm run hot-server\" \"npm run start-hot\""    
+    "dev": "concurrently --kill-others \"node -r babel-register build.development.js\" \"npm run hot-server\" \"npm run start-hot\""
   },
   "bin": {
     "electron": "./node_modules/.bin/electron"

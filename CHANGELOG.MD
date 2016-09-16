@@ -1,5 +1,11 @@
 # SAFE Launcher Change Log
 
+##[0.9.0]
+- Requires safe_core 0.20.0
+- UI switched to React + Redux from angular
+- FFI forked process is removed
+- Basic API methods to work with low level DataTypes are added
+
 ##[0.8.1]
 - Package identifier updated to match correct reverse DNS identifier
 - Updated the forum link
