@@ -1,4 +1,7 @@
+import { shell } from 'electron';
 import { errorCodeLookup } from './server/error_code_lookup';
+import { cleanup } from './ffi/loader';
+import auth from './ffi/api/auth';
 
 class ProxyListener {
   constructor() {
@@ -34,8 +37,7 @@ class ProxyListener {
 
 // UI Utils
 export default class UIUtils {
-  constructor(api, remote, restServer, proxy) {
-    this.api = api;
+  constructor(remote, restServer, proxy) {
     this.remote = remote;
     this.restServer = restServer;
     this.proxy = proxy;
@@ -44,25 +46,24 @@ export default class UIUtils {
     this.errorCodeLookup = errorCodeLookup;
   }
 
-  // login
-  login(location, password, callback) {
-    this.api.auth.login(location, password, callback);
-  }
-
-  // register
-  register(location, password, callback) {
-    var self = this;
-    this.api.auth.register(location, password, function(err) {
-      if (err) {
-        return callback(err);
-      }
-      callback(err);
-    });
-  }
-
-  dropUnregisteredClient(callback) {
-    this.api.auth.dropUnregisteredClient(callback);
-  }
+  // // login
+  // login(location, password, callback) {
+  //   this.api.auth.login(location, password, callback);
+  // }
+  //
+  // // register
+  // register(location, password, callback) {
+  //   this.api.auth.register(location, password, (err) => {
+  //     if (err) {
+  //       return callback(err);
+  //     }
+  //     callback(err);
+  //   });
+  // }
+  //
+  // dropUnregisteredClient(callback) {
+  //   this.api.auth.dropUnregisteredClient(callback);
+  // }
 
   // close browser window
   closeWindow() {
@@ -129,10 +130,10 @@ export default class UIUtils {
 
   // focus window
   focusWindow() {
-    var browserWindow = this.remote.getCurrentWindow();
-    this.remote.getCurrentWindow().setAlwaysOnTop(true);
-    this.remote.getCurrentWindow().focus();
-    this.remote.getCurrentWindow().setAlwaysOnTop(false);
+    const browserWindow = this.remote.getCurrentWindow();
+    browserWindow.setAlwaysOnTop(true);
+    browserWindow.focus();
+    browserWindow.setAlwaysOnTop(false);
   }
 
   // start proxy server
@@ -171,45 +172,27 @@ export default class UIUtils {
     this.onNetworkStateChange = callback;
   }
 
-  reconnect(user) {
-    var self = this;
-    this.api.reset();
-    if (user && Object.keys(user).length !== 0) {
-      this.api.auth.login(user.accountSecret, user.accountPassword, function(err) {
-        if (!self.onNetworkStateChange) {
-          return;
-        }
-        var status;
-        if (err) {
-          status = window.NETWORK_STATE.DISCONNECTED;
-        } else {
-          status = window.NETWORK_STATE.CONNECTED;
-        }
-        self.onNetworkStateChange(status);
-      });
-    } else {
-      this.api.connectWithUnauthorisedClient();
+  reconnect = async (user) => {
+    try {
+      await cleanup();
+       // reconnect Unauthorised client
+      if (!user || Object.keys(user).length === 0) {
+        await auth.getUnregisteredSession();
+        return;
+      }
+      if (!user.accountSecret || !user.accountPassword) {
+        return console.error('User account is not available for retrying');
+      }
+      // reconnect authorised client
+      await auth.login(user.accountSecret, user.accountPassword);
+      await this.restServer.registerConnectedApps();
+    } catch(e) {
+      console.error(e);
+      if (!this.onNetworkStateChange) {
+        return;
+      }
+      this.onNetworkStateChange(window.NETWORK_STATE.DISCONNECTED);
     }
-  }
-
-  fetchGetsCount(callback) {
-    this.api.clientStats.fetchGetsCount(callback);
-  }
-
-  fetchDeletesCount(callback) {
-    this.api.clientStats.fetchDeletesCount(callback);
-  }
-
-  fetchPostsCount(callback) {
-    this.api.clientStats.fetchPostsCount(callback);
-  }
-
-  fetchPutsCount(callback) {
-    this.api.clientStats.fetchPutsCount(callback);
-  }
-
-  getAccountInfo(callback) {
-    this.api.clientStats.getAccountInfo(callback);
   }
 
   onUploadEvent(callback) {
@@ -233,7 +216,6 @@ export default class UIUtils {
   }
 
   openExternal(url) {
-    require('shell').openExternal(url);
+    shell.openExternal(url);
   }
-
 }

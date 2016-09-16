@@ -1,13 +1,8 @@
 import crypto from 'crypto';
 export default class SessionInfo {
-  constructor(appId, appName, appVersion, vendor, permissions, appDirKey) {
-    this.appIdentifier = appId;
-    this.appDisplayName = appName;
-    this.version = appVersion;
-    this.appVendor = vendor;
-    this.appPermissions = permissions || [];
+  constructor(app) {
     this.appSigningKey = crypto.randomBytes(32);
-    this.appRootDirKey = appDirKey;
+    this.ffiApp = app;
     this.activities = [];
   }
 
@@ -32,35 +27,31 @@ export default class SessionInfo {
     return this.activities;
   }
 
-  hasSafeDriveAccess() {
-    return this.permissions.hasSafeDriveAccess();
-  }
-
   get appId() {
-    return this.appIdentifier;
+    return this.ffiApp.id;
   }
 
   get appName() {
-    return this.appDisplayName;
+    return this.ffiApp.name;
   }
 
   get appVersion() {
-    return this.version;
+    return this.ffiApp.version;
   }
 
   get vendor() {
-    return this.appVendor;
+    return this.ffiApp.vendor;
   }
 
   get permissions() {
-    return this.appPermissions;
+    return this.ffiApp.permission;
   }
 
   get signingKey() {
     return this.appSigningKey;
   }
 
-  get appDirKey() {
-    return this.appRootDirKey;
+  get app() {
+    return this.ffiApp;
   }
 }
