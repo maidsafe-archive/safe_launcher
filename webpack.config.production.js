@@ -16,16 +16,12 @@ const config = merge(baseConfig, {
   output: {
     publicPath: '../dist/'
   },
-  externals: {
-    buffer: 'buffer',
-    winston: 'winston'
-  },
   module: {
     loaders: [
       {
         test: /\.js$/,
         loaders: ['babel'],
-        exclude: [path.join(__dirname, 'app', 'server')]
+        exclude: []
       },
       {
         test: /\.less$/,
@@ -47,12 +43,11 @@ const config = merge(baseConfig, {
     }),
     new ExtractTextPlugin('style.css', { allChunks: true }),
     new CopyWebpackPlugin([
-      { from: 'app/server', to: 'server' },
+      { from: 'app/ffi/{*.dll, *.so, *.dylib}'},
       { from: 'app/app.html' },
-      { from: 'app//images', to: 'images' }
+      { from: 'app/images', to: 'images' }
     ])
   ],
-
   target: 'electron-renderer'
 });
 
