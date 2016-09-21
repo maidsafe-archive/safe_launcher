@@ -440,16 +440,14 @@ class NFS extends FfiApi {
       if (length === 0) {
         return resolve(new Buffer(0));
       }
-      const fileDetailsPointerHandle = ref.alloc(PointerToFileDetailsPointer);
+      const fileDetailsHandle = ref.alloc(FileDetailsHandle);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
-        const fileDetailsHandle = fileDetailsPointerHandle.deref();
-        const handle = ref.alloc(FileDetailsHandle, fileDetailsHandle).deref();
-        const fileDetails = handle.deref();
+        const fileDetails = new FileDetails(fileDetailsHandle.deref());
         const data = Buffer.concat([ref.reinterpret(fileDetails.content, fileDetails.content_len)]);
-        self.safeCore.file_details_drop.async(handle, (e) => {
+        self.safeCore.file_details_drop.async(fileDetailsHandle.deref(), (e) => {
           if (e) {
             console.error(e);
           }
@@ -458,7 +456,7 @@ class NFS extends FfiApi {
       };
       const pathBuffer = new Buffer(path);
       self.safeCore.nfs_get_file.async(appManager.getHandle(app), offset, length,
-        pathBuffer, pathBuffer.length, isShared, false, fileDetailsPointerHandle, onResult);
+        pathBuffer, pathBuffer.length, isShared, false, fileDetailsHandle, onResult);
     };
     return new Promise(executor);
   }
