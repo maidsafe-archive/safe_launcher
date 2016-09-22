@@ -118,7 +118,8 @@ function build(cfg) {
 
 function startPack() {
   console.log('start pack...');
-  build(electronCfg)
+  del('dist')
+    .then(() => build(electronCfg))
     .then(() => build(cfg))
     .then(() => del('release'))
     .then(paths => {

@@ -36,8 +36,7 @@ mods.forEach(mod => {
 
 export const loadLibrary = () => {
   let libPath = remote.getGlobal('args').isProduction ?
-    (remote.app.getAppPath() + '.unpacked/dist') : process.cwd();
-  libPath = path.resolve(libPath, 'app', 'ffi');
+    (remote.app.getAppPath() + '.unpacked/dist') : path.resolve(process.cwd(), 'app', 'ffi');  
   libPath =  path.resolve(libPath, (os.platform() === 'win32') ? 'safe_core' : 'libsafe_core');
   console.log('Library loaded from - ', libPath);
   const safeCore = ffi.Library(libPath, ffiFunctions);
