@@ -64,6 +64,7 @@ export default class Settings extends Component {
 
   checkAuthenticated(props, onInit) {
     if (props.authenticated) {
+      props.resetDashData();
       return this.context.router.push('/account_app_list');
     } else if (onInit) {
       props.resetUser();
