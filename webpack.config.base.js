@@ -24,6 +24,7 @@ export default {
 
   ],
   externals: {
+    winston: 'winston',
     ffi: 'ffi',
     ref: 'ref'
   }

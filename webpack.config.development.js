@@ -19,16 +19,13 @@ export default merge(baseConfig, {
   output: {
     publicPath: 'http://localhost:3000/dist/',
   },
-  externals: {
-    winston: 'winston',
-  },
   module: {
     loaders: [
       {
         test: /\.js$/,
         loaders: ['react-hot', 'babel'],
         include: path.join(__dirname, 'app'),
-        exclude: [path.join(__dirname, 'app', 'server')]
+        exclude: []
       },
       {
         test: /\.less$/,

@@ -12,13 +12,17 @@ const exec = require('child_process').exec;
 const argv = require('minimist')(process.argv.slice(2));
 const pkg = require('./package.json');
 
+const util = require('util');
+const path = require('path');
+const fs = require('fs');
+const fse = require('fs-extra');
 const deps = Object.keys(pkg.dependencies);
 const devDeps = Object.keys(pkg.devDependencies);
 
 const shouldBuildAll = argv.all || false;
 const appCopyright = pkg.copyright;
 
-const packageForOs = {
+const osPackageConfig = {
   darwin: {
     binaryName: pkg.productName,
     icon: 'resources/osx/icon',
@@ -44,19 +48,22 @@ const packageForOs = {
         CompanyName: pkg.author.name,
         FileDescription: pkg.description,
         ProductName: pkg.productName
+      },
+      win32metadata: {
+        CompanyName: pkg.author.name,
+        FileDescription: pkg.description,
+        ProductName: pkg.productName
       }
     }
   }
 };
 
-
-const optionForOs = packageForOs[os.platform()];
-
+const osConfig = osPackageConfig[os.platform()];
 const DEFAULT_OPTS = {
   dir: './',
-  name: optionForOs.binaryName,
+  name: osConfig.binaryName,
   asar: {
-    unpack: optionForOs.unpack
+    unpack: osConfig.unpack
   },
   'app-copyright': appCopyright,
   ignore: [
@@ -67,14 +74,16 @@ const DEFAULT_OPTS = {
     '^/main.development.js',
     '^/build.development.js'
   ]
-  // .concat(devDeps.map(name => `/node_modules/${name}($|/)`))
+  .concat(devDeps.map(name => `/node_modules/${name}($|/)`))
   // .concat(
   //   deps.filter(name => !electronCfg.externals.includes(name))
-  //     .map(name => `/node_modules/${name}($|/)`)
-  //)
+  //     .map(name => {
+  //         return `/node_modules/${name}($|/)`
+  //     })
+  // )
 };
 
-const icon = argv.icon || argv.i || optionForOs.icon;
+const icon = argv.icon || argv.i || osConfig.icon;
 
 if (icon) {
   DEFAULT_OPTS.icon = icon;
@@ -91,13 +100,12 @@ if (version) {
     if (err) {
       DEFAULT_OPTS.version = '1.2.0';
     } else {
-      DEFAULT_OPTS.version = stdout.split('electron-prebuilt@')[1].replace(/\s/g, '');
+      DEFAULT_OPTS.version = stdout.split('electron-prebuilt@')[1].split(' ')[0].replace(/\s/g, '');
     }
 
     startPack();
   });
-}
-
+};
 
 function build(cfg) {
   return new Promise((resolve, reject) => {
@@ -106,11 +114,12 @@ function build(cfg) {
       resolve(stats);
     });
   });
-}
+};
 
 function startPack() {
   console.log('start pack...');
-  build(electronCfg)
+  del('dist')
+    .then(() => build(electronCfg))
     .then(() => build(cfg))
     .then(() => del('release'))
     .then(paths => {
@@ -132,7 +141,7 @@ function startPack() {
     .catch(err => {
       console.error(err);
     });
-}
+};
 
 function pack(plat, arch, cb) {
   // there is no darwin ia32 electron
@@ -154,17 +163,51 @@ function pack(plat, arch, cb) {
     arch,
     prune: true,
     'app-version': pkg.version || DEFAULT_OPTS.version,
-    out: `release/${plat}-${arch}`
+    out: `release/`
+  }, osConfig.preferences);
+  packager(opts, (err) => {
+    if (err) {
+      return cb(err);
+    }
+
+    var folderName = opts.name.toLowerCase().replace(/ /g, '-');
+    var platformName = 'linux'
+    if (plat === 'win32') {
+      platformName = 'win'
+    } else if (plat === 'darwin') {
+      platformName = 'osx'
+    }
+    var packageFolderName = util.format('%s-%s-%s', opts.name, plat, arch);
+    var packageNameWithVersion = util.format('%s-v%s-%s-%s', folderName, pkg.version, platformName, arch);
+
+    var packagePath = path.resolve('.', opts.out, packageFolderName);
+    var versionFileName = 'version';
+    var filesToRemove = [ 'LICENSE', 'LICENSES.chromium.html' ];
+
+    var versionFilePath = path.resolve(packagePath, versionFileName);
+
+    filesToRemove.forEach(function(fileName) {
+      fileName = path.resolve(packagePath, fileName);
+      try {
+        fse.removeSync(fileName);
+      } catch (e) {
+        if (e.code === 'ENOENT') {
+          gutil.log('%s file not present to be deleted', fileName);
+        } else {
+          throw e;
+        }
+      }
+    });
+    fse.writeFileSync(versionFilePath, pkg.version);
+    fs.renameSync(path.resolve(opts.out, packageFolderName),
+        path.resolve(opts.out, packageNameWithVersion));
+    cb();
   });
-
-  // console.log(opts);
-
-  packager(opts, cb);
-}
+};
 
 function log(plat, arch) {
   return (err, filepath) => {
     if (err) return console.error(err);
     console.log(`${plat}-${arch} finished!`);
   };
-}
+};

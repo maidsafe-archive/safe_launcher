@@ -9,6 +9,10 @@ let mainWindow = null;
 const appWidth = 750 + (process.platform === 'win32' ? 20 : 0);
 const appHeight = 560 + (process.platform === 'win32' ? 30 : 0);
 
+global.args = {
+  isProduction: (process.env.NODE_ENV === 'production')
+};
+
 global.proxy = {
   pid: null
 };
@@ -44,7 +48,6 @@ app.on('before-quit', function() {
   if (global.proxy.pid) {
     kill(global.proxy.pid);
   }
-  // cleanup();
 });
 
 app.on('ready', async () => {
@@ -58,7 +61,7 @@ app.on('ready', async () => {
   });
 
   if (process.env.NODE_ENV === 'development') {
-    mainWindow.loadURL(`file://${__dirname}/dist/app.html`);
+    mainWindow.loadURL(`file://${__dirname}/app/app.html`);
   } else {
     mainWindow.loadURL(`file://${__dirname}/app.html`);
   }
@@ -71,7 +74,7 @@ app.on('ready', async () => {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
-  // mainWindow.openDevTools();
+    
   if (process.env.NODE_ENV === 'development') {
     mainWindow.openDevTools();
     mainWindow.webContents.on('context-menu', (e, props) => {

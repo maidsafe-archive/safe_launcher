@@ -26,8 +26,7 @@ npm install
 Native dependencies `ffi` and `ref` have be rebuilt using `electron-rebuild`
 
 ```
-$ cd node_modules/ffi && ../.bin/electron-rebuild . & cd ../..
-$ cd node_modules/ref && ../.bin/electron-rebuild . & cd ../..
+$ npm run rebuild-native
 ```
 
 ## Starting the app
@@ -35,7 +34,7 @@ $ cd node_modules/ref && ../.bin/electron-rebuild . & cd ../..
 
 Run this two commands simultaneously in different console tabs.
 ```
-$ node -r babel-register build.development.js && npm run hot-server
+$ npm run hot-server
 $ npm run start-hot
 ```
 or run two servers with one command
@@ -47,7 +46,7 @@ npm run dev
 
 To make ready for distribution package use command based on the platform:
 ```
-$ node -r babel-register build.development.js && npm run package
+$ npm run package
 ```
 
 this will generate the package files in the `release` folder
