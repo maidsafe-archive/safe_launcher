@@ -39,10 +39,10 @@ const registerOrAddService = (req, res, isRegister, next) => {
   if (!domainCheck.test(reqBody.serviceName)) {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'serviceName')));
   }
-  if (!ROOT_PATH.hasOwnProperty(reqBody.rootPath)) {
+  if (!ROOT_PATH.hasOwnProperty(reqBody.rootPath.toLowerCase())) {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
   }
-  let isPathShared = ROOT_PATH[reqBody.rootPath];
+  let isPathShared = ROOT_PATH[reqBody.rootPath.toLowerCase()];
   let responseHandler = new ResponseHandler(req, res);
   if (isRegister) {
     log.debug('DNS - Invoking register API for ' + JSON.stringify(reqBody));
@@ -61,7 +61,7 @@ export const getHomeDirectory = async (req, res, next) => {
     const sessionInfo = req.headers.sessionId ? sessionManager.get(req.headers.sessionId) : null;
     const app = sessionInfo ? sessionInfo.app : null;
     let longName = req.params.longName;
-    let serviceName = req.params.serviceName;    
+    let serviceName = req.params.serviceName;
     log.debug('DNS - Invoking getHomeDirectory API for ' + longName + ', ' + serviceName);
     const directory = await dns.getServiceDirectory(app, longName, serviceName);
     responseHandler(null, directory);

@@ -1,5 +1,6 @@
 main.js
-app/server/**/*
+app/ffi
+app/server
 app/logger
-app/api
-app/env.js
+test/dist
+rebuild_native.js

@@ -26,7 +26,7 @@ const packageForOs = {
     preferences: {
       'app-bundle-id': pkg.identifier,
       'app-category-type': 'public.app-category.utilities',
-      'helper-bundle-id': pkg.identifier + 'helper'
+      'helper-bundle-id': `${pkg.identifier}helper`
     }
   },
   linux: {
@@ -71,7 +71,7 @@ const DEFAULT_OPTS = {
   // .concat(
   //   deps.filter(name => !electronCfg.externals.includes(name))
   //     .map(name => `/node_modules/${name}($|/)`)
-  //)
+  // )
 };
 
 const icon = argv.icon || argv.i || optionForOs.icon;
@@ -87,11 +87,11 @@ if (version) {
   startPack();
 } else {
   // use the same version as the currently-installed electron-prebuilt
-  exec('npm list electron-prebuilt --dev', (err, stdout) => {
+  exec('npm list electron --dev', (err, stdout) => {
     if (err) {
       DEFAULT_OPTS.version = '1.2.0';
     } else {
-      DEFAULT_OPTS.version = stdout.split('electron-prebuilt@')[1].replace(/\s/g, '');
+      DEFAULT_OPTS.version = stdout.split('electron@')[1].replace(/\s/g, '');
     }
 
     startPack();

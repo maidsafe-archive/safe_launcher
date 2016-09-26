@@ -45,9 +45,7 @@ const user = (state = initialState, action) => {
   switch (action.type) {
     case ActionTypes.SHOW_APP_DETAIL_PAGE: {
       const currentAppLogs = action.currentAppLogs.slice();
-      currentAppLogs.sort((a, b) => {
-        return b.beginTime - a.beginTime;
-      });
+      currentAppLogs.sort((a, b) => b.beginTime - a.beginTime);
       const app = state.appList[action.appId];
       return {
         ...state,
@@ -147,7 +145,7 @@ const user = (state = initialState, action) => {
     case ActionTypes.UPDATE_ACTIVITY: {
       const appLogs = state.appLogs.slice();
       const activityIndex = appLogs.map(obj => obj.activityId)
-      .indexOf(action.activityLog.activity.activityId);
+        .indexOf(action.activityLog.activity.activityId);
       appLogs.splice(activityIndex, 1);
       const activity = {
         ...action.activityLog.activity,
@@ -160,17 +158,17 @@ const user = (state = initialState, action) => {
       if (state.appDetailPageVisible && (state.currentApp.id === action.activityLog.app)) {
         const currentAppActivityIndex = currentAppLogs.map(obj => obj.activityId)
           .indexOf(action.activityLog.activity.activityId);
-          if (currentAppActivityIndex !== -1) {
-            currentAppLogs.splice(currentAppActivityIndex, 1);
-          }
-          currentAppLogs.unshift(activity);
+        if (currentAppActivityIndex !== -1) {
+          currentAppLogs.splice(currentAppActivityIndex, 1);
+        }
+        currentAppLogs.unshift(activity);
       }
 
       const appList = {};
       let list = null;
       let key = null;
       for (key of Object.keys(state.appList)) {
-        list = state.appList[key];11
+        list = state.appList[key];
         appList[key] = {
           ...list,
           status: { ...list.status },
@@ -305,7 +303,7 @@ const user = (state = initialState, action) => {
         accountStorage: {
           ...state.accountStorage,
           updateTimeout: state.accountStorage.updateTimeout !== 0 ?
-            state.accountStorage.updateTimeout - 1 : 0,
+          state.accountStorage.updateTimeout - 1 : 0,
         }
       };
     default:

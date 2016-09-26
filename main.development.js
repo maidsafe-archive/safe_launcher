@@ -40,7 +40,7 @@ const installExtensions = async () => {
   }
 };
 
-app.on('before-quit', function() {
+app.on('before-quit', () => {
   if (global.proxy.pid) {
     kill(global.proxy.pid);
   }

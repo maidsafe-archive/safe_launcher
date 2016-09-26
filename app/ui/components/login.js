@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import className from 'classnames';
-import $ from 'jquery';
 import AuthLoader from './auth_loader';
 import { MESSAGES } from '../constant';
 

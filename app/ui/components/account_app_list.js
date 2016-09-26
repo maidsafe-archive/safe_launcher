@@ -25,7 +25,7 @@ export default class AccountAppList extends Component {
     router: React.PropTypes.object.isRequired
   };
 
-  componentWillMount() {    
+  componentWillMount() {
     if (!this.props.authenticated) {
       return this.context.router.push('/login');
     }

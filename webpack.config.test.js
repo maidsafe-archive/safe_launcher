@@ -2,7 +2,6 @@ import webpack from 'webpack';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import merge from 'webpack-merge';
 import path from 'path';
-import CopyWebpackPlugin from 'copy-webpack-plugin';
 import baseConfig from './webpack.config.base';
 
 const config = merge(baseConfig, {
@@ -10,10 +9,11 @@ const config = merge(baseConfig, {
 
   entry: [
     'babel-polyfill',
-    './app/index'
+    './test/app/index'
   ],
 
   output: {
+    path: path.join(__dirname, 'test', 'dist'),
     publicPath: '../dist/'
   },
   externals: {
@@ -37,7 +37,7 @@ const config = merge(baseConfig, {
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('production')
+      'process.env.NODE_ENV': JSON.stringify('test')
     }),
     new webpack.optimize.UglifyJsPlugin({
       compressor: {
@@ -45,12 +45,7 @@ const config = merge(baseConfig, {
         warnings: false
       }
     }),
-    new ExtractTextPlugin('style.css', { allChunks: true }),
-    new CopyWebpackPlugin([
-      { from: 'app/server', to: 'server' },
-      { from: 'app/app.html' },
-      { from: 'app//images', to: 'images' }
-    ])
+    new ExtractTextPlugin('style.css', { allChunks: true })
   ],
 
   target: 'electron-renderer'

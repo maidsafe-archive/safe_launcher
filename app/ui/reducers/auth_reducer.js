@@ -66,7 +66,13 @@ const auth = (state = initialState, action) => {
       }
       return { ...state, registerState: action.navState };
     case ActionTypes.RESET_USER: {
-      return { ...state, user: Object.assign({}), registerState: 0, error: Object.assign({}), errorMsg: '' };
+      return {
+        ...state,
+        user: Object.assign({}),
+        registerState: 0,
+        error: Object.assign({}),
+        errorMsg: ''
+      };
     }
     case ActionTypes.LOGOUT:
       return initialState;

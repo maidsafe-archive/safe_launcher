@@ -11,7 +11,7 @@ export default class NetworkStatus extends Component {
   render() {
     const { status, onNetworkStatusClick } = this.props;
 
-    const currentPath = window.location.hash.split('?')[0]; 
+    const currentPath = window.location.hash.split('?')[0];
     const networkStatusClasses = className(
       'network-status',
       {
@@ -40,6 +40,7 @@ export default class NetworkStatus extends Component {
     }
     return (
       <span
+        id="networkStatus"
         className={networkStatusClasses}
         onClick={() => {
           onNetworkStatusClick(status);

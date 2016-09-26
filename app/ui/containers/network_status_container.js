@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import NetworkStatus from '../components/network_status';
 import { showToaster } from '../actions/toaster_action';
-import { MESSAGES, CONSTANT } from '../constant';
+import { MESSAGES } from '../constant';
 
 const mapStateToProps = state => (
   {

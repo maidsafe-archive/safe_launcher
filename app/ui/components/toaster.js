@@ -12,7 +12,8 @@ export default class Toaster extends Component {
     retryCount: PropTypes.number.isRequired,
     hideToaster: PropTypes.func.isRequired,
     showNextToaster: PropTypes.func.isRequired,
-    retryNetwork: PropTypes.func.isRequired
+    retryNetwork: PropTypes.func.isRequired,
+    user: PropTypes.object
   };
 
   constructor() {
