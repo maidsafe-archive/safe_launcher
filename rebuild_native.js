@@ -1,7 +1,7 @@
 import os from 'os';
 import childProcess from 'child_process';
 import path from 'path';
-import * as electron from 'electron-prebuilt';
+import electron from 'electron-prebuilt';
 import * as rebuild from 'electron-rebuild';
 
 const pathToElectronNativeModules = path.join(__dirname, '/node_modules');
@@ -40,5 +40,14 @@ const rebuildForWindows = () => {
   console.log('Rebuilding complete.');
 };
 
-console.log('Rebuilding native modules');
-"win32" === os.platform() ? rebuildForWindows() : rebuildNativeModules();
+const run = () => {
+  console.log('Rebuilding native modules');
+
+  if (os.platform() === "win32") {
+    return rebuildForWindows();
+  } else {
+    return rebuildNativeModules();
+  }
+};
+
+run();

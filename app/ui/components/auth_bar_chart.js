@@ -49,7 +49,7 @@ export default class AuthBarChart extends Component {
       }
       let i = null;
       for (i of tempData) {
-        this.add(tempData[i]);
+        this.add(i);
       }
     }
   }
