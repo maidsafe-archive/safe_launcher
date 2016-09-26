@@ -407,17 +407,25 @@ class NFS extends FfiApi {
       return error('Invalid parameters');
     }
     const self = this;
-    const fileMetadataPointerHandle = ref.alloc(PointerToFileMetadataPointer);
+    const fileMetadataHandle = ref.alloc(FileMetadataHandle);
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
         try {
-          const fileMetadataHandle = fileMetadataPointerHandle.deref();
-          const fileMetadataRef = ref.alloc(FileMetadataHandle, fileMetadataHandle).deref();
-          const metadata = derefFileMetadataStruct(fileMetadataRef.deref());
-          self.safeCore.file_metadata_drop.async(fileMetadataHandle, (e) => {});
+          let metadata = new FileMetadata(fileMetadataHandle.deref());
+          metadata = {
+            name: Buffer.concat([ref.reinterpret(metadata.name, metadata.name_len)]),
+            user_metadata: Buffer.concat([ref.reinterpret(metadata.user_metadata,
+                                                          metadata.user_metadata_len)]),
+            size: metadata.size,
+            creation_time_sec: metadata.creation_time_sec,
+            creation_time_nsec: metadata.creation_time_nsec,
+            modification_time_sec: metadata.modification_time_sec,
+            modification_time_nsec: metadata.modification_time_nsec
+          };
+          self.safeCore.file_metadata_drop.async(fileMetadataHandle.deref(), (e) => {});
           resolve(metadata);
         } catch(e) {
           console.error(e);
@@ -426,7 +434,7 @@ class NFS extends FfiApi {
 
       const pathBuff = new Buffer(path);
       self.safeCore.nfs_get_file_metadata.async(appManager.getHandle(app),
-        pathBuff, pathBuff.length, isShared, fileMetadataPointerHandle, onResult);
+        pathBuff, pathBuff.length, isShared, fileMetadataHandle, onResult);
     };
     return new Promise(executor);
   }
