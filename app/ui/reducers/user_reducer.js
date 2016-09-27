@@ -19,6 +19,7 @@ const initialState = {
   currentApp: null,
   currentAppLogs: [],
   showAuthRequest: false,
+  spinner: false,
   authRequestPayload: {},
   authRequestHasNext: false,
   unAuthGET: [],
@@ -65,6 +66,35 @@ const user = (state = initialState, action) => {
     case ActionTypes.HIDE_APP_DETAIL_PAGE: {
       return { ...state, appDetailPageVisible: false, currentApp: null, currentAppLogs: [] };
     }
+    case ActionTypes.SHOW_SPINNER: {
+      return { ...state, spinner: true };
+    }
+    case ActionTypes.HIDE_SPINNER: {
+      return { ...state, spinner: false };
+    }
+    case ActionTypes.RESET_DASH_DATA: {
+      return {
+        ...state,
+        unAuthGET: [],
+        authHTTPMethods: [],
+        accountStorage: {
+          fetching: false,
+          lastUpdated: null,
+          lastUpdatedFromNow: null,
+          updateTimeout: 0,
+          used: 0,
+          available: 0
+        },
+        dashData: {
+          getsCount: 0,
+          putsCount: 0,
+          postsCount: 0,
+          deletesCount: 0,
+          upload: 0,
+          download: 0
+        }
+      }
+    }
     case ActionTypes.SHOW_AUTH_REQUEST: {
       AuthRequestQueue.unshift(action.payload);
       if (state.showAuthRequest) {
@@ -74,6 +104,7 @@ const user = (state = initialState, action) => {
       return {
         ...state,
         showAuthRequest: true,
+        appDetailPageVisible: false,
         authRequestPayload: currentReq,
         authRequestHasNext: (AuthRequestQueue.length !== 0)
       };

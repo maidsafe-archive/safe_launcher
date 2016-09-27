@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import AppDetail from './app_detail';
 import AppAuthRequest from './app_auth_request';
+import Spinner from './spinner';
 import AppList from './app_list';
 
 export default class AccountAppList extends Component {
@@ -25,7 +26,7 @@ export default class AccountAppList extends Component {
     router: React.PropTypes.object.isRequired
   };
 
-  componentWillMount() {    
+  componentWillMount() {
     if (!this.props.authenticated) {
       return this.context.router.push('/login');
     }
@@ -43,10 +44,12 @@ export default class AccountAppList extends Component {
       user,
       appDetailPageVisible,
       showAuthRequest,
+      spinner,
       authRequestPayload,
       authRequestHasNext,
       showNextAuthRequest,
       hideAuthRequest,
+      showSpinner,
       logout
     } = this.props;
     if (appDetailPageVisible) {
@@ -79,7 +82,11 @@ export default class AccountAppList extends Component {
           hideAuthRequest={hideAuthRequest}
           authRequestHasNext={authRequestHasNext}
           showNextAuthRequest={showNextAuthRequest}
+          showSpinner={showSpinner}
         /> : null }
+        {
+          spinner ? <Spinner /> : null
+        }
       </div>
     );
   }

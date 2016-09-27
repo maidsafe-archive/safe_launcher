@@ -38,13 +38,15 @@ export default class UnAuthBarChart extends Component {
       }
       let i = null;
       for (i of tempData) {
-        this.add(tempData[i]);
+        this.add(i);
       }
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    this.add(nextProps.unAuthGET[nextProps.unAuthGET.length - 1]);
+    if (nextProps.unAuthGET.length !== this.props.unAuthGET.length) {
+      this.add(nextProps.unAuthGET[nextProps.unAuthGET.length - 1]);
+    }
   }
 
   add(d) {
@@ -59,7 +61,7 @@ export default class UnAuthBarChart extends Component {
 
     let i = null;
     for (i of self.actualData) {
-      data.push(self.actualData[i]);
+      data.push(i);
     }
 
     while (data.length < self.MAX_BARS) {

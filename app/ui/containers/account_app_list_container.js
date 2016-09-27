@@ -8,7 +8,8 @@ import {
   hideAuthRequest,
   revokeApplication,
   setLogsFilter,
-  resetLogsFilter
+  resetLogsFilter,
+  showSpinner
 } from '../actions/app_action';
 
 const mapStateToProps = state => (
@@ -19,6 +20,7 @@ const mapStateToProps = state => (
     logFilter: state.user.logFilter,
     appDetailPageVisible: state.user.appDetailPageVisible,
     showAuthRequest: state.user.showAuthRequest,
+    spinner: state.user.spinner,
     authRequestPayload: state.user.authRequestPayload,
     authRequestHasNext: state.user.authRequestHasNext,
     currentApp: state.user.currentApp,
@@ -30,6 +32,7 @@ const mapDispatchToProps = dispatch => (
   {
     showAppDetailPage: appId => (dispatch(showAppDetailPage(appId))),
     hideAppDetailPage: () => (dispatch(hideAppDetailPage())),
+    showSpinner: () => (dispatch(showSpinner())),
     hideAuthRequest: (payload, status) => (dispatch(hideAuthRequest(payload, status))),
     showNextAuthRequest: (payload, status) => (dispatch(showNextAuthRequest(payload, status))),
     revokeApplication: appId => (dispatch(revokeApplication(appId))),

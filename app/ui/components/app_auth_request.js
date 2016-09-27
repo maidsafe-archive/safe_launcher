@@ -14,7 +14,8 @@ export default class AppAuthRequest extends Component {
       authRequestPayload,
       authRequestHasNext,
       showNextAuthRequest,
-      hideAuthRequest
+      hideAuthRequest,
+      showSpinner
     } = this.props;
 
     return (
@@ -57,6 +58,7 @@ export default class AppAuthRequest extends Component {
                     name="allow"
                     onClick={e => {
                       e.preventDefault();
+                      showSpinner();
                       return (authRequestHasNext ? showNextAuthRequest(authRequestPayload, true) :
                         hideAuthRequest(authRequestPayload, true));
                     }}

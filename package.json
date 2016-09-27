@@ -19,8 +19,9 @@
     "start-hot": "cross-env HOT=1 NODE_ENV=development electron -r babel-register -r babel-polyfill ./main.development",
     "package": "cross-env NODE_ENV=production node -r babel-register package.js",
     "package-all": "npm run package -- --all",
-    "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
-    "dev": "concurrently --kill-others \"node -r babel-register build.development.js\" \"npm run hot-server\" \"npm run start-hot\""
+    "rebuild-native": "node -r babel-register rebuild_native.js",
+    "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json && npm run rebuild-native",
+    "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\""
   },
   "bin": {
     "electron": "./node_modules/.bin/electron"
@@ -60,6 +61,7 @@
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.9.0",
     "chai": "^3.5.0",
+    "clean-webpack-plugin": "^0.1.10",
     "concurrently": "^2.2.0",
     "copy-webpack-plugin": "^3.0.1",
     "cross-env": "^2.0.0",

@@ -27,8 +27,7 @@ class ProxyController {
       args.push('--unsafe_mode');
       args.push('true');
     }
-    const rootPath = (process.env.NODE_ENV === 'production') ? remote.app.getAppPath() : process.cwd();
-    this.process = childProcess.fork(path.resolve(rootPath, 'dist/server/web_proxy.js'), args);
+    this.process = childProcess.fork('app/server/web_proxy.js', args);
     this.process.on('exit', function() {
       log.info('Proxy server stopped');
       remote.getGlobal('proxy').pid = null;

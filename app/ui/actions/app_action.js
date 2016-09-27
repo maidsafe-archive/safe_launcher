@@ -23,6 +23,14 @@ export const hideAppDetailPage = () => ({
   type: ActionTypes.HIDE_APP_DETAIL_PAGE
 });
 
+export const showSpinner = () => ({
+  type: ActionTypes.SHOW_SPINNER
+});
+
+export const hideSpinner = () => ({
+  type: ActionTypes.HIDE_SPINNER
+});
+
 export const showAuthRequest = (payload) => ({
   type: ActionTypes.SHOW_AUTH_REQUEST,
   payload
@@ -117,6 +125,10 @@ export const setDashPutCount = data => ({
 
 export const fetchingAccountStorage = _ => ({
   type: ActionTypes.FETCHING_ACCOUNT_STORAGE
+});
+
+export const resetDashData = () => ({
+  type: ActionTypes.RESET_DASH_DATA
 });
 
 export const updateAccountStorage = _ => (
