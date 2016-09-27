@@ -199,7 +199,7 @@ class NFS extends FfiApi {
       return error('Invalid parameters');
     }
     const self = this;
-    const dirDetailsHandle = ref.alloc(PointerToVoidPointer);
+    const dirDetailsHandle = ref.alloc(VoidPointerHandle);
 
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
