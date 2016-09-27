@@ -43,7 +43,7 @@ export default class AccountStorageChart extends Component {
 
   handleUpdateTimoutTimer(props) {
     if ((props.accountStorage.updateTimeout !== 0) && !this.updateTimeoutTimer) {
-      this.updateTimeoutTimer = window.setInterval(_ => {
+      this.updateTimeoutTimer = window.setInterval(() => {
         props.decAccountUpdateTimeout();
       }, 1000);
     }
@@ -110,7 +110,7 @@ export default class AccountStorageChart extends Component {
           </div>
           <div className="desc">
             Each account is currently limited to
-             {accountStorage.used + accountStorage.available} PUTs on the Network.
+            {accountStorage.used + accountStorage.available} PUTs on the Network.
           </div>
           <div className="opt">
             <div className="opt-lt">

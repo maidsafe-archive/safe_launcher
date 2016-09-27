@@ -7,9 +7,12 @@ export default class RegisterAccSecretForm extends Component {
   static propTypes = {
     user: PropTypes.object.isRequired,
     error: PropTypes.object.isRequired,
+    errorMsg: PropTypes.string,
     showToaster: PropTypes.func.isRequired,
     stateContinue: PropTypes.func.isRequired,
-    stateBack: PropTypes.func.isRequired
+    stateBack: PropTypes.func.isRequired,
+    setErrorMessage: PropTypes.func,
+    clearErrorMessage: PropTypes.func
   };
 
   constructor() {
@@ -87,7 +90,7 @@ export default class RegisterAccSecretForm extends Component {
     const parentEle = $('#AccountSecret');
     if (parentEle.hasClass('error')) {
       parentEle.removeClass('error');
-      parentEle.children('.msg').text('')
+      parentEle.children('.msg').text('');
     }
   }
 
@@ -164,7 +167,7 @@ export default class RegisterAccSecretForm extends Component {
   }
 
   render() {
-    const { error, errorMsg } = this.props;
+    const { errorMsg } = this.props;
 
     const inputGrpClassNames = className(
       'inp-grp',

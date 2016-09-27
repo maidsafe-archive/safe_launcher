@@ -16,10 +16,6 @@ export default class LogList extends Component {
     this.handleFilter = this.handleFilter.bind(this);
   }
 
-  componentDidUpdate() {
-    const { appLogs } = this.props;
-  }
-
   handleFilter() {
     const { setLogsFilter } = this.props;
     const filter = [];
@@ -64,9 +60,11 @@ export default class LogList extends Component {
             <input
               id="inProgress"
               type="checkbox"
-              ref={c => { this.inProgress = c; }}
+              ref={c => {
+                this.inProgress = c;
+              }}
               onChange={this.handleFilter}
-              checked={ !filterDisabled && (logFilter.indexOf(STATUS[0].code) !== -1) }
+              checked={!filterDisabled && (logFilter.indexOf(STATUS[0].code) !== -1)}
               disabled={filterDisabled ? 'disabled' : ''}
             />
             <label htmlFor="inProgress">In Progress</label>
@@ -75,9 +73,11 @@ export default class LogList extends Component {
             <input
               id="completed"
               type="checkbox"
-              ref={c => { this.completed = c; }}
+              ref={c => {
+                this.completed = c;
+              }}
               onChange={this.handleFilter}
-              checked={ !filterDisabled && (logFilter.indexOf(STATUS[1].code) !== -1) }
+              checked={!filterDisabled && (logFilter.indexOf(STATUS[1].code) !== -1)}
               disabled={filterDisabled ? 'disabled' : ''}
             />
             <label htmlFor="completed">Completed</label>
@@ -86,9 +86,11 @@ export default class LogList extends Component {
             <input
               id="error"
               type="checkbox"
-              ref={c => { this.error = c; }}
+              ref={c => {
+                this.error = c;
+              }}
               onChange={this.handleFilter}
-              checked={ !filterDisabled && (logFilter.indexOf(STATUS['-1'].code) !== -1) }
+              checked={!filterDisabled && (logFilter.indexOf(STATUS['-1'].code) !== -1)}
               disabled={filterDisabled ? 'disabled' : ''}
             />
             <label htmlFor="error">Error</label>

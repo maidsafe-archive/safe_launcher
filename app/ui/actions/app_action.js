@@ -123,7 +123,7 @@ export const setDashPutCount = data => ({
   data
 });
 
-export const fetchingAccountStorage = _ => ({
+export const fetchingAccountStorage = () => ({
   type: ActionTypes.FETCHING_ACCOUNT_STORAGE
 });
 

@@ -29,7 +29,7 @@ export default merge(baseConfig, {
       },
       {
         test: /\.less$/,
-        loader: "style!css!less"
+        loader: 'style!css!less'
       },
       { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' }
     ]

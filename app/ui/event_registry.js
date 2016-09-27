@@ -1,4 +1,3 @@
-import { browserHistory } from 'react-router'
 import {
   setNetworkDisconnected,
   setNetworkConnected,
@@ -69,10 +68,10 @@ export default class EventRegistry {
         try {
           const count = await sessionManager.getClientGetsCount();
           self.dispatch(setUnAuthStateData(count));
-        } catch(e) {
+        } catch (e) {
           console.error(e);
         }
-      }
+      };
       updateGetsCount();
     }, CONSTANT.FETCH_DELAY));
   }
@@ -82,7 +81,7 @@ export default class EventRegistry {
     self.intervals.push(window.setInterval(() => {
       const fetchCounts = async () => {
         try {
-          console.log('Update Client stats');
+          console.warn('Update Client stats');
           const getsCount = await sessionManager.getClientGetsCount();
           const putsCount = await sessionManager.getClientPutsCount();
           const postsCount = await sessionManager.getClientPostsCount();
@@ -91,7 +90,7 @@ export default class EventRegistry {
           self.onAuthFetchComplete('DELETE', self.state().user.dashData.deletesCount, deletesCount);
           self.onAuthFetchComplete('POST', self.state().user.dashData.postsCount, postsCount);
           self.onAuthFetchComplete('PUT', self.state().user.dashData.putsCount, putsCount);
-          let temp = {};
+          const temp = {};
           temp.GET = self.authorisedData.GET.newVal - self.authorisedData.GET.oldVal;
           temp.POST = self.authorisedData.POST.newVal - self.authorisedData.POST.oldVal;
           temp.PUT = self.authorisedData.PUT.newVal - self.authorisedData.PUT.oldVal;
@@ -101,11 +100,11 @@ export default class EventRegistry {
           self.dispatch(setDashPostCount(postsCount));
           self.dispatch(setDashDeleteCount(deletesCount));
           self.dispatch(setDashPutCount(putsCount));
-        } catch(e) {
+        } catch (e) {
           console.error(e);
         }
       };
-      fetchCounts()
+      fetchCounts();
     }, CONSTANT.FETCH_DELAY));
   }
 
@@ -125,7 +124,6 @@ export default class EventRegistry {
       if (currentPath === '#/') {
         return;
       }
-      console.log('show')
       return this.dispatch(showToaster(msg, opt));
     };
 
@@ -149,8 +147,6 @@ export default class EventRegistry {
         }
         case 2:
           this.dispatch(setNetworkDisconnected());
-          console.log('test');
-
           showNetworkToaster(MESSAGES.NETWORK_DISCONNECTED,
             { type: CONSTANT.TOASTER_OPTION_TYPES.NETWORK_RETRY, autoHide: false, error: true });
           break;
@@ -196,7 +192,7 @@ export default class EventRegistry {
       const appName = this.state().user.appList[appId] ?
         this.state().user.appList[appId].name : this.state().user.revokedAppList[appId].name;
       this.dispatch(showToaster(`${MESSAGES.APP_REVOKED} ${appName}`, { autoHide: true }));
-      return console.log('Removed App Session :: ', appId);
+      return console.warn('Removed App Session :: ', appId);
     });
   }
 

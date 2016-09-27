@@ -1,12 +1,12 @@
-import { remote } from 'electron';
-
-import env from './env';
-import UIUtils from './ui_utils';
-import { loadLibrary } from './ffi/loader';
-import sessionManager from './ffi/util/session_manager';
-import auth from './ffi/api/auth';
-import { proxyController } from './server/proxy_controller';
-import RESTServer from './server/boot';
+import { remote, ipcRenderer } from 'electron';
+import path from 'path';
+import env from '../../app/env';
+import UIUtils from '../../app/ui_utils';
+import { loadLibrary } from '../../app/ffi/loader';
+import sessionManager from '../../app/ffi/util/session_manager';
+import auth from '../../app/ffi/api/auth';
+import { proxyController } from '../../app/server/proxy_controller';
+import RESTServer from '../../app/server/boot';
 
 window.NETWORK_STATE = {
   CONNECTING: 0,
@@ -31,6 +31,7 @@ const onFfiLaodFailure = (title, msg) => {
 window.msl = new UIUtils(remote, restServer, proxyController);
 
 const networkStateListener = (state) => {
+  ipcRenderer.send('networkStatus', state);
   switch (state) {
     case 0:
       window.msl.networkStateChange(window.NETWORK_STATE.CONNECTED);
@@ -49,7 +50,7 @@ const networkStateListener = (state) => {
 };
 
 try {
-  loadLibrary();
+  loadLibrary(path.resolve('app', 'ffi'));
   sessionManager.onNetworkStateChange(networkStateListener);
   auth.getUnregisteredSession().then(() => {}, () => {
     networkStateListener(1);

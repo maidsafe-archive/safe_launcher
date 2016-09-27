@@ -186,7 +186,7 @@ export default class UIUtils {
       // reconnect authorised client
       await auth.login(user.accountSecret, user.accountPassword);
       await this.restServer.registerConnectedApps();
-    } catch(e) {
+    } catch (e) {
       console.error(e);
       if (!this.onNetworkStateChange) {
         return;

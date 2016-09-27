@@ -8,3 +8,4 @@
 /app/ffi/safe_core.dll
 /app/ui/utils/.gitkeep
 /app/ffi/*.dll
+/test/dist
