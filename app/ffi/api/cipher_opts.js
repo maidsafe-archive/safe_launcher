@@ -22,23 +22,20 @@ class CipherOpts extends FfiApi {
   }
 
   getCipherOptPlain() {
-    const self = this;
-    const executor = async (resolve, reject) => {
-      const handleRef = ref.alloc(u64);
+    return new Promise((resolve, reject) => {
+      let handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
         resolve(handleRef.deref());
       };
-      self.safeCore.cipher_opt_new_plaintext.async(handleRef, onResult);
-    };
-    return new Promise(executor);
+      this.safeCore.cipher_opt_new_plaintext.async(handleRef, onResult);
+    });
   }
 
   getCipherOptSymmetric() {
-    const self = this;
-    const executor = async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
@@ -46,14 +43,12 @@ class CipherOpts extends FfiApi {
         }
         resolve(handleRef.deref());
       };
-      self.safeCore.cipher_opt_new_symmetric.async(handleRef, onResult);
-    };
-    return new Promise(executor);
+      this.safeCore.cipher_opt_new_symmetric.async(handleRef, onResult);
+    });
   }
 
   getCipherOptAsymmetric(privateKeyHandle) {
-    const self = this;
-    const executor = async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
@@ -61,23 +56,20 @@ class CipherOpts extends FfiApi {
         }
         resolve(handleRef.deref());
       };
-      self.safeCore.cipher_opt_new_asymmetric.async(privateKeyHandle, handleRef, onResult);
-    };
-    return new Promise(executor);
+      this.safeCore.cipher_opt_new_asymmetric.async(privateKeyHandle, handleRef, onResult);
+    });
   }
 
   dropHandle(handleId) {
-    const self = this;
-    const executor = async (resolve, reject) => {
-      const onResult = (err, res) => {        
+    return new Promise((resolve, reject) => {
+      const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
         resolve();
       };
-      self.safeCore.cipher_opt_free.async(handleId, onResult);
-    };
-    return new Promise(executor);
+      this.safeCore.cipher_opt_free.async(handleId, onResult);
+    });
   }
 
 }

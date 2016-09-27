@@ -24,22 +24,19 @@ class DataId extends FfiApi {
   }
 
   dropHandle(handleId) {
-    const self = this;
-    const executor = async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
         resolve();
       };
-      self.safeCore.data_id_free.async(handleId, onResult);
-    };
-    return new Promise(executor);
+      this.safeCore.data_id_free.async(handleId, onResult);
+    });
   }
 
-  getStructuredDataHandle(typeTag, id) {
-    const self = this;
-    const executor = (resolve, reject) => {
+  getStructuredDataHandle(typeTag = 501, name) {
+    return new Promise((resolve, reject) => {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
@@ -47,14 +44,12 @@ class DataId extends FfiApi {
         }
         resolve(handleRef.deref());
       };
-      self.safeCore.data_id_new_struct_data.async(typeTag, id, handleRef, onResult);
-    };
-    return new Promise(executor);
+      this.safeCore.data_id_new_struct_data.async(typeTag, name, handleRef, onResult);
+    });
   }
 
-  getAppendableDataHandle(id, isPrivate) {
-    const self = this;
-    const executor = (resolve, reject) => {
+  getAppendableDataHandle(name, isPrivate = false) {
+    return new Promise((resolve, reject) => {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
@@ -62,9 +57,8 @@ class DataId extends FfiApi {
         }
         resolve(handleRef.deref());
       };
-      self.safeCore.data_id_new_appendable_data.async(id, isPrivate, handleRef, onResult);
-    };
-    return new Promise(executor);
+      this.safeCore.data_id_new_appendable_data.async(name, isPrivate, handleRef, onResult);
+    });
   }
 
 }

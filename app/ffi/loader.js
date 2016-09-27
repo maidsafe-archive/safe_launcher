@@ -37,9 +37,8 @@ mods.forEach(mod => {
 export const loadLibrary = (ffiDirPath) => {
   let libPath = ffiDirPath;
   if (!libPath) {
-    const isPacked = remote.app.getAppPath().indexOf('default_app.asar') === -1;
-    libPath = path.resolve((isPacked ? `${remote.app.getAppPath()}.unpacked` : process.cwd()),
-      'dist', 'ffi');
+    libPath = remote.getGlobal('args').isProduction ?
+      (remote.app.getAppPath() + '.unpacked/dist') : path.resolve(process.cwd(), 'app', 'ffi');
   }
   libPath =  path.resolve(libPath, (os.platform() === 'win32') ? 'safe_core' : 'libsafe_core');
   console.log('Library loaded from - ', libPath);
