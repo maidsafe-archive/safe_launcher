@@ -7,6 +7,7 @@ import {
   setErrorMessage,
   clearErrorMessage
 } from '../actions/auth_action';
+import { resetDashData } from '../actions/app_action';
 import { showToaster } from '../actions/toaster_action';
 
 const mapStateToProps = state => (
@@ -24,6 +25,7 @@ const mapDispatchToProps = dispatch => (
   {
     userLogin: payload => (dispatch(login(payload))),
     cancelAuthReq: () => (dispatch(cancelAuthReq())),
+    resetDashData: () => (dispatch(resetDashData())),
     resetUser: () => (dispatch(resetUser())),
     showToaster: (message, options) => (dispatch(showToaster(message, options))),
     setErrorMessage: msg => (dispatch(setErrorMessage(msg))),

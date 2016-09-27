@@ -23,6 +23,14 @@ export const hideAppDetailPage = () => ({
   type: ActionTypes.HIDE_APP_DETAIL_PAGE
 });
 
+export const showSpinner = () => ({
+  type: ActionTypes.SHOW_SPINNER
+});
+
+export const hideSpinner = () => ({
+  type: ActionTypes.HIDE_SPINNER
+});
+
 export const showAuthRequest = (payload) => ({
   type: ActionTypes.SHOW_AUTH_REQUEST,
   payload
@@ -119,7 +127,11 @@ export const fetchingAccountStorage = () => ({
   type: ActionTypes.FETCHING_ACCOUNT_STORAGE
 });
 
-export const updateAccountStorage = () => (
+export const resetDashData = () => ({
+  type: ActionTypes.RESET_DASH_DATA
+});
+
+export const updateAccountStorage = _ => (
   dispatch => {
     dispatch(fetchingAccountStorage());
     sessionManager.getAccountInfo()

@@ -18,7 +18,8 @@ import {
   setDashPostCount,
   setDashDeleteCount,
   setDashPutCount,
-  updateAccountStorage
+  updateAccountStorage,
+  hideSpinner
 } from './actions/app_action';
 import sessionManager from '../ffi/util/session_manager';
 import { CONSTANT, MESSAGES } from './constant';
@@ -177,9 +178,15 @@ export default class EventRegistry {
   }
 
   handleAppSession() {
-    window.msl.onSessionCreated(appData => this.dispatch(addApplication(appData)));
+    window.msl.onSessionCreated(appData => {
+      this.dispatch(addApplication(appData));
+      this.dispatch(hideSpinner());
+    });
 
-    window.msl.onSessionCreationFailed(() => console.error('Failed to create App Session'));
+    window.msl.onSessionCreationFailed(() => {
+      this.dispatch(hideSpinner());
+      console.error('Failed to create App Session')
+    });
 
     window.msl.onSessionRemoved(appId => {
       const appName = this.state().user.appList[appId] ?

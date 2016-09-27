@@ -2,8 +2,15 @@ import webpack from 'webpack';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import merge from 'webpack-merge';
 import path from 'path';
+import os from 'os';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import baseConfig from './webpack.config.base';
+
+const SAFE_CORE = {
+  'win32': '*.dll',
+  'darwin': '*.dylib',
+  'linux': '*.so'
+}
 
 const config = merge(baseConfig, {
   devtool: 'cheap-module-source-map',
@@ -16,16 +23,12 @@ const config = merge(baseConfig, {
   output: {
     publicPath: '../dist/'
   },
-  externals: {
-    buffer: 'buffer',
-    winston: 'winston'
-  },
   module: {
     loaders: [
       {
         test: /\.js$/,
         loaders: ['babel'],
-        exclude: [path.join(__dirname, 'app', 'server')]
+        exclude: []
       },
       {
         test: /\.less$/,
@@ -47,12 +50,11 @@ const config = merge(baseConfig, {
     }),
     new ExtractTextPlugin('style.css', { allChunks: true }),
     new CopyWebpackPlugin([
-      { from: 'app/server', to: 'server' },
+      { context: 'app/ffi', from: SAFE_CORE[os.platform()], flatten: true},
       { from: 'app/app.html' },
-      { from: 'app//images', to: 'images' }
+      { from: 'app/images', to: 'images' }
     ])
   ],
-
   target: 'electron-renderer'
 });
 
