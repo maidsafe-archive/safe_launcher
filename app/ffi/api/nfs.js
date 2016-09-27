@@ -275,13 +275,13 @@ class NFS extends FfiApi {
     }
     const self = this;
     const executor = (resolve, reject) => {
-      const writerVoidPointer = ref.alloc(PointerToVoidPointer);
+      const writerPointer = ref.alloc(VoidPointerHandle);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
         const key = {writerId: uuid.v4()};
-        self.writerHolder.set(key, writerVoidPointer.deref());
+        self.writerHolder.set(key, writerPointer.deref());
         resolve(key);
       };
       const filePathBuff = new Buffer(filePath);
@@ -293,7 +293,7 @@ class NFS extends FfiApi {
         filePathBuff, filePathBuff.length,
         metadataBuff, (metadataBuff ? metadataBuff.length : 0),
         isShared,
-        writerVoidPointer, onResult);
+        writerPointer, onResult);
     };
     return new Promise(executor);
   }
