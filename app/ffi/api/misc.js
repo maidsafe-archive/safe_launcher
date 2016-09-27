@@ -26,9 +26,12 @@ class Misc extends FfiApi {
       'misc_encrypt_key_free': [int32, [u64]],
       'misc_sign_key_free': [int32, [u64]],
       'misc_serialise_data_id': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
-      'misc_deserialise_data_id': [int32, [u8Pointer, u64, u64Pointer]],
+      'misc_deserialise_data_id': [int32, [u8Pointer, size_t, u64Pointer]],
       'misc_serialise_appendable_data': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
-      'misc_u8_ptr_free': [Void, [u8Pointer, u64, u64]]
+      'misc_serialise_struct_data': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
+      'misc_deserialise_appendable_data': [int32, [u8Pointer, size_t, u64Pointer]],
+      'misc_deserialise_struct_data': [int32, [u8Pointer, size_t, u64Pointer]],
+      'misc_u8_ptr_free': [Void, [u8Pointer, size_t, size_t]]
     };
   }
 
@@ -103,6 +106,34 @@ class Misc extends FfiApi {
           this.safeCore.misc_serialise_appendable_data.async(handleId, dataPointerRef,
             sizeRef, capacityRef, onResult);
           break;
+        case 2:
+          this.safeCore.misc_serialise_structured_data.async(handleId, dataPointerRef,
+            sizeRef, capacityRef, onResult);
+          break;
+        default:
+      }
+    });
+  }
+
+  _deserialise(data, type) {
+    return new Promise((resolve, reject) => {
+      let handleRef = ref.alloc(u64);
+      const onResult = (err, res) => {
+        if (err || res !== 0) {
+          return reject(err || res);
+        }
+        resolve(handleRef.deref());
+      };
+      switch (type) {
+        case 0:
+          this.safeCore.misc_deserialise_data_id.async(data, data.length, handleRef, onResult);
+          break;
+        case 1:
+          this.safeCore.misc_deserialise_appendable_data.async(data, data.length, handleRef, onResult);
+          break;
+        case 2:
+          this.safeCore.misc_deserialise_structured_data.async(data, data.length, handleRef, onResult);
+          break;
         default:
       }
     });
@@ -116,21 +147,21 @@ class Misc extends FfiApi {
     return this._serialise(handleId, 1);
   }
 
-  deserialiseDataId(data) {
-    const self = this;
-    const executor = (resolve, reject) => {
-      const handleRef = ref.alloc(u64);
-      const onResult = (err, res) => {
-        if (err || res !== 0) {
-          return reject(err || res);
-        }
-        resolve(handleRef.deref());
-      };
-      self.safeCore.misc_deserialise_data_id.async(data, data.length, handleRef, onResult);
-    };
-    return new Promise(executor);
+  serialiseStructuredData(handleId) {
+    return this._serialise(handleId, 2);
   }
 
+  deserialiseDataId(data) {
+    return this._deserialise(data, 0);
+  }
+
+  deserialiseAppendableData(data) {
+    return this._deserialise(data, 1);
+  }
+
+  deserialiseStructuredData(data) {
+    return this._deserialise(data, 2);
+  }
 }
 
 const misc = new Misc();
