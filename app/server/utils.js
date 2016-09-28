@@ -85,6 +85,9 @@ export class ResponseError {
 export let ResponseHandler = function(req, res) {
   this.onResponse = function(err, data) {
     if (err) {
+      if (err instanceof Error) {
+        err = err.message || err;
+      }
       return req.next(new ResponseError(400, err));
     }
     updateAppActivity(req, res, true);

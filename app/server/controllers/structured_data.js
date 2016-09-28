@@ -3,9 +3,7 @@
 import sessionManager from '../session_manager';
 import {ResponseError, ResponseHandler, updateAppActivity} from '../utils';
 import structuredData from '../../ffi/api/structured_data';
-import dataId from '../../ffi/api/data_id';
 import cipherOpts from '../../ffi/api/cipher_opts';
-import { ENCRYPTION_TYPE } from '../../ffi/model/enum';
 
 const API_ACCESS_NOT_GRANTED = 'Low level api access is not granted';
 const UNAUTHORISED_ACCESS = 'Unauthorised access';
