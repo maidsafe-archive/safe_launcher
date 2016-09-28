@@ -70,15 +70,14 @@ class DNS extends FfiApi {
       return error('Application parameter is mandatory');
     }
     return new Promise((resolve, reject) => {
-      const listHandlePointer = ref.alloc(PointerToVoidPointer);
+      const listHandle = ref.alloc(PointerHandle);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
-        const listHandle = listHandlePointer.deref();
-        resolve(consumeStringListHandle(this.safeCore, listHandle));
+        resolve(consumeStringListHandle(this.safeCore, listHandle.deref()));
       };
-      this.safeCore.dns_get_long_names.async(appManager.getHandle(app), listHandlePointer, onResult);
+      this.safeCore.dns_get_long_names.async(appManager.getHandle(app), listHandle, onResult);
     });
   }
 
