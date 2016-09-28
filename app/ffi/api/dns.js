@@ -171,20 +171,20 @@ class DNS extends FfiApi {
 
   getServiceDirectory(app, longName, serviceName) {
     return new Promise((resolve, reject) => {
-      const directoryDetailsHandlePointer = ref.alloc(PointerToVoidPointer);
+      const directoryDetailsHandle = ref.alloc(PointerHandle);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           log.error(`FFI :: DNS :: Get service directory :: ${err || res}`);
           return reject(err || res);
         }
-        resolve(nfs.derefDirectoryDetailsHandle(directoryDetailsHandlePointer.deref()));
+        resolve(nfs.derefDirectoryDetailsHandle(directoryDetailsHandle.deref()));
       };
       const longNameBuffer = new Buffer(longName);
       const serviceNameBuffer = new Buffer(serviceName);
       this.safeCore.dns_get_service_dir.async(appManager.getHandle(app),
         longNameBuffer, longNameBuffer.length,
         serviceNameBuffer, serviceNameBuffer.length,
-        directoryDetailsHandlePointer, onResult);
+        directoryDetailsHandle, onResult);
     });
   }
 
