@@ -63,21 +63,20 @@ export const create = async (req, res, next) => {
 };
 
 export const getHandle = async (req, res) => {
+  const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     const app = sessionInfo ? sessionInfo.app : null;
     const handleId = await structuredData.asStructuredData(app, req.params.dataIdHandle);
     const isOwner = await structuredData.isOwner(app, handleId);
     const version = await structuredData.getVersion(handleId);
-    // TODO get typeTag
-    res.send({
+    responseHandler(null, {
       handleId: handleId,
       isOwner: isOwner,
       version: version
     });
-    updateAppActivity(req, res, true);
   } catch(e) {
-    new ResponseHandler(req, res)(e);
+    responseHandler(e);
   }
 };
 

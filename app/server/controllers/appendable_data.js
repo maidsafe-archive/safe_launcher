@@ -42,6 +42,7 @@ export const create = async (req, res, next) => {
 };
 
 export const post = async (req, res, next) => {
+  const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     if (!sessionInfo) {
@@ -53,13 +54,14 @@ export const post = async (req, res, next) => {
     }
     const handleId = req.params.handleId;
     await appendableData.save(app, handleId, true);
-    res.sendStatus(200);
+    responseHandler();
   } catch (e) {
-    new ResponseHandler(req, res)(e);
+    responseHandler(e);
   }
 };
 
 export const put = async (req, res, next) => {
+  const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     if (!sessionInfo) {
@@ -71,9 +73,9 @@ export const put = async (req, res, next) => {
     }
     const handleId = req.params.handleId;
     await appendableData.save(app, handleId, false);
-    res.sendStatus(200);
+    responseHandler();
   } catch (e) {
-    new ResponseHandler(req, res)(e);
+    responseHandler(e);
   }
 };
 
@@ -118,14 +120,15 @@ export const getMetadata = async (req, res) => {
     const filterType = await appendableData.getFilterType(handleId);
     const dataLength = await appendableData.getLength(handleId, false);
     const deletedDataLength = await appendableData.getLength(handleId, true);
-    responseHandler(null, {
+    const metadata = {
       handleId: handleId,
       isOwner: isOwner,
       version: version,
       filterType: filterType,
       dataLength: dataLength,
       deletedDataLength: deletedDataLength
-    });
+    };
+    responseHandler(null, metadata);
   } catch(e) {
     responseHandler(e);
   }

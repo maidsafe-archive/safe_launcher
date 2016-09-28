@@ -89,7 +89,7 @@ router.post('/structured-data/', jsonParser, new ActivityMiddleware('Create stru
 router.post('/structured-data/deserialise', rawBodyParser(),
   new ActivityMiddleware('De-Serialise structured data handle'), StructuredData.deserialise);
 router.post('/structured-data/:handleId', new ActivityMiddleware('Save structured data - POST'), StructuredData.post);
-router.head('/structured-data/:handleId', new ActivityMiddleware('Get metadata of structured data'),
+router.get('/structured-data/metadata/:handleId', new ActivityMiddleware('Get metadata of structured data'),
   StructuredData.getMetadata);
 router.get('/structured-data/handle/:dataIdHandle', new ActivityMiddleware('Get structured data handle'),
   StructuredData.getHandle);
@@ -116,7 +116,7 @@ router.post('/appendable-data', jsonParser, new ActivityMiddleware('Create appen
 router.post('/appendable-data/deserialise', rawBodyParser(),
   new ActivityMiddleware('De-Serialise appendable data'), AppendableData.deserialise);
 router.post('/appendable-data/:handleId', new ActivityMiddleware('Save appendable data - POST'), AppendableData.post);
-router.head('/appendable-data/:handleId', new ActivityMiddleware('Get metadata of appendable data'),
+router.get('/appendable-data/metadata/:handleId', new ActivityMiddleware('Get metadata of appendable data'),
   AppendableData.getMetadata);
 router.get('/appendable-data/handle/:dataIdHandle', new ActivityMiddleware('Get appendable data handle'),
   AppendableData.getHandle);
