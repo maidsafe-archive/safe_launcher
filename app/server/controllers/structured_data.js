@@ -13,10 +13,16 @@ const NAME_LENGTH = 32;
 let PLAIN_ENCRYPTION;
 
 const getPlainEncryptionHandle = () => {
-  if (!PLAIN_ENCRYPTION) {
-    PLAIN_ENCRYPTION = cipherOpts.getCipherOptPlain();
-  }
-  return PLAIN_ENCRYPTION;
+  return new Promise(async (resolve, reject) => {
+    if (PLAIN_ENCRYPTION === undefined) {
+      try {
+        PLAIN_ENCRYPTION = await cipherOpts.getCipherOptPlain();
+      } catch(e) {
+        reject(e);
+      }
+    }
+    resolve(PLAIN_ENCRYPTION);
+  });
 };
 
 const TYPE_TAG = {
@@ -50,7 +56,7 @@ export const create = async (req, res, next) => {
     if (!(typeTag === TYPE_TAG.UNVERSIONED || typeTag === TYPE_TAG.VERSIONED || typeTag >= 15000)) {
       return next(new ResponseError(400, 'Invalid tag type specified'));
     }
-    const cipherOptsHandle = body.cipherOpts || getPlainEncryptionHandle();
+    const cipherOptsHandle = body.cipherOpts || (await getPlainEncryptionHandle());
     const data = body.data ? new Buffer(body.data, 'base64'): null;
     const handleId = await structuredData.create(app, name, typeTag, cipherOptsHandle, data);
     res.send({
@@ -123,7 +129,7 @@ export const update = async (req, res, next) => {
     if (!app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
-    const cipherOptsHandle = req.body.cipherOpts || getPlainEncryptionHandle();
+    const cipherOptsHandle = req.body.cipherOpts || (await getPlainEncryptionHandle());
     const data = new Buffer(req.body, 'base64');
     await structuredData.update(app, req.params.handleId, cipherOptsHandle, data);
     responseHandler();

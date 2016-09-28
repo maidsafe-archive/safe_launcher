@@ -168,7 +168,7 @@ export const getEncryptKey = async (req, res, next) => {
   }
 };
 
-export const getSigningKey = async (req, res, next) => {
+const getSignKey = async (req, res, next, fromDeleted) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -179,7 +179,7 @@ export const getSigningKey = async (req, res, next) => {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     const app = sessionInfo.app;
-    const signingKeyHandle = await appendableData.getSigningKey(app, req.params.index, req.params.handleId, false);
+    const signingKeyHandle = await appendableData.getSigningKey(app, req.params.handleId, req.params.index, fromDeleted);
     responseHandler(null, {
       handleId: signingKeyHandle
     });
@@ -188,24 +188,12 @@ export const getSigningKey = async (req, res, next) => {
   }
 };
 
+export const getSigningKey = async (req, res, next) => {
+  getSignKey(req, res, next, false);
+};
+
 export const getSigningKeyFromDeletedData = async (req, res, next) => {
-  const responseHandler = new ResponseHandler(req, res);
-  try {
-    const sessionInfo = sessionManager.get(req.headers.sessionId);
-    if (!sessionInfo) {
-      return next(new ResponseError(401, UNAUTHORISED_ACCESS));
-    }
-    if (!sessionInfo.app.permission.lowLevelApi) {
-      return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
-    }
-    const app = sessionInfo.app;
-    const signingKeyHandle = await appendableData.getSigningKey(app, req.params.index, req.params.handleId, true);
-    responseHandler(null, {
-      handleId: signingKeyHandle
-    });
-  } catch(e) {
-    responseHandler(e);
-  }
+  getSignKey(req, res, next, true);
 };
 
 export const append = async (req, res, next) => {
@@ -226,30 +214,26 @@ export const append = async (req, res, next) => {
   }
 };
 
-export const getDataIdAt = async (req, res) => {
+const dataIdAt = async (req, res, fromDeleted) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
-    const handleId = await appendableData.getDataId(req.params.handleId, req.params.index, false);
-    res.send({
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
+    const app = sessionInfo ? sessionInfo.app : null;
+    const handleId = await appendableData.getDataId(app, req.params.handleId, req.params.index, fromDeleted);
+    responseHandler(null, {
       handleId: handleId
     });
-    responseHandler();
   } catch(e) {
     responseHandler(e);
   }
 };
 
+export const getDataIdAt = (req, res) => {
+  dataIdAt(req, res, false);
+};
+
 export const getDeletedDataIdAt = async (req, res) => {
-  try {
-    const handleId = await appendableData.getDataId(req.params.handleId, req.params.index, true);
-    res.send({
-      handleId: handleId
-    });
-    res.sendStatus(200);
-    updateAppActivity(req, res, true);
-  } catch(e) {
-    new ResponseHandler(req, res)(e);
-  }
+  dataIdAt(req, res, true);
 };
 
 export const toggleFilter = async (req, res) => {
