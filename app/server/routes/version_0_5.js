@@ -135,8 +135,8 @@ router.get('/appendable-data/:handleId/:index', new ActivityMiddleware('Get Data
   AppendableData.getDataIdAt);
 router.put('/appendable-data/toggle-filter/:handleId', new ActivityMiddleware('Toggle appendable data filter'),
   AppendableData.toggleFilter);
-router.put('/appendable-data/filter/:handleId', new ActivityMiddleware('Add sign keys to appendable data filter'),
-  AppendableData.addToFilter);
+router.put('/appendable-data/filter/:handleId', jsonParser,
+  new ActivityMiddleware('Add sign keys to appendable data filter'), AppendableData.addToFilter);
 router.put('/appendable-data/:handleId/:dataIdHandle', new ActivityMiddleware('Append to appendable data'),
   AppendableData.append);
 router.put('/appendable-data/restore/:handleId/:index',
@@ -146,8 +146,8 @@ router.put('/appendable-data/:handleId', new ActivityMiddleware('Save appendable
 router.delete('/appendable-data/sign-key/:handleId',
   new ActivityMiddleware('Drop signing key handle'),
   AppendableData.dropSigningKeyHandle);
-router.delete('/appendable-data/filter/:handleId', new ActivityMiddleware('Remove sign keys from appendable data filter'),
-  AppendableData.removeFromFilter);
+router.delete('/appendable-data/filter/:handleId', jsonParser,
+  new ActivityMiddleware('Remove sign keys from appendable data filter'), AppendableData.removeFromFilter);
 router.delete('/appendable-data/deleted-data/:handleId/:index',
   new ActivityMiddleware('Remove from appendable data - deleted'), AppendableData.removeDeletedData);
 router.delete('/appendable-data/clear-data/:handleId',

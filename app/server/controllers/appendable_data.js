@@ -87,7 +87,10 @@ export const getHandle = async (req, res) => {
       app = sessionInfo.app;
     }
     const handleId = await appendableData.getAppendableDataHandle(app, req.params.dataIdHandle);
-    const isOwner = await appendableData.isOwner(app, handleId);
+    let isOwner = false;
+    if (sessionInfo) {
+      isOwner = await appendableData.isOwner(app, handleId);
+    }
     const version = await appendableData.getVersion(handleId);
     const filterType = await appendableData.getFilterType(handleId);
     const dataLength = await appendableData.getLength(handleId, false);
@@ -115,7 +118,10 @@ export const getMetadata = async (req, res) => {
       app = sessionInfo.app;
     }
     const handleId = req.params.handleId;
-    const isOwner = await appendableData.isOwner(app, handleId);
+    let isOwner = false;
+    if (sessionInfo) {
+      isOwner = await appendableData.isOwner(app, handleId);
+    }
     const version = await appendableData.getVersion(handleId);
     const filterType = await appendableData.getFilterType(handleId);
     const dataLength = await appendableData.getLength(handleId, false);
