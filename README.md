@@ -49,7 +49,7 @@ To make ready for distribution package use command based on the platform:
 $ npm run package
 ```
 
-this will generate the package files in the `release` folder
+this will generate the package files in the `release` folder.
 
 # License
 
