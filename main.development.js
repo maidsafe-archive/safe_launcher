@@ -1,6 +1,5 @@
 import { app, BrowserWindow, Menu, shell } from 'electron';
 import pkg from './package.json';
-import os from 'os';
 
 let menu;
 let template;

@@ -6,7 +6,8 @@ export default class AppAuthRequest extends Component {
     authRequestPayload: PropTypes.object.isRequired,
     authRequestHasNext: PropTypes.bool.isRequired,
     showNextAuthRequest: PropTypes.func.isRequired,
-    hideAuthRequest: PropTypes.func.isRequired
+    hideAuthRequest: PropTypes.func.isRequired,
+    showSpinner: PropTypes.func
   };
 
   render() {

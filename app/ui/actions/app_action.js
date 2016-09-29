@@ -131,7 +131,7 @@ export const resetDashData = () => ({
   type: ActionTypes.RESET_DASH_DATA
 });
 
-export const updateAccountStorage = _ => (
+export const updateAccountStorage = () => (
   dispatch => {
     dispatch(fetchingAccountStorage());
     sessionManager.getAccountInfo()

@@ -94,7 +94,7 @@ const user = (state = initialState, action) => {
           upload: 0,
           download: 0
         }
-      }
+      };
     }
     case ActionTypes.SHOW_AUTH_REQUEST: {
       AuthRequestQueue.unshift(action.payload);

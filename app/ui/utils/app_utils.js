@@ -36,9 +36,9 @@ export const setProxy = (status) => {
     JSON.stringify({ status }));
 };
 
-export const getVersionFromLocalStorage = () => {
-  return window.localStorage.getItem(LOCAL_STORAGE_KEYS.SAFE_LAUNCHER_VERSION);
-};
+export const getVersionFromLocalStorage = () => (
+  window.localStorage.getItem(LOCAL_STORAGE_KEYS.SAFE_LAUNCHER_VERSION)
+);
 
 export const setVersionToLocalStorage = (version) => {
   if (!version) {

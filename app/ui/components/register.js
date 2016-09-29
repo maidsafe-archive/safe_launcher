@@ -6,7 +6,11 @@ import RegisterAccSecretForm from './register_acc_secret_form.js';
 import RegisterAccPassInfo from './register_acc_pass_info.js';
 import RegisterAccPassForm from './register_acc_pass_form.js';
 import AuthLoader from './auth_loader';
-import { appVersion, getVersionFromLocalStorage, setVersionToLocalStorage } from '../utils/app_utils';
+import {
+  appVersion,
+  getVersionFromLocalStorage,
+  setVersionToLocalStorage
+} from '../utils/app_utils';
 
 export default class Register extends Component {
   static propTypes = {

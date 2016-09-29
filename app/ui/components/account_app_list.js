@@ -7,6 +7,7 @@ import AppList from './app_list';
 export default class AccountAppList extends Component {
   static propTypes = {
     appList: PropTypes.object.isRequired,
+    spinner: PropTypes.bool,
     user: PropTypes.object.isRequired,
     appDetailPageVisible: PropTypes.bool.isRequired,
     authenticated: PropTypes.bool.isRequired,
@@ -19,7 +20,8 @@ export default class AccountAppList extends Component {
     resetLogsFilter: PropTypes.func.isRequired,
     showNextAuthRequest: PropTypes.func.isRequired,
     revokeApplication: PropTypes.func.isRequired,
-    logout: PropTypes.func.isRequired
+    logout: PropTypes.func.isRequired,
+    showSpinner: PropTypes.func
   };
 
   static contextTypes = {

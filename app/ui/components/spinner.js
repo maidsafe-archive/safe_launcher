@@ -11,8 +11,7 @@ export default class Spinner extends Component {
     return (
       <div className="loader">
         <div className="loader-b">
-          <div className="loader-i">
-          </div>
+          <div className="loader-i">{' '}</div>
           <h3 className="loader-desc">{description}</h3>
         </div>
       </div>
