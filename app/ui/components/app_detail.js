@@ -48,6 +48,9 @@ export default class AppDetail extends Component {
                     if (permission === 'SAFE_DRIVE_ACCESS') {
                       return (<li key={i} className="icn safe-drive">SAFE Drive Access</li>);
                     }
+                    if (permission === 'LOW_LEVEL_API') {
+                      return (<li key={i} className="icn safe-drive">Low Level API</li>);
+                    }
                     return null;
                   })
               }

@@ -17,7 +17,7 @@ export default class Splash extends Component {
       if (initialSettings) {
         return router.push('/account');
       }
-      return router.push('/initial_settings');
+      return router.push('/register');
     }
   }
 

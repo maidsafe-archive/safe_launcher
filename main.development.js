@@ -1,6 +1,5 @@
 import { app, BrowserWindow, Menu, shell } from 'electron';
 import pkg from './package.json';
-import os from 'os';
 
 let menu;
 let template;
@@ -44,15 +43,6 @@ const installExtensions = async () => {
   }
 };
 
-app.on('before-quit', () => {
-  if (os.platform() !== 'win32') {
-    const kill = require('killprocess');
-    if (global.proxy.pid) {
-      kill(global.proxy.pid);
-    }
-  }
-});
-
 app.on('ready', async () => {
   await installExtensions();
 
@@ -77,7 +67,7 @@ app.on('ready', async () => {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
-    
+
   if (process.env.NODE_ENV === 'development') {
     mainWindow.openDevTools();
     mainWindow.webContents.on('context-menu', (e, props) => {

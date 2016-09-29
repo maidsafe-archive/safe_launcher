@@ -2,6 +2,7 @@ import pkg from '../../../package.json';
 
 const LOCAL_STORAGE_KEYS = {
   SAFE_LAUNCHER_PROXY: 'safe_launcher_proxy',
+  SAFE_LAUNCHER_VERSION: 'safe_launcher_version',
 };
 
 export const appVersion = pkg.version;
@@ -33,6 +34,17 @@ export const setProxy = (status) => {
   }
   window.localStorage.setItem(LOCAL_STORAGE_KEYS.SAFE_LAUNCHER_PROXY,
     JSON.stringify({ status }));
+};
+
+export const getVersionFromLocalStorage = () => (
+  window.localStorage.getItem(LOCAL_STORAGE_KEYS.SAFE_LAUNCHER_VERSION)
+);
+
+export const setVersionToLocalStorage = (version) => {
+  if (!version) {
+    return;
+  }
+  window.localStorage.setItem(LOCAL_STORAGE_KEYS.SAFE_LAUNCHER_VERSION, version);
 };
 
 export const openExternal = (url) => {

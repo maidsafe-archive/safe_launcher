@@ -16,6 +16,7 @@ const util = require('util');
 const path = require('path');
 const fs = require('fs');
 const fse = require('fs-extra');
+
 const deps = Object.keys(pkg.dependencies);
 const devDeps = Object.keys(pkg.devDependencies);
 
@@ -99,7 +100,7 @@ if (version) {
 
     startPack();
   });
-};
+}
 
 function build(cfg) {
   return new Promise((resolve, reject) => {
@@ -108,7 +109,7 @@ function build(cfg) {
       resolve(stats);
     });
   });
-};
+}
 
 function startPack() {
   console.log('start pack...');
@@ -135,7 +136,7 @@ function startPack() {
     .catch(err => {
       console.error(err);
     });
-};
+}
 
 function pack(plat, arch, cb) {
   // there is no darwin ia32 electron
@@ -157,36 +158,37 @@ function pack(plat, arch, cb) {
     arch,
     prune: true,
     'app-version': pkg.version || DEFAULT_OPTS.version,
-    out: `release/`
+    out: 'release/'
   }, osConfig.preferences);
   packager(opts, (err) => {
     if (err) {
       return cb(err);
     }
 
-    var folderName = opts.name.toLowerCase().replace(/ /g, '-');
-    var platformName = 'linux'
+    const folderName = opts.name.toLowerCase().replace(/ /g, '-');
+    let platformName = 'linux';
     if (plat === 'win32') {
-      platformName = 'win'
+      platformName = 'win';
     } else if (plat === 'darwin') {
-      platformName = 'osx'
+      platformName = 'osx';
     }
-    var packageFolderName = util.format('%s-%s-%s', opts.name, plat, arch);
-    var packageNameWithVersion = util.format('%s-v%s-%s-%s', folderName, pkg.version, platformName, arch);
+    const packageFolderName = util.format('%s-%s-%s', opts.name, plat, arch);
+    const packageNameWithVersion = util.format('%s-v%s-%s-%s', folderName,
+      pkg.version, platformName, arch);
 
-    var packagePath = path.resolve('.', opts.out, packageFolderName);
-    var versionFileName = 'version';
-    var filesToRemove = [ 'LICENSE', 'LICENSES.chromium.html' ];
+    const packagePath = path.resolve('.', opts.out, packageFolderName);
+    const versionFileName = 'version';
+    const filesToRemove = ['LICENSE', 'LICENSES.chromium.html'];
 
-    var versionFilePath = path.resolve(packagePath, versionFileName);
+    const versionFilePath = path.resolve(packagePath, versionFileName);
 
-    filesToRemove.forEach(function(fileName) {
-      fileName = path.resolve(packagePath, fileName);
+    filesToRemove.forEach((fileName) => {
+      const filePath = path.resolve(packagePath, fileName);
       try {
-        fse.removeSync(fileName);
+        fse.removeSync(filePath);
       } catch (e) {
         if (e.code === 'ENOENT') {
-          gutil.log('%s file not present to be deleted', fileName);
+          console.warn('%s file not present to be deleted', filePath);
         } else {
           throw e;
         }
@@ -197,11 +199,11 @@ function pack(plat, arch, cb) {
         path.resolve(opts.out, packageNameWithVersion));
     cb();
   });
-};
+}
 
 function log(plat, arch) {
   return (err, filepath) => {
     if (err) return console.error(err);
     console.log(`${plat}-${arch} finished!`);
   };
-};
+}

@@ -1,7 +1,7 @@
 import moment from 'moment';
 import ActionTypes from '../actions/action_types';
 import { CONSTANT } from '../constant';
-import { LOG_STATUS } from '../utils/app_utils';
+import { LOG_STATUS, getVersionFromLocalStorage, appVersion } from '../utils/app_utils';
 
 const AuthRequestQueue = [];
 const LOG_FILTER_INITIAL = [
@@ -10,7 +10,10 @@ const LOG_FILTER_INITIAL = [
   LOG_STATUS['-1'].code
 ];
 
+const appVersionInLocalStorage = getVersionFromLocalStorage();
+
 const initialState = {
+  initialSettings: (appVersionInLocalStorage === appVersion),
   appList: {},
   appLogs: [],
   logFilter: LOG_FILTER_INITIAL,
@@ -91,7 +94,7 @@ const user = (state = initialState, action) => {
           upload: 0,
           download: 0
         }
-      }
+      };
     }
     case ActionTypes.SHOW_AUTH_REQUEST: {
       AuthRequestQueue.unshift(action.payload);

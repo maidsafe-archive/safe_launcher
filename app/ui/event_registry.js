@@ -3,7 +3,7 @@ import {
   setNetworkConnected,
   setNetworkConnecting
 } from './actions/network_status_action';
-import { setProxy, setProxyError } from './actions/proxy_action';
+import { setProxyError } from './actions/proxy_action';
 import { showToaster } from './actions/toaster_action';
 import {
   showAuthRequest,
@@ -185,7 +185,7 @@ export default class EventRegistry {
 
     window.msl.onSessionCreationFailed(() => {
       this.dispatch(hideSpinner());
-      console.error('Failed to create App Session')
+      console.error('Failed to create App Session');
     });
 
     window.msl.onSessionRemoved(appId => {
@@ -241,7 +241,7 @@ export default class EventRegistry {
   }
 
   run() {
-    this.dispatch(setProxy());
+    // this.dispatch(setProxy());
     this.handleNetworkEvents();
     this.handleAPIServer();
     this.handleProxyServer();
