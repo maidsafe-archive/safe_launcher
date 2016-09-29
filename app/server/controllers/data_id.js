@@ -76,14 +76,6 @@ export const deserialise = async (req, res, next) => {
 export const dropHandle = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
-    const sessionInfo = sessionManager.get(req.headers.sessionId);
-    if (!sessionInfo) {
-      return next(new ResponseError(401, UNAUTHORISED_ACCESS));
-    }
-    const app = sessionInfo.app;
-    if (!app.permission.lowLevelApi) {
-      return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
-    }
     const responseHandler = new ResponseHandler(req, res);
     await dataId.dropHandle(req.params.handleId);
     responseHandler();

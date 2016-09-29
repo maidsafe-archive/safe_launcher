@@ -72,7 +72,10 @@ export const getHandle = async (req, res) => {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     const app = sessionInfo ? sessionInfo.app : null;
     const handleId = await structuredData.asStructuredData(app, req.params.dataIdHandle);
-    const isOwner = await structuredData.isOwner(app, handleId);
+    let isOwner = false;
+    if (sessionInfo) {
+     isOwner = await structuredData.isOwner(app, handleId);
+    }
     const version = await structuredData.getVersion(handleId);
     responseHandler(null, {
       handleId: handleId,
@@ -90,7 +93,10 @@ export const getMetadata = async (req, res) => {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     const app = sessionInfo ? sessionInfo.app : null;
     const handleId = req.params.handleId;
-    const isOwner = await structuredData.isOwner(app, handleId);
+    let isOwner = false;
+    if (sessionInfo) {
+      isOwner = await structuredData.isOwner(app, handleId);
+    }
     const version = await structuredData.getVersion(handleId);
     responseHandler(null, {
       isOwner: isOwner,
