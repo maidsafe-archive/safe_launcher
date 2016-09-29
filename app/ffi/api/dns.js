@@ -142,7 +142,7 @@ class DNS extends FfiApi {
 
   listServices(app, longName) {
     return new Promise((resolve, reject) => {
-      const listHandle = ref.alloc(PointerToVoidPointer);
+      const listHandle = ref.alloc(PointerHandle);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
