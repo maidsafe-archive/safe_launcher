@@ -3,14 +3,25 @@
 import sessionManager from '../session_manager';
 import {ResponseError, ResponseHandler, updateAppActivity} from '../utils';
 import structuredData from '../../ffi/api/structured_data';
-import dataId from '../../ffi/api/data_id';
 import cipherOpts from '../../ffi/api/cipher_opts';
-import { ENCRYPTION_TYPE } from '../../ffi/model/enum';
 
 const API_ACCESS_NOT_GRANTED = 'Low level api access is not granted';
 const UNAUTHORISED_ACCESS = 'Unauthorised access';
 const NAME_LENGTH = 32;
-const PLAIN_ENCRYPTION = cipherOpts.getCipherOptPlain();
+let PLAIN_ENCRYPTION;
+
+const getPlainEncryptionHandle = () => {
+  return new Promise(async (resolve, reject) => {
+    if (PLAIN_ENCRYPTION === undefined) {
+      try {
+        PLAIN_ENCRYPTION = await cipherOpts.getCipherOptPlain();
+      } catch(e) {
+        reject(e);
+      }
+    }
+    resolve(PLAIN_ENCRYPTION);
+  });
+};
 
 const TYPE_TAG = {
   VERSIONED: 500,
@@ -43,7 +54,7 @@ export const create = async (req, res, next) => {
     if (!(typeTag === TYPE_TAG.UNVERSIONED || typeTag === TYPE_TAG.VERSIONED || typeTag >= 15000)) {
       return next(new ResponseError(400, 'Invalid tag type specified'));
     }
-    const cipherOptsHandle = body.cipherOpts || PLAIN_ENCRYPTION;
+    const cipherOptsHandle = body.cipherOpts || (await getPlainEncryptionHandle());
     const data = body.data ? new Buffer(body.data, 'base64'): null;
     const handleId = await structuredData.create(app, name, typeTag, cipherOptsHandle, data);
     res.send({
@@ -56,21 +67,23 @@ export const create = async (req, res, next) => {
 };
 
 export const getHandle = async (req, res) => {
+  const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     const app = sessionInfo ? sessionInfo.app : null;
     const handleId = await structuredData.asStructuredData(app, req.params.dataIdHandle);
-    const isOwner = await structuredData.isOwner(app, handleId);
+    let isOwner = false;
+    if (sessionInfo) {
+     isOwner = await structuredData.isOwner(app, handleId);
+    }
     const version = await structuredData.getVersion(handleId);
-    // TODO get typeTag
-    res.send({
+    responseHandler(null, {
       handleId: handleId,
       isOwner: isOwner,
       version: version
     });
-    updateAppActivity(req, res, true);
   } catch(e) {
-    new ResponseHandler(req, res)(e);
+    responseHandler(e);
   }
 };
 
@@ -80,7 +93,10 @@ export const getMetadata = async (req, res) => {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     const app = sessionInfo ? sessionInfo.app : null;
     const handleId = req.params.handleId;
-    const isOwner = await structuredData.isOwner(app, handleId);
+    let isOwner = false;
+    if (sessionInfo) {
+      isOwner = await structuredData.isOwner(app, handleId);
+    }
     const version = await structuredData.getVersion(handleId);
     responseHandler(null, {
       isOwner: isOwner,
@@ -117,7 +133,7 @@ export const update = async (req, res, next) => {
     if (!app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
-    const cipherOptsHandle = req.body.cipherOpts || PLAIN_ENCRYPTION;
+    const cipherOptsHandle = req.body.cipherOpts || (await getPlainEncryptionHandle());
     const data = new Buffer(req.body, 'base64');
     await structuredData.update(app, req.params.handleId, cipherOptsHandle, data);
     responseHandler();

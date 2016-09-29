@@ -31,7 +31,6 @@ export default class NfsReader extends Readable {
       let data = await nfs.readFile(this.app, this.filePath, this.isPathShared,
         this.curOffset, this.sizeToRead);
       this.curOffset += this.sizeToRead;
-      data = new Buffer(data.toString(), 'base64');
       this.push(data);
       eventEmitter.emit(eventType, data.length);
     } catch(e) {

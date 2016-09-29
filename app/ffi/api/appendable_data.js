@@ -89,7 +89,7 @@ class AppendableData extends FfiApi {
     });
   }
 
-  getDataId(appendHandleId, index, fromDeleted) {
+  getDataId(app, handleId, index, fromDeleted) {
     return new Promise((resolve, reject) => {
       let dataHandleRef = ref.alloc(u64);
       const onResult = (err, res) => {
@@ -99,9 +99,11 @@ class AppendableData extends FfiApi {
         resolve(dataHandleRef.deref());
       };
       if (fromDeleted) {
-        this.safeCore.appendable_data_nth_deleted_data_id.async(appendHandleId, index, dataHandleRef, onResult);
+        this.safeCore.appendable_data_nth_deleted_data_id.async(appManager.getHandle(app),
+          handleId, index, dataHandleRef, onResult);
       } else {
-        this.safeCore.appendable_data_nth_data_id.async(appendHandleId, index, dataHandleRef, onResult);
+        this.safeCore.appendable_data_nth_data_id.async(appManager.getHandle(app),
+          handleId, index, dataHandleRef, onResult);
       }
     });
   }
@@ -213,7 +215,7 @@ class AppendableData extends FfiApi {
     });
   }
 
-  getSigningKey(handleId, index, fromDeleted) {
+  getSigningKey(app, handleId, index, fromDeleted) {
     return new Promise((resolve, reject) => {
       const keyHandleRef = ref.alloc(u64);
       const onResult = (err, res) => {
@@ -223,9 +225,9 @@ class AppendableData extends FfiApi {
         resolve(keyHandleRef.deref());
       };
       if (fromDeleted) {
-        this.safeCore.appendable_data_nth_deleted_data_sign_key.async(handleId, index, keyHandleRef, onResult);
+        this.safeCore.appendable_data_nth_deleted_data_sign_key.async(appManager.getHandle(app), handleId, index, keyHandleRef, onResult);
       } else {
-        this.safeCore.appendable_data_nth_data_sign_key.async(handleId, index, keyHandleRef, onResult);
+        this.safeCore.appendable_data_nth_data_sign_key.async(appManager.getHandle(app), handleId, index, keyHandleRef, onResult);
       }
     });
   }

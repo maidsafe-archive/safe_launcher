@@ -1,6 +1,6 @@
 import { app, BrowserWindow, Menu, shell } from 'electron';
-import kill from 'killprocess';
 import pkg from './package.json';
+import os from 'os';
 
 let menu;
 let template;
@@ -45,8 +45,11 @@ const installExtensions = async () => {
 };
 
 app.on('before-quit', () => {
-  if (global.proxy.pid) {
-    kill(global.proxy.pid);
+  if (os.platform() !== 'win32') {
+    const kill = require('killprocess');
+    if (global.proxy.pid) {
+      kill(global.proxy.pid);
+    }
   }
 });
 

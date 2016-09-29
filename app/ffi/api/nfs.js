@@ -239,7 +239,7 @@ class NFS extends FfiApi {
       };
       const pathBuff = new Buffer(path);
       const nameBuff = newName ? new Buffer(newName) : null;
-      const metadataBuff = metadataBuff ? new Buffer(metadataBuff) : null;
+      const metadataBuff = metadata ? new Buffer(metadata) : null;
       self.safeCore.nfs_modify_dir.async(appManager.getHandle(app), pathBuff, pathBuff.length,
         isShared, nameBuff, (nameBuff ? nameBuff.length : 0),
         metadataBuff, (metadataBuff ? metadataBuff.length : 0), onResult);

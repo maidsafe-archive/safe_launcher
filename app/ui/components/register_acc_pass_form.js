@@ -51,7 +51,7 @@ export default class RegisterAccPassForm extends Component {
     e.preventDefault();
 
     if (!this.passwordStrengthValid) {
-      accountPasswordMsgEle.text('Account secret needs to be stronger.');
+      accountPasswordMsgEle.text('Account password needs to be stronger.');
       return;
     }
 

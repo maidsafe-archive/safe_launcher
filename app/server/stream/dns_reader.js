@@ -38,7 +38,7 @@ DnsReader.prototype._read = function() {
     dns.readFile(self.app, self.longName, self.serviceName, self.filePath, self.curOffset,
       self.sizeToRead).then((data) => {
         self.curOffset += self.sizeToRead;
-        self.push(new Buffer(data.toString(), 'base64'));
+        self.push(data);
         eventEmitter.emit(eventType, data.length);
       }, (e) => {
         console.error(e);
