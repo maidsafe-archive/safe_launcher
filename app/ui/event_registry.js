@@ -241,7 +241,7 @@ export default class EventRegistry {
   }
 
   run() {
-    this.dispatch(setProxy());
+    // this.dispatch(setProxy());
     this.handleNetworkEvents();
     this.handleAPIServer();
     this.handleProxyServer();

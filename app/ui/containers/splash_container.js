@@ -5,7 +5,7 @@ import { retryNetwork } from '../actions/network_status_action';
 const mapStateToProps = state => (
   {
     status: state.networkStatus.networkStatus,
-    initialSettings: state.proxy.initialSettings
+    initialSettings: state.user.initialSettings
   }
 );
 

@@ -69,19 +69,6 @@ export default class Home extends Component {
               <li
                 className={
                   className({
-                    active: router.isActive('/settings'),
-                    disabled: authProcessing
-                  })
-                }
-              >
-                <Link to="/settings" onClick={this.handleLinkClick}>
-                  <span className="icn settings-icn">{' '}</span>
-                  <span className="txt">Settings</span>
-                </Link>
-              </li>
-              <li
-                className={
-                  className({
                     active: router.isActive('/help'),
                     disabled: authProcessing
                   })
