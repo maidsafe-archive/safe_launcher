@@ -7,6 +7,7 @@ import misc from './misc';
 import appManager from '../util/app_manager';
 import { FILTER_TYPE } from '../model/enum';
 const int32 = ref.types.int32;
+const Int = ref.types.int;
 const u8 = ref.types.uint8;
 const u64 = ref.types.uint64;
 const Void = ref.types.void;
@@ -18,9 +19,7 @@ const u64Pointer = ref.refType(u64);
 const boolPointer = ref.refType(bool);
 const size_tPointer = ref.refType(size_t);
 
-const Ffi_FilterType = new Enum([ 'BlackList', 'WhiteList' ]);
-
-const filterTypePointer = ref.refType(Ffi_FilterType);
+const Ffi_FilterType = new Enum({'BlackList': 0, 'WhiteList': 1});
 
 class AppendableData extends FfiApi {
 
@@ -55,7 +54,7 @@ class AppendableData extends FfiApi {
       'appendable_data_clear_deleted_data': [int32, [u64]],
       'appendable_data_remove_nth_deleted_data': [int32, [u64, size_t]],
       'appendable_data_remove_from_filter': [int32, [u64, u64]],
-      'appendable_data_filter_type': [int32, [u64, filterTypePointer]]
+      'appendable_data_filter_type': [int32, [u64, ref.refType(Int)]]
       // 'appendable_data_delete': [int32, [AppHandle, u64]]
     };
   }
@@ -159,14 +158,14 @@ class AppendableData extends FfiApi {
 
   getFilterType(handleId) {
     return new Promise((resolve, reject) => {
-      let filterTypeRef = ref.alloc(Ffi_FilterType);
+      let filterType = ref.alloc(Int);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
-        resolve(filterTypeRef.deref());
+        resolve(Ffi_FilterType.get(filterType.deref()).key);
       };
-      this.safeCore.appendable_data_filter_type.async(handleId, filterTypeRef, onResult);
+      this.safeCore.appendable_data_filter_type.async(handleId, filterType, onResult);
     });
   }
 
