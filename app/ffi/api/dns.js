@@ -3,7 +3,8 @@ import ref from 'ref';
 import appManager from '../util/app_manager';
 import {
   error, consumeStringListHandle, derefFileMetadataStruct,
-  FileDetails, FileMetadata, parseExceptionForLog
+  FileDetails, FileMetadata, parseExceptionForLog,
+  safeBufferGetter
 } from '../util/utils';
 import FfiApi from '../ffi_api';
 import nfs from './nfs';
@@ -238,17 +239,15 @@ class DNS extends FfiApi {
 
   readFile(app, longName, serviceName, path, offset, length) {
     return new Promise((resolve, reject) => {
-      const fileDetailsPointerHandle = ref.alloc(PointerToFileDetailsPointer);
+      const fileDetailsHandle = ref.alloc(FileDetailsHandle);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           log.error(`FFI :: DNS :: Read file :: ${err || res}`);
           return reject(err || res);
         }
-        const fileDetailsHandle = fileDetailsPointerHandle.deref();
-        const handle = ref.alloc(FileDetailsHandle, fileDetailsHandle).deref();
-        const fileDetails = handle.deref();
-        const data = Buffer.concat([ref.reinterpret(fileDetails.content, fileDetails.content_len)]);
-        this.safeCore.file_details_drop.async(handle, (e) => {
+        const fileDetails = new FileDetails(fileDetailsHandle.deref());
+        const data = safeBufferGetter(fileDetails, 'content');
+        this.safeCore.file_details_drop.async(fileDetailsHandle.deref(), (e) => {
           if (e) {
             log.error(`FFI :: DNS :: File details drop :: ${e}`);
           }
@@ -262,7 +261,7 @@ class DNS extends FfiApi {
         longNameBuffer, longNameBuffer.length,
         serviceNameBuffer, serviceNameBuffer.length,
         pathBuffer, pathBuffer.length,
-        offset, length, false, fileDetailsPointerHandle, onResult);
+        offset, length, false, fileDetailsHandle, onResult);
     });
   }
 
