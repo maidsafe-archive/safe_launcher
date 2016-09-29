@@ -221,16 +221,14 @@ class DNS extends FfiApi {
 
   readFile(app, longName, serviceName, path, offset, length) {
     return new Promise((resolve, reject) => {
-      const fileDetailsPointerHandle = ref.alloc(PointerToFileDetailsPointer);
+      const fileDetailsHandle = ref.alloc(FileDetailsHandle);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
-        const fileDetailsHandle = fileDetailsPointerHandle.deref();
-        const handle = ref.alloc(FileDetailsHandle, fileDetailsHandle).deref();
-        const fileDetails = handle.deref();
+        const fileDetails = new FileDetails(fileDetailsHandle.deref());
         const data = Buffer.concat([ref.reinterpret(fileDetails.content, fileDetails.content_len)]);
-        this.safeCore.file_details_drop.async(handle, (e) => {
+        this.safeCore.file_details_drop.async(fileDetailsHandle.drop(), (e) => {
           if (e) {
             console.error(e);
           }
@@ -244,7 +242,7 @@ class DNS extends FfiApi {
         longNameBuffer, longNameBuffer.length,
         serviceNameBuffer, serviceNameBuffer.length,
         pathBuffer, pathBuffer.length,
-        offset, length, false, fileDetailsPointerHandle, onResult);
+        offset, length, false, fileDetailsHandle, onResult);
     });
   }
 
