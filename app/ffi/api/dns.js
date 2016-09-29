@@ -193,16 +193,24 @@ class DNS extends FfiApi {
 
   getFileMetadata(app, longName, serviceName, path) {
     return new Promise((resolve, reject) => {
-      const fileMetadataRefRef = ref.alloc(PointerToFileMetadataPointer);
+      const fileMetadataHandle = ref.alloc(FileMetadataHandle);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
         try {
-          const fileMetadataHandle = fileMetadataRefRef.deref();
-          const fileMetadataRef = ref.alloc(FileMetadataHandle, fileMetadataHandle).deref();
-          const metadata = derefFileMetadataStruct(fileMetadataRef.deref());
-          this.safeCore.file_metadata_drop.async(fileMetadataHandle, (e) => {});
+          let metadata = new FileMetadata(fileMetadataHandle.deref());
+          metadata = {
+            name: Buffer.concat([ref.reinterpret(metadata.name, metadata.name_len)]),
+            user_metadata: Buffer.concat([ref.reinterpret(metadata.user_metadata,
+                                                          metadata.user_metadata_len)]),
+            size: metadata.size,
+            creation_time_sec: metadata.creation_time_sec,
+            creation_time_nsec: metadata.creation_time_nsec,
+            modification_time_sec: metadata.modification_time_sec,
+            modification_time_nsec: metadata.modification_time_nsec
+          };
+          this.safeCore.file_metadata_drop.async(fileMetadataHandle.deref(), (e) => {});
           resolve(metadata);
         } catch(e) {
           console.error(e);
@@ -215,7 +223,7 @@ class DNS extends FfiApi {
         longNameBuffer, longNameBuffer.length,
         serviceNameBuffer, serviceNameBuffer.length,
         pathBuffer, pathBuffer.length,
-        fileMetadataRefRef, onResult);
+        fileMetadataHandle, onResult);
     });
   }
 
