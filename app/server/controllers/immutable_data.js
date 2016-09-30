@@ -158,8 +158,10 @@ export const closeWriter = async (req, res, next) => {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     let cipherOptsHandle = req.params.cipherOptsHandle || (await getPlainEncryptionHandle());
-    await immutableData.closeWriter(app, req.params.handleId, cipherOptsHandle);
-    responseHandler();
+    const dataIdHandle = await immutableData.closeWriter(app, req.params.handleId, cipherOptsHandle);
+    responseHandler(null, {
+      handleId: dataIdHandle
+    });
   } catch(e) {
     responseHandler(e);
   }
