@@ -134,7 +134,7 @@ export const update = async (req, res, next) => {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     const cipherOptsHandle = req.body.cipherOpts || (await getPlainEncryptionHandle());
-    const data = new Buffer(req.body, 'base64');
+    const data = new Buffer(req.body.data, 'base64');
     await structuredData.update(app, req.params.handleId, cipherOptsHandle, data);
     responseHandler();
   } catch (e) {

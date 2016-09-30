@@ -6,10 +6,9 @@ var util = require('util');
 
 export var ImmutableDataReader = function(req, res, readerId, start, end) {
   Readable.call(this);
-  this.eventEmitter = this.req.app.get('eventEmitter');
-  this.eventType = this.req.app.get('EVENT_TYPE').DATA_DOWNLOADED;
+  this.eventEmitter = req.app.get('eventEmitter');
+  this.eventType = req.app.get('EVENT_TYPE').DATA_DOWNLOADED;
   this.res = res;
-  this.responseHandler = new ResponseHandler(req, res);
   this.readerId = readerId;
   this.end = end;
   this.curOffset = start;
@@ -23,7 +22,7 @@ util.inherits(ImmutableDataReader, Readable);
 ImmutableDataReader.prototype._read = function() {
   /*jscs:enable disallowDanglingUnderscores*/
   if (this.curOffset === this.end) {
-    this.responseHandler();
+    this.res.end();
     return this.push(null);
   }
   const MAX_SIZE_TO_READ = 1048576; // 1 MB
@@ -37,6 +36,6 @@ ImmutableDataReader.prototype._read = function() {
     }, (err) => {
       this.push(null);
       // log.error(err);
-      this.responseHandler();
+      this.res.end();
     }, console.error);
 };

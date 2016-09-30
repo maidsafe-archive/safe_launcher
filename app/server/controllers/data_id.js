@@ -13,7 +13,8 @@ export const getDataIdForStructuredData = async (req, res) => {
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     const app = sessionInfo ? sessionInfo.app : undefined;
-    const handleId = await dataId.getStructuredDataHandle(req.body.typeTag, req.body.name);
+    const name = new Buffer(req.body.name, 'base64');
+    const handleId = await dataId.getStructuredDataHandle(req.body.typeTag, name);
     responseHandler(null, {
       handleId: handleId
     });

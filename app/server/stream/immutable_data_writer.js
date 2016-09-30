@@ -4,8 +4,8 @@ import immutableData from '../../ffi/api/immutable_data';
 
 export var ImmutableDataWriter = function(req, writerId, responseHandler, size, offset) {
   Writable.call(this);
-  this.eventEmitter = this.req.app.get('eventEmitter');
-  this.uploadEvent = this.req.app.get('EVENT_TYPE').DATA_UPLOADED;
+  this.eventEmitter = req.app.get('eventEmitter');
+  this.uploadEvent = req.app.get('EVENT_TYPE').DATA_UPLOADED;
   this.writerId = writerId;
   this.curOffset = parseInt(offset || 0);
   this.maxSize = size;
