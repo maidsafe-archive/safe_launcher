@@ -83,14 +83,16 @@ router.delete('/cipher-opts/:handleId', new ActivityMiddleware('Drop cipher-opts
 // ImmutableData API
 router.get('/immutable-data/reader/:handleId', new ActivityMiddleware('Get ImmutableDataReader handle'),
   ImmutableData.getReaderHandle);
-router.get('/immutable-data/writer/:handleId', new ActivityMiddleware('Create ImmutableDataWriter handle'),
+router.get('/immutable-data/writer', new ActivityMiddleware('Create ImmutableDataWriter handle'),
   ImmutableData.getWriterHandle);
 router.get('/immutable-data/:handleId', new ActivityMiddleware('Read ImmutableData'), ImmutableData.read);
 router.post('/immutable-data/:handleId', new ActivityMiddleware('Write ImmutableData'), ImmutableData.write);
-router.delete('/immutable-data/:handleId/:cipherOptsHandle', new ActivityMiddleware('Close ImmutableDataWriter handle'),
+router.put('/immutable-data/:handleId/:cipherOptsHandle', new ActivityMiddleware('Close ImmutableDataWriter handle'),
   ImmutableData.closeWriter);
-router.delete('/immutable-data/:handleId', new ActivityMiddleware('Close ImmutableDataReader handle'),
-  ImmutableData.closeReader);
+router.delete('/immutable-data/reader/:handleId', new ActivityMiddleware('Close ImmutableDataReader handle'),
+  ImmutableData.dropReader);
+router.delete('/immutable-data/writer/:handleId', new ActivityMiddleware('Close ImmutableDataWriter handle'),
+  ImmutableData.dropWriter);
 
 // Structured Data
 router.post('/structured-data/', jsonParser, new ActivityMiddleware('Create structured data'), StructuredData.create);

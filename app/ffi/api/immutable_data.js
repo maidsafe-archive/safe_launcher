@@ -79,11 +79,6 @@ class ImmutableData extends FfiApi {
           if (err || res !== 0) {
             return reject(err || res);
           }
-          self.safeCore.immut_data_self_encryptor_writer_free.async(writerHandleId, (e) => {
-            if (e) {
-              console.error(e);
-            }
-          });
           resolve(dataIdRef.deref());
         };
         self.safeCore.immut_data_close_self_encryptor.async(appManager.getHandle(app), writerHandleId,
@@ -148,7 +143,7 @@ class ImmutableData extends FfiApi {
     return new Promise(executor);
   }
 
-  closeReader(readerId) {
+  dropReader(readerId) {
     const self = this;
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
@@ -158,6 +153,20 @@ class ImmutableData extends FfiApi {
         resolve();
       };
       self.safeCore.immut_data_self_encryptor_reader_free.async(readerId, onResult);
+    };
+    return new Promise(executor);
+  }
+
+  dropWriterHandle(writerId) {
+    const self = this;
+    const executor = (resolve, reject) => {
+      const onResult = (err, res) => {
+        if (err || res !== 0) {
+          reject(err || res);
+        }
+        resolve();
+      };
+      self.safeCore.immut_data_self_encryptor_writer_free.async(writerId, onResult);
     };
     return new Promise(executor);
   }

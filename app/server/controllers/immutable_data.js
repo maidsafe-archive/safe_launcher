@@ -134,18 +134,6 @@ export const read = async (req, res, next) => {
   }
 };
 
-export const closeReader = async (req, res) => {
-  const responseHandler = new ResponseHandler(req, res);
-  try {
-    const sessionInfo = sessionManager.get(req.headers.sessionId);
-    const app = sessionInfo ? sessionInfo.app : null;
-    await immutableData.closeReader(app, req.params.handleId);
-    responseHandler();
-  } catch(e) {
-    responseHandler(e);
-  }
-};
-
 export const closeWriter = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -162,6 +150,36 @@ export const closeWriter = async (req, res, next) => {
     responseHandler(null, {
       handleId: dataIdHandle
     });
+  } catch(e) {
+    responseHandler(e);
+  }
+};
+
+export const dropReader = async (req, res) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
+    const app = sessionInfo ? sessionInfo.app : null;
+    await immutableData.dropReader(req.params.handleId);
+    responseHandler();
+  } catch(e) {
+    responseHandler(e);
+  }
+};
+
+export const dropWriter = async (req, res) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
+    if (!sessionInfo) {
+      return next(new ResponseError(401, UNAUTHORISED_ACCESS));
+    }
+    const app = sessionInfo.app;
+    if (!app.permission.lowLevelApi) {
+      return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
+    }
+    await immutableData.dropWriterHandle(req.params.handleId);
+    responseHandler();
   } catch(e) {
     responseHandler(e);
   }
