@@ -69,41 +69,20 @@ class ImmutableData extends FfiApi {
     return new Promise(executor);
   }
 
-  closeWriter(app, writerHandleId, encryptionType, privateKeyHandle) {
+  closeWriter(app, writerHandleId, cipherOptsHandle) {
     const self = this;
     const executor = async (resolve, reject) => {
       const dataIdRef = ref.alloc(u64);
       try {
-        let cipherOptHandle;
-        switch (encryptionType) {
-          case ENCRYPTION_TYPE.PLAIN:
-            cipherOptHandle = await cipherOpts.getCipherOptPlain();
-            break;
-          case ENCRYPTION_TYPE.SYMMETRIC:
-            cipherOptHandle = await cipherOpts.getCipherOptSymmetric();
-            break;
-          case ENCRYPTION_TYPE.ASYMMETRIC:
-            if (!privateKeyHandle) {
-              return reject('Invalid private key handle');
-            }
-            cipherOptHandle = await cipherOpts.getCipherOptAsymmetric(privateKeyHandle);
-            break;
-        }
         const dataIdRef = ref.alloc(u64);
         const onResult = (err, res) => {
           if (err || res !== 0) {
             return reject(err || res);
           }
-          self.safeCore.immut_data_self_encryptor_writer_free.async(writerHandleId, (e) => {
-            if (e) {
-              console.error(e);
-            }
-          });
-          cipherOpts.dropHandle(cipherOptHandle);
           resolve(dataIdRef.deref());
         };
         self.safeCore.immut_data_close_self_encryptor.async(appManager.getHandle(app), writerHandleId,
-          cipherOptHandle, dataIdRef, onResult);
+          cipherOptsHandle, dataIdRef, onResult);
       } catch (e) {
         reject(e);
       }
@@ -164,7 +143,7 @@ class ImmutableData extends FfiApi {
     return new Promise(executor);
   }
 
-  closeReader(readerId) {
+  dropReader(readerId) {
     const self = this;
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
@@ -174,6 +153,20 @@ class ImmutableData extends FfiApi {
         resolve();
       };
       self.safeCore.immut_data_self_encryptor_reader_free.async(readerId, onResult);
+    };
+    return new Promise(executor);
+  }
+
+  dropWriterHandle(writerId) {
+    const self = this;
+    const executor = (resolve, reject) => {
+      const onResult = (err, res) => {
+        if (err || res !== 0) {
+          reject(err || res);
+        }
+        resolve();
+      };
+      self.safeCore.immut_data_self_encryptor_writer_free.async(writerId, onResult);
     };
     return new Promise(executor);
   }

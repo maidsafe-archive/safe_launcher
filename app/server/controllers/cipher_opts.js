@@ -16,7 +16,7 @@ export const getHandle = async (req, res, next) => {
     if (!sessionInfo && encType !== ENCRYPTION_TYPE.PLAIN) {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
-    if (!sessionInfo.app.lowLevelApi && encType !== ENCRYPTION_TYPE.PLAIN) {
+    if (!sessionInfo.app.permission.lowLevelApi && encType !== ENCRYPTION_TYPE.PLAIN) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
 
