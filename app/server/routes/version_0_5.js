@@ -143,9 +143,6 @@ router.put('/appendable-data/restore/:handleId/:index',
   new ActivityMiddleware('Restore deleted data at an index of an appendable data'), AppendableData.restore);
 router.put('/appendable-data/:handleId', new ActivityMiddleware('Save appendable data - PUT'), AppendableData.put);
 
-router.delete('/appendable-data/sign-key/:handleId',
-  new ActivityMiddleware('Drop signing key handle'),
-  AppendableData.dropSigningKeyHandle);
 router.delete('/appendable-data/filter/:handleId', jsonParser,
   new ActivityMiddleware('Remove sign keys from appendable data filter'), AppendableData.removeFromFilter);
 router.delete('/appendable-data/deleted-data/:handleId/:index',
@@ -161,6 +158,12 @@ router.delete('/appendable-data/:handleId/:index', new ActivityMiddleware('Remov
 // router.delete('/appendable-data/:handleId',
 //   new ActivityMiddleware('Delete appendable data'), AppendableData.deleteAppendableData);
 
+router.get('/sign-key/serialise/:handleId', new ActivityMiddleware('Serialise sign key'),
+  AppendableData.serialiseSignKey);
+router.post('/sign-key/deserialise', rawBodyParser(), new ActivityMiddleware('De-Serialise sign key'),
+  AppendableData.deserialiseSignKey);
+router.delete('/sign-key/:handleId', rawBodyParser(), new ActivityMiddleware('Drop sign key'),
+  AppendableData.dropSigningKeyHandle);
 
 /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
 export {router as router_0_5};

@@ -477,6 +477,42 @@ export const deserialise = async (req, res) => {
   }
 };
 
+export const serialiseSignKey = async (req, res, next) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
+    if (!sessionInfo) {
+      return next(new ResponseError(401, UNAUTHORISED_ACCESS));
+    }
+    if (!sessionInfo.app.permission.lowLevelApi) {
+      return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
+    }
+    const data = await misc.serialiseSignKey(req.params.handleId);
+    responseHandler(null, data);
+  } catch(e) {
+    responseHandler(e);
+  }
+};
+
+export const deserialiseSignKey = async (req, res, next) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
+    if (!sessionInfo) {
+      return next(new ResponseError(401, UNAUTHORISED_ACCESS));
+    }
+    if (!sessionInfo.app.permission.lowLevelApi) {
+      return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
+    }
+    const handleId = await misc.deserialiseSignKey(req.rawBody);
+    responseHandler(null, {
+      handleId
+    });
+  } catch(e) {
+    responseHandler(e);
+  }
+};
+
 export const dropHandle = async (req, res) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
