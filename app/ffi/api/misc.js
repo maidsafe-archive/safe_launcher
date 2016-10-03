@@ -31,6 +31,8 @@ class Misc extends FfiApi {
       'misc_serialise_struct_data': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
       'misc_deserialise_appendable_data': [int32, [u8Pointer, size_t, u64Pointer]],
       'misc_deserialise_struct_data': [int32, [u8Pointer, size_t, u64Pointer]],
+      'misc_serialise_sign_key': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
+      'misc_deserialise_sign_key': [int32, [u8Pointer, size_t, u64Pointer]],
       'misc_u8_ptr_free': [Void, [u8Pointer, size_t, size_t]]
     };
   }
@@ -110,6 +112,10 @@ class Misc extends FfiApi {
           this.safeCore.misc_serialise_structured_data.async(handleId, dataPointerRef,
             sizeRef, capacityRef, onResult);
           break;
+        case 3:
+          this.safeCore.misc_serialise_sign_key.async(handleId, dataPointerRef,
+            sizeRef, capacityRef, onResult);
+          break;
         default:
       }
     });
@@ -134,6 +140,9 @@ class Misc extends FfiApi {
         case 2:
           this.safeCore.misc_deserialise_structured_data.async(data, data.length, handleRef, onResult);
           break;
+        case 3:
+          this.safeCore.misc_deserialise_sign_key.async(data, data.length, handleRef, onResult);
+          break;
         default:
       }
     });
@@ -151,6 +160,10 @@ class Misc extends FfiApi {
     return this._serialise(handleId, 2);
   }
 
+  serialiseSignKey(handleId) {
+    return this._serialise(handleId, 3);
+  }
+
   deserialiseDataId(data) {
     return this._deserialise(data, 0);
   }
@@ -161,6 +174,10 @@ class Misc extends FfiApi {
 
   deserialiseStructuredData(data) {
     return this._deserialise(data, 2);
+  }
+
+  deserialiseSignKey(data) {
+    return this._deserialise(data, 3);
   }
 }
 
