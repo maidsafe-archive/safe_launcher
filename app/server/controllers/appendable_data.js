@@ -164,8 +164,7 @@ export const getEncryptKey = async (req, res, next) => {
     if (!sessionInfo.app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
-    const app = sessionInfo.app;
-    const encryptKeyHandle = await appendableData.getEncryptKey(app, req.params.handleId);
+    const encryptKeyHandle = await appendableData.getEncryptKey(req.params.handleId);
     responseHandler(null, {
       handleId: encryptKeyHandle
     });
