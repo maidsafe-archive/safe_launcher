@@ -1,5 +1,10 @@
 # SAFE Launcher Change Log
 
+##[0.9.1]
+- Requires safe_core 0.21.2
+- Web proxy removed
+- Low level api updated to match one to one with safe_core
+
 ##[0.9.0]
 - Requires safe_core 0.20.0
 - UI switched to React + Redux from angular
