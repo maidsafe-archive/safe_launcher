@@ -105,7 +105,7 @@ router.get('/structured-data/handle/:dataIdHandle', new ActivityMiddleware('Get 
   StructuredData.getHandle);
 router.get('/structured-data/data-id/:handleId',
   new ActivityMiddleware('Get data-id handle from structured data handle'), StructuredData.asDataId);
-router.get('/structured-data/:handleId', new ActivityMiddleware('Read structured data'), StructuredData.read);
+router.get('/structured-data/:handleId/:version?', new ActivityMiddleware('Read structured data'), StructuredData.read);
 router.put('/structured-data/:handleId', new ActivityMiddleware('Save structured data - PUT'), StructuredData.put);
 router.patch('/structured-data/:handleId', jsonParser, new ActivityMiddleware('Update data of structured data'),
   StructuredData.update);

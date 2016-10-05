@@ -24,8 +24,8 @@ const getPlainEncryptionHandle = () => {
 };
 
 const TYPE_TAG = {
-  VERSIONED: 500,
-  UNVERSIONED: 501
+  UNVERSIONED: 500,
+  VERSIONED: 501
 };
 
 export const create = async (req, res, next) => {
@@ -77,10 +77,12 @@ export const getHandle = async (req, res) => {
      isOwner = await structuredData.isOwner(app, handleId);
     }
     const version = await structuredData.getVersion(handleId);
+    const dataVersion = await structuredData.getDataVersionsCount(handleId);
     responseHandler(null, {
       handleId: handleId,
       isOwner: isOwner,
-      version: version
+      version: version,
+      dataVersionLength: dataVersion
     });
   } catch(e) {
     responseHandler(e);
@@ -98,9 +100,11 @@ export const getMetadata = async (req, res) => {
       isOwner = await structuredData.isOwner(app, handleId);
     }
     const version = await structuredData.getVersion(handleId);
+    const dataVersion = await structuredData.getDataVersionsCount(handleId);
     responseHandler(null, {
       isOwner: isOwner,
-      version: version
+      version: version,
+      dataVersionLength: dataVersion
     });
   } catch(e) {
     responseHandler(e);
@@ -147,7 +151,7 @@ export const read = async (req, res) => {
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     const app = sessionInfo ? sessionInfo.app : null;
-    const data = await structuredData.read(app, req.params.handleId);
+    const data = await structuredData.read(app, req.params.handleId, req.params.version);
     res.send(data);
     updateAppActivity(req, res, true);
   } catch (e) {
@@ -255,10 +259,12 @@ export const deserialise = async (req, res) => {
     const handleId = await structuredData.deserialise(req.rawBody);
     const isOwner = app ? await structuredData.isOwner(app, handleId) : false;
     const version = await structuredData.getVersion(handleId);
+    const dataVersion = await structuredData.getDataVersionsCount(handleId);
     responseHandler(null, {
       handleId: handleId,
       isOwner: isOwner,
-      version: version
+      version: version,
+      dataVersionLength: dataVersion
     });
   } catch (e) {
     console.error(e);
