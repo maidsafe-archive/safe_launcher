@@ -55,7 +55,9 @@ class AppendableData extends FfiApi {
       'appendable_data_clear_deleted_data': [int32, [u64]],
       'appendable_data_remove_nth_deleted_data': [int32, [u64, size_t]],
       'appendable_data_remove_from_filter': [int32, [u64, u64]],
-      'appendable_data_filter_type': [int32, [u64, filterTypePointer]]
+      'appendable_data_filter_type': [int32, [u64, filterTypePointer]],
+      'appendable_data_num_of_filter_keys': [int32, [u64, size_tPointer]],
+      'appendable_data_nth_filter_key': [int32, [u64, size_t, u64Pointer]]
       // 'appendable_data_delete': [int32, [AppHandle, u64]]
     };
   }
@@ -167,6 +169,32 @@ class AppendableData extends FfiApi {
         resolve(filterTypeRef.deref());
       };
       this.safeCore.appendable_data_filter_type.async(handleId, filterTypeRef, onResult);
+    });
+  }
+
+  getFilterLength(handleId) {
+    return new Promise((resolve, reject) => {
+      const lengthRef = ref.alloc(size_t);
+      const onResult = (err, res) => {
+        if (err || res !== 0) {
+          return reject(err || res);
+        }
+        resolve(lengthRef.deref());
+      };
+      this.safeCore.appendable_data_num_of_filter_keys.async(handleId, lengthRef, onResult);
+    });
+  }
+
+  getSignKeyFromFilter(handleId, index) {
+    return new Promise((resolve, reject) => {
+      const signKeyHandleRef = ref.alloc(u64);
+      const onResult = (err, res) => {
+        if (err || res !== 0) {
+          return reject(err || res);
+        }
+        resolve(signedKeyHandleRef.deref());
+      };
+      this.safeCore.appendable_data_nth_filter_key.async(handleId, index, signKeyHandleRef, onResult);
     });
   }
 

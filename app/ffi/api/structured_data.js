@@ -3,7 +3,7 @@ import ref from 'ref';
 import misc from './misc';
 import FfiApi from '../ffi_api';
 import appManager from '../util/app_manager';
-
+import {errorCodeLookup} from '../../server/error_code_lookup';
 const int32 = ref.types.int32;
 const u8 = ref.types.uint8;
 const u64 = ref.types.uint64;
@@ -31,8 +31,8 @@ class StructuredData extends FfiApi {
       'struct_data_extract_data_id': [int32, [u64, u64Pointer]],
       'struct_data_new_data': [int32, [AppHandle, u64, u64, u8Pointer, size_t]],
       'struct_data_extract_data': [int32, [AppHandle, u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
-      'struct_data_num_of_versions': [int32, [AppHandle, u64, u64Pointer]],
-      'struct_data_nth_version': [int32, [AppHandle, u64, u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
+      'struct_data_nth_version': [int32, [AppHandle, u64, size_t, PointerToU8Pointer, size_tPointer, size_tPointer]],
+      'struct_data_num_of_versions': [int32, [u64, size_tPointer]],
       'struct_data_put': [int32, [AppHandle, u64]],
       'struct_data_post': [int32, [AppHandle, u64]],
       'struct_data_delete': [int32, [AppHandle, u64]],
@@ -84,6 +84,24 @@ class StructuredData extends FfiApi {
     });
   }
 
+  getDataVersionsCount(handleId) {
+    return new Promise((resolve, reject) => {
+      let countRef = ref.alloc(size_t);
+      const onResult = (err, res) => {
+        if (err) {
+          reject(err);
+        } else if (errorCodeLookup(res) === 'FfiError::InvalidStructuredDataTypeTag') {
+          resolve();
+        } else if (res !== 0) {
+          reject(res);
+        } else {
+          resolve(countRef.deref());
+        }
+      };
+      this.safeCore.struct_data_num_of_versions.async(handleId, countRef, onResult);
+    });
+  }
+
   create(app, id, tagType, cipherOptHandle, data) {
     return new Promise(async (resolve, reject) => {
       if (!app) {
@@ -124,7 +142,7 @@ class StructuredData extends FfiApi {
     });
   }
 
-  read(app, handleId) {
+  read(app, handleId, version) {
     return new Promise((resolve, reject) => {
       try {
         const dataPointerRef = ref.alloc(PointerToU8Pointer);
@@ -144,8 +162,13 @@ class StructuredData extends FfiApi {
           }
           resolve(data);
         };
-        this.safeCore.struct_data_extract_data.async(appManager.getHandle(app), handleId,
-          dataPointerRef, sizeRef, capacityRef, onResult);
+        if (isNaN(version)) {
+          this.safeCore.struct_data_extract_data.async(appManager.getHandle(app), handleId,
+            dataPointerRef, sizeRef, capacityRef, onResult);
+        } else {
+          this.safeCore.struct_data_nth_version.async(appManager.getHandle(app), handleId,
+            version, dataPointerRef, sizeRef, capacityRef, onResult);
+        }
       } catch (e) {
         reject(e);
       }

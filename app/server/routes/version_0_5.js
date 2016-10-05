@@ -105,7 +105,7 @@ router.get('/structured-data/handle/:dataIdHandle', new ActivityMiddleware('Get 
   StructuredData.getHandle);
 router.get('/structured-data/data-id/:handleId',
   new ActivityMiddleware('Get data-id handle from structured data handle'), StructuredData.asDataId);
-router.get('/structured-data/:handleId', new ActivityMiddleware('Read structured data'), StructuredData.read);
+router.get('/structured-data/:handleId/:version?', new ActivityMiddleware('Read structured data'), StructuredData.read);
 router.put('/structured-data/:handleId', new ActivityMiddleware('Save structured data - PUT'), StructuredData.put);
 router.patch('/structured-data/:handleId', jsonParser, new ActivityMiddleware('Update data of structured data'),
   StructuredData.update);
@@ -141,6 +141,8 @@ router.get('/appendable-data/sign-key/:handleId/:index', new ActivityMiddleware(
   AppendableData.getSigningKey);
 router.get('/appendable-data/deleted-data/:handleId/:index',
   new ActivityMiddleware('Get DataId from appendable data - deleted'), AppendableData.getDeletedDataIdAt);
+router.get('/appendable-data/filter/:handleId/:index',
+  new ActivityMiddleware('Get SignKey from filter of AppendableData'), AppendableData.getSignKeyFromFilter);
 router.get('/appendable-data/:handleId/:index', new ActivityMiddleware('Get DataId from appendable data'),
   AppendableData.getDataIdAt);
 router.put('/appendable-data/toggle-filter/:handleId', new ActivityMiddleware('Toggle appendable data filter'),

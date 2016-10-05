@@ -126,11 +126,13 @@ export const getMetadata = async (req, res) => {
     const filterType = await appendableData.getFilterType(handleId);
     const dataLength = await appendableData.getLength(handleId, false);
     const deletedDataLength = await appendableData.getLength(handleId, true);
+    const filterLength = await appendableData.getFilterLength(handleId);
     const metadata = {
       handleId: handleId,
       isOwner: isOwner,
       version: version,
       filterType: filterType,
+      filterLength: filterLength,
       dataLength: dataLength,
       deletedDataLength: deletedDataLength
     };
@@ -293,6 +295,25 @@ export const removeFromFilter = async (req, res) => {
       await appendableData.removeFromFilter(req.params.handleId, key);
     }
     responseHandler();
+  } catch(e) {
+    responseHandler(e);
+  }
+};
+
+export const getSignKeyFromFilter = async (req, res) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
+    if (!sessionInfo) {
+      return next(new ResponseError(401, UNAUTHORISED_ACCESS));
+    }
+    if (!sessionInfo.app.permission.lowLevelApi) {
+      return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
+    }
+    const signKeyHandle = await appendableData.getSignKeyFromFilter(req.params.handleId, req.params.index);
+    responseHandler(null, {
+      handleId: signKeyHandle
+    });
   } catch(e) {
     responseHandler(e);
   }
