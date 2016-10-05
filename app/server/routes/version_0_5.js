@@ -141,6 +141,8 @@ router.get('/appendable-data/sign-key/:handleId/:index', new ActivityMiddleware(
   AppendableData.getSigningKey);
 router.get('/appendable-data/deleted-data/:handleId/:index',
   new ActivityMiddleware('Get DataId from appendable data - deleted'), AppendableData.getDeletedDataIdAt);
+router.get('/appendable-data/filter/:handleId/:index',
+  new ActivityMiddleware('Get SignKey from filter of AppendableData'), AppendableData.getSignKeyFromFilter);
 router.get('/appendable-data/:handleId/:index', new ActivityMiddleware('Get DataId from appendable data'),
   AppendableData.getDataIdAt);
 router.put('/appendable-data/toggle-filter/:handleId', new ActivityMiddleware('Toggle appendable data filter'),
