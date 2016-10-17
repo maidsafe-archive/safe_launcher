@@ -61,16 +61,18 @@ export var errorCodeLookup = function(errCode) {
     case CLIENT_ERROR_START_RANGE - 27:
       return 'CoreError::MutationFailure::MutationError::NetworkFull';
     case CLIENT_ERROR_START_RANGE - 28:
-      return 'SelfEncryptionError::Compression::<SelfEncryptionStorageError>)';
+      return 'CoreError::MutationFailure::MutationError::DataTooLarge';
     case CLIENT_ERROR_START_RANGE - 29:
-      return 'SelfEncryptionError::Decryption::<SelfEncryptionStorageError>)';
+      return 'SelfEncryptionError::Compression::<SelfEncryptionStorageError>)';
     case CLIENT_ERROR_START_RANGE - 30:
-      return 'CoreError::SelfEncryption(SelfEncryptionError::Io::<SelfEncryptionStorageError>)';
+      return 'SelfEncryptionError::Decryption::<SelfEncryptionStorageError>)';
     case CLIENT_ERROR_START_RANGE - 31:
-      return 'CoreError::GetAccountInfoFailure::GetError::NoSuchAccount';
+      return 'CoreError::SelfEncryption(SelfEncryptionError::Io::<SelfEncryptionStorageError>)';
     case CLIENT_ERROR_START_RANGE - 32:
-      return 'CoreError::GetAccountInfoFailure';
+      return 'CoreError::GetAccountInfoFailure::GetError::NoSuchAccount';
     case CLIENT_ERROR_START_RANGE - 33:
+      return 'CoreError::GetAccountInfoFailure';
+    case CLIENT_ERROR_START_RANGE - 34:
       return 'CoreError::RequestTimeout';
     case NFS_ERROR_START_RANGE - 1:
       return 'NfsError::DirectoryAlreadyExistsWithSameName';

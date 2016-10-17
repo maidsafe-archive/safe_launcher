@@ -219,12 +219,43 @@ export const deleteStructuredData = async (req, res, next) => {
     if (!app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
-    await structuredData.delete(app, req.params.handleId);
+    await structuredData.delete(app, req.params.handleId, false);
     responseHandler();
   } catch (e) {
     responseHandler(e);
   }
 };
+
+export const isSizeValid = async (req, res, next) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    const isValid = await structuredData.isSizeValid(req.params.handleId);
+    responseHandler(null, {
+      isValid: isValid
+    });
+  } catch(e) {
+    responseHandler(e);
+  }
+};
+
+export const makeStructuredDataUnclaimable = async (req, res, next) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
+    if (!sessionInfo) {
+      return next(new ResponseError(401, UNAUTHORISED_ACCESS));
+    }
+    const app = sessionInfo.app;
+    if (!app.permission.lowLevelApi) {
+      return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
+    }
+    await structuredData.delete(app, req.params.handleId, true);
+    responseHandler();
+  } catch (e) {
+    responseHandler(e);
+  }
+};
+
 
 export const dropHandle = async (req, res) => {
   const responseHandler = new ResponseHandler(req, res);

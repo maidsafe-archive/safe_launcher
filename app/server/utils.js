@@ -82,7 +82,7 @@ export class ResponseError {
   }
 }
 
-export let ResponseHandler = function(req, res) {
+export const ResponseHandler = function(req, res) {
   this.onResponse = function(err, data) {
     if (err) {
       if (err instanceof Error) {

@@ -35,6 +35,7 @@ class AppendableData extends FfiApi {
       'appendable_data_get': [int32, [AppHandle, u64, u64Pointer]],
       'appendable_data_extract_data_id': [int32, [u64, u64Pointer]],
       'appendable_data_put': [int32, [AppHandle, u64]],
+      'appendable_data_validate_size': [int32, [AppHandle, boolPointer]],
       'appendable_data_post': [int32, [AppHandle, u64, bool]],
       'appendable_data_encrypt_key': [int32, [u64, u64Pointer]],
       'appendable_data_num_of_data': [int32, [u64, size_tPointer]],
@@ -75,6 +76,19 @@ class AppendableData extends FfiApi {
       } else {
         this.safeCore.appendable_data_put.async(appManager.getHandle(app), appendHandleId, onResult);
       }
+    });
+  }
+
+  isSizeValid(appendHandleId) {
+    return new Promise((resolve, reject) => {
+      let isValidRef = ref.alloc(bool);
+      const onResult = (err, res) => {
+        if (err || res !== 0) {
+          return reject(err || res);
+        }
+        resolve(isValidRef.deref());
+      };
+      this.safeCore.appendable_data_validate_size.async(appendHandleId, isValidRef, onResult);
     });
   }
 

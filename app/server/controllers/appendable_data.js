@@ -142,11 +142,21 @@ export const getMetadata = async (req, res) => {
   }
 };
 
+export const isSizeValid = async (req, res, next) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    const isValid = await appendableData.isSizeValid(req.params.handleId);
+    responseHandler(null, {
+      isValid: isValid
+    });
+  } catch(e) {
+    responseHandler(e);
+  }
+};
+
 export const getDataIdHandle = async (req, res) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
-    const sessionInfo = sessionManager.get(req.headers.sessionId);
-    const app = sessionInfo ? sessionInfo.app : null;
     const handleId = await appendableData.asDataId(req.params.handleId);
     responseHandler(null, {
       handleId: handleId
