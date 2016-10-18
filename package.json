@@ -1,7 +1,7 @@
 {
   "name": "safe-launcher",
   "productName": "SAFE Launcher",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "SAFE Launcher Application",
   "copyright": "© 2016, MaidSafe.net Ltd",
   "main": "dist/main.js",
