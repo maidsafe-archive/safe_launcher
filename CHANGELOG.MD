@@ -1,6 +1,13 @@
 # SAFE Launcher Change Log
 
 ##[0.9.1]
+- Requires safe_core 0.22.0
+- Versioned StructuredData API exposed to read a specific version
+- StructuredData Delete APIs exposed
+- API to validate size of StructuredData and ImmutableData added
+- Minor bug fixes
+
+##[0.9.1]
 - Requires safe_core 0.21.2
 - Web proxy removed
 - Low level api updated to match one to one with safe_core
