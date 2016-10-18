@@ -26,7 +26,7 @@ class StructuredData extends FfiApi {
 
   getFunctionsToRegister() {
     return {
-      'struct_data_new': [int32, [AppHandle, u64, u8Pointer, u64, u8Pointer, size_t, u64Pointer]],
+      'struct_data_new': [int32, [AppHandle, u64, u8Pointer, u64, u64, u8Pointer, size_t, u64Pointer]],
       'struct_data_fetch': [int32, [AppHandle, u64, u64Pointer]],
       'struct_data_extract_data_id': [int32, [u64, u64Pointer]],
       'struct_data_validate_size': [int32, [u64, boolPointer]],
@@ -117,13 +117,13 @@ class StructuredData extends FfiApi {
     });
   }
 
-  create(app, id, tagType, cipherOptHandle, data) {
+  create(app, id, tagType, cipherOptHandle, data, version = 0) {
     return new Promise(async (resolve, reject) => {
       if (!app) {
         reject('app parameter missing');
       }
       let handleRef = ref.alloc(u64);
-      this.safeCore.struct_data_new.async(appManager.getHandle(app), tagType, id,
+      this.safeCore.struct_data_new.async(appManager.getHandle(app), tagType, id, version,
         cipherOptHandle, data, (data ? data.length : 0), handleRef, (err, res) => {
           if (err || res !== 0) {
             return reject(err || res);
@@ -214,7 +214,7 @@ class StructuredData extends FfiApi {
     });
   }
 
-  delete(app, handleId, unclaimable= false) {
+  delete(app, handleId, unclaimable = false) {
     return new Promise((resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {

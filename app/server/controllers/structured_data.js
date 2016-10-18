@@ -56,7 +56,8 @@ export const create = async (req, res, next) => {
     }
     const cipherOptsHandle = body.cipherOpts || (await getPlainEncryptionHandle());
     const data = body.data ? new Buffer(body.data, 'base64'): null;
-    const handleId = await structuredData.create(app, name, typeTag, cipherOptsHandle, data);
+    const version = body.hasOwnProperty('version') ? body.version : 0;
+    const handleId = await structuredData.create(app, name, typeTag, cipherOptsHandle, data, version);
     res.send({
       handleId: handleId
     });
