@@ -145,7 +145,8 @@ export const closeWriter = async (req, res, next) => {
     if (!app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
-    let cipherOptsHandle = req.params.cipherOptsHandle || (await getPlainEncryptionHandle());
+    let cipherOptsHandle = isNaN(req.params.cipherOptsHandle) ? (await getPlainEncryptionHandle()) :
+      req.params.cipherOptsHandle;
     const dataIdHandle = await immutableData.closeWriter(app, req.params.handleId, cipherOptsHandle);
     responseHandler(null, {
       handleId: dataIdHandle

@@ -56,7 +56,8 @@ export const create = async (req, res, next) => {
     }
     const cipherOptsHandle = body.cipherOpts || (await getPlainEncryptionHandle());
     const data = body.data ? new Buffer(body.data, 'base64'): null;
-    const handleId = await structuredData.create(app, name, typeTag, cipherOptsHandle, data);
+    const version = body.hasOwnProperty('version') ? body.version : 0;
+    const handleId = await structuredData.create(app, name, typeTag, cipherOptsHandle, data, version);
     res.send({
       handleId: handleId
     });
@@ -219,12 +220,43 @@ export const deleteStructuredData = async (req, res, next) => {
     if (!app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
-    await structuredData.delete(app, req.params.handleId);
+    await structuredData.delete(app, req.params.handleId, false);
     responseHandler();
   } catch (e) {
     responseHandler(e);
   }
 };
+
+export const isSizeValid = async (req, res, next) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    const isValid = await structuredData.isSizeValid(req.params.handleId);
+    responseHandler(null, {
+      isValid: isValid
+    });
+  } catch(e) {
+    responseHandler(e);
+  }
+};
+
+export const makeStructuredDataUnclaimable = async (req, res, next) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
+    if (!sessionInfo) {
+      return next(new ResponseError(401, UNAUTHORISED_ACCESS));
+    }
+    const app = sessionInfo.app;
+    if (!app.permission.lowLevelApi) {
+      return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
+    }
+    await structuredData.delete(app, req.params.handleId, true);
+    responseHandler();
+  } catch (e) {
+    responseHandler(e);
+  }
+};
+
 
 export const dropHandle = async (req, res) => {
   const responseHandler = new ResponseHandler(req, res);

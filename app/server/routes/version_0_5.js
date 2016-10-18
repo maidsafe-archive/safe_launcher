@@ -105,14 +105,18 @@ router.get('/structured-data/handle/:dataIdHandle', new ActivityMiddleware('Get 
   StructuredData.getHandle);
 router.get('/structured-data/data-id/:handleId',
   new ActivityMiddleware('Get data-id handle from structured data handle'), StructuredData.asDataId);
+router.get('/structured-data/serialise/:handleId', new ActivityMiddleware('Get serialise structured data'),
+  StructuredData.serialise);
+router.get('/structured-data/validate-size/:handleId', new ActivityMiddleware('Validate size of structured data'),
+  StructuredData.isSizeValid);
 router.get('/structured-data/:handleId/:version?', new ActivityMiddleware('Read structured data'), StructuredData.read);
 router.put('/structured-data/:handleId', new ActivityMiddleware('Save structured data - PUT'), StructuredData.put);
 router.patch('/structured-data/:handleId', jsonParser, new ActivityMiddleware('Update data of structured data'),
   StructuredData.update);
-router.get('/structured-data/serialise/:handleId', new ActivityMiddleware('Get serialise structured data'),
-  StructuredData.serialise);
 router.delete('/structured-data/handle/:handleId', new ActivityMiddleware('Drop structured data handle'),
   StructuredData.dropHandle);
+router.delete('/structured-data/unclaim/:handleId', new ActivityMiddleware('Make structured data unclaimable'),
+  StructuredData.makeStructuredDataUnclaimable);
 router.delete('/structured-data/:handleId', new ActivityMiddleware('Delete structured data'),
   StructuredData.deleteStructureData);
 
@@ -134,6 +138,8 @@ router.get('/appendable-data/serialise/:handleId', new ActivityMiddleware('Seria
   AppendableData.serialise);
 router.get('/appendable-data/data-id/:handleId', new ActivityMiddleware('Get data-id handle from appendable data handle'),
   AppendableData.getDataIdHandle);
+router.get('/appendable-data/validate-size/:handleId', new ActivityMiddleware('Validate size of appendable data'),
+  AppendableData.isSizeValid);
 router.get('/appendable-data/sign-key/deleted-data/:handleId/:index',
   new ActivityMiddleware('Get signing key from appendable data - deleted'),
   AppendableData.getSigningKeyFromDeletedData);

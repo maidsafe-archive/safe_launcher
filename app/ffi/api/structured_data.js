@@ -26,9 +26,10 @@ class StructuredData extends FfiApi {
 
   getFunctionsToRegister() {
     return {
-      'struct_data_new': [int32, [AppHandle, u64, u8Pointer, u64, u8Pointer, size_t, u64Pointer]],
+      'struct_data_new': [int32, [AppHandle, u64, u8Pointer, u64, u64, u8Pointer, size_t, u64Pointer]],
       'struct_data_fetch': [int32, [AppHandle, u64, u64Pointer]],
       'struct_data_extract_data_id': [int32, [u64, u64Pointer]],
+      'struct_data_validate_size': [int32, [u64, boolPointer]],
       'struct_data_new_data': [int32, [AppHandle, u64, u64, u8Pointer, size_t]],
       'struct_data_extract_data': [int32, [AppHandle, u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
       'struct_data_nth_version': [int32, [AppHandle, u64, size_t, PointerToU8Pointer, size_tPointer, size_tPointer]],
@@ -36,6 +37,7 @@ class StructuredData extends FfiApi {
       'struct_data_put': [int32, [AppHandle, u64]],
       'struct_data_post': [int32, [AppHandle, u64]],
       'struct_data_delete': [int32, [AppHandle, u64]],
+      'struct_data_make_unclaimable': [int32, [AppHandle, u64]],
       'struct_data_version': [int32, [u64, u64Pointer]],
       'struct_data_is_owned': [int32, [AppHandle, u64, boolPointer]],
       'struct_data_free': [int32, [u64]]
@@ -102,13 +104,26 @@ class StructuredData extends FfiApi {
     });
   }
 
-  create(app, id, tagType, cipherOptHandle, data) {
+  isSizeValid(handleId) {
+    return new Promise((resolve, reject) => {
+      let isValidRef = ref.alloc(bool);
+      const onResult = (err, res) => {
+        if (err || res !== 0) {
+          return reject(err || res);
+        }
+        resolve(isValidRef.deref());
+      };
+      this.safeCore.struct_data_validate_size.async(handleId, isValidRef, onResult);
+    });
+  }
+
+  create(app, id, tagType, cipherOptHandle, data, version = 0) {
     return new Promise(async (resolve, reject) => {
       if (!app) {
         reject('app parameter missing');
       }
       let handleRef = ref.alloc(u64);
-      this.safeCore.struct_data_new.async(appManager.getHandle(app), tagType, id,
+      this.safeCore.struct_data_new.async(appManager.getHandle(app), tagType, id, version,
         cipherOptHandle, data, (data ? data.length : 0), handleRef, (err, res) => {
           if (err || res !== 0) {
             return reject(err || res);
@@ -199,14 +214,19 @@ class StructuredData extends FfiApi {
     });
   }
 
-  delete(app, handleId) {
+  delete(app, handleId, unclaimable = false) {
     return new Promise((resolve, reject) => {
-      this.safeCore.struct_data_delete.async(appManager.getHandle(app), handleId, (err, res) => {
+      const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
         resolve();
-      });
+      };
+      if (unclaimable) {
+        this.safeCore.struct_data_make_unclaimable.async(appManager.getHandle(app), handleId, onResult);
+      } else {
+        this.safeCore.struct_data_delete.async(appManager.getHandle(app), handleId, onResult);
+      }
     });
   }
 
