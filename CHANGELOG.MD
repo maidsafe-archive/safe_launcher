@@ -1,6 +1,6 @@
 # SAFE Launcher Change Log
 
-##[0.9.1]
+##[0.9.2]
 - Requires safe_core 0.22.0
 - Versioned StructuredData API exposed to read a specific version
 - StructuredData Delete APIs exposed
