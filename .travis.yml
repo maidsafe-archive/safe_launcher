@@ -24,15 +24,6 @@ addons:
     packages:
       - xvfb
 
-before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install google-chrome-stable; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew tap caskroom/cask; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cask install google-chrome; fi
-
 install:
   - curl -sSf https://static.rust-lang.org/rustup.sh | sh
   - rustc -V
@@ -55,9 +46,9 @@ script:
   - cargo build --release --verbose --features use-mock-routing
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libgconf-2-4; fi
   - cd $TRAVIS_BUILD_DIR
-  - npm install --silent
+  - npm install
   - npm run rebuild-native
   - npm run lint
-  - npm run build-test
   - npm test

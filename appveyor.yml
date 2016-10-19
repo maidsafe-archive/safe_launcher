@@ -1,7 +1,7 @@
 platform:
   - x64
 
-# image: Visual Studio 2015
+image: Visual Studio 2015
 
 os: unstable
 
@@ -16,26 +16,20 @@ install:
         $url = "https://github.com/maidsafe/QA/raw/master/Powershell%20Scripts/AppVeyor"
         cmd /c curl -fsSL -o "Install Rustup.ps1" "$url/Install%20Rustup.ps1"
         . ".\Install Rustup.ps1"
-  # - ps: Install-Product node $env:nodejs_version
-  # - node --version
-  # - npm --version
-  # - python --version
-  # - choco install googlechrome
+  - ps: Install-Product node $env:nodejs_version x64
+  - node --version
+  - npm --version
+  - python --version
   - cd %APPVEYOR_BUILD_FOLDER%
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
-  # - cargo clean
-  # - cargo update
   - cargo build --release --verbose --features use-mock-routing
-  # - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\ffi
-  # - cd %APPVEYOR_BUILD_FOLDER%
-
+  - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\ffi
+  - cd %APPVEYOR_BUILD_FOLDER%
 build: off
-
 test_script:
-  # - npm config set msvs_version=2015
-  # - npm config set python C:/Python27/python.exe
-  # - npm install
-  # - npm run rebuild-native
-  # - npm run lint
-  # - npm run build-test
-  # - npm test
+  - npm config set msvs_version=2015
+  - npm -g install npm@next
+  - npm install
+  - npm run rebuild-native
+  - npm run lint
+  - npm test
