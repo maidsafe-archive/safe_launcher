@@ -9,45 +9,38 @@ const electronVersion = require('electron-prebuilt/package.json').version;
 
 const rebuildNativeModules = () => {
   rebuild.shouldRebuildNativeModules(electron)
-    .then(function(shouldBuild) {
+    .then((shouldBuild) => {
       if (!shouldBuild) {
         return true;
       }
 
       return rebuild.installNodeHeaders(electronVersion)
-        .then(function() {
-          return rebuild.rebuildNativeModules(electronVersion, pathToElectronNativeModules);
-        });
+        .then(() => rebuild.rebuildNativeModules(electronVersion, pathToElectronNativeModules));
     })
-    .then(function() {
-      console.log('Rebuilding complete.');
-    })
-    .catch(function(err) {
-      console.error("Rebuilding error!");
+    .then(() => console.warn('Rebuilding complete'))
+    .catch((err) => {
+      console.error('Rebuilding error!');
       console.error(err);
     });
 };
 
 const rebuildForWindows = () => {
   const mods = ['ffi', 'ref'];
-  for (let mod of mods) {
-    console.log('Rebuilding ', mod);
-    childProcess.execSync('node-gyp rebuild --target=' + electronVersion + ' --arch=' + os.arch() +
-    ' --dist-url=https://atom.io/download/atom-shell', {
-      cwd: 'node_modules/' + mod
-    });
+  let mod = null;
+  for (mod of mods) {
+    console.warn('Rebuilding ', mod);
+    childProcess.execSync(`node-gyp rebuild --target=${electronVersion} --arch=${os.arch()} --dist-url=https://atom.io/download/atom-shell`, { cwd: `node_modules/${mod}` });
   }
-  console.log('Rebuilding complete.');
+  console.warn('Rebuilding complete.');
 };
 
 const run = () => {
-  console.log('Rebuilding native modules');
+  console.warn('Rebuilding native modules');
 
-  if (os.platform() === "win32") {
+  if (os.platform() === 'win32') {
     return rebuildForWindows();
-  } else {
-    return rebuildNativeModules();
   }
+  return rebuildNativeModules();
 };
 
 run();

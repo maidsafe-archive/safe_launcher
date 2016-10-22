@@ -206,7 +206,7 @@ class AppendableData extends FfiApi {
         if (err || res !== 0) {
           return reject(err || res);
         }
-        resolve(signedKeyHandleRef.deref());
+        resolve(signKeyHandleRef.deref());
       };
       this.safeCore.appendable_data_nth_filter_key.async(handleId, index, signKeyHandleRef, onResult);
     });
