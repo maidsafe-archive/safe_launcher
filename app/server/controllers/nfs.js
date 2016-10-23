@@ -234,6 +234,9 @@ export var modifyFileMeta = function(req, res, next) {
   if (typeof rootPath === 'undefined') {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
   }
+  if (!reqBody.name && !reqBody.metadata) {
+    return next(new ResponseError(400, MSG_CONSTANTS.FAILURE.REQUIRED_PARAMS_MISSING));
+  }
   reqBody.metadata = reqBody.metadata || '';
   reqBody.name = reqBody.name || '';
   if (typeof reqBody.metadata !== 'string') {

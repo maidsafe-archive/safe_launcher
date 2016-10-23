@@ -109,7 +109,7 @@ class Misc extends FfiApi {
             sizeRef, capacityRef, onResult);
           break;
         case 2:
-          this.safeCore.misc_serialise_structured_data.async(handleId, dataPointerRef,
+          this.safeCore.misc_serialise_struct_data.async(handleId, dataPointerRef,
             sizeRef, capacityRef, onResult);
           break;
         case 3:
@@ -138,7 +138,7 @@ class Misc extends FfiApi {
           this.safeCore.misc_deserialise_appendable_data.async(data, data.length, handleRef, onResult);
           break;
         case 2:
-          this.safeCore.misc_deserialise_structured_data.async(data, data.length, handleRef, onResult);
+          this.safeCore.misc_deserialise_struct_data.async(data, data.length, handleRef, onResult);
           break;
         case 3:
           this.safeCore.misc_deserialise_sign_key.async(data, data.length, handleRef, onResult);

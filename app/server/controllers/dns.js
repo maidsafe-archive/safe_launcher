@@ -75,11 +75,9 @@ export const getFile = async (req, res, next) => {
     let sessionInfo = req.headers.sessionId ? sessionManager.get(req.headers.sessionId) : null;
     let app = sessionInfo ? sessionInfo.app : null;
     var reqParams = req.params;
-    let hasSafeDriveAccess = sessionInfo ? sessionInfo.hasSafeDriveAccess() : false;
     let longName = reqParams.longName;
     let serviceName = reqParams.serviceName;
     let filePath = reqParams['0'];
-
     if (!(longName && serviceName && filePath)) {
       return next(new ResponseError(400, MSG_CONSTANTS.FAILURE.REQUIRED_PARAMS_MISSING));
     }

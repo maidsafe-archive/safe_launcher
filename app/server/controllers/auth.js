@@ -53,14 +53,14 @@ export let CreateSession = async (data) => {
       } else {
         emitSessionCreationFailed();
       }
-      console.log(sessionId);
+      // console.log(sessionId);
       log.debug('Session for app created');
       new ResponseHandler(req, res)(null, {
         token: token,
         permissions: permissions.list
       });
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       emitSessionCreationFailed();
       req.next(new ResponseError(500, e.message));
     }
@@ -70,7 +70,7 @@ export let CreateSession = async (data) => {
     await appManager.registerApp(app);
     onRegistered(app);
   } catch(e) {
-    console.error(e);
+    // console.error(e);
     emitSessionCreationFailed();
     return req.next(new ResponseError(500, e));
   }
@@ -97,7 +97,7 @@ export var authorise = function(req, res, next) {
   try {
     permissions = new Permission(authReq.permissions);
   } catch(e) {
-    console.error(e);
+    // console.error(e);
     log.debug('Authorisation request - Invalid permissions requested');
     return next(new ResponseError(400, 'Invalid permissions requested'));
   }
