@@ -55,7 +55,7 @@ export const create = async (req, res, next) => {
       return next(new ResponseError(400, 'Invalid tag type specified'));
     }
     const cipherOptsHandle = body.cipherOpts || (await getPlainEncryptionHandle());
-    const data = body.data ? new Buffer(body.data, 'base64'): null;
+    const data = body.data ? new Buffer(body.data, 'base64') : null;
     const version = body.hasOwnProperty('version') ? body.version : 0;
     const handleId = await structuredData.create(app, name, typeTag, cipherOptsHandle, data, version);
     res.send({
