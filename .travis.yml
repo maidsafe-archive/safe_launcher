@@ -1,63 +1,35 @@
-env:
+platform:
+  - x64
+
+image: Visual Studio 2015
+
+os: unstable
+
+environment:
+  nodejs_version: "6.4.0"
   global:
-  - secure: g7WTo8ofUjRFP5ce3+8imSm7V6V9jmyNvkPST1m6q8XOcfTTH2ualDS5At3Zk1mHG9x656LKQfC/voeUq7RK17AJ3wtMp6R84kmzF0v3Y0hRUn5ALOXQIEtPb4V+c8TxOrInZLxVQSxLlSZg9Bjia5U/8SjpYWHn0NqSiNkZvt2NKdNDCvx3krHpDVAD6nUui4qf0JCU3SbjMfaLwuDRgr2Hs5cDVa+y6EyVkODLqMjiz5k9yXEhom3H5gaSzm/tLwXHnxtPrNaQXEIvI8jgyEA9f3NPRjM2eAAbg9pbAiJjNSkStgA6Vvq1ANMQ7H3Q4D/ml7LGPGlsKq5M/C5cL8IEq8JHndTFOxuMLv9322P6z5VeAx5BD2xlbXdOivxac4iqbduVns9NEyHxi3g9y9K2ssC7f7p6JxyBXxuN4b0HPwJdGC3+1WcA+XdIxeeudeg3K+QcHyUc5obq6pb7iasgD5x3DDSSe4pKdwIUUbYUotptvxwYYzVKY/E9g2Kid2KyGbO3WTitLdk4fLQ6BF1dqkGNcDSJb3s5/W40lcq7KODQvmBQy7iUMTZnLk2FogZtyXbf8c+V2joF3EDX+lW0N3OBLf/Q2p3jKNzl+F9xJhcFa5t1ZORJRLG5Ap+zm12qh/lpkoFegGqmt3Y6yDGS9rrVpgEsb7qOmQX2VQ0=
-  - $FFIDest=$TRAVIS_BUILD_DIR/app/ffi
-
-matrix:
-  include:
-  - os: linux
-  - os: osx
-
-language: generic
-
-python:
-  - '2.7'
-
-osx_image: xcode7.3
-
-sudo: required
-
-dist: trusty
-
-addons:
-  apt:
-    packages:
-      - xvfb
-
-before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install google-chrome-stable; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew tap caskroom/cask; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cask install google-chrome; fi
+    RUST_BACKTRACE: 1
+    RUST_VERSION: stable
 
 install:
-  - curl -sSf https://static.rust-lang.org/rustup.sh | sh
-  - rustc -V
-  - cargo -V
-  - nvm --version
-  - nvm install 6.4.0
+  - ps: |
+        $url = "https://github.com/maidsafe/QA/raw/master/Powershell%20Scripts/AppVeyor"
+        cmd /c curl -fsSL -o "Install Rustup.ps1" "$url/Install%20Rustup.ps1"
+        . ".\Install Rustup.ps1"
+  - ps: Install-Product node $env:nodejs_version x64
   - node --version
   - npm --version
   - python --version
-
-before_script:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start &
-  - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-  - sleep 3
-
-script:
-  - cd $TRAVIS_BUILD_DIR
+  - cd %APPVEYOR_BUILD_FOLDER%
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
-  - cd $TRAVIS_BUILD_DIR
-  - npm install --silent
+  - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\ffi
+  - cd %APPVEYOR_BUILD_FOLDER%
+build: off
+test_script:
+  - npm config set msvs_version=2015
+  - npm -g install npm@next
+  - npm install
   - npm run rebuild-native
   - npm run lint
-  - npm run build-test
   - npm test

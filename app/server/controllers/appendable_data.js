@@ -29,6 +29,9 @@ export const create = async (req, res, next) => {
       return next(new ResponseError(400, 'Invalid name field'));
     }
     const isPrivate = payload.isPrivate || false;
+    if(typeof isPrivate !== 'boolean') {
+      return next(new ResponseError(400, 'Invalid isPrivate field'));
+    }
     const filterType = FILTER_TYPE[payload.filterType] || FILTER_TYPE.BLACK_LIST;
     const filterKeys = payload.filterKeys || [];
     const handleId = await appendableData.create(app, name, isPrivate, filterType, filterKeys);
@@ -253,7 +256,7 @@ export const getDeletedDataIdAt = async (req, res) => {
   dataIdAt(req, res, true);
 };
 
-export const toggleFilter = async (req, res) => {
+export const toggleFilter = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -270,7 +273,7 @@ export const toggleFilter = async (req, res) => {
   }
 };
 
-export const addToFilter = async (req, res) => {
+export const addToFilter = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -290,7 +293,7 @@ export const addToFilter = async (req, res) => {
   }
 };
 
-export const removeFromFilter = async (req, res) => {
+export const removeFromFilter = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -310,7 +313,7 @@ export const removeFromFilter = async (req, res) => {
   }
 };
 
-export const getSignKeyFromFilter = async (req, res) => {
+export const getSignKeyFromFilter = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -448,7 +451,7 @@ export const deleteAppendableData = async (req, res) => {
   }
 };
 
-export const restore = async (req, res) => {
+export const restore = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -488,6 +491,8 @@ export const serialise = async (req, res, next) => {
 export const deserialise = async (req, res) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
+    const app = sessionInfo ? sessionInfo.app : null;
     const handleId = await appendableData.deserialise(req.rawBody);
     const isOwner = await appendableData.isOwner(app, handleId);
     const version = await appendableData.getVersion(handleId);

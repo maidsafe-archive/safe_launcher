@@ -168,7 +168,7 @@ export const dropReader = async (req, res) => {
   }
 };
 
-export const dropWriter = async (req, res) => {
+export const dropWriter = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
