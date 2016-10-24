@@ -1,5 +1,6 @@
 import ActionTypes from './action_types';
 import auth from './../../ffi/api/auth';
+import { resetDashData } from './app_action';
 
 export const loginSuccess = (res) => (
   {
@@ -67,6 +68,7 @@ export const login = payload => (
     auth.login(payload.accountSecret, payload.accountPassword)
     .then(() => {
       dispatch(loginSuccess(payload));
+      dispatch(resetDashData());
     }, (err) => {
       dispatch(loginError({
         errorCode: err
@@ -87,11 +89,14 @@ export const register = payload => (
   }
 );
 
-export const logout = (userData) => {
-  window.msl.clearAllSessions();
-  window.msl.networkStateChange(0);
-  window.msl.reconnect(userData);
-  return {
-    type: ActionTypes.LOGOUT
-  };
-};
+export const logout = userData => (
+  dispatch => {
+    window.msl.clearAllSessions();
+    window.msl.networkStateChange(0);
+    window.msl.reconnect(userData);
+    dispatch(resetDashData());
+    dispatch({
+      type: ActionTypes.LOGOUT
+    });
+  }
+);
