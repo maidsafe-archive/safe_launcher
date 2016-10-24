@@ -1,12 +1,14 @@
 import should from 'should';
-import axios from 'axios';
-import CONSTANTS from './constants';
+import mockApp from '../mock_app';
 
-export const checkHealth = async() => {
-  const health = await axios(`${CONSTANTS.API_SERVER}/health`);
-  should(health.status).equal(200);
-};
-
-export const getpacFile = async() => {
-
-};
+describe('Server status', () => {
+  it('Should have started', (cb) => {
+    mockApp.axios.get('health')
+      .should.be.fulfilled()
+      .then((res) => {
+        should(res.status).be.equal(200);
+        cb();
+      })
+      .catch((err) => cb(err));
+  });
+});
