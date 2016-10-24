@@ -3,7 +3,6 @@ import {
   setNetworkConnected,
   setNetworkConnecting
 } from './actions/network_status_action';
-import { setProxyError } from './actions/proxy_action';
 import { showToaster } from './actions/toaster_action';
 import {
   showAuthRequest,
@@ -165,18 +164,6 @@ export default class EventRegistry {
     window.msl.onServerShutdown((data) => console.warn('API Server Stopped :: ', data));
   }
 
-  handleProxyServer() {
-    window.msl.onProxyStart(() => console.warn('Proxy Server Started'));
-
-    window.msl.onProxyError(err => {
-      this.dispatch(showToaster(MESSAGES.PROXY_SERVER_ERROR, { autoHide: true, error: true }));
-      this.dispatch(setProxyError());
-      return console.error('Proxy Server Error :: ', err);
-    });
-
-    window.msl.onProxyExit(() => console.warn('Proxy Server Stopped'));
-  }
-
   handleAppSession() {
     window.msl.onSessionCreated(appData => {
       this.dispatch(addApplication(appData));
@@ -241,10 +228,8 @@ export default class EventRegistry {
   }
 
   run() {
-    // this.dispatch(setProxy());
     this.handleNetworkEvents();
     this.handleAPIServer();
-    this.handleProxyServer();
     this.handleAppSession();
     this.handleDataTransfer();
     this.handleActivityEvents();

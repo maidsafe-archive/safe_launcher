@@ -12,10 +12,6 @@ global.args = {
   isProduction: (process.env.NODE_ENV === 'production')
 };
 
-global.proxy = {
-  pid: null
-};
-
 if (process.env.NODE_ENV === 'development') {
   require('electron-debug')(); // eslint-disable-line global-require
 }

@@ -3,45 +3,11 @@ import { errorCodeLookup } from './server/error_code_lookup';
 import { cleanup } from './ffi/loader';
 import auth from './ffi/api/auth';
 
-class ProxyListener {
-  constructor() {
-    this.errorCb = null;
-    this.exitCb = null;
-    this.startCb = null;
-  }
-
-  registerOnError(callback) {
-    this.errorCb = callback;
-  }
-
-  registerOnExit(callback) {
-    this.exitCb = callback;
-  }
-
-  registerOnStart(callback) {
-    this.startCb = callback;
-  }
-
-  onExit(msg) {
-    this.exitCb(msg);
-  }
-
-  onError(err) {
-    this.errorCb(err);
-  }
-
-  onStart(msg) {
-    this.startCb(msg);
-  }
-}
-
 // UI Utils
 export default class UIUtils {
-  constructor(remote, restServer, proxy) {
+  constructor(remote, restServer) {
     this.remote = remote;
     this.restServer = restServer;
-    this.proxy = proxy;
-    this.proxyListener = new ProxyListener();
     this.onNetworkStateChange = null;
     this.errorCodeLookup = errorCodeLookup;
   }
@@ -134,31 +100,6 @@ export default class UIUtils {
     browserWindow.setAlwaysOnTop(true);
     browserWindow.focus();
     browserWindow.setAlwaysOnTop(false);
-  }
-
-  // start proxy server
-  startProxyServer() {
-    this.proxy.start(this.proxyListener);
-  }
-
-  // handle proxy error
-  onProxyError(callback) {
-    this.proxyListener.registerOnError(callback);
-  }
-
-  // handle proxy exit
-  onProxyExit(callback) {
-    this.proxyListener.registerOnExit(callback);
-  }
-
-  // handle proxy start
-  onProxyStart(callback) {
-    this.proxyListener.registerOnStart(callback);
-  }
-
-  // stop proxy server
-  stopProxyServer() {
-    this.proxy.stop();
   }
 
   networkStateChange(state) {

@@ -36,13 +36,6 @@ export default class Help extends Component {
               href={undefined}
               onClick={e => {
                 e.preventDefault();
-                openExternal('https://maidsafe.readme.io/docs/proxy-setup');
-              }}
-            >Proxy Setup</a></li>
-            <li><a
-              href={undefined}
-              onClick={e => {
-                e.preventDefault();
                 openExternal('https://maidsafe.readme.io/docs/install-demo-app');
               }}
             >Install Demo Application</a></li>

@@ -5,7 +5,6 @@ import UIUtils from './ui_utils';
 import { loadLibrary } from './ffi/loader';
 import sessionManager from './ffi/util/session_manager';
 import auth from './ffi/api/auth';
-import { proxyController } from './server/proxy_controller';
 import RESTServer from './server/boot';
 
 window.NETWORK_STATE = {
@@ -28,7 +27,7 @@ const onFfiLaodFailure = (title, msg) => {
   });
 };
 
-window.msl = new UIUtils(remote, restServer, proxyController);
+window.msl = new UIUtils(remote, restServer);
 
 const networkStateListener = (state) => {
   switch (state) {

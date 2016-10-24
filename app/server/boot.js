@@ -73,9 +73,6 @@ export default class RESTServer {
     app.use('/health', function(req, res) {
       res.sendStatus(200);
     });
-    app.get('/pac-file', function(req, res) {
-      res.download(path.resolve(__dirname, 'server/web_proxy.pac'));
-    });
     /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     app.use('/', router_0_5);
     app.use('/0.5', router_0_5);
