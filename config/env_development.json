@@ -1,7 +1,6 @@
 {
   "name": "development",
   "serverPort": 8100,
-  "proxyPort": 8101,
   "log": {
     "level": "silly",
     "file": {

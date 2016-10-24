@@ -1,7 +1,6 @@
 import pkg from '../../../package.json';
 
 const LOCAL_STORAGE_KEYS = {
-  SAFE_LAUNCHER_PROXY: 'safe_launcher_proxy',
   SAFE_LAUNCHER_VERSION: 'safe_launcher_version',
 };
 
@@ -20,20 +19,6 @@ export const LOG_STATUS = {
     className: 'error',
     code: 'FAILURE'
   }
-};
-
-export const getProxy = () => (
-  JSON.parse(window.localStorage.getItem(LOCAL_STORAGE_KEYS.SAFE_LAUNCHER_PROXY))
-);
-
-export const setProxy = (status) => {
-  if (status) {
-    window.msl.startProxyServer();
-  } else {
-    window.msl.stopProxyServer();
-  }
-  window.localStorage.setItem(LOCAL_STORAGE_KEYS.SAFE_LAUNCHER_PROXY,
-    JSON.stringify({ status }));
 };
 
 export const getVersionFromLocalStorage = () => (

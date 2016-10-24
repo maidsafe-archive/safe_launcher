@@ -1,7 +1,6 @@
 {
   "name": "test",
   "serverPort": 8100,
-  "proxyPort": 8101,
   "log": {
     "level": "warn",
     "file": {
