@@ -30,7 +30,7 @@ const initialState = {
   accountStorage: {
     fetching: false,
     lastUpdated: null,
-    lastUpdatedFromNow: null,
+    lastUpdatedFromNow: 'a few seconds ago',
     updateTimeout: 0,
     used: 0,
     available: 0
@@ -81,7 +81,7 @@ const user = (state = initialState, action) => {
         accountStorage: {
           fetching: false,
           lastUpdated: null,
-          lastUpdatedFromNow: null,
+          lastUpdatedFromNow: 'a few seconds ago',
           updateTimeout: 0,
           used: 0,
           available: 0
@@ -310,7 +310,6 @@ const user = (state = initialState, action) => {
         }
       };
     case ActionTypes.UPDATE_ACCOUNT_STORAGE: {
-      const accountInfoLastUpdated = (new Date()).toLocaleString();
       return {
         ...state,
         accountStorage: {
@@ -318,7 +317,7 @@ const user = (state = initialState, action) => {
           fetching: false,
           used: isNaN(action.data.used) ? 0 : action.data.used,
           available: isNaN(action.data.available) ? 0 : action.data.available,
-          lastUpdated: accountInfoLastUpdated,
+          lastUpdated: new Date(),
           updateTimeout: CONSTANT.ACCOUNT_UPDATE_TIMEOUT
         }
       };

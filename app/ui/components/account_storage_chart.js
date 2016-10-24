@@ -10,7 +10,7 @@ export default class AccountStorageChart extends Component {
   constructor() {
     super();
     this.disableUpdate = true;
-    this.updateTimeLeft = null;
+    this.updateTimeLeft = '00:00';
     this.lastUpdateTimer = null;
     this.updateTimeoutTimer = null;
     this.handleUpdateTimoutTimer = this.handleUpdateTimoutTimer.bind(this);
@@ -43,6 +43,7 @@ export default class AccountStorageChart extends Component {
 
   handleUpdateTimoutTimer(props) {
     if ((props.accountStorage.updateTimeout !== 0) && !this.updateTimeoutTimer) {
+      props.decAccountUpdateTimeout();
       this.updateTimeoutTimer = window.setInterval(() => {
         props.decAccountUpdateTimeout();
       }, 1000);
@@ -66,7 +67,7 @@ export default class AccountStorageChart extends Component {
 
     let container = null;
     const progressWidth = ((accountStorage.used /
-      (accountStorage.used + accountStorage.available)) * 100);
+    (accountStorage.used + accountStorage.available)) * 100);
 
     if (accountStorage.fetching) {
       container = (
@@ -85,7 +86,8 @@ export default class AccountStorageChart extends Component {
                 className="btn flat"
                 name="update"
                 disabled="disabled"
-              >Updating</button>
+              >Updating
+              </button>
             </div>
           </div>
         </div>
@@ -109,7 +111,7 @@ export default class AccountStorageChart extends Component {
             >{' '}</span>
           </div>
           <div className="desc">
-            Each account is currently limited to
+            Each account is currently limited to&nbsp;
             {accountStorage.used + accountStorage.available} PUTs on the Network.
           </div>
           <div className="opt">

@@ -133,10 +133,10 @@ export default class EventRegistry {
           this.dispatch(setNetworkConnecting());
           break;
         case 1: {
+          this.clearIntervals();
           if (!this.state().auth.authenticated) {
             this.fetchStatsForUnauthorisedClient();
           } else {
-            this.clearIntervals();
             this.fetchStatsForAuthorisedClient();
             this.updateAccountStorage();
             this.fetchAccountStorage();
