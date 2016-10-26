@@ -1,6 +1,6 @@
 import mime from 'mime';
 import sessionManager from '../session_manager';
-import { ResponseError, ResponseHandler } from '../utils';
+import { ResponseError, ResponseHandler, parseExpectionMsg } from '../utils';
 import { log } from './../../logger/log';
 import nfs from '../../ffi/api/nfs';
 import { NfsWriter } from '../stream/nfs_writer';
@@ -20,8 +20,10 @@ const FILE_OR_DIR_ACTION = {
 };
 
 let deleteOrGetDirectory = function(req, res, isDelete, next) {
+  log.debug(`NFS - ${req.id} :: ${isDelete ? 'DELETE' : 'GET'} API`);
   const sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
+    log.error(`NFS - ${req.id} :: ${isDelete ? 'DELETE' : 'GET'} API :: Unauthorised request`);
     return next(new ResponseError(401));
   }
   const app = sessionInfo.app;
@@ -38,16 +40,16 @@ let deleteOrGetDirectory = function(req, res, isDelete, next) {
         if (dirPath === '/') {
           return next(new ResponseError(400, 'Cannot delete root directory'));
         }
-        log.debug('NFS - Invoking delete directory request');
+        log.debug(`NFS - ${req.id} :: Invoking delete directory request`);
         await nfs.deleteDirectory(app, dirPath, rootPath);
         responseHandler();
       } else {
-        log.debug('NFS  - Invoking get directory request');
+        log.debug(`NFS  - ${req.id} :: Invoking get directory request`);
         const directory = await nfs.getDirectory(app, dirPath, rootPath);
         responseHandler(null, directory);
       }
     } catch(e) {
-      console.error(e);
+      log.warn(`NFS - ${req.id} :: ${isDelete ? 'DELETE' : 'GET'} API error :: ${parseExpectionMsg(e)}`);
       responseHandler(e);
     }
   };
@@ -55,8 +57,10 @@ let deleteOrGetDirectory = function(req, res, isDelete, next) {
 };
 
 let move = function(req, res, isFile, next) {
+  log.debug(`NFS - ${req.id} :: MOVE ${isFile ? 'File' : 'Directory'} API`);
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
+    log.error(`NFS - ${req.id} :: MOVE ${isFile ? 'File' : 'Directory'} API :: Unauthorised request`);
     return next(new ResponseError(401));
   }
   const app = sessionInfo.app;
@@ -83,18 +87,18 @@ let move = function(req, res, isFile, next) {
     const responseHandler = new ResponseHandler(req, res);
     try {
       if (isFile) {
-        log.debug('NFS - Invoking move file request');
+        log.debug(`NFS - ${req.id} :: Invoking move file request`);
         await nfs.moveFile(app, reqBody.srcPath, srcRootPath, reqBody.destPath, destRootPath, action);
       } else {
         if (action === false && reqBody.srcPath === '/') {
           return next(new ResponseError(400, 'Cannot move root directory'));
         }
-        log.debug('NFS - Invoking move directory request');
+        log.debug(`NFS - ${req.id} :: Invoking move directory request`);
         await nfs.moveDir(app, reqBody.srcPath, srcRootPath, reqBody.destPath, destRootPath, action);
       }
       responseHandler();
     } catch(e) {
-      console.error(e);
+      log.warn(`NFS - ${req.id} :: MOVE ${isFile ? 'File' : 'Directory'} API error :: ${parseExpectionMsg(e)}`);
       responseHandler(e);
     }
   };
@@ -102,8 +106,10 @@ let move = function(req, res, isFile, next) {
 };
 
 export var createDirectory = function(req, res, next) {
+  log.debug(`NFS - ${req.id} :: Create directory`);
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
+    log.error(`NFS - ${req.id} :: Create Directory API :: Unauthorised request`);
     return next(new ResponseError(401));
   }
   const app = sessionInfo.app;
@@ -124,7 +130,7 @@ export var createDirectory = function(req, res, next) {
   if (typeof reqBody.isPrivate !== 'boolean') {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'isPrivate')));
   }
-  log.debug('NFS - Invoking create directory request');
+  log.debug(`NFS - ${req.id} :: Invoking create directory request`);
   let responseHandler = new ResponseHandler(req, res);
   nfs.createDirectory(app, dirPath, reqBody.metadata, reqBody.isPrivate, false, rootPath)
     .then(responseHandler, responseHandler, console.error);
@@ -139,11 +145,12 @@ export var getDirectory = function(req, res, next) {
 };
 
 export var modifyDirectory = function(req, res, next) {
+  log.debug(`NFS - ${req.id} :: Modify directory`);
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
+    log.error(`NFS - ${req.id} :: Modify Directory :: Unauthorised request`);
     return next(new ResponseError(401));
   }
-
   let reqBody = req.body;
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
@@ -166,7 +173,7 @@ export var modifyDirectory = function(req, res, next) {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'name')));
   }
   let responseHandler = new ResponseHandler(req, res);
-  log.debug('NFS - Invoking modify directory request');
+  log.debug(`NFS - ${req.id} :: Invoking modify directory request`);
   nfs.updateDirectory(sessionInfo.app, dirPath, rootPath, reqBody.name, reqBody.metadata)
     .then(responseHandler, responseHandler, responseHandler);
 };
@@ -176,8 +183,10 @@ export var moveDirectory = function(req, res, next) {
 };
 
 export var createFile = function(req, res, next) {
+  log.debug(`NFS - ${req.id} :: Create file`);
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
+    log.error(`NFS - ${req.id} :: Create File :: Unauthorised request`);
     return next(new ResponseError(401));
   }
   const app = sessionInfo.app;
@@ -194,7 +203,7 @@ export var createFile = function(req, res, next) {
   if (typeof metadata !== 'string') {
     return next(new ResponseError(400, MSG_CONSTANTS.FAILURE.REQUIRED_PARAMS_MISSING));
   }
-  log.debug('NFS - Invoking create file request');
+  log.debug(`NFS - ${req.id} :: Invoking create file request`);
   const responseHandler = new ResponseHandler(req, res);
   const onWriterObtained = (writerId) => {
     var writer = new NfsWriter(req, writerId, responseHandler, length);
@@ -208,8 +217,10 @@ export var createFile = function(req, res, next) {
 };
 
 export var deleteFile = function(req, res, next) {
+  log.debug(`NFS - ${req.id} :: Delete file`);
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
+    log.error(`NFS - ${req.id} :: Delete File :: Unauthorised request`);
     return next(new ResponseError(401));
   }
   let filePath = req.params['0'];
@@ -218,14 +229,16 @@ export var deleteFile = function(req, res, next) {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'rootPath')));
   }
   let responseHandler = new ResponseHandler(req, res);
-  log.debug('NFS - Invoking delete file request');
+  log.debug(`NFS - ${req.id} :: Invoking delete file request`);
   nfs.deleteFile(sessionInfo.app, filePath, rootPath)
     .then(responseHandler, responseHandler, responseHandler);
 };
 
 export var modifyFileMeta = function(req, res, next) {
+  log.debug(`NFS - ${req.id} :: Modify file metadata`);
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
+    log.error(`NFS - ${req.id} :: Modify File Meta API :: Unauthorised request`);
     return next(new ResponseError(401));
   }
   let reqBody = req.body;
@@ -246,14 +259,16 @@ export var modifyFileMeta = function(req, res, next) {
     return next(new ResponseError(400, util.format(MSG_CONSTANTS.FAILURE.FIELD_NOT_VALID, 'name')));
   }
   let responseHandler = new ResponseHandler(req, res);
-  log.debug('NFS - Invoking modify file metadata request');
+  log.debug(`NFS - ${req.id} :: Invoking modify file metadata request`);
   nfs.updateFileMetadata(sessionInfo.app, filePath, rootPath, reqBody.name, reqBody.metadata)
     .then(responseHandler, responseHandler, responseHandler);
 };
 
 export var getFile = function(req, res, next) {
+  log.debug(`NFS - ${req.id} :: Get file`);
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
+    log.error(`NFS - ${req.id} :: Get file :: Unauthorised request`);
     return next(new ResponseError(401));
   }
   let filePath = req.params['0'];
@@ -263,7 +278,7 @@ export var getFile = function(req, res, next) {
   }
   const responseHandler = new ResponseHandler(req, res);
   let onFileMetadataReceived = function(fileStats) {
-    log.debug('NFS - File metadata for reading - ' + JSON.stringify(fileStats));
+    log.debug(`NFS - ${req.id} :: File metadata for reading - ${JSON.stringify(fileStats)}`);
     let range = req.get('range');
     let positions = [ 0 ];
     if (range) {
@@ -285,7 +300,7 @@ export var getFile = function(req, res, next) {
     if (chunksize < 0 || end > total) {
       return next(new ResponseError(416));
     }
-    log.debug('NFS - Ready to stream file for range' + start + '-' + end + '/' + total);
+    log.debug(`NFS - ${req.id} :: Ready to stream file for range ${start} - ${end} / ${total}`);
     var headers = {
       'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
       'Accept-Ranges': 'bytes',
@@ -302,14 +317,16 @@ export var getFile = function(req, res, next) {
     let nfsReader = new NfsReader(req, res, filePath, rootPath, start, end, sessionInfo.app);
     nfsReader.pipe(res);
   };
-  log.debug('NFS - Invoking get file request');
+  log.debug(`NFS - ${req.id} :: Invoking get file request`);
   nfs.getFileMetadata(sessionInfo.app, filePath, rootPath)
     .then(onFileMetadataReceived, responseHandler, console.error);
 };
 
 export var getFileMetadata = function(req, res, next) {
+  log.debug(`NFS - ${req.id} :: Get file metadata`);
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
+    log.error(`NFS - ${req.id} :: Get File Metadata :: Unauthorised request`);
     return next(new ResponseError(401));
   }
   let filePath = req.params['0'];
@@ -319,7 +336,7 @@ export var getFileMetadata = function(req, res, next) {
   }
   const responseHandler = new ResponseHandler(req, res);
   let onFileMetadataReceived = function(fileStats) {
-    log.debug('NFS - File metatda for reading - ' + JSON.stringify(fileStats));
+    log.debug(`NFS - File metatda for reading - ${JSON.stringify(fileStats)}`);
     let headers = {
       'Accept-Ranges': 'bytes',
       'Created-On': fileStats.createdOn,
@@ -332,7 +349,7 @@ export var getFileMetadata = function(req, res, next) {
     res.writeHead(200, headers);
     res.end();
   };
-  log.debug('NFS - Invoking get file metadata request');
+  log.debug(`NFS - ${req.id} :: Invoking get file metadata request`);
   nfs.getFileMetadata(sessionInfo.app, filePath, rootPath)
   .then(onFileMetadataReceived, responseHandler, console.error);
 };

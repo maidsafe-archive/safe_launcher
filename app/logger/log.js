@@ -8,7 +8,7 @@ import winston from 'winston';
 class Logger {
 
   constructor() {
-    var self = this;
+    const self = this;
     self.logFilePath = null;
     // TODO pass log id that can used for the log visualiser
     // let id = 'uid_' + 1001;
@@ -25,68 +25,82 @@ class Logger {
           date.getMilliseconds());
       return util.format('%s %s - %s', log.level.toUpperCase(), timeStamp, log.message);
     };
-    try {
-      process.stdout.write('\n');
-      self.winston.remove(self.winston.transports.Console);
-      self.winston.add(self.winston.transports.Console, {
-        level: self.logLevel,
-        handleExceptions: true,
-        formatter: self.logFormatter
-      });
-    } catch (e) {
-      console.log('Console Logger initialisation failed', e);
+    self.winston.remove(self.winston.transports.Console);
+    if(env.name !== 'test') {
+      try {
+        process.stdout.write('\n');
+        self.winston.add(self.winston.transports.Console, {
+          level: self.logLevel,
+          handleExceptions: true,
+          formatter: self.logFormatter
+        });
+      } catch (e) {
+        console.log('Console Logger initialisation failed', e);
+      }
     }
   }
 
   setFileLogger(path) {
     var self = this;
-    try {
-      self.logFilePath = path;
-      fse.ensureFileSync(self.logFilePath);
-      self.winston.add(self.winston.transports.File, {
-        filename: self.logFilePath,
-        json: false,
-        options: {
-          flags: 'w'
-        },
-        level: self.logLevel,
-        formatter: self.logFormatter
-      });
-    } catch (e) {
-      console.log('File logger could not be added ', e);
+    if(env.name !== 'test') {
+      try {
+        self.logFilePath = path;
+        fse.ensureFileSync(self.logFilePath);
+        self.winston.add(self.winston.transports.File, {
+          filename: self.logFilePath,
+          json: false,
+          options: {
+            flags: 'w'
+          },
+          level: self.logLevel,
+          formatter: self.logFormatter
+        });
+      } catch (e) {
+        console.log('File logger could not be added ', e);
+      }
     }
   }
 
   info(msg) {
     try {
       this.winston.info(msg);
-    } catch(e) {}
+    } catch(e) {
+      console.log(e)
+    }
   }
 
   warn(msg) {
     try {
       this.winston.warn(msg);
-    } catch(e) {}
+    } catch(e) {
+      console.log(e)
+    }
   }
 
   error(msg) {
     try {
       this.winston.error(msg);
-    } catch(e) {}
+    } catch(e) {
+      console.log(e)
+    }
   }
 
   debug(msg) {
     try {
       this.winston.debug(msg);
-    } catch(e) {}
+    } catch(e) {
+      console.log(e)
+    }
   }
 
   verbose(msg) {
     try {
       this.winston.verbose(msg);
-    } catch(e) {}
+    } catch(e) {
+      console.log(e)
+    }
   }
 
 }
 
-export var log = new Logger();
+export const log = new Logger();

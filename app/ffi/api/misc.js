@@ -7,9 +7,11 @@ const int32 = ref.types.int32;
 const u64 = ref.types.uint64;
 const u8 = ref.types.uint8;
 const bool = ref.types.bool;
+const CString = ref.types.CString;
 const size_t = ref.types.size_t;
 const u8Pointer = ref.refType(u8);
 const u64Pointer = ref.refType(u64);
+const int32Ptr = ref.refType(int32);
 const size_tPointer = ref.refType(size_t);
 
 const PointerToU8Pointer = ref.refType(u8Pointer);
@@ -33,9 +35,37 @@ class Misc extends FfiApi {
       'misc_deserialise_struct_data': [int32, [u8Pointer, size_t, u64Pointer]],
       'misc_serialise_sign_key': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
       'misc_deserialise_sign_key': [int32, [u8Pointer, size_t, u64Pointer]],
-      'misc_u8_ptr_free': [Void, [u8Pointer, size_t, size_t]]
+      'misc_u8_ptr_free': [Void, [u8Pointer, size_t, size_t]],
+      'output_log_path': [ 'pointer', [ CString, u64, int32Ptr, int32Ptr, int32Ptr ] ]
     };
   }
+
+  getLogFilePath() {
+    const self = this;
+    const executor = (resolve, reject) => {
+      const sizePtr = ref.alloc(int32);
+      const capacityPtr = ref.alloc(int32);
+      const resultPtr = ref.alloc(int32);
+      const outputFile = 'Client_ui.log';
+
+      const onResult = (err, res) => {
+        if (err) {
+          return reject(err);
+        }
+        const result = resultPtr.deref();
+        if (res.isNull() || result !== 0) {
+          return reject(result);
+        }
+        const size = sizePtr.deref();
+        const capacity = capacityPtr.deref();
+        const response = ref.reinterpret(res, size).toString();
+        self.dropVector(res, size, capacity);
+        resolve(response);
+      };
+      self.safeCore.output_log_path.async(outputFile, outputFile.length, sizePtr, capacityPtr, resultPtr, onResult);
+    };
+    return new Promise(executor);
+  };
 
   dropEncryptKeyHandle(handleId) {
     const self = this;

@@ -8,12 +8,14 @@ import config from '../config/env_test.json';
 class MockApp {
   constructor() {
     this.config = config;
-    loadLibrary();
-    this.server = new RESTServer(this.config.serverPort);
-    this.server.start();
-    this.axios = axios.create({
-      baseURL: `http://localhost:${this.config.serverPort}/`
-    });
+    loadLibrary()
+      .then(() => {
+        this.server = new RESTServer(this.config.serverPort);
+        this.server.start();
+        this.axios = axios.create({
+          baseURL: `http://localhost:${this.config.serverPort}/`
+        });
+      });
     this.authorizationToken = null;
   }
 

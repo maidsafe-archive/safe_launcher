@@ -27,8 +27,6 @@ const onFfiLaodFailure = (title, msg) => {
   });
 };
 
-window.msl = new UIUtils(remote, restServer);
-
 const networkStateListener = (state) => {
   switch (state) {
     case 0:
@@ -47,15 +45,19 @@ const networkStateListener = (state) => {
   }
 };
 
-try {
-  loadLibrary();
-  sessionManager.onNetworkStateChange(networkStateListener);
-  auth.getUnregisteredSession().then(() => {}, () => {
-    networkStateListener(1);
-  });
-} catch (e) {
-  onFfiLaodFailure('FFI library load error', e.message);
-}
+const load = async (eventRegistry) => {
+  try {
+    window.msl = new UIUtils(remote, restServer);
+    await loadLibrary();
+    eventRegistry.run();
+    sessionManager.onNetworkStateChange(networkStateListener);
+    auth.getUnregisteredSession().then(() => {}, () => {
+      networkStateListener(1);
+    });
+  } catch (e) {
+    onFfiLaodFailure('FFI library load error', e.message);
+  }
+};
 
 // Disabling drag and drop
 window.document.addEventListener('drop', (e) => {
@@ -67,3 +69,5 @@ window.document.addEventListener('dragover', (e) => {
   e.preventDefault();
   e.stopPropagation();
 });
+
+export default load;

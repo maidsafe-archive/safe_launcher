@@ -10,7 +10,6 @@ class AuthUtils extends Utils {
         this.removeAuthReqEvent();
       });
     }
-
     return this.sendRequest(this.HTTP_METHOD.POST, CONSTANTS.API.AUTH, null, authPayload, config);
   }
 

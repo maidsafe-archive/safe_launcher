@@ -124,7 +124,7 @@ export var setSessionHeaderAndParseBody = function(req, res, next) {
     log.debug('Unauthorised request ::' + req.path);
     return next();
   }
-  log.debug('Authorised request ::' + req.path);
+  log.debug('Authorised request :: ' + req.path);
   let sessionId = getSessionIdFromRequest(req);
   log.debug('Decrypted session id :: ' + sessionId);
   if (!sessionId) {
@@ -251,4 +251,8 @@ export let updateAppActivity = function(req, res, isSuccess) {
   if (req.headers.sessionId && sessionInfo) {
     sessionManager.get(req.headers.sessionId).updateActivity(activity);
   }
+};
+
+export const parseExpectionMsg = (e) => {
+  return (typeof e.message === 'object') ? JSON.stringify(e.message) : e.message;
 };

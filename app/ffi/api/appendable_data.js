@@ -3,9 +3,10 @@ import Enum from 'enum';
 
 import FfiApi from '../ffi_api';
 import misc from './misc';
-
 import appManager from '../util/app_manager';
 import { FILTER_TYPE } from '../model/enum';
+import { log } from '../../logger/log';
+
 const int32 = ref.types.int32;
 const u8 = ref.types.uint8;
 const u64 = ref.types.uint64;
@@ -67,6 +68,7 @@ class AppendableData extends FfiApi {
     return new Promise((resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Save :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -84,6 +86,7 @@ class AppendableData extends FfiApi {
       let isValidRef = ref.alloc(bool);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Check size valid :: ${err || res}`);
           return reject(err || res);
         }
         resolve(isValidRef.deref());
@@ -97,6 +100,7 @@ class AppendableData extends FfiApi {
       let dataHandleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Get data handle Id :: ${err || res}`);
           return reject(err || res);
         }
         resolve(dataHandleRef.deref());
@@ -110,6 +114,7 @@ class AppendableData extends FfiApi {
       let dataHandleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Get data at index :: ${err || res}`);
           return reject(err || res);
         }
         resolve(dataHandleRef.deref());
@@ -129,6 +134,7 @@ class AppendableData extends FfiApi {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Get data handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve(handleRef.deref());
@@ -141,6 +147,7 @@ class AppendableData extends FfiApi {
     return new Promise((resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Toggle filter :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -153,6 +160,7 @@ class AppendableData extends FfiApi {
     return new Promise((resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Add to filter :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -162,9 +170,11 @@ class AppendableData extends FfiApi {
   }
 
   removeFromFilter(appendDataHandle, signKeyHandle) {
+    log.debug('FFI :: Appendable data :: Remove from filter');
     return new Promise((resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Remove from filter :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -178,6 +188,7 @@ class AppendableData extends FfiApi {
       let filterTypeRef = ref.alloc(Ffi_FilterType);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Get filter type :: ${err || res}`);
           return reject(err || res);
         }
         resolve(filterTypeRef.deref());
@@ -191,6 +202,7 @@ class AppendableData extends FfiApi {
       const lengthRef = ref.alloc(size_t);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Get filter length :: ${err || res}`);
           return reject(err || res);
         }
         resolve(lengthRef.deref());
@@ -204,6 +216,7 @@ class AppendableData extends FfiApi {
       const signKeyHandleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Get sign key from filter :: ${err || res}`);
           return reject(err || res);
         }
         resolve(signKeyHandleRef.deref());
@@ -220,6 +233,7 @@ class AppendableData extends FfiApi {
       let handleRef = ref.alloc(u64);
       const onResult = async(err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Create :: ${err || res}`);
           return reject(err || res);
         }
         try {
@@ -249,6 +263,7 @@ class AppendableData extends FfiApi {
       const keyHandleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Get encrypt key :: ${err || res}`);
           return reject(err || res);
         }
         resolve(keyHandleRef.deref());
@@ -262,6 +277,7 @@ class AppendableData extends FfiApi {
       const keyHandleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Get sign key :: ${err || res}`);
           return reject(err || res);
         }
         resolve(keyHandleRef.deref());
@@ -278,6 +294,7 @@ class AppendableData extends FfiApi {
     return new Promise((resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Restore :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -290,6 +307,7 @@ class AppendableData extends FfiApi {
     return new Promise((resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Append :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -304,6 +322,7 @@ class AppendableData extends FfiApi {
       const lengthRef = ref.alloc(size_t);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Get length :: ${err || res}`);
           return reject(err || res);
         }
         resolve(lengthRef.deref());
@@ -320,6 +339,7 @@ class AppendableData extends FfiApi {
     return new Promise((resolve, reject) => {
       const onResult = async (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Remove at index :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -336,6 +356,7 @@ class AppendableData extends FfiApi {
     return new Promise((resolve, reject) => {
       const onResult = async (err, res) => {
         if (err || res != 0) {
+          log.error(`FFI :: Appendable data :: Clear all :: ${err || res}`);
           reject(err);
         }
         resolve();
@@ -353,6 +374,7 @@ class AppendableData extends FfiApi {
       let versionRef = ref.alloc(u64);
       this.safeCore.appendable_data_version.async(handleId, versionRef, (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Get version :: ${err || res}`);
           return reject(err || res);
         }
         resolve(versionRef.deref());
@@ -365,6 +387,7 @@ class AppendableData extends FfiApi {
       let boolRef = ref.alloc(bool);
       this.safeCore.appendable_data_is_owned.async(appManager.getHandle(app), handleId, boolRef, (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Check owner :: ${err || res}`);
           return reject(err || res);
         }
         resolve(boolRef.deref());
@@ -376,6 +399,7 @@ class AppendableData extends FfiApi {
     return new Promise((resolve, reject) => {
       this.safeCore.appendable_data_delete.async(appManager.getHandle(app), handleId, (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Delete :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -395,6 +419,7 @@ class AppendableData extends FfiApi {
     return new Promise((resolve, reject) => {
       this.safeCore.appendable_data_free.async(handleId, (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Appendable data :: Drop handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve();

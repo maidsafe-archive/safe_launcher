@@ -4,7 +4,8 @@ import misc from './misc';
 import FfiApi from '../ffi_api';
 import cipherOpts from './cipher_opts';
 import appManager from '../util/app_manager';
-import {ENCRYPTION_TYPE} from '../model/enum';
+import { ENCRYPTION_TYPE } from '../model/enum';
+import { log } from '../../logger/log';
 
 const int32 = ref.types.int32;
 const u8 = ref.types.uint8;
@@ -46,6 +47,7 @@ class ImmutableData extends FfiApi {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Immutable data :: Get writer handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve(handleRef.deref());
@@ -60,6 +62,7 @@ class ImmutableData extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Immutable data :: Write :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -71,12 +74,13 @@ class ImmutableData extends FfiApi {
 
   closeWriter(app, writerHandleId, cipherOptsHandle) {
     const self = this;
-    const executor = async (resolve, reject) => {
+    const executor = async(resolve, reject) => {
       const dataIdRef = ref.alloc(u64);
       try {
         const dataIdRef = ref.alloc(u64);
         const onResult = (err, res) => {
           if (err || res !== 0) {
+            log.error(`FFI :: Immutable data :: Close writer :: ${err || res}`);
             return reject(err || res);
           }
           resolve(dataIdRef.deref());
@@ -96,6 +100,7 @@ class ImmutableData extends FfiApi {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Immutable data :: Get reader handle :: ${err || res}`);
           reject(err || res);
         }
         resolve(handleRef.deref());
@@ -111,6 +116,7 @@ class ImmutableData extends FfiApi {
       const sizeRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Immutable data :: Get reader size :: ${err || res}`);
           reject(err || res);
         }
         resolve(sizeRef.deref());
@@ -128,6 +134,7 @@ class ImmutableData extends FfiApi {
       const capacityRef = ref.alloc(size_t);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Immutable data :: Read :: ${err || res}`);
           reject(err || res);
         }
         const dataRef = dataRefRef.deref();
@@ -148,6 +155,7 @@ class ImmutableData extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Immutable data :: Drop reader :: ${err || res}`);
           reject(err || res);
         }
         resolve();
@@ -162,6 +170,7 @@ class ImmutableData extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Immutable data :: Drop writer :: ${err || res}`);
           reject(err || res);
         }
         resolve();

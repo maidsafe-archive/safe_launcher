@@ -17,6 +17,7 @@ import structuredData from './api/structured_data';
 import appendableData from './api/appendable_data';
 import appManager from './util/app_manager';
 import sessionManager from './util/session_manager';
+import { log } from '../logger/log';
 
 let ffiFunctions = {};
 // add modules in the order of invoking the drop function
@@ -34,7 +35,7 @@ mods.forEach(mod => {
   ffiFunctions = Object.assign({}, ffiFunctions, functionsToRegister);
 });
 
-export const loadLibrary = (ffiDirPath) => {
+export const loadLibrary = async (ffiDirPath) => {
   let libPath = ffiDirPath;
   if (!libPath) {
     libPath = (!remote || !remote.getGlobal('args').isProduction) ?
@@ -50,6 +51,9 @@ export const loadLibrary = (ffiDirPath) => {
       return;
     }
     mod.setSafeCore(safeCore);
+  });
+  return misc.getLogFilePath().then(logPath => {
+    log.setFileLogger(logPath);
   });
 };
 

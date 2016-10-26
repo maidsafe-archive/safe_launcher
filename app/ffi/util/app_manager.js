@@ -4,6 +4,7 @@ import ref from 'ref';
 import FfiApi from '../ffi_api';
 import App from '../model/app';
 import sessionManager from '../util/session_manager';
+import { log } from '../../logger/log';
 
 const Void = ref.types.void;
 const int32 = ref.types.int32;
@@ -31,6 +32,7 @@ class AppManager extends FfiApi {
   }
 
   getHandle(app) {
+    log.debug('FFI :: Get handle');
     if (!app || !this.holder.has(app)) {
       return this.anonymousApp;
     }
@@ -38,15 +40,18 @@ class AppManager extends FfiApi {
   }
 
   registerApp(app) {
+    log.debug(`FFI :: Register App ${JSON.stringify(app)}`);
     const self = this;
     const appHandle = ref.alloc(AppHandlePointer);
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Register App error :: ${err || res}`);
           return reject(err || res);
         }
         const handle = appHandle.deref();
         self.holder.set(app, handle);
+        log.debug('FFI :: Registered App successfully');
         resolve(app);
       };
       self.safeCore.register_app.async(sessionManager.sessionHandle,
@@ -57,6 +62,7 @@ class AppManager extends FfiApi {
   }
 
   revokeApp(app) {
+    log.debug(`FFI :: Revoke App ${JSON.stringify(app)}`);
     const self = this;
     if (!self.holder.has(app)) {
       return new Promise((resolve, reject) => {
@@ -66,6 +72,7 @@ class AppManager extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err) => {
         if (err) {
+          log.error(`FFI :: Revoke App error :: ${err}`);
           return reject(err);
         }
         self.holder.delete(app);
@@ -77,10 +84,12 @@ class AppManager extends FfiApi {
   }
 
   revokeAnonymousApp() {
+    log.debug('FFI :: Revoke Anonymous App');
     const self = this;
     const executor = (resolve, reject) => {
       const onResult = (err) => {
         if (err) {
+          log.error(`FFI :: Revoke Anonymous App error :: ${err}`);
           return reject(err);
         }
         self.anonymousApp = null;
@@ -92,20 +101,22 @@ class AppManager extends FfiApi {
   }
 
   createUnregisteredApp() {
+    log.debug('FFI :: Create unregistered app');
     const self = this;
 
     const executor = (resolve, reject) => {
       const app = new App('Anonymous Application', 'Anonymous', '0.0.0', 'Anonymous', []);
       const appHandle = ref.alloc(AppHandlePointer);
-      const onResult = async (err, res) => {
+      const onResult = async(err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Create unregistered app error :: ${err || res}`);
           return reject(err || res);
         }
         try {
-          const handle = appHandle.deref();          
+          const handle = appHandle.deref();
           self.anonymousApp = handle;
           resolve(app);
-        } catch(e) {
+        } catch (e) {
           console.error(e);
         }
       };
@@ -117,13 +128,14 @@ class AppManager extends FfiApi {
 
   drop() {
     const self = this;
-    const exec = async (resolve, reject) => {
+    log.debug('FFI :: Drop');
+    const exec = async(resolve, reject) => {
       try {
         for (let app of self.holder.keys()) {
           await self.revokeApp(app);
         }
         resolve();
-      } catch(e) {
+      } catch (e) {
         console.error(e);
         reject(e);
       }
