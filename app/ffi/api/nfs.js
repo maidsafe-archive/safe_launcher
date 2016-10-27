@@ -433,7 +433,7 @@ class NFS extends FfiApi {
           self.safeCore.file_metadata_drop.async(fileMetadataHandle, (e) => {});
           resolve(metadata);
         } catch(e) {
-          log.error(`FFI :: NFS :: Get file metadata error :: ${typeof e === 'object' ? JSON.parse(e) : e}`);
+          log.error(`FFI :: NFS :: Get file metadata :: Caught exception - ${typeof e === 'object' ? JSON.parse(e) : e}`);
         }
       };
 
