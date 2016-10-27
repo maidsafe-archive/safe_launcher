@@ -47,8 +47,13 @@ const networkStateListener = (state) => {
 
 const run = async (eventRegistry) => {
   try {
-    window.msl = new UIUtils(remote, restServer);
     loadLibrary();
+  } catch (e) {
+    onFfiLaodFailure('FFI library load error', e.message);
+  }
+
+  try {
+    window.msl = new UIUtils(remote, restServer);
     await setFileLoggerPath();
     eventRegistry.run();
     sessionManager.onNetworkStateChange(networkStateListener);
@@ -56,7 +61,7 @@ const run = async (eventRegistry) => {
       networkStateListener(1);
     });
   } catch (e) {
-    onFfiLaodFailure('FFI library load error', e.message);
+    console.error(e.message);
   }
 };
 
