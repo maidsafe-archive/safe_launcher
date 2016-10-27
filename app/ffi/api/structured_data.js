@@ -3,7 +3,9 @@ import ref from 'ref';
 import misc from './misc';
 import FfiApi from '../ffi_api';
 import appManager from '../util/app_manager';
-import {errorCodeLookup} from '../../server/error_code_lookup';
+import { errorCodeLookup } from '../../server/error_code_lookup';
+import { log } from '../../logger/log';
+
 const int32 = ref.types.int32;
 const u8 = ref.types.uint8;
 const u64 = ref.types.uint64;
@@ -48,6 +50,7 @@ class StructuredData extends FfiApi {
     return new Promise((resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Structured data :: Save :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -65,6 +68,7 @@ class StructuredData extends FfiApi {
       let handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Structured data :: Get Data Id handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve(handleRef.deref());
@@ -78,6 +82,7 @@ class StructuredData extends FfiApi {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Structured data :: Get handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve(handleRef.deref());
@@ -91,10 +96,12 @@ class StructuredData extends FfiApi {
       let countRef = ref.alloc(size_t);
       const onResult = (err, res) => {
         if (err) {
+          log.error(`FFI :: Structured data :: Get version count :: ${err}`);
           reject(err);
         } else if (errorCodeLookup(res) === 'FfiError::InvalidStructuredDataTypeTag') {
           resolve();
         } else if (res !== 0) {
+          log.error(`FFI :: Structured data :: Get version count :: ${res}`);
           reject(res);
         } else {
           resolve(countRef.deref());
@@ -105,10 +112,12 @@ class StructuredData extends FfiApi {
   }
 
   isSizeValid(handleId) {
+    log.debug('FFI :: Structured data :: Check size valid');
     return new Promise((resolve, reject) => {
       let isValidRef = ref.alloc(bool);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Structured data :: Check size valid :: ${err || res}`);
           return reject(err || res);
         }
         resolve(isValidRef.deref());
@@ -118,7 +127,7 @@ class StructuredData extends FfiApi {
   }
 
   create(app, id, tagType, cipherOptHandle, data, version = 0) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
       if (!app) {
         reject('app parameter missing');
       }
@@ -126,6 +135,7 @@ class StructuredData extends FfiApi {
       this.safeCore.struct_data_new.async(appManager.getHandle(app), tagType, id, version,
         cipherOptHandle, data, (data ? data.length : 0), handleRef, (err, res) => {
           if (err || res !== 0) {
+            log.error(`FFI :: Structured data :: Create :: ${err || res}`);
             return reject(err || res);
           }
           resolve(handleRef.deref());
@@ -134,24 +144,25 @@ class StructuredData extends FfiApi {
   }
 
   update(app, handleId, cipherOptHandle, data) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
       if (!app) {
         reject('app parameter missing');
       }
       try {
-        const onResult = async (err, res) => {
+        const onResult = async(err, res) => {
           if (err || res !== 0) {
+            log.error(`FFI :: Structured data :: Update :: ${err || res}`);
             return reject(err || res);
           }
           try {
             resolve();
-          } catch(e) {
+          } catch (e) {
             reject(e);
           }
         };
         this.safeCore.struct_data_new_data.async(appManager.getHandle(app), handleId,
           cipherOptHandle, data, (data ? data.length : 0), onResult);
-      } catch(e) {
+      } catch (e) {
         reject(e);
       }
     });
@@ -165,6 +176,7 @@ class StructuredData extends FfiApi {
         const capacityRef = ref.alloc(size_t);
         const onResult = (err, res) => {
           if (err || res !== 0) {
+            log.error(`FFI :: Structured data :: Read :: ${err || res}`);
             return reject(err || res);
           }
           const capacity = capacityRef.deref();
@@ -195,6 +207,7 @@ class StructuredData extends FfiApi {
       let versionRef = ref.alloc(u64);
       this.safeCore.struct_data_version.async(handleId, versionRef, (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Structured data :: Get version :: ${err || res}`);
           return reject(err || res);
         }
         resolve(versionRef.deref());
@@ -207,6 +220,7 @@ class StructuredData extends FfiApi {
       let boolRef = ref.alloc(bool);
       this.safeCore.struct_data_is_owned.async(appManager.getHandle(app), handleId, boolRef, (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Structured data :: Check owner :: ${err || res}`);
           return reject(err || res);
         }
         resolve(boolRef.deref());
@@ -218,6 +232,7 @@ class StructuredData extends FfiApi {
     return new Promise((resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Structured data :: Delete :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -234,6 +249,7 @@ class StructuredData extends FfiApi {
     return new Promise((resolve, reject) => {
       this.safeCore.struct_data_free.async(handleId, (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Structured data :: Drop handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve();

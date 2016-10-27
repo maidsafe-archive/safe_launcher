@@ -1,6 +1,8 @@
+import _ from 'lodash';
 import Permission from '../ffi/model/permission';
 import appManager from '../ffi/util/app_manager';
-import _ from 'lodash';
+import { log } from '../logger/log';
+import { parseExpectionMsg } from './utils';
 
 let sessionManager = null;
 
@@ -26,13 +28,13 @@ class SessionManager {
     return this.sessionPool[id];
   }
 
-  remove = async (id) => {
+  remove = async(id) => {
     try {
       await appManager.revokeApp(this.sessionPool[id].app);
       delete this.sessionPool[id];
       return !this.sessionPool.hasOwnProperty(id);
-    } catch(e) {
-      console.error(e);
+    } catch (e) {
+      log.warn(`Session manager :: Remove session error :: ${parseExpectionMsg(e)}`);
     }
   }
 
@@ -48,7 +50,7 @@ class SessionManager {
   }
 
   registerApps = () => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
       try {
         for (let key in this.sessionPool) {
           app = this.sessionPool[key].app;
@@ -56,7 +58,7 @@ class SessionManager {
         }
         resolve();
       } catch (e) {
-        console.error(e);
+        log.warn(`Session manager :: Register app error :: ${parseExpectionMsg(e)}`);
         reject(e);
       }
     });

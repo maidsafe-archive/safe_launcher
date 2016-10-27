@@ -1,6 +1,6 @@
 import { log } from './../../logger/log';
 import nfs from '../../ffi/api/nfs';
-import { updateAppActivity } from './../utils.js';
+import { updateAppActivity, parseExpectionMsg } from './../utils.js';
 var Readable = require('stream').Readable;
 
 export default class NfsReader extends Readable {
@@ -18,7 +18,7 @@ export default class NfsReader extends Readable {
     this.MAX_SIZE_TO_READ = 1048576; // 1 MB
   }
 
-  _read = async (next) => {
+  _read = async(next) => {
     try {
       if (this.curOffset === this.end) {
         this.push(null);
@@ -33,10 +33,9 @@ export default class NfsReader extends Readable {
       this.curOffset += this.sizeToRead;
       this.push(data);
       eventEmitter.emit(eventType, data.length);
-    } catch(e) {
-      console.error(e);
+    } catch (e) {
+      log.warn(`Stream :: NFS reader :: ${parseExpectionMsg(e)}`);
       this.push(null);
-      log.error(e);
       updateAppActivity(this.req, this.res);
       this.res.sendStatus(400);
     }

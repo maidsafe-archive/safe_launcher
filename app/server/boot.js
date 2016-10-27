@@ -39,6 +39,7 @@ export default class RESTServer {
   /* jscs:disable disallowDanglingUnderscores*/
   _onError(type, eventEmitter) {
     return function(error) {
+      log.error(`API server exited with error :: ${error.message}`);
       if (error.syscall !== 'listen') {
         throw error;
       }
@@ -48,18 +49,21 @@ export default class RESTServer {
 
   _onClose(type, eventEmitter) {
     return function() {
+      log.warn('API server closed');
       eventEmitter.emit(type);
     };
   }
 
   _onListening(type, eventEmitter) {
     return function() {
+      log.info('API server started');
       eventEmitter.emit(type);
     };
   }
   /* jscs:enable disallowDanglingUnderscores*/
 
   start() {
+    log.info('Server started');
     let app = this.app;
     let EVENT_TYPE = this.app.get('EVENT_TYPE');
     let eventEmitter = this.app.get('eventEmitter');
@@ -80,12 +84,11 @@ export default class RESTServer {
 
     // API Error handling
     app.use(function(err, req, res, next) {
-      // console.error(err);
       if (!(err instanceof ResponseError)) {
         return next();
       }
       updateAppActivity(req, res);
-      // log.warn('Err ' + err.status + ' - Msg :: ' + err.msg);
+      log.warn(`API Error handling :: ${req.id} :: Err ${err.status} - Msg :: ${JSON.stringify(err.msg)}`);
       res.status(err.status).send(err.msg);
     });
 
@@ -95,8 +98,10 @@ export default class RESTServer {
         return;
       }
       if (typeof res === 'function') {
+        log.warn('Caught 404 Error');
         return req.status(404).send({ errorCode: 404, description: 'Endpoint Not Found' });
       }
+      log.warn(`Server Error :: ${req.id} :: Err ${err.status} - Msg :: ${err.msg}`);
       res.status(500).send(err);
     });
 
@@ -113,43 +118,55 @@ export default class RESTServer {
 
   stop() {
     if (!this.server) {
+      log.error('Can\'t stop API server. Server object is empty');
       return;
     }
     this.server.close();
   }
 
   removeSession(id) {
+    log.info('Remove session');
+    log.debug(`Remove session for id :: ${id}`);
     sessionManager.remove(id);
     this.app.get('eventEmitter').emit(this.EVENT_TYPE.SESSION_REMOVED, id);
   }
 
   clearAllSessions() {
+    log.info('Clear all session');
     sessionManager.clear();
   }
 
   registerConnectedApps() {
+    log.info('Register connected apps');
     return sessionManager.registerApps();
   }
 
   addEventListener(event, listener) {
+    log.debug(`Add event listener - ${event}`);
     this.app.get('eventEmitter').addListener(event, listener);
   }
 
   removeAllEventListener(event) {
+    log.debug('Remove all event listener');
     this.app.get('eventEmitter').removeAllListeners(event);
   }
 
   authApproved(data) {
+    log.info('Authorisation approved');
+    log.debug(`Authorisation approved :: ${data.request.id} - App Name :: ${data.payload.app.name}`);
     new CreateSession(data)
   }
 
   getAppActivityList(sessionId) {
+    log.debug(`Get app activity list for session id :: ${sessionId}`);
     let sessionInfo = sessionManager.get(sessionId);
     return sessionInfo ? sessionInfo.activityList : null;
   }
 
-  authRejected(payload) {
-    updateAppActivity(payload.request, payload.response);
-    payload.response.status(401).send('Unauthorised');
+  authRejected(data) {
+    log.info('Authorisation rejected');
+    log.debug(`Authorisation rejected for app - ${data.payload.app.name}`);
+    updateAppActivity(data.request, data.response);
+    data.response.status(401).send('Unauthorised');
   }
 }

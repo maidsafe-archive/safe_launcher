@@ -33,8 +33,7 @@ export var getSessionIdFromRequest = function(req) {
     jwt.verify(token, new Buffer(sessionInfo.signingKey));
     return payload.id;
   } catch (e) {
-    console.error(e);
-    return;
+    log.warn(`Get Session Id from request error :: ${parseExpectionMsg(e)}`);
   }
 };
 
@@ -106,7 +105,7 @@ export const ResponseHandler = function(req, res) {
         }
         req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').DATA_DOWNLOADED, length);
       } catch(e) {
-        console.error(e);
+        log.warn(`Response Handler error :: ${parseExpectionMsg(e)}`);
       }
     } else {
       res.sendStatus(successStatus);
@@ -121,12 +120,12 @@ export var setSessionHeaderAndParseBody = function(req, res, next) {
   req.time = Date.now();
   res.id = req.id;
   if (!req.get('Authorization')) {
-    log.debug('Unauthorised request ::' + req.path);
+    log.debug(`Unauthorised request :: ${req.id} :: Path - ${req.path}`);
     return next();
   }
-  log.debug('Authorised request ::' + req.path);
+  log.debug(`Authorised request :: ${req.id} :: Path - ${req.path}`);
   let sessionId = getSessionIdFromRequest(req);
-  log.debug('Decrypted session id :: ' + sessionId);
+  log.debug(`Authorised request :: ${req.id} :: Decrypted session id - ${sessionId}`);
   if (!sessionId) {
     log.warn('Session ID not found');
     return res.sendStatus(401);
@@ -251,4 +250,8 @@ export let updateAppActivity = function(req, res, isSuccess) {
   if (req.headers.sessionId && sessionInfo) {
     sessionManager.get(req.headers.sessionId).updateActivity(activity);
   }
+};
+
+export const parseExpectionMsg = (e) => {
+  return (typeof e.message === 'object') ? JSON.stringify(e.message) : e.message;
 };

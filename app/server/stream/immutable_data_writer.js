@@ -2,7 +2,7 @@ import util from 'util';
 import { Writable } from 'stream';
 import immutableData from '../../ffi/api/immutable_data';
 
-export var ImmutableDataWriter = function(req, writerId, responseHandler, size, offset) {
+export var ImmutableDataWriter = function (req, writerId, responseHandler, size, offset) {
   Writable.call(this);
   this.eventEmitter = req.app.get('eventEmitter');
   this.uploadEvent = req.app.get('EVENT_TYPE').DATA_UPLOADED;
@@ -16,7 +16,7 @@ export var ImmutableDataWriter = function(req, writerId, responseHandler, size, 
 util.inherits(ImmutableDataWriter, Writable);
 
 /*jscs:disable disallowDanglingUnderscores*/
-ImmutableDataWriter.prototype._write = function(data, enc, next) {
+ImmutableDataWriter.prototype._write = function (data, enc, next) {
   /*jscs:enable disallowDanglingUnderscores*/
   immutableData.write(this.writerId, data)
     .then(() => {
@@ -28,5 +28,7 @@ ImmutableDataWriter.prototype._write = function(data, enc, next) {
       next();
     }, (err) => {
       this.responseHandler(err);
-    }, console.error);
+    }, (e) => {
+      log.error(`Stream :: Immutable data writer :: ${e}`);
+    });
 };
