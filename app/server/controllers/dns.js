@@ -16,7 +16,7 @@ const ROOT_PATH = {
 };
 
 const registerOrAddService = (req, res, isRegister, next) => {
-  log.debug(`DNS - ${req.id} :: ${isRegister ? 'Register' : 'Add Service'} API`)
+  log.debug(`DNS - ${req.id} :: ${isRegister ? 'Register' : 'Add Service'} API`);
   const sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
     log.error(`DNS - ${req.id} :: ${isRegister ? 'Register' : 'Add Service'} API :: Unauthorised request`);

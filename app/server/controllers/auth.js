@@ -98,6 +98,7 @@ export var authorise = function(req, res, next) {
     log.debug(`Auth :: ${req.id} :: Authorisation request - Invalid permissions requested`);
     return next(new ResponseError(400, 'Invalid permissions requested'));
   }
+  log.debug(`Auth :: ${req.id} :: Authorisation request for ${JSON.stringify(authReq)}`);
   const payload = {
     payload: authReq,
     request: req,

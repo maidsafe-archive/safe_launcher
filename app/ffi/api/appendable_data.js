@@ -100,7 +100,7 @@ class AppendableData extends FfiApi {
       let dataHandleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
-          log.error(`FFI :: Appendable data :: Get data handle Id :: ${err || res}`);
+          log.error(`FFI :: Appendable data :: Get Data Id handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve(dataHandleRef.deref());

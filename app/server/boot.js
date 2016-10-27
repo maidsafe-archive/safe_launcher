@@ -63,7 +63,7 @@ export default class RESTServer {
   /* jscs:enable disallowDanglingUnderscores*/
 
   start() {
-    console.log('Server started');
+    log.info('Server started');
     let app = this.app;
     let EVENT_TYPE = this.app.get('EVENT_TYPE');
     let eventEmitter = this.app.get('eventEmitter');

@@ -32,7 +32,7 @@ class AppManager extends FfiApi {
   }
 
   getHandle(app) {
-    log.debug('FFI :: Get handle');
+    log.debug('FFI :: Get application handle');
     if (!app || !this.holder.has(app)) {
       return this.anonymousApp;
     }
@@ -46,7 +46,7 @@ class AppManager extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
-          log.error(`FFI :: Register App error :: ${err || res}`);
+          log.error(`FFI :: Register App :: ${err || res}`);
           return reject(err || res);
         }
         const handle = appHandle.deref();
@@ -72,7 +72,7 @@ class AppManager extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err) => {
         if (err) {
-          log.error(`FFI :: Revoke App error :: ${err}`);
+          log.error(`FFI :: Revoke App :: ${err}`);
           return reject(err);
         }
         self.holder.delete(app);
@@ -89,7 +89,7 @@ class AppManager extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err) => {
         if (err) {
-          log.error(`FFI :: Revoke Anonymous App error :: ${err}`);
+          log.error(`FFI :: Revoke Anonymous App :: ${err}`);
           return reject(err);
         }
         self.anonymousApp = null;
@@ -109,7 +109,7 @@ class AppManager extends FfiApi {
       const appHandle = ref.alloc(AppHandlePointer);
       const onResult = async(err, res) => {
         if (err || res !== 0) {
-          log.error(`FFI :: Create unregistered app error :: ${err || res}`);
+          log.error(`FFI :: Create unregistered app :: ${err || res}`);
           return reject(err || res);
         }
         try {
@@ -117,7 +117,7 @@ class AppManager extends FfiApi {
           self.anonymousApp = handle;
           resolve(app);
         } catch (e) {
-          console.error(e);
+          log.warn(`FFI :: Create unregistered app error :: ${typeof e === 'object' ? JSON.parse(e) : e}`);
         }
       };
 
@@ -128,7 +128,7 @@ class AppManager extends FfiApi {
 
   drop() {
     const self = this;
-    log.debug('FFI :: Drop');
+    log.debug('FFI :: Drop application handle');
     const exec = async(resolve, reject) => {
       try {
         for (let app of self.holder.keys()) {
@@ -136,10 +136,10 @@ class AppManager extends FfiApi {
         }
         resolve();
       } catch (e) {
-        console.error(e);
+        log.warn(`FFI :: Drop application handle error :: ${typeof e === 'object' ? JSON.parse(e) : e}`);
         reject(e);
       }
-    }
+    };
     return new Promise(exec);
   }
 }

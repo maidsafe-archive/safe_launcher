@@ -28,7 +28,7 @@ class DataId extends FfiApi {
     return new Promise((resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
-          log.error(`FFI :: Data Id :: Drop handle :: ${err || res}`);
+          log.error(`FFI :: Data Id :: Drop Data Id handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -42,7 +42,7 @@ class DataId extends FfiApi {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
-          log.error(`FFI :: Data Id :: Get structured data handle :: ${err || res}`);
+          log.error(`FFI :: Data Id :: Get Structured Data Id handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve(handleRef.deref());
@@ -56,7 +56,7 @@ class DataId extends FfiApi {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
-          log.error(`FFI :: Data Id :: Get appendable data handle :: ${err || res}`);
+          log.error(`FFI :: Data Id :: Get Appendable Data Id handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve(handleRef.deref());

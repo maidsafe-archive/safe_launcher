@@ -68,7 +68,7 @@ class StructuredData extends FfiApi {
       let handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
-          log.error(`FFI :: Structured data :: Get data handle Id :: ${err || res}`);
+          log.error(`FFI :: Structured data :: Get Data Id handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve(handleRef.deref());

@@ -26,79 +26,71 @@ class Logger {
       return util.format('%s %s - %s', log.level.toUpperCase(), timeStamp, log.message);
     };
     self.winston.remove(self.winston.transports.Console);
-    if(env.name !== 'test') {
-      try {
-        process.stdout.write('\n');
-        self.winston.add(self.winston.transports.Console, {
-          level: self.logLevel,
-          handleExceptions: true,
-          formatter: self.logFormatter
-        });
-      } catch (e) {
-        console.log('Console Logger initialisation failed', e);
-      }
+    if(env.name === 'test') {
+      return;
+    }
+    try {
+      process.stdout.write('\n');
+      self.winston.add(self.winston.transports.Console, {
+        level: self.logLevel,
+        handleExceptions: true,
+        formatter: self.logFormatter
+      });
+    } catch (e) {
+      console.error('Console Logger initialisation failed', e);
     }
   }
 
   setFileLogger(path) {
     var self = this;
-    if(env.name !== 'test') {
-      try {
-        self.logFilePath = path;
-        fse.ensureFileSync(self.logFilePath);
-        self.winston.add(self.winston.transports.File, {
-          filename: self.logFilePath,
-          json: false,
-          options: {
-            flags: 'w'
-          },
-          level: self.logLevel,
-          formatter: self.logFormatter
-        });
-      } catch (e) {
-        console.log('File logger could not be added ', e);
-      }
+    if(env.name === 'test') {
+      return;
+    }
+    try {
+      self.logFilePath = path;
+      fse.ensureFileSync(self.logFilePath);
+      self.winston.add(self.winston.transports.File, {
+        filename: self.logFilePath,
+        json: false,
+        options: {
+          flags: 'w'
+        },
+        level: self.logLevel,
+        formatter: self.logFormatter
+      });
+    } catch (e) {
+      console.error('File logger could not be added ', e);
     }
   }
 
   info(msg) {
     try {
       this.winston.info(msg);
-    } catch(e) {
-      console.log(e)
-    }
+    } catch(e) {}
   }
 
   warn(msg) {
     try {
       this.winston.warn(msg);
-    } catch(e) {
-      console.log(e)
-    }
+    } catch(e) {}
   }
 
   error(msg) {
     try {
       this.winston.error(msg);
-    } catch(e) {
-      console.log(e)
-    }
+    } catch(e) {}
   }
 
   debug(msg) {
     try {
       this.winston.debug(msg);
-    } catch(e) {
-      console.log(e)
-    }
+    } catch(e) {}
   }
 
   verbose(msg) {
     try {
       this.winston.verbose(msg);
-    } catch(e) {
-      console.log(e)
-    }
+    } catch(e) {}
   }
 
 }

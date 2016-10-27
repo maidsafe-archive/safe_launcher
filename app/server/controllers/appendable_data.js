@@ -38,6 +38,12 @@ export const create = async(req, res, next) => {
     }
     const filterType = FILTER_TYPE[payload.filterType] || FILTER_TYPE.BLACK_LIST;
     const filterKeys = payload.filterKeys || [];
+    log.debug(`Appendable data - ${req.id} :: Create for ${JSON.stringify({
+      name,
+      isPrivate,
+      filterType,
+      filterKeys
+    })}`);
     const handleId = await appendableData.create(app, name, isPrivate, filterType, filterKeys);
     log.debug(`Appendable data - ${req.id} :: Created new appendable data`);
     res.send({

@@ -150,7 +150,7 @@ class NFS extends FfiApi {
           const files = await getFiles();
           self.safeCore.directory_details_drop.async(dirDetailsHandle, (err) => {
             if (err) {
-              console.log('Error in dropping directory details handle', err);
+              log.error(`FFI :: Error in dropping directory details handle :: ${err}`);
             }
           });
           resolve({
@@ -433,7 +433,7 @@ class NFS extends FfiApi {
           self.safeCore.file_metadata_drop.async(fileMetadataHandle, (e) => {});
           resolve(metadata);
         } catch(e) {
-          console.error(e);
+          log.error(`FFI :: NFS :: Get file metadata error :: ${typeof e === 'object' ? JSON.parse(e) : e}`);
         }
       };
 
@@ -465,7 +465,7 @@ class NFS extends FfiApi {
         const data = Buffer.concat([ref.reinterpret(fileDetails.content, fileDetails.content_len)]);
         self.safeCore.file_details_drop.async(handle, (e) => {
           if (e) {
-            console.error(e);
+            log.error(`FFI :: NFS :: Drop file detail handle :: ${e}`);
           }
         });
         resolve(data);
@@ -484,7 +484,6 @@ class NFS extends FfiApi {
       }
     } catch(e) {
       log.warn(`FFI :: NFS :: Drop writer handles error :: ${typeof e === 'object' ? JSON.parse(e) : e}`);
-      console.log('Error', e);
     }
   }
 }

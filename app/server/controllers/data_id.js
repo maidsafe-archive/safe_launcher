@@ -16,7 +16,10 @@ export const getDataIdForStructuredData = async(req, res) => {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     const app = sessionInfo ? sessionInfo.app : undefined;
     log.debug(`DATA ID - ${req.id} :: Get data id for structured data :: ${ app ? 'Authorised' : 'Unauthorised' } request`);
-    log.debug(`DATA ID - ${req.id} :: Get data id for structured data for - Name :: ${req.body.name} - Type tag :: ${req.body.typeTag}`);
+    log.debug(`DATA ID - ${req.id} :: Get data id for structured data for ${JSON.stringify({
+      name: req.body.name,
+      typeTag: req.body.typeTag
+    })}`);
     const name = new Buffer(req.body.name, 'base64');
     const handleId = await dataId.getStructuredDataHandle(req.body.typeTag, name);
     responseHandler(null, {
@@ -35,7 +38,10 @@ export const getDataIdForAppendableData = async(req, res) => {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     const app = sessionInfo ? sessionInfo.app : undefined;
     log.debug(`DATA ID - ${req.id} :: Get data id for appendable data :: ${ app ? 'Authorised' : 'Unauthorised' } request`);
-    log.debug(`DATA ID - ${req.id} :: Get data id for appendable data for - Name :: ${req.body.name} - Is Private :: ${req.body.isPrivate}`);
+    log.debug(`DATA ID - ${req.id} :: Get data id for appendable data for ${JSON.stringify({
+      name: req.body.name,
+      isPrivate: req.body.isPrivate
+    })}`);
     const name = new Buffer(req.body.name, 'base64');
     const handleId = await dataId.getAppendableDataHandle(name, req.body.isPrivate);
     responseHandler(null, {

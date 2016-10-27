@@ -1,7 +1,7 @@
 'use strict';
 
 import sessionManager from '../session_manager';
-import {ResponseError, ResponseHandler, updateAppActivity, parseExpectionMsg} from '../utils';
+import { ResponseError, ResponseHandler, updateAppActivity, parseExpectionMsg } from '../utils';
 import structuredData from '../../ffi/api/structured_data';
 import cipherOpts from '../../ffi/api/cipher_opts';
 import { log } from '../../logger/log';
@@ -12,11 +12,11 @@ const NAME_LENGTH = 32;
 let PLAIN_ENCRYPTION;
 
 const getPlainEncryptionHandle = () => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async(resolve, reject) => {
     if (PLAIN_ENCRYPTION === undefined) {
       try {
         PLAIN_ENCRYPTION = await cipherOpts.getCipherOptPlain();
-      } catch(e) {
+      } catch (e) {
         reject(e);
       }
     }
@@ -29,7 +29,7 @@ const TYPE_TAG = {
   VERSIONED: 501
 };
 
-export const create = async (req, res, next) => {
+export const create = async(req, res, next) => {
   log.debug(`Structured Data - ${req.id} :: Create`);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -61,19 +61,26 @@ export const create = async (req, res, next) => {
     const cipherOptsHandle = body.cipherOpts || (await getPlainEncryptionHandle());
     const data = body.data ? new Buffer(body.data, 'base64') : null;
     const version = body.hasOwnProperty('version') ? body.version : 0;
+    log.debug(`Structured Data - ${req.id} :: Create payload - ${JSON.stringify({
+      name,
+      typeTag,
+      cipherOpts,
+      version,
+      data: data ? 'With data' : 'Without data'
+    })}`);
     const handleId = await structuredData.create(app, name, typeTag, cipherOptsHandle, data, version);
     log.debug(`Structured Data - ${req.id} :: Created new structured data`);
     res.send({
       handleId: handleId
     });
     updateAppActivity(req, res, true);
-  } catch(e) {
+  } catch (e) {
     log.warn(`Structured Data - ${req.id} :: Create error :: ${parseExpectionMsg(e)}`);
     new ResponseHandler(req, res)(e);
   }
 };
 
-export const getHandle = async (req, res) => {
+export const getHandle = async(req, res) => {
   log.debug(`Structured Data - ${req.id} :: Get handle`);
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -83,7 +90,7 @@ export const getHandle = async (req, res) => {
     const handleId = await structuredData.asStructuredData(app, req.params.dataIdHandle);
     let isOwner = false;
     if (sessionInfo) {
-     isOwner = await structuredData.isOwner(app, handleId);
+      isOwner = await structuredData.isOwner(app, handleId);
     }
     const version = await structuredData.getVersion(handleId);
     const dataVersion = await structuredData.getDataVersionsCount(handleId);
@@ -93,13 +100,13 @@ export const getHandle = async (req, res) => {
       version: version,
       dataVersionLength: dataVersion
     });
-  } catch(e) {
+  } catch (e) {
     log.warn(`Structured Data - ${req.id} :: Get handle error :: ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
 
-export const getMetadata = async (req, res) => {
+export const getMetadata = async(req, res) => {
   log.debug(`Structured Data - ${req.id} :: Get metadata`);
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -118,13 +125,13 @@ export const getMetadata = async (req, res) => {
       version: version,
       dataVersionLength: dataVersion
     });
-  } catch(e) {
+  } catch (e) {
     log.warn(`Structured Data - ${req.id} :: Get metadata error :: ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
 
-export const asDataId = async (req, res) => {
+export const asDataId = async(req, res) => {
   log.debug(`Structured Data - ${req.id} :: Handle as Data handle`);
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -136,13 +143,13 @@ export const asDataId = async (req, res) => {
     responseHandler(null, {
       handleId: dataIdHandle
     });
-  } catch(e) {
+  } catch (e) {
     log.warn(`Structured Data - ${req.id} :: Handle as Data handle error :: ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
 
-export const update = async (req, res, next) => {
+export const update = async(req, res, next) => {
   log.debug(`Structured Data - ${req.id} :: Update`);
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -158,6 +165,10 @@ export const update = async (req, res, next) => {
     }
     const cipherOptsHandle = req.body.cipherOpts || (await getPlainEncryptionHandle());
     const data = new Buffer(req.body.data, 'base64');
+    log.debug(`Structured Data - ${req.id} :: Update payload - ${JSON.stringify({
+      cipherOpts: req.body.cipherOpts,
+      data: req.body.data ? 'With data' : 'Without data'
+    })}`)
     await structuredData.update(app, req.params.handleId, cipherOptsHandle, data);
     log.debug(`Structured Data - ${req.id} :: Updated structured data`);
     responseHandler();
@@ -167,7 +178,7 @@ export const update = async (req, res, next) => {
   }
 };
 
-export const read = async (req, res) => {
+export const read = async(req, res) => {
   log.debug(`Structured Data - ${req.id} :: Read`);
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -184,7 +195,7 @@ export const read = async (req, res) => {
   }
 };
 
-export const deleteStructureData = async (req, res, next) => {
+export const deleteStructureData = async(req, res, next) => {
   log.debug(`Structured Data - ${req.id} :: Delete`);
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -204,7 +215,7 @@ export const deleteStructureData = async (req, res, next) => {
   }
 };
 
-export const post = async (req, res, next) => {
+export const post = async(req, res, next) => {
   log.debug(`Structured Data - ${req.id} :: Post`);
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -223,7 +234,7 @@ export const post = async (req, res, next) => {
   }
 };
 
-export const put = async (req, res, next) => {
+export const put = async(req, res, next) => {
   log.debug(`Structured Data - ${req.id} :: Put`);
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -242,7 +253,7 @@ export const put = async (req, res, next) => {
   }
 };
 
-export const deleteStructuredData = async (req, res, next) => {
+export const deleteStructuredData = async(req, res, next) => {
   log.debug(`Structured Data - ${req.id} :: Delete`);
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -265,7 +276,7 @@ export const deleteStructuredData = async (req, res, next) => {
   }
 };
 
-export const isSizeValid = async (req, res, next) => {
+export const isSizeValid = async(req, res, next) => {
   log.debug(`Structured Data - ${req.id} :: Check size valid`);
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -274,13 +285,13 @@ export const isSizeValid = async (req, res, next) => {
     responseHandler(null, {
       isValid: isValid
     });
-  } catch(e) {
+  } catch (e) {
     log.warn(`Structured Data - ${req.id} :: Check size valid error :: ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
 
-export const makeStructuredDataUnclaimable = async (req, res, next) => {
+export const makeStructuredDataUnclaimable = async(req, res, next) => {
   log.debug(`Structured Data - ${req.id} :: Make structured data unclimbable`);
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -303,8 +314,7 @@ export const makeStructuredDataUnclaimable = async (req, res, next) => {
   }
 };
 
-
-export const dropHandle = async (req, res) => {
+export const dropHandle = async(req, res) => {
   log.debug(`Structured Data - ${req.id} :: Drop handle`);
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -318,7 +328,7 @@ export const dropHandle = async (req, res) => {
   }
 };
 
-export const serialise = async (req, res) => {
+export const serialise = async(req, res) => {
   log.debug(`Structured Data - ${req.id} :: Serialise`);
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -333,7 +343,7 @@ export const serialise = async (req, res) => {
   }
 };
 
-export const deserialise = async (req, res) => {
+export const deserialise = async(req, res) => {
   log.debug(`Structured Data - ${req.id} :: Deserialise`);
   const responseHandler = new ResponseHandler(req, res);
   try {
