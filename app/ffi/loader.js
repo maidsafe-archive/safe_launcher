@@ -17,11 +17,12 @@ import structuredData from './api/structured_data';
 import appendableData from './api/appendable_data';
 import appManager from './util/app_manager';
 import sessionManager from './util/session_manager';
+import { log } from '../logger/log';
 
 let ffiFunctions = {};
 // add modules in the order of invoking the drop function
 let mods = [nfs, appManager, sessionManager, auth, dns, immutableData,
-   structuredData, appendableData, misc, dataId, cipherOpts];
+  structuredData, appendableData, misc, dataId, cipherOpts];
 
 mods.forEach(mod => {
   if (!(mod instanceof FfiApi)) {
@@ -34,28 +35,33 @@ mods.forEach(mod => {
   ffiFunctions = Object.assign({}, ffiFunctions, functionsToRegister);
 });
 
-export const loadLibrary = (ffiDirPath) => {
+export const loadLibrary = async (ffiDirPath) => {
   let libPath = ffiDirPath;
   if (!libPath) {
     libPath = (!remote || !remote.getGlobal('args').isProduction) ?
       path.resolve(process.cwd(), 'app', 'ffi') : (remote.app.getAppPath() + '.unpacked/dist');
   }
-  libPath =  path.resolve(libPath, (os.platform() === 'win32') ? 'safe_core' : 'libsafe_core');
+  libPath = path.resolve(libPath, (os.platform() === 'win32') ? 'safe_core' : 'libsafe_core');
   console.log('Library loaded from - ', libPath);
   const safeCore = ffi.Library(libPath, ffiFunctions);
   safeCore.init_logging();
   mods.forEach(mod => {
     if (!(mod instanceof FfiApi)) {
-      debugger;
       return;
     }
     mod.setSafeCore(safeCore);
   });
 };
 
+export const setFileLoggerPath = () => {
+  return misc.getLogFilePath().then(logPath => {
+    log.setFileLogger(logPath);
+  });
+};
+
 export const cleanup = () => {
   let promise;
-  const executor = async (mod) => {
+  const executor = async(mod) => {
     try {
       promise = mod.drop();
       if (promise) {

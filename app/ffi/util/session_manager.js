@@ -3,8 +3,8 @@
 import FfiApi from '../ffi_api';
 import ffi from 'ffi';
 import ref from 'ref';
-
 import appManager from './app_manager';
+import { log } from '../../logger/log';
 
 const Void = ref.types.void;
 const int32 = ref.types.int32;
@@ -44,11 +44,13 @@ class SessionManager extends FfiApi {
   }
 
   getAccountInfo() {
+    log.debug('FFI :: Get account info');
     return new Promise((resolve, reject) => {
       const used = ref.alloc(u64);
       const total = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Get account info :: ${err || res}`);
           return reject(err || res);
         }
         resolve({
@@ -61,9 +63,11 @@ class SessionManager extends FfiApi {
   }
 
   getClientGetsCount() {
+    log.debug('FFI :: Get client stats - Gets count');
     return new Promise((resolve, reject) => {
       const onResult = (err, count) => {
         if (err) {
+          log.error(`FFI :: Get client stats - Gets count :: ${err}`);
           return reject(err);
         }
         resolve(count);
@@ -73,10 +77,12 @@ class SessionManager extends FfiApi {
   }
 
   getClientDeletesCount() {
+    log.debug('FFI :: Get client stats - Deleted count');
     const self = this;
     const executor = (resolve, reject) => {
       const onResult = (err, count) => {
         if (err) {
+          log.error(`FFI :: Get client stats - Deleted count :: ${err}`);
           return reject(err);
         }
         resolve(count);
@@ -87,10 +93,12 @@ class SessionManager extends FfiApi {
   }
 
   getClientPutsCount() {
+    log.debug('FFI :: Get client stats - Puts count');
     const self = this;
     const executor = (resolve, reject) => {
       const onResult = (err, count) => {
         if (err) {
+          log.error(`FFI :: Get client stats - Puts count error :: ${err}`);
           return reject(err);
         }
         resolve(count);
@@ -101,10 +109,12 @@ class SessionManager extends FfiApi {
   }
 
   getClientPostsCount() {
+    log.debug('FFI :: Get client stats - Posts count');
     const self = this;
     const executor = (resolve, reject) => {
       const onResult = (err, count) => {
         if (err) {
+          log.error(`FFI :: Get client stats - Posts count :: ${err}`);
           return reject(err);
         }
         resolve(count);
@@ -121,12 +131,13 @@ class SessionManager extends FfiApi {
   };
 
   set sessionHandle(handle) {
-    (async () => {
+    log.debug('FFI :: Set session handle');
+    (async() => {
       if (this.handle) {
         await appManager.revokeAnonymousApp();
         await this.dropSessionHandle();
       }
-      const onStateChange = ffi.Callback(Void, [ int32 ], (state) => {
+      const onStateChange = ffi.Callback(Void, [int32], (state) => {
         if (this.stateChangeListener) {
           this.stateChangeListener(state);
         }
@@ -143,10 +154,12 @@ class SessionManager extends FfiApi {
   }
 
   dropSessionHandle() {
+    log.debug('FFI :: Drop session handle');
     const self = this;
     const executor = (resolve, reject) => {
       self.safeCore.drop_session.async(self.handle, (err) => {
         if (err) {
+          log.error(`FFI :: Drop session handle :: ${err}`);
           return reject(err);
         }
         resolve();

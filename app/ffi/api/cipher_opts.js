@@ -1,6 +1,7 @@
 import ref from 'ref';
 
 import FfiApi from '../ffi_api';
+import { log } from '../../logger/log';
 
 const int32 = ref.types.int32;
 const u64 = ref.types.uint64;
@@ -26,6 +27,7 @@ class CipherOpts extends FfiApi {
       let handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Cipher Opts :: Get plain handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve(handleRef.deref());
@@ -39,6 +41,7 @@ class CipherOpts extends FfiApi {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Cipher Opts :: Get symmetric handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve(handleRef.deref());
@@ -52,6 +55,7 @@ class CipherOpts extends FfiApi {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Cipher Opts :: Get asymmetric handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve(handleRef.deref());
@@ -64,6 +68,7 @@ class CipherOpts extends FfiApi {
     return new Promise((resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Cipher Opts :: Drop handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
