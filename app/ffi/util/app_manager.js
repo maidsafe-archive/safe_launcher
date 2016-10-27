@@ -117,7 +117,7 @@ class AppManager extends FfiApi {
           self.anonymousApp = handle;
           resolve(app);
         } catch (e) {
-          log.warn(`FFI :: Create unregistered app error :: ${typeof e === 'object' ? JSON.parse(e) : e}`);
+          log.warn(`FFI :: Create unregistered app :: Caught exception - ${typeof e === 'object' ? JSON.parse(e) : e}`);
         }
       };
 
@@ -136,7 +136,7 @@ class AppManager extends FfiApi {
         }
         resolve();
       } catch (e) {
-        log.warn(`FFI :: Drop application handle error :: ${typeof e === 'object' ? JSON.parse(e) : e}`);
+        log.warn(`FFI :: Drop application handle :: Caught exception - ${typeof e === 'object' ? JSON.parse(e) : e}`);
         reject(e);
       }
     };

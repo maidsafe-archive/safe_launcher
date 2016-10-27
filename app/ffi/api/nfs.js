@@ -483,7 +483,7 @@ class NFS extends FfiApi {
         await this.closeWriter(key);
       }
     } catch(e) {
-      log.warn(`FFI :: NFS :: Drop writer handles error :: ${typeof e === 'object' ? JSON.parse(e) : e}`);
+      log.warn(`FFI :: NFS :: Drop writer handle :: Caught exception - ${typeof e === 'object' ? JSON.parse(e) : e}`);
     }
   }
 }

@@ -2,7 +2,7 @@ import { remote } from 'electron';
 
 import env from './env';
 import UIUtils from './ui_utils';
-import { loadLibrary } from './ffi/loader';
+import { loadLibrary, setFileLoggerPath } from './ffi/loader';
 import sessionManager from './ffi/util/session_manager';
 import auth from './ffi/api/auth';
 import RESTServer from './server/boot';
@@ -45,10 +45,11 @@ const networkStateListener = (state) => {
   }
 };
 
-const load = async (eventRegistry) => {
+const run = async (eventRegistry) => {
   try {
     window.msl = new UIUtils(remote, restServer);
-    await loadLibrary();
+    loadLibrary();
+    await setFileLoggerPath();
     eventRegistry.run();
     sessionManager.onNetworkStateChange(networkStateListener);
     auth.getUnregisteredSession().then(() => {}, () => {
@@ -70,4 +71,4 @@ window.document.addEventListener('dragover', (e) => {
   e.stopPropagation();
 });
 
-export default load;
+export default run;

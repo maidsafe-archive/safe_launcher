@@ -27,7 +27,7 @@ class CipherOpts extends FfiApi {
       let handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
-          log.error(`FFI :: Cipher Opts :: Get cipher opt plain :: ${err || res}`);
+          log.error(`FFI :: Cipher Opts :: Get plain handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve(handleRef.deref());
@@ -41,7 +41,7 @@ class CipherOpts extends FfiApi {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
-          log.error(`FFI :: Cipher Opts :: Get cipher opt symmetric :: ${err || res}`);
+          log.error(`FFI :: Cipher Opts :: Get symmetric handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve(handleRef.deref());
@@ -55,7 +55,7 @@ class CipherOpts extends FfiApi {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
-          log.error(`FFI :: Cipher Opts :: Get cipher opt asymmetric :: ${err || res}`);
+          log.error(`FFI :: Cipher Opts :: Get asymmetric handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve(handleRef.deref());

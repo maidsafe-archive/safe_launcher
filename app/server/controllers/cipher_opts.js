@@ -40,11 +40,12 @@ export const getHandle = async(req, res, next) => {
         handle = await cypherOpts.getCipherOptAsymmetric(req.params.keyHandle);
         break;
     }
+    log.debug(`Cipher opts - ${req.id} :: Handle obtained`);
     responseHandler(null, {
       handleId: handle
     });
   } catch (e) {
-    log.warn(`Cipher opts - ${req.id} :: Get handle error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Cipher opts - ${req.id} :: Get handle :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -54,10 +55,10 @@ export const dropHandle = async(req, res) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     await cypherOpts.dropHandle(req.params.handleId);
-    log.debug(`Cipher opts - ${req.id} :: Dropped handle id`);
+    log.debug(`Cipher opts - ${req.id} :: Handle dropped`);
     responseHandler();
   } catch (e) {
-    log.warn(`Cipher opts - ${req.id} :: Drop handle error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Cipher opts - ${req.id} :: Drop handle :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };

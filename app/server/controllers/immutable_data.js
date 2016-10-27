@@ -33,15 +33,15 @@ export const getReaderHandle = async (req, res, next) => {
     const app = sessionInfo ? sessionInfo.app : null;
     log.debug(`Immutable data - ${req.id} :: Get reader handle :: ${ app ? 'Authorised' : 'Unauthorised' } request`);
     const readerHandle = await immutableData.getReaderHandle(app, req.params.handleId);
-    log.debug(`Immutable data - ${req.id} :: Get reader handle id`);
+    log.debug(`Immutable data - ${req.id} :: Reader handle obtained`);
     const size = await immutableData.getReaderSize(readerHandle);
-    log.debug(`Immutable data - ${req.id} :: Get reader handle size`);
+    log.debug(`Immutable data - ${req.id} :: Reader handle size obtained`);
     responseHandler(null, {
       handleId: readerHandle,
       size: size
     });
   } catch(e) {
-    log.warn(`Immutable data - ${req.id} :: Get reader handle error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Immutable data - ${req.id} :: Get reader handle :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -61,12 +61,12 @@ export const getWriterHandle = async (req, res, next) => {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     const writerHandle = await immutableData.getWriterHandle(app);
-    log.debug(`Immutable data - ${req.id} :: Got writer handle`);
+    log.debug(`Immutable data - ${req.id} :: Writer handle obtained`);
     responseHandler(null, {
       handleId: writerHandle
     });
   } catch(e) {
-    log.warn(`Immutable data - ${req.id} :: Get writer handle error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Immutable data - ${req.id} :: Get writer handle :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -99,7 +99,7 @@ export const write = async (req, res, next) => {
     });
     req.pipe(writer);
   } catch(e) {
-    log.warn(`Immutable data - ${req.id} :: Write Immutable data error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Immutable data - ${req.id} :: Write Immutable data :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -113,7 +113,7 @@ export const read = async (req, res, next) => {
     let app = sessionInfo ? sessionInfo.app : null;
     log.debug(`Immutable data - ${req.id} :: Read Immutable data :: ${app ? 'Authorised' : 'Unauthorised'} request`);
     const size = await immutableData.getReaderSize(handleId);
-    log.debug(`Immutable data - ${req.id} :: Got reader size`);
+    log.debug(`Immutable data - ${req.id} :: Reader size obtained`);
     let range = req.get('range');
     let positions = [ 0 ];
     if (range) {
@@ -151,7 +151,7 @@ export const read = async (req, res, next) => {
     const reader = new ImmutableDataReader(req, res, handleId, start, end);
     reader.pipe(res);
   } catch(e) {
-    log.warn(`Immutable data - ${req.id} :: Read Immutable data error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Immutable data - ${req.id} :: Read Immutable data :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -173,11 +173,12 @@ export const closeWriter = async (req, res, next) => {
     let cipherOptsHandle = isNaN(req.params.cipherOptsHandle) ? (await getPlainEncryptionHandle()) :
       req.params.cipherOptsHandle;
     const dataIdHandle = await immutableData.closeWriter(app, req.params.handleId, cipherOptsHandle);
+    log.debug(`Immutable data - ${req.id} :: Writer closed`);
     responseHandler(null, {
       handleId: dataIdHandle
     });
   } catch(e) {
-    log.warn(`Immutable data - ${req.id} :: Close writer error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Immutable data - ${req.id} :: Close writer :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -190,9 +191,10 @@ export const dropReader = async (req, res) => {
     const app = sessionInfo ? sessionInfo.app : null;
     log.debug(`Immutable data - ${req.id} :: Drop reader handle :: ${app ? 'Authorised' : 'Unauthorised'} request`);
     await immutableData.dropReader(req.params.handleId);
+    log.debug(`Immutable data - ${req.id} :: Reader handle dropped`);
     responseHandler();
   } catch(e) {
-    log.warn(`Immutable data - ${req.id} :: Drop reader handle error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Immutable data - ${req.id} :: Drop reader handle :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -212,9 +214,10 @@ export const dropWriter = async (req, res, next) => {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     await immutableData.dropWriterHandle(req.params.handleId);
+    log.debug(`Immutable data - ${req.id} :: Writer handle dropped`);
     responseHandler();
   } catch(e) {
-    log.warn(`Immutable data - ${req.id} :: Drop writer handle error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Immutable data - ${req.id} :: Drop writer handle :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };

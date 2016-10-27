@@ -45,13 +45,13 @@ export const create = async(req, res, next) => {
       filterKeys
     })}`);
     const handleId = await appendableData.create(app, name, isPrivate, filterType, filterKeys);
-    log.debug(`Appendable data - ${req.id} :: Created new appendable data`);
+    log.debug(`Appendable data - ${req.id} :: Created`);
     res.send({
       handleId: handleId
     });
     updateAppActivity(req, res, true);
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Create error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Create :: Caught exception - ${parseExpectionMsg(e)}`);
     new ResponseHandler(req, res)(e);
   }
 };
@@ -72,9 +72,10 @@ export const post = async(req, res, next) => {
     }
     const handleId = req.params.handleId;
     await appendableData.save(app, handleId, true);
+    log.debug(`Appendable data - ${req.id} :: Post successful`);
     responseHandler();
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Post error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Post :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -95,9 +96,10 @@ export const put = async(req, res, next) => {
     }
     const handleId = req.params.handleId;
     await appendableData.save(app, handleId, false);
+    log.debug(`Appendable data - ${req.id} :: Put successful`);
     responseHandler();
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Put error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Put :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -128,10 +130,10 @@ export const getHandle = async(req, res) => {
       dataLength: dataLength,
       deletedDataLength: deletedDataLength
     });
-    log.debug(`Appendable data - ${req.id} :: Got appendable data handle`);
+    log.debug(`Appendable data - ${req.id} :: Handle obtained`);
     updateAppActivity(req, res, true);
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Get handle error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Get handle :: Caught exception - ${parseExpectionMsg(e)}`);
     new ResponseHandler(req, res)(e);
   }
 };
@@ -165,10 +167,10 @@ export const getMetadata = async(req, res) => {
       dataLength: dataLength,
       deletedDataLength: deletedDataLength
     };
-    log.debug(`Appendable data - ${req.id} :: Got appendable data metadata`);
+    log.debug(`Appendable data - ${req.id} :: Metadata obtained`);
     responseHandler(null, metadata);
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Get metadata error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Get metadata :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -178,26 +180,27 @@ export const isSizeValid = async(req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const isValid = await appendableData.isSizeValid(req.params.handleId);
-    log.debug(`Appendable data - ${req.id} :: Check size valid :: isValid - ${isValid}`);
+    log.debug(`Appendable data - ${req.id} :: Size validated`);
     responseHandler(null, {
       isValid: isValid
     });
   } catch (e) {
+    log.warn(`Appendable data - ${req.id} :: Check size valid :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
 
 export const getDataIdHandle = async(req, res) => {
-  log.debug(`Appendable data - ${req.id} :: Get Data ID handle`);
+  log.debug(`Appendable data - ${req.id} :: Get Data Id handle`);
   const responseHandler = new ResponseHandler(req, res);
   try {
     const handleId = await appendableData.asDataId(req.params.handleId);
-    log.debug(`Appendable data - ${req.id} :: Got Data ID handle`);
+    log.debug(`Appendable data - ${req.id} :: Data Id handle obtained`);
     responseHandler(null, {
       handleId: handleId
     });
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Get Data ID handle error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Get Data Id handle :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -216,12 +219,12 @@ export const getEncryptKey = async(req, res, next) => {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     const encryptKeyHandle = await appendableData.getEncryptKey(req.params.handleId);
-    log.debug(`Appendable data - ${req.id} :: Got encrypt key handle`);
+    log.debug(`Appendable data - ${req.id} :: Encrypt key handle obtained`);
     responseHandler(null, {
       handleId: encryptKeyHandle
     });
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Get encrypt key handle error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Get encrypt key handle :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -241,12 +244,12 @@ const getSignKey = async(req, res, next, fromDeleted) => {
     }
     const app = sessionInfo.app;
     const signingKeyHandle = await appendableData.getSigningKey(app, req.params.handleId, req.params.index, fromDeleted);
-    log.debug(`Appendable data - ${req.id} :: Got sign key handle ${fromDeleted ? 'from deleted data' : ''}`);
+    log.debug(`Appendable data - ${req.id} :: Sign key handle ${fromDeleted ? 'from deleted data' : ''} obtained`);
     responseHandler(null, {
       handleId: signingKeyHandle
     });
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Get sign key handle ${fromDeleted ? 'from deleted data' : ''} error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Get sign key handle ${fromDeleted ? 'from deleted data' : ''} :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -274,10 +277,10 @@ export const append = async(req, res, next) => {
     }
     const app = sessionInfo.app;
     await appendableData.append(app, req.params.handleId, req.params.dataIdHandle);
-    log.debug(`Appendable data - ${req.id} :: Appended data to Appendable data`);
+    log.debug(`Appendable data - ${req.id} :: Data Appended`);
     responseHandler();
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Append error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Append :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -290,12 +293,12 @@ const dataIdAt = async(req, res, fromDeleted) => {
     const app = sessionInfo ? sessionInfo.app : null;
     log.debug(`Appendable data - ${req.id} :: Get Data ${ fromDeleted ? 'from deleted data' : '' } at index :: ${ app ? 'Authorised' : 'Unauthorised'} request`);
     const handleId = await appendableData.getDataId(app, req.params.handleId, req.params.index, fromDeleted);
-    log.debug(`Appendable data - ${req.id} :: Got Data ${ fromDeleted ? 'from deleted data' : '' } at index - ${req.params.index}`);
+    log.debug(`Appendable data - ${req.id} :: Data ${ fromDeleted ? 'from deleted data' : '' } at index - ${req.params.index} obtained`);
     responseHandler(null, {
       handleId: handleId
     });
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Get Data ${ fromDeleted ? 'from deleted data' : '' } at index error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Get Data ${ fromDeleted ? 'from deleted data' : '' } at index :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -322,10 +325,10 @@ export const toggleFilter = async(req, res, next) => {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     await appendableData.toggleFilter(req.params.handleId);
-    log.debug(`Appendable data - ${req.id} :: Toggled filter`);
+    log.debug(`Appendable data - ${req.id} :: Filter toggled`);
     responseHandler();
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Toggled filter error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Toggle filter :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -350,7 +353,7 @@ export const addToFilter = async(req, res, next) => {
     log.debug(`Appendable data - ${req.id} :: Added ${keys.length} keys to filter`);
     responseHandler();
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Add to filter error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Add to filter :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -375,7 +378,7 @@ export const removeFromFilter = async(req, res, next) => {
     log.debug(`Appendable data - ${req.id} :: Removed ${keys.length} keys from filter`);
     responseHandler();
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Remove from filter error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Remove from filter :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -394,56 +397,56 @@ export const getSignKeyFromFilter = async(req, res, next) => {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     const signKeyHandle = await appendableData.getSignKeyFromFilter(req.params.handleId, req.params.index);
-    log.debug(`Appendable data - ${req.id} :: Got sign key from filter at index - ${req.params.index}`);
+    log.debug(`Appendable data - ${req.id} :: Sign key from filter at index - ${req.params.index} obtained`);
     responseHandler(null, {
       handleId: signKeyHandle
     });
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Get sign key from filter error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Get sign key from filter :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
 
 export const remove = async(req, res, next) => {
-  log.debug(`Appendable data - ${req.id} :: Remove at`);
+  log.debug(`Appendable data - ${req.id} :: Remove data at index`);
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     if (!sessionInfo) {
-      log.error(`Appendable data - ${req.id} :: Remove at :: Unauthorised request`);
+      log.error(`Appendable data - ${req.id} :: Remove data at index :: Unauthorised request`);
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
     if (!sessionInfo.app.permission.lowLevelApi) {
-      log.error(`Appendable data - ${req.id} :: Remove at :: Low level access not granted`);
+      log.error(`Appendable data - ${req.id} :: Remove data at index :: Low level access not granted`);
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     await appendableData.removeDataAt(req.params.handleId, req.params.index, false);
-    log.debug(`Appendable data - ${req.id} :: Removed at index - ${req.params.index}`);
+    log.debug(`Appendable data - ${req.id} :: Removed data at index - ${req.params.index}`);
     responseHandler();
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Remove at - error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Remove data at index :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
 
 export const removeDeletedData = async(req, res, next) => {
-  log.debug(`Appendable data - ${req.id} :: Remove deleted data at`);
+  log.debug(`Appendable data - ${req.id} :: Remove deleted data at index`);
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     if (!sessionInfo) {
-      log.error(`Appendable data - ${req.id} :: Remove deleted data at :: Unauthorised request`);
+      log.error(`Appendable data - ${req.id} :: Remove deleted data at index :: Unauthorised request`);
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
     if (!sessionInfo.app.permission.lowLevelApi) {
-      log.error(`Appendable data - ${req.id} :: Remove deleted data at :: Low level access not granted`);
+      log.error(`Appendable data - ${req.id} :: Remove deleted data at index :: Low level access not granted`);
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     await appendableData.removeDataAt(req.params.handleId, req.params.index, true);
     log.debug(`Appendable data - ${req.id} :: Removed deleted data at index - ${req.params.index}`);
     responseHandler();
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Remove deleted data at - error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Remove deleted data at index :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -462,10 +465,10 @@ export const clearData = async(req, res, next) => {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     await appendableData.clearAll(req.params.handleId, false);
-    log.debug(`Appendable data - ${req.id} :: Cleared data`);
+    log.debug(`Appendable data - ${req.id} :: Data cleared`);
     responseHandler();
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Clear data error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Clear data :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -484,10 +487,10 @@ export const clearDeletedData = async(req, res, next) => {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     await appendableData.clearAll(req.params.handleId, true);
-    log.debug(`Appendable data - ${req.id} :: Cleared deleted data`);
+    log.debug(`Appendable data - ${req.id} :: Deleted data cleared`);
     responseHandler();
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Clear deleted data error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Clear deleted data :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -506,10 +509,10 @@ export const dropEncryptKeyHandle = async(req, res, next) => {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     await misc.dropEncryptKeyHandle(req.params.handleId);
-    log.debug(`Appendable data - ${req.id} :: Dropped encrypt key handle`);
+    log.debug(`Appendable data - ${req.id} :: Encrypt key handle dropped`);
     responseHandler();
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Drop encrypt key handle error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Drop encrypt key handle :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -528,10 +531,10 @@ export const dropSigningKeyHandle = async(req, res, next) => {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     await misc.dropSignKeyHandle(req.params.handleId);
-    log.debug(`Appendable data - ${req.id} :: Dropped signing key handle`);
+    log.debug(`Appendable data - ${req.id} :: Signing key handle dropped`);
     responseHandler();
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Drop signing key handle error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Drop signing key handle :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -550,35 +553,35 @@ export const deleteAppendableData = async(req, res) => {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     await appendableData.delete(sessionInfo.app, req.params.handleId);
-    log.debug(`Appendable data - ${req.id} :: Deleted appendable data`);
+    log.debug(`Appendable data - ${req.id} :: Deleted`);
     responseHandler();
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Delete error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Delete :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
 
 export const restore = async(req, res, next) => {
-  log.debug(`Appendable data - ${req.id} :: Restore`);
+  log.debug(`Appendable data - ${req.id} :: Restore data at index`);
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     if (!sessionInfo) {
-      log.error(`Appendable data - ${req.id} :: Restore :: Unauthorised request`);
+      log.error(`Appendable data - ${req.id} :: Restore data at index :: Unauthorised request`);
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
     if (!sessionInfo.app.permission.lowLevelApi) {
-      log.error(`Appendable data - ${req.id} :: Restore :: Low level access not granted`);
+      log.error(`Appendable data - ${req.id} :: Restore data at index :: Low level access not granted`);
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     if (isNaN(req.params.index)) {
       return next(new ResponseError(400, 'index must be a valid number'));
     }
     await appendableData.restore(req.params.handleId, parseInt(req.params.index));
-    log.debug(`Appendable data - ${req.id} :: Restored appendable data at index - ${req.params.index}`);
+    log.debug(`Appendable data - ${req.id} :: Data restored at index - ${req.params.index}`);
     responseHandler();
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Restored error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Restored :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -596,11 +599,11 @@ export const serialise = async(req, res, next) => {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     const data = await appendableData.serialise(req.params.handleId);
-    log.debug(`Appendable data - ${req.id} :: Serialised appendable data handle`);
+    log.debug(`Appendable data - ${req.id} :: Serialised`);
     res.send(data);
     updateAppActivity(req, res, true);
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Serialise error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Serialise :: Caught exception - ${parseExpectionMsg(e)}`);
     new ResponseHandler(req, res)(e);
   }
 };
@@ -618,7 +621,7 @@ export const deserialise = async(req, res) => {
     const filterType = await appendableData.getFilterType(handleId);
     const dataLength = await appendableData.getLength(handleId, false);
     const deletedDataLength = await appendableData.getLength(handleId, true);
-    log.debug(`Appendable data - ${req.id} :: Deserialised appendable data handle`);
+    log.debug(`Appendable data - ${req.id} :: Deserialised`);
     responseHandler(null, {
       handleId: handleId,
       isOwner: isOwner,
@@ -628,7 +631,7 @@ export const deserialise = async(req, res) => {
       deletedDataLength: deletedDataLength
     });
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Deserialise error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Deserialise :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -647,10 +650,10 @@ export const serialiseSignKey = async(req, res, next) => {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     const data = await misc.serialiseSignKey(req.params.handleId);
-    log.debug(`Appendable data - ${req.id} :: Serialised sign key appendable data handle`);
+    log.debug(`Appendable data - ${req.id} :: Serialised sign key`);
     responseHandler(null, data);
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Serialise sign key error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Serialise sign key :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -669,12 +672,12 @@ export const deserialiseSignKey = async(req, res, next) => {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     const handleId = await misc.deserialiseSignKey(req.rawBody);
-    log.debug(`Appendable data - ${req.id} :: Deserialised sign key appendable data handle`);
+    log.debug(`Appendable data - ${req.id} :: Deserialised sign key`);
     responseHandler(null, {
       handleId
     });
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Deserialise sign key error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Deserialise sign key :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };
@@ -684,10 +687,10 @@ export const dropHandle = async(req, res) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     await appendableData.dropHandle(req.params.handleId);
-    log.debug(`Appendable data - ${req.id} :: Dropped handle`);
+    log.debug(`Appendable data - ${req.id} :: Handle dropped`);
     responseHandler();
   } catch (e) {
-    log.warn(`Appendable data - ${req.id} :: Drop handle error :: ${parseExpectionMsg(e)}`);
+    log.warn(`Appendable data - ${req.id} :: Drop handle :: Caught exception - ${parseExpectionMsg(e)}`);
     responseHandler(e);
   }
 };

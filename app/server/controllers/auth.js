@@ -58,7 +58,7 @@ export let CreateSession = async (data) => {
         permissions: permissions.list
       });
     } catch (e) {
-      log.warn(`Auth :: ${req.id} :: Create Session error :: ${parseExpectionMsg(e)}`);
+      log.warn(`Auth :: ${req.id} :: Create Session :: Caught exception - ${parseExpectionMsg(e)}`);
       emitSessionCreationFailed();
       req.next(new ResponseError(500, e.message));
     }
@@ -68,7 +68,7 @@ export let CreateSession = async (data) => {
     await appManager.registerApp(app);
     onRegistered(app);
   } catch(e) {
-    log.warn(`Auth :: ${req.id} :: Register App :: ${parseExpectionMsg(e)}`);
+    log.warn(`Auth :: ${req.id} :: Register App :: Caught exception - ${parseExpectionMsg(e)}`);
     emitSessionCreationFailed();
     return req.next(new ResponseError(500, e));
   }
@@ -98,7 +98,7 @@ export var authorise = function(req, res, next) {
     log.debug(`Auth :: ${req.id} :: Authorisation request - Invalid permissions requested`);
     return next(new ResponseError(400, 'Invalid permissions requested'));
   }
-  log.debug(`Auth :: ${req.id} :: Authorisation request for ${JSON.stringify(authReq)}`);
+  log.debug(`Auth :: ${req.id} :: Requesting authorisation for ${JSON.stringify(authReq)}`);
   const payload = {
     payload: authReq,
     request: req,
@@ -127,9 +127,9 @@ export var revoke = function(req, res, next) {
 export var isTokenValid = function(req, res, next) {
   log.debug(`Auth :: ${req.id} :: Check authorisation token valid`);
   if (!req.headers.sessionId) {
-    log.debug(`Auth :: ${req.id} :: Return authorisation token invalid`);
+    log.debug(`Auth :: ${req.id} :: Authorisation token invalid`);
     return next(new ResponseError(401));
   }
-  log.debug(`Auth :: ${req.id} :: Return authorisation token valid`);
+  log.debug(`Auth :: ${req.id} :: Authorisation token valid`);
   return new ResponseHandler(req, res)();
 };

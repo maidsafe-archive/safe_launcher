@@ -216,7 +216,7 @@ class DNS extends FfiApi {
           this.safeCore.file_metadata_drop.async(fileMetadataHandle, (e) => {});
           resolve(metadata);
         } catch(e) {
-          log.warn(`FFI :: DNS :: Get file metadata error :: ${typeof e === 'object' ? JSON.parse(e) : e}`);
+          log.warn(`FFI :: DNS :: Get file metadata :: Caught exception - ${typeof e === 'object' ? JSON.parse(e) : e}`);
         }
       };
       const longNameBuffer = new Buffer(longName);
