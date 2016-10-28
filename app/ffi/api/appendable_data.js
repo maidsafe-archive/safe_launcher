@@ -18,7 +18,7 @@ const u64Pointer = ref.refType(u64);
 const boolPointer = ref.refType(bool);
 const size_tPointer = ref.refType(size_t);
 
-const Ffi_FilterType = new Enum([ 'BlackList', 'WhiteList' ]);
+const Ffi_FilterType = new Enum({ 'BlackList': 0, 'WhiteList': 1 });
 
 const filterTypePointer = ref.refType(Ffi_FilterType);
 
@@ -180,7 +180,7 @@ class AppendableData extends FfiApi {
         if (err || res !== 0) {
           return reject(err || res);
         }
-        resolve(filterTypeRef.deref());
+        resolve(Ffi_FilterType.get(filterTypeRef.deref().key));
       };
       this.safeCore.appendable_data_filter_type.async(handleId, filterTypeRef, onResult);
     });
