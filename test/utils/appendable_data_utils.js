@@ -49,7 +49,7 @@ class AppendabelDataUtils extends Utils {
     return this.sendRequest(this.HTTP_METHOD.GET, url, token, config);
   }
 
-  getSigningKey(token, handleId, index, config) {
+  getSignKeyAt(token, handleId, index, config) {
     const url = `${CONSTANTS.API.APPEND}sign-key/${handleId}/${index}`;
     return this.sendRequest(this.HTTP_METHOD.GET, url, token, config);
   }
@@ -150,6 +150,11 @@ class AppendabelDataUtils extends Utils {
   post(token, handleId, config) {
     const url = `${CONSTANTS.API.APPEND}${handleId}`;
     return this.sendRequest(this.HTTP_METHOD.POST, url, token, null, config);
+  }
+
+  getSignKey(token, config) {
+    const url = `${CONSTANTS.API.SIGN_KEY}`;
+    return this.sendRequest(this.HTTP_METHOD.GET, url, token, config);
   }
 }
 

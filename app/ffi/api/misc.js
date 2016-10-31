@@ -1,6 +1,7 @@
 import ref from 'ref';
 
 import FfiApi from '../ffi_api';
+import appManager from '../util/app_manager';
 
 const Void = ref.types.void;
 const int32 = ref.types.int32;
@@ -13,6 +14,7 @@ const u8Pointer = ref.refType(u8);
 const u64Pointer = ref.refType(u64);
 const int32Ptr = ref.refType(int32);
 const size_tPointer = ref.refType(size_t);
+const AppHandle = ref.refType(Void);
 
 const PointerToU8Pointer = ref.refType(u8Pointer);
 
@@ -35,6 +37,7 @@ class Misc extends FfiApi {
       'misc_deserialise_struct_data': [int32, [u8Pointer, size_t, u64Pointer]],
       'misc_serialise_sign_key': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
       'misc_deserialise_sign_key': [int32, [u8Pointer, size_t, u64Pointer]],
+      'misc_maid_sign_key': [int32, [AppHandle, u64Pointer]],
       'misc_u8_ptr_free': [Void, [u8Pointer, size_t, size_t]],
       'output_log_path': [ 'pointer', [ CString, u64, int32Ptr, int32Ptr, int32Ptr ] ]
     };
@@ -208,6 +211,26 @@ class Misc extends FfiApi {
 
   deserialiseSignKey(data) {
     return this._deserialise(data, 3);
+  }
+
+  getSignKey(app) {
+    const self = this;
+    const executor = (resolve, reject) => {
+      const handleRef = ref.alloc(u64);
+      const onResult = (err, res) => {
+        if (err || res !== 0) {
+          return reject(err || res);
+        }
+        resolve(handleRef.deref());
+      };
+
+      try {
+        self.safeCore.misc_maid_sign_key.async(appManager.getHandle(app), handleRef, onResult);
+      } catch (e) {
+        reject(e);
+      }
+    };
+    return new Promise(executor)
   }
 }
 

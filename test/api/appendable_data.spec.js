@@ -5,6 +5,7 @@ import structUtils from '../utils/structured_data_utils';
 import dataIdUtils from '../utils/data_id_utils';
 import signKeyUtils from '../utils/sign_key_utils';
 import authUtils from '../utils/auth_utils';
+import { FILTER_TYPE } from '../../app/ffi/model/enum';
 import { CONSTANTS, MESSAGES } from '../constants';
 
 describe('Appendable data', () => {
@@ -12,6 +13,8 @@ describe('Appendable data', () => {
   const SD_CONTENT = new Buffer('test structured data').toString('base64');
   let authToken = null;
   let adHandleId = null;
+
+  const getName = () => crypto.randomBytes(32).toString('base64');
 
   const createSD = () => {
     let sdHandleId = null;
@@ -26,10 +29,10 @@ describe('Appendable data', () => {
       .then(() => dataIdhandle);
   };
 
-  const readSD = (dataIdhandle) => {
+  const readSD = (dataIdHandle) => {
     let handleId = null;
     let data = null;
-    return structUtils.getHandle(authToken, dataIdhandle)
+    return structUtils.getHandle(authToken, dataIdHandle)
       .then(res => (handleId = res.data.handleId))
       .then(() => structUtils.read(authToken, handleId))
       .then(res => (data = res.data))
@@ -64,10 +67,11 @@ describe('Appendable data', () => {
     authUtils.registerAndAuthorise(CONSTANTS.AUTH_PAYLOAD_LOW_LEVEL_API)
       .then(token => (authToken = token))
   ));
+
   after(() => authUtils.revokeApp(authToken));
 
   describe('Create, Append and Read Appendable data', () => {
-    const AD_NAME = crypto.randomBytes(32).toString('base64');
+    const AD_NAME = getName();
     const sdDataHandles = [];
 
     after(() => (
@@ -95,6 +99,12 @@ describe('Appendable data', () => {
           should(err.response.status).be.equal(401);
           should(err.response.data.errorCode).be.equal(400);
         })
+        .then(() => adUtils.getSignKey(null))
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(401);
+          should(err.response.data.errorCode).be.equal(400);
+        })
     ));
 
     it('Should return 403 if low Level API Access is not provided', () => {
@@ -116,6 +126,13 @@ describe('Appendable data', () => {
           should(err.response.data.description).be.equal(MESSAGES.LOW_LEVEL_API_ACCESS_NOT_GRANTED);
         })
         .then(() => adUtils.append(authTokenWithoutAccess))
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(403);
+          should(err.response.data.errorCode).be.equal(400);
+          should(err.response.data.description).be.equal(MESSAGES.LOW_LEVEL_API_ACCESS_NOT_GRANTED);
+        })
+        .then(() => adUtils.getSignKey(authTokenWithoutAccess))
         .should.be.rejectedWith(Error)
         .then(err => {
           should(err.response.status).be.equal(403);
@@ -261,16 +278,7 @@ describe('Appendable data', () => {
         .then(handleId => sdDataHandles.push(handleId))
         .then(() => adUtils.append(authToken, adHandleId, sdDataHandles[2]))
         .should.be.fulfilled()
-        .then(() => adUtils.dropHandle(authToken, adHandleId))
-        .should.be.fulfilled()
-        .then(() => dataIdUtils.getDataIdForAppendableData(authToken, AD_NAME))
-        .should.be.fulfilled()
-        .then(res => (dataIdHandle = res.data.handleId))
-        .then(() => adUtils.getHandle(authToken, dataIdHandle))
-        .should.be.fulfilled()
-        .then(res => (adHandleId = res.data.handleId))
-        .then(() => dataIdUtils.dropHandle(authToken, dataIdHandle))
-        .should.be.fulfilled()
+        .then(() => dropAndGetHandle(AD_NAME))
         .then(() => adUtils.getMetadata(authToken, adHandleId))
         .should.be.fulfilled()
         .then(res => {
@@ -311,10 +319,72 @@ describe('Appendable data', () => {
           should(err.response.data.description.indexOf('DataExists')).not.be.equal(-1);
         })
     ));
+
+    it('Should be able to create appendable data with white list filter', () => {
+      let signKeyHandle = null;
+      const NAME = getName();
+      return adUtils.create(authToken, NAME, false, FILTER_TYPE.WHITE_LIST)
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data).have.keys('handleId');
+          should(res.data.handleId).be.Number();
+          adHandleId = res.data.handleId;
+        })
+        .then(() => adUtils.put(authToken, adHandleId))
+        .should.be.fulfilled()
+        .then(res => should(res.status).be.equal(200))
+        .then(() => adUtils.isSizeValid(authToken, adHandleId))
+        .should.be.fulfilled()
+        .then(() => dropAndGetHandle(NAME))
+        .then(() => adUtils.getSignKey(authToken))
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.data).have.keys('handleId');
+          should(res.data.handleId).be.Number();
+          signKeyHandle = res.data.handleId;
+        })
+        .then(() => adUtils.addToFilter(authToken, adHandleId, [signKeyHandle]))
+        .should.be.fulfilled()
+        .then(() => adUtils.post(authToken, adHandleId))
+        .should.be.fulfilled()
+        .then(() => signKeyUtils.dropHandle(authToken, signKeyHandle))
+        .should.be.fulfilled()
+        .then(() => dropAndGetHandle(NAME))
+        .then(() => adUtils.getMetadata(authToken, adHandleId))
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data.version).be.equal(1);
+          should(res.data.filterType.toLowerCase()).be.equal('whitelist');
+          should(res.data.filterLength).be.equal(1);
+          should(res.data.dataLength).be.equal(0);
+          should(res.data.deletedDataLength).be.equal(0);
+        })
+        .then(() => createSD())
+        .then(handleId => sdDataHandles.push(handleId))
+        .then(() => adUtils.append(authToken, adHandleId, sdDataHandles.slice(-1)[0]))
+        .should.be.fulfilled()
+        .then(() => dropAndGetHandle(NAME))
+        .then(() => adUtils.getMetadata(authToken, adHandleId))
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data.version).be.equal(1);
+          should(res.data.filterType.toLowerCase()).be.equal('whitelist');
+          should(res.data.filterLength).be.equal(1);
+          should(res.data.dataLength).be.equal(1);
+          should(res.data.deletedDataLength).be.equal(0);
+        })
+        .then(() => adUtils.getDataIdAt(authToken, adHandleId, 0))
+        .should.be.fulfilled()
+        .then(res => readSD(res.data.handleId))
+        .then(data => should(data).be.equal(new Buffer(SD_CONTENT, 'base64').toString()));
+    });
   });
 
   describe('Remove, restore, delete and remove deleted data', () => {
-    const AD_NAME = crypto.randomBytes(32).toString('base64');
+    const AD_NAME = getName();
 
     before(() => createAD(AD_NAME));
 
@@ -442,7 +512,7 @@ describe('Appendable data', () => {
   });
 
   describe('Clear all data and deleted data', () => {
-    const AD_NAME = crypto.randomBytes(32).toString('base64');
+    const AD_NAME = getName();
 
     before(() => (
       createAD(AD_NAME)
@@ -547,7 +617,7 @@ describe('Appendable data', () => {
   });
 
   describe('Add key, remove key and toggle key from filter', () => {
-    const AD_NAME = crypto.randomBytes(32).toString('base64');
+    const AD_NAME = getName();
     let signKeyHandleId = null;
     let dataIdHandle = null;
 
@@ -560,7 +630,7 @@ describe('Appendable data', () => {
     after(() => adUtils.dropHandle(authToken, adHandleId));
 
     it('Should return 401 if authorisation token is not valid', () => (
-      adUtils.getSigningKey(null, adHandleId, 0)
+      adUtils.getSignKeyAt(null, adHandleId, 0)
         .should.be.rejectedWith(Error)
         .then(err => {
           should(err.response.status).be.equal(401);
@@ -590,7 +660,7 @@ describe('Appendable data', () => {
       let authTokenWithoutAccess = null;
       return authUtils.registerAndAuthorise()
         .then(token => (authTokenWithoutAccess = token))
-        .then(() => adUtils.getSigningKey(authTokenWithoutAccess, adHandleId, 0))
+        .then(() => adUtils.getSignKeyAt(authTokenWithoutAccess, adHandleId, 0))
         .should.be.rejectedWith(Error)
         .then(err => {
           should(err.response.status).be.equal(403);
@@ -623,7 +693,7 @@ describe('Appendable data', () => {
 
     // TODO must check
     it('Should return 400 if handle Id is not valid on getSigningKey', () => (
-      adUtils.getSigningKey(authToken, invalidHandleId)
+      adUtils.getSignKeyAt(authToken, invalidHandleId)
         .should.be.rejectedWith(Error)
         .then(err => {
           should(err.response.status).be.equal(400);
@@ -688,7 +758,7 @@ describe('Appendable data', () => {
     ));
 
     it('Should be able to Add and remove keys in filter and toggle filter', () => (
-      adUtils.getSigningKey(authToken, adHandleId, 0)
+      adUtils.getSignKeyAt(authToken, adHandleId, 0)
         .should.be.fulfilled()
         .then(res => {
           should(res.status).be.equal(200);
@@ -740,7 +810,7 @@ describe('Appendable data', () => {
   });
 
   describe('Serialise and deserialise data', () => {
-    const AD_NAME = crypto.randomBytes(32).toString('base64');
+    const AD_NAME = getName();
     before(() => (
       createAD(AD_NAME)
         .then(() => createSD())
@@ -797,7 +867,7 @@ describe('Appendable data', () => {
   });
 
   describe('Get signkey from deleted data', () => {
-    const AD_NAME = crypto.randomBytes(32).toString('base64');
+    const AD_NAME = getName();
     before(() => (
       createAD(AD_NAME)
         .then(() => createSD())
@@ -871,7 +941,7 @@ describe('Appendable data', () => {
   });
 
   describe('Get encrypt key and drop it', () => {
-    const AD_NAME = crypto.randomBytes(32).toString('base64');
+    const AD_NAME = getName();
     before(() => (
       createAD(AD_NAME, true)
         .then(() => createSD())
@@ -950,7 +1020,7 @@ describe('Appendable data', () => {
   });
 
   describe('Get DataId Handle', () => {
-    const AD_NAME = crypto.randomBytes(32).toString('base64');
+    const AD_NAME = getName();
     before(() => (
       createAD(AD_NAME)
         .then(() => createSD())
