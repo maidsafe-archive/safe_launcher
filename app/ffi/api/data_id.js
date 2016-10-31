@@ -1,6 +1,7 @@
 import ref from 'ref';
 
 import FfiApi from '../ffi_api';
+import { log } from '../../logger/log';
 
 const int32 = ref.types.int32;
 const u64 = ref.types.uint64;
@@ -27,6 +28,7 @@ class DataId extends FfiApi {
     return new Promise((resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Data Id :: Drop handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -40,6 +42,7 @@ class DataId extends FfiApi {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Data Id :: Structured Data - Get handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve(handleRef.deref());
@@ -53,6 +56,7 @@ class DataId extends FfiApi {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Data Id :: Appendable Data - Get handle :: ${err || res}`);
           return reject(err || res);
         }
         resolve(handleRef.deref());

@@ -7,6 +7,7 @@ import { error, consumeStringListHandle, derefFileMetadataStruct,
          DirectoryMetadata, FileDetails, FileMetadata} from '../util/utils';
 import FfiApi from '../ffi_api';
 import nfs from './nfs';
+import {log} from '../../logger/log';
 
 const CString = ref.types.CString;
 const int32 = ref.types.int32;
@@ -54,6 +55,7 @@ class DNS extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: DNS :: Register longname :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -73,6 +75,7 @@ class DNS extends FfiApi {
       const listHandlePointer = ref.alloc(PointerToVoidPointer);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: DNS :: List longname :: ${err || res}`);
           return reject(err || res);
         }
         const listHandle = listHandlePointer.deref();
@@ -89,6 +92,7 @@ class DNS extends FfiApi {
     return new Promise((resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: DNS :: Delete longname :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -102,6 +106,7 @@ class DNS extends FfiApi {
     return new Promise(async (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: DNS :: Register service :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -126,6 +131,7 @@ class DNS extends FfiApi {
     return new Promise((resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: DNS :: Add service :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -146,6 +152,7 @@ class DNS extends FfiApi {
       const listHandle = ref.alloc(PointerToVoidPointer);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: DNS :: List service :: ${err || res}`);
           return reject(err || res);
         }
         resolve(consumeStringListHandle(this.safeCore, listHandle.deref()));
@@ -162,6 +169,7 @@ class DNS extends FfiApi {
       const directoryDetailsHandlePointer = ref.alloc(PointerToVoidPointer);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: DNS :: Get service directory :: ${err || res}`);
           return reject(err || res);
         }
         resolve(nfs.derefDirectoryDetailsHandle(directoryDetailsHandlePointer.deref()));
@@ -179,6 +187,7 @@ class DNS extends FfiApi {
     return new Promise((resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: DNS :: Delete service :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -197,6 +206,7 @@ class DNS extends FfiApi {
       const fileMetadataRefRef = ref.alloc(PointerToFileMetadataPointer);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: DNS :: Get file metadata :: ${err || res}`);
           return reject(err || res);
         }
         try {
@@ -206,7 +216,7 @@ class DNS extends FfiApi {
           this.safeCore.file_metadata_drop.async(fileMetadataHandle, (e) => {});
           resolve(metadata);
         } catch(e) {
-          console.error(e);
+          log.warn(`FFI :: DNS :: Get file metadata :: Caught exception - ${typeof e === 'object' ? JSON.parse(e) : e}`);
         }
       };
       const longNameBuffer = new Buffer(longName);
@@ -225,6 +235,7 @@ class DNS extends FfiApi {
       const fileDetailsPointerHandle = ref.alloc(PointerToFileDetailsPointer);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: DNS :: Read file :: ${err || res}`);
           return reject(err || res);
         }
         const fileDetailsHandle = fileDetailsPointerHandle.deref();
@@ -233,7 +244,7 @@ class DNS extends FfiApi {
         const data = Buffer.concat([ref.reinterpret(fileDetails.content, fileDetails.content_len)]);
         this.safeCore.file_details_drop.async(handle, (e) => {
           if (e) {
-            console.error(e);
+            log.error(`FFI :: DNS :: File details drop :: ${e}`);
           }
         });
         resolve(data);

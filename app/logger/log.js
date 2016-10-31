@@ -8,7 +8,7 @@ import winston from 'winston';
 class Logger {
 
   constructor() {
-    var self = this;
+    const self = this;
     self.logFilePath = null;
     // TODO pass log id that can used for the log visualiser
     // let id = 'uid_' + 1001;
@@ -25,21 +25,27 @@ class Logger {
           date.getMilliseconds());
       return util.format('%s %s - %s', log.level.toUpperCase(), timeStamp, log.message);
     };
+    self.winston.remove(self.winston.transports.Console);
+    if(env.name === 'test') {
+      return;
+    }
     try {
       process.stdout.write('\n');
-      self.winston.remove(self.winston.transports.Console);
       self.winston.add(self.winston.transports.Console, {
         level: self.logLevel,
         handleExceptions: true,
         formatter: self.logFormatter
       });
     } catch (e) {
-      console.log('Console Logger initialisation failed', e);
+      console.error('Console Logger initialisation failed', e);
     }
   }
 
   setFileLogger(path) {
     var self = this;
+    if(env.name === 'test') {
+      return;
+    }
     try {
       self.logFilePath = path;
       fse.ensureFileSync(self.logFilePath);
@@ -53,7 +59,7 @@ class Logger {
         formatter: self.logFormatter
       });
     } catch (e) {
-      console.log('File logger could not be added ', e);
+      console.error('File logger could not be added ', e);
     }
   }
 
@@ -89,4 +95,4 @@ class Logger {
 
 }
 
-export var log = new Logger();
+export const log = new Logger();

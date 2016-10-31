@@ -7,13 +7,13 @@ import { syncHistoryWithStore } from 'react-router-redux';
 import './stylesheets/main.less';
 import routes from './ui/routes';
 import configureStore from './ui/store/configure_store';
-import './bridge';
+import bridge from './bridge';
 import EventRegistry from './ui/event_registry';
 
 const store = configureStore();
 const history = syncHistoryWithStore(hashHistory, store);
 
-(new EventRegistry(store, history)).run();
+bridge(new EventRegistry(store, history));
 
 render(
   <Provider store={store}>

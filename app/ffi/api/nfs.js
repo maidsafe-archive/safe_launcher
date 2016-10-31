@@ -7,6 +7,7 @@ import {FileMetadata, DirectoryMetadata, FileDetails,
        error, derefFileMetadataStruct, derefDirectoryMetadataStruct} from '../util/utils';
 import FfiApi from '../ffi_api';
 import appManager from '../util/app_manager';
+import { log } from '../../logger/log';
 
 const Void = ref.types.void;
 const int32 = ref.types.int32;
@@ -149,7 +150,7 @@ class NFS extends FfiApi {
           const files = await getFiles();
           self.safeCore.directory_details_drop.async(dirDetailsHandle, (err) => {
             if (err) {
-              console.log('Error in dropping directory details handle', err);
+              log.error(`FFI :: Error in dropping directory details handle :: ${err}`);
             }
           });
           resolve({
@@ -172,6 +173,7 @@ class NFS extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: NFS :: Create directory :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -194,6 +196,7 @@ class NFS extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: NFS :: Get directory :: ${err || res}`);
           return reject(err || res);
         }
         const dirDetails = dirDetailsHandle.deref();
@@ -214,6 +217,7 @@ class NFS extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: NFS :: Delete directory :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -233,6 +237,7 @@ class NFS extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: NFS :: Update directory :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -255,6 +260,7 @@ class NFS extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: NFS :: ${isCopy ? 'Copy' : 'Move' } directory :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -278,6 +284,7 @@ class NFS extends FfiApi {
       const writerVoidPointer = ref.alloc(PointerToVoidPointer);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: NFS :: Create file :: ${err || res}`);
           return reject(err || res);
         }
         const key = {writerId: uuid.v4()};
@@ -309,6 +316,7 @@ class NFS extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: NFS :: Write to file :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -326,6 +334,7 @@ class NFS extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: NFS :: Close writer :: ${err || res}`);
           return reject(err || res);
         }
         self.writerHolder.delete(writerKey);
@@ -344,6 +353,7 @@ class NFS extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: NFS :: Delete file :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -363,6 +373,7 @@ class NFS extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: NFS :: Update file metadata :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -387,6 +398,7 @@ class NFS extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: NFS :: ${isCopy ? 'Copy' : 'Move'} file :: ${err || res}`);
           return reject(err || res);
         }
         resolve();
@@ -411,6 +423,7 @@ class NFS extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: NFS :: Get file metadata :: ${err || res}`);
           return reject(err || res);
         }
         try {
@@ -420,7 +433,7 @@ class NFS extends FfiApi {
           self.safeCore.file_metadata_drop.async(fileMetadataHandle, (e) => {});
           resolve(metadata);
         } catch(e) {
-          console.error(e);
+          log.error(`FFI :: NFS :: Get file metadata :: Caught exception - ${typeof e === 'object' ? JSON.parse(e) : e}`);
         }
       };
 
@@ -443,6 +456,7 @@ class NFS extends FfiApi {
       const fileDetailsPointerHandle = ref.alloc(PointerToFileDetailsPointer);
       const onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: NFS :: Read file :: ${err || res}`);
           return reject(err || res);
         }
         const fileDetailsHandle = fileDetailsPointerHandle.deref();
@@ -451,7 +465,7 @@ class NFS extends FfiApi {
         const data = Buffer.concat([ref.reinterpret(fileDetails.content, fileDetails.content_len)]);
         self.safeCore.file_details_drop.async(handle, (e) => {
           if (e) {
-            console.error(e);
+            log.error(`FFI :: NFS :: Drop file detail handle :: ${e}`);
           }
         });
         resolve(data);
@@ -469,7 +483,7 @@ class NFS extends FfiApi {
         await this.closeWriter(key);
       }
     } catch(e) {
-      console.log('Error', e);
+      log.warn(`FFI :: NFS :: Drop writer handle :: Caught exception - ${typeof e === 'object' ? JSON.parse(e) : e}`);
     }
   }
 }

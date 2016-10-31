@@ -3,6 +3,7 @@
 import ref from 'ref';
 import FfiApi from '../ffi_api';
 import sessionManager from '../util/session_manager';
+import { log } from '../../logger/log';
 
 const int32 = ref.types.int32;
 const SessionHandlePointer = ref.refType(ref.refType(ref.types.void));
@@ -29,6 +30,7 @@ class Auth extends FfiApi {
       let onResult = (err, res) => {
         if (err || res !== 0) {
           sessionManager.sendNetworkDisconnected();
+          log.error(`FFI :: Auth :: Get unregistered session :: ${err || res}`);
           return reject(err || res);
         }
         sessionManager.sessionHandle = sessionHandle.deref();
@@ -45,6 +47,7 @@ class Auth extends FfiApi {
       let sessionHandle = ref.alloc(SessionHandlePointer);
       let onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Auth :: Register :: ${err || res}`);
           return reject(err || res);
         }
         sessionManager.sessionHandle = sessionHandle.deref();
@@ -61,6 +64,7 @@ class Auth extends FfiApi {
       let sessionHandle = ref.alloc(SessionHandlePointer);
       let onResult = (err, res) => {
         if (err || res !== 0) {
+          log.error(`FFI :: Auth :: Login :: ${err || res}`);
           return reject(err || res);
         }
         try {

@@ -2,7 +2,7 @@ import { remote } from 'electron';
 
 import env from './env';
 import UIUtils from './ui_utils';
-import { loadLibrary } from './ffi/loader';
+import { loadLibrary, setFileLoggerPath } from './ffi/loader';
 import sessionManager from './ffi/util/session_manager';
 import auth from './ffi/api/auth';
 import RESTServer from './server/boot';
@@ -27,8 +27,6 @@ const onFfiLaodFailure = (title, msg) => {
   });
 };
 
-window.msl = new UIUtils(remote, restServer);
-
 const networkStateListener = (state) => {
   switch (state) {
     case 0:
@@ -47,15 +45,28 @@ const networkStateListener = (state) => {
   }
 };
 
-try {
-  loadLibrary();
-  sessionManager.onNetworkStateChange(networkStateListener);
-  auth.getUnregisteredSession().then(() => {}, () => {
-    networkStateListener(1);
-  });
-} catch (e) {
-  onFfiLaodFailure('FFI library load error', e.message);
-}
+const loadFfiLibrary = () => {
+  try {
+    loadLibrary();
+  } catch (e) {
+    onFfiLaodFailure('FFI library load error', e.message);
+  }
+};
+
+const run = async (eventRegistry) => {
+  loadFfiLibrary();
+  try {
+    window.msl = new UIUtils(remote, restServer);
+    await setFileLoggerPath();
+    eventRegistry.run();
+    sessionManager.onNetworkStateChange(networkStateListener);
+    auth.getUnregisteredSession().then(() => {}, () => {
+      networkStateListener(1);
+    });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
 
 // Disabling drag and drop
 window.document.addEventListener('drop', (e) => {
@@ -67,3 +78,5 @@ window.document.addEventListener('dragover', (e) => {
   e.preventDefault();
   e.stopPropagation();
 });
+
+export default run;

@@ -1,5 +1,5 @@
 import { log } from './../../logger/log';
-import { updateAppActivity } from './../utils.js';
+import { updateAppActivity, parseExpectionMsg } from './../utils.js';
 import dns from '../../ffi/api/dns';
 var Readable = require('stream').Readable;
 var util = require('util');
@@ -41,13 +41,12 @@ DnsReader.prototype._read = function() {
         self.push(data);
         eventEmitter.emit(eventType, data.length);
       }, (e) => {
-        console.error(e);
         self.push(null);
-        log.error(e);
+        log.error(`Stream :: DNS Reader :: ${e}`);
         updateAppActivity(self.req, self.res);
         return self.res.end();
       });
   } catch(e) {
-    console.error(e);
+    log.warn(`Stream :: DNS Reader error :: ${parseExpectionMsg(e)}`);
   }
 };
