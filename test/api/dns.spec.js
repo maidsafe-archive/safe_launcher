@@ -39,7 +39,7 @@ describe('DNS', () => {
         .then(err => (should(err.response.status).be.equal(401)))
     ));
 
-    it('Should return 400 if longName not found', () => (
+    it('Should return 400 if longName param not found', () => (
       dnsUtils.register(authToken)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -49,7 +49,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if serviceName not found', () => (
+    it('Should return 400 if serviceName param not found', () => (
       dnsUtils.register(authToken, longName)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -59,7 +59,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if serviceHomeDirPath not found', () => (
+    it('Should return 400 if serviceHomeDirPath param not found', () => (
       dnsUtils.register(authToken, longName, serviceName)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -69,7 +69,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if rootPath not found', () => (
+    it('Should return 400 if rootPath param not found', () => (
       dnsUtils.register(authToken, longName, serviceName, dirPath)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -79,7 +79,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if longName contains Capitalcase', () => (
+    it('Should return 400 if longName param contains Capitalcase', () => (
       dnsUtils.register(authToken, 'testCase', serviceName, dirPath, rootPath)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -89,7 +89,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if longName contains underscore', () => (
+    it('Should return 400 if longName param contains underscore', () => (
       dnsUtils.register(authToken, 'test_case', serviceName, dirPath, rootPath)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -99,7 +99,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if longName contains space', () => (
+    it('Should return 400 if longName param contains space', () => (
       dnsUtils.register(authToken, 'test case', serviceName, dirPath, rootPath)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -109,7 +109,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if longName contains more than 63 characters', () => (
+    it('Should return 400 if longName param contains more than 63 characters', () => (
       dnsUtils.register(authToken,
         'fa159afeea08a801cbf0fe6ac79050d015efe76e5a9fc9f34a12d42f7b8bb7r', serviceName, dirPath,
         rootPath)
@@ -121,7 +121,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if serviceName contains Capitalcase', () => (
+    it('Should return 400 if serviceName param contains Capitalcase', () => (
       dnsUtils.register(authToken, longName, 'testCase', dirPath, rootPath)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -131,7 +131,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if serviceName contains underscore', () => (
+    it('Should return 400 if serviceName param contains underscore', () => (
       dnsUtils.register(authToken, longName, 'test_case', dirPath, rootPath)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -141,7 +141,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if serviceName contains space', () => (
+    it('Should return 400 if serviceName param contains space', () => (
       dnsUtils.register(authToken, longName, 'test case', dirPath, rootPath)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -151,7 +151,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if serviceName contains more than 63 characters', () => (
+    it('Should return 400 if serviceName param contains more than 63 characters', () => (
       dnsUtils.register(authToken, longName,
         'fa159afeea08a801cbf0fe6ac79050d015efe76e5a9fc9f34a12d42f7b8bb7r', dirPath, rootPath)
         .should.be.rejectedWith(Error)
@@ -162,7 +162,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if rootPath is not valid', () => (
+    it('Should return 400 if rootPath param is not valid', () => (
       dnsUtils.register(authToken, longName, serviceName, dirPath, 'rootPath')
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -196,7 +196,7 @@ describe('DNS', () => {
         .then(err => should(err.response.status).be.equal(401))
     ));
 
-    it('Should return 400 if longName contains Capitalcase', () => (
+    it('Should return 400 if longName param contains Capitalcase', () => (
       dnsUtils.createPublicId(authToken, 'testCase')
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -206,7 +206,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if longName contains underscore', () => (
+    it('Should return 400 if longName param contains underscore', () => (
       dnsUtils.createPublicId(authToken, 'test_case')
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -216,7 +216,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if longName contains space', () => (
+    it('Should return 400 if longName param contains space', () => (
       dnsUtils.createPublicId(authToken, 'test case')
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -226,7 +226,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if longName contains more than 63 characters', () => (
+    it('Should return 400 if longName param contains more than 63 characters', () => (
       dnsUtils.createPublicId(authToken,
         'fa159afeea08a801cbf0fe6ac79050d015efe76e5a9fc9f34a12d42f7b8bb7r')
         .should.be.rejectedWith(Error)
@@ -271,7 +271,7 @@ describe('DNS', () => {
         .then(err => should(err.response.status).be.equal(401))
     ));
 
-    it('Should return 400 if longName not found', () => (
+    it('Should return 400 if longName param not found', () => (
       dnsUtils.addService(authToken)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -281,7 +281,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if serviceName not found', () => (
+    it('Should return 400 if serviceName param not found', () => (
       dnsUtils.addService(authToken, longName)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -291,7 +291,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if serviceHomeDirPath not found', () => (
+    it('Should return 400 if serviceHomeDirPath param not found', () => (
       dnsUtils.addService(authToken, longName, serviceName)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -301,7 +301,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if rootPath not found', () => (
+    it('Should return 400 if rootPath param not found', () => (
       dnsUtils.addService(authToken, longName, serviceName, dirPath)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -311,7 +311,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if longName contains Capitalcase', () => (
+    it('Should return 400 if longName param contains Capitalcase', () => (
       dnsUtils.register(authToken, 'testCase', serviceName, dirPath, rootPath)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -321,7 +321,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if longName contains underscore', () => (
+    it('Should return 400 if longName param contains underscore', () => (
       dnsUtils.register(authToken, 'test_case', serviceName, dirPath, rootPath)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -331,7 +331,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if longName contains space', () => (
+    it('Should return 400 if longName param contains space', () => (
       dnsUtils.register(authToken, 'test case', serviceName, dirPath, rootPath)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -341,7 +341,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if longName contains more than 63 characters', () => (
+    it('Should return 400 if longName param contains more than 63 characters', () => (
       dnsUtils.register(authToken,
         'fa159afeea08a801cbf0fe6ac79050d015efe76e5a9fc9f34a12d42f7b8bb7r', serviceName, dirPath,
         rootPath)
@@ -353,7 +353,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if serviceName contains Capitalcase', () => (
+    it('Should return 400 if serviceName param contains Capitalcase', () => (
       dnsUtils.addService(authToken, longName, 'testCase', dirPath, rootPath)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -363,7 +363,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if serviceName contains underscore', () => (
+    it('Should return 400 if serviceName param contains underscore', () => (
       dnsUtils.addService(authToken, longName, 'test_case', dirPath, rootPath)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -373,7 +373,7 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if serviceName contains space', () => (
+    it('Should return 400 if serviceName param contains space', () => (
       dnsUtils.addService(authToken, longName, 'test case', dirPath, rootPath)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -383,7 +383,17 @@ describe('DNS', () => {
         })
     ));
 
-    it('Should return 400 if serviceName contains more than 63 characters', () => (
+    it('Should return 404 if longName not found', () => (
+      dnsUtils.addService(authToken, '12345', serviceName, dirPath, rootPath)
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(404);
+          should(err.response.data.errorCode).be.equal(-1002);
+          should(err.response.data.description).be.equal('DnsError::DnsRecordNotFound');
+        })
+    ));
+
+    it('Should return 400 if serviceName param contains more than 63 characters', () => (
       dnsUtils.addService(authToken, longName,
         'fa159afeea08a801cbf0fe6ac79050d015efe76e5a9fc9f34a12d42f7b8bb7r', dirPath, rootPath)
         .should.be.rejectedWith(Error)
@@ -398,6 +408,16 @@ describe('DNS', () => {
       dnsUtils.addService(authToken, longName, serviceName, dirPath, rootPath)
         .should.be.fulfilled()
         .then(res => should(res.status).be.equal(200))
+    ));
+
+    it('Should return 400 if serviceName already exist', () => (
+      dnsUtils.addService(authToken, longName, serviceName, dirPath, rootPath)
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(400);
+          should(err.response.data.errorCode).be.equal(-1003);
+          should(err.response.data.description).be.equal('DnsError::ServiceAlreadyExists');
+        })
     ));
   });
 
@@ -514,10 +534,10 @@ describe('DNS', () => {
         .then(err => should(err.response.status).be.equal(401))
     ));
 
-    it('Should return 400 if longName doesn\'t exist', () => (
+    it('Should return 404 if longName doesn\'t exist', () => (
       dnsUtils.listServiceNames(authToken, 'longName', serviceName)
         .should.be.rejectedWith(Error)
-        .then(err => should(err.response.status).be.equal(400))
+        .then(err => should(err.response.status).be.equal(404))
     ));
 
     it('Should be able to get list of service names', () => (
@@ -542,10 +562,10 @@ describe('DNS', () => {
         .then(() => dnsUtils.deleteDns(authToken, longName))
     ));
 
-    it('Should return 400 if longName doesn\'t exist', () => (
+    it('Should return 404 if longName doesn\'t exist', () => (
       dnsUtils.getHomeDir(authToken, 'longName', serviceName)
         .should.be.rejectedWith(Error)
-        .then(err => should(err.response.status).be.equal(400))
+        .then(err => should(err.response.status).be.equal(404))
     ));
 
     it('Should return 404 if serviceName doesn\'t exist', () => (

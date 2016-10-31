@@ -60,6 +60,7 @@ export class ResponseError {
       message.description = errorCodeLookup(message.errorCode);
       if (message.description.toLowerCase().indexOf('notfound') > -1 ||
           message.description.toLowerCase().indexOf('pathnotfound') > -1 ||
+          message.description.toLowerCase().indexOf('nosuchdata') > -1 ||
           message.description.toLowerCase().indexOf('invalidpath') > -1) {
         status = 404;
       }

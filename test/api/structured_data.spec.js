@@ -144,7 +144,7 @@ describe('Structured data', () => {
         })
     ));
 
-    it('Should return 400 if data not found', () => (
+    it('Should return 404 if data not found', () => (
       structUtils.create(authToken, SD_NAME, TYPE_TAG, null, SD_CONTENT)
         .should.be.fulfilled()
         .then(res => {
@@ -161,9 +161,8 @@ describe('Structured data', () => {
         .then(res => structUtils.getHandle(authToken, res.data.handleId))
         .should.be.rejectedWith(Error)
         .then(err => {
-          should(err.response.status).be.equal(400);
+          should(err.response.status).be.equal(404);
           should(err.response.data.errorCode).be.equal(-18);
-          should(err.response.data.description.indexOf('NoSuchData')).be.not.equal(-1);
         })
     ));
 
