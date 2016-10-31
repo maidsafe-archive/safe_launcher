@@ -176,6 +176,7 @@ router.delete('/appendable-data/:handleId/:index', new ActivityMiddleware('Remov
 // router.delete('/appendable-data/:handleId',
 //   new ActivityMiddleware('Delete appendable data'), AppendableData.deleteAppendableData);
 
+router.get('/sign-key/', new ActivityMiddleware('Get sign key'), AppendableData.getSignKey);
 router.get('/sign-key/serialise/:handleId', new ActivityMiddleware('Serialise sign key'),
   AppendableData.serialiseSignKey);
 router.post('/sign-key/deserialise', rawBodyParser(), new ActivityMiddleware('De-Serialise sign key'),

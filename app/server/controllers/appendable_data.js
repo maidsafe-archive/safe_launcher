@@ -229,7 +229,7 @@ export const getEncryptKey = async(req, res, next) => {
   }
 };
 
-const getSignKey = async(req, res, next, fromDeleted) => {
+const getSignKeyAt = async(req, res, next, fromDeleted) => {
   log.debug(`Appendable data - ${req.id} :: Get sign key handle ${fromDeleted ? 'from deleted data' : ''}`);
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -255,11 +255,11 @@ const getSignKey = async(req, res, next, fromDeleted) => {
 };
 
 export const getSigningKey = async(req, res, next) => {
-  getSignKey(req, res, next, false);
+  getSignKeyAt(req, res, next, false);
 };
 
 export const getSigningKeyFromDeletedData = async(req, res, next) => {
-  getSignKey(req, res, next, true);
+  getSignKeyAt(req, res, next, true);
 };
 
 export const append = async(req, res, next) => {
@@ -632,6 +632,26 @@ export const deserialise = async(req, res) => {
     });
   } catch (e) {
     log.warn(`Appendable data - ${req.id} :: Deserialise :: Caught exception - ${parseExpectionMsg(e)}`);
+    responseHandler(e);
+  }
+};
+
+export const getSignKey = async (req, res, next) => {
+  const responseHandler = new ResponseHandler(req, res);
+  try {
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
+    if (!sessionInfo) {
+      return next(new ResponseError(401, UNAUTHORISED_ACCESS));
+    }
+    if (!sessionInfo.app.permission.lowLevelApi) {
+      return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
+    }
+    const app = sessionInfo.app;
+    const signKeyHandle = await misc.getSignKey(app);
+    responseHandler(null, {
+      handleId: signKeyHandle
+    });
+  } catch (e) {
     responseHandler(e);
   }
 };
