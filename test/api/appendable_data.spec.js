@@ -279,12 +279,9 @@ describe('Appendable data', () => {
             'handleId',
             'isOwner',
             'version',
-            'filterType',
             'filterLength',
             'dataLength',
             'deletedDataLength');
-          should(['blacklist', 'whitelist']).matchAny(res.data.filterType.toLowerCase());
-          should(res.data.filterType.toLowerCase()).be.equal('blacklist');
           should(res.data.dataLength).be.equal(sdDataHandles.length);
         })
         .then(() => adUtils.getDataIdAt(authToken, adHandleId, 0))
