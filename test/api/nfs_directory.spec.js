@@ -1,7 +1,7 @@
 import should from 'should';
 import nfsUtils from '../utils/nfs_utils';
 import authUtils from '../utils/auth_utils';
-import { MESSAGES } from '../constants';
+import { MESSAGES, CONSTANTS } from '../constants';
 
 describe('NFS directory', () => {
   const utils = nfsUtils;
@@ -104,6 +104,34 @@ describe('NFS directory', () => {
           should(res.data).be.ok();
         })
         .then(() => utils.deleteDir(authToken, rootPath, dirPath));
+    });
+    it('Should return 400 when creating directory in SAFE Drive without permission', () => (
+      utils.createDir(authToken, 'drive', '/test_app')
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(400);
+          should(err.response.data.errorCode).be.equal(-1504);
+          should(err.response.data.description).be.equal('FfiError::PermissionDenied');
+        })
+    ));
+
+    it('Should be able to create directory in SAFE DRIVE and retrieve it', () => {
+      const dirPath = 'test_app';
+      const rootPath = 'drive';
+      let safeDriveToken = null;
+
+      return authUtils.registerAndAuthorise(CONSTANTS.AUTH_PAYLOAD_SAFE_DRIVE)
+        .then(token => (safeDriveToken = token))
+        .then(() => utils.createDir(safeDriveToken, rootPath, dirPath))
+        .should.be.fulfilled()
+        .then(() => utils.getDir(safeDriveToken, rootPath, dirPath))
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data.info.name).be.equal(dirPath);
+        })
+        .then(() => utils.deleteDir(safeDriveToken, rootPath, dirPath))
+        .then(() => authUtils.revokeApp(safeDriveToken));
     });
   });
 
