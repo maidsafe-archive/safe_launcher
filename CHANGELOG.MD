@@ -1,5 +1,16 @@
 # SAFE Launcher Change Log
 
+##[0.9.3]
+- Requires safe_core 0.22.1
+- Get User's Sign Key API added
+- FilterType returned in AppendableData GET response
+- Dashboard bugs fixed
+- UI logger integrated
+- 404 validation added for low level APIs
+- Proxy code removed
+- Test suite integrated
+- Unused production dependencies removed
+
 ##[0.9.2]
 - Requires safe_core 0.22.0
 - Versioned StructuredData API exposed to read a specific version
