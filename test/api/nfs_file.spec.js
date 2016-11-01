@@ -1,7 +1,7 @@
 import should from 'should';
 import nfsUtils from '../utils/nfs_utils';
 import authUtils from '../utils/auth_utils';
-import { MESSAGES } from '../constants';
+import { MESSAGES, CONSTANTS } from '../constants';
 
 describe('NFS file', () => {
   let authToken = null;
@@ -76,6 +76,30 @@ describe('NFS file', () => {
               .equal('NfsError::FileAlreadyExistsWithSameName');
           })
     ));
+    it('Should be able to create file in SAFE DRIVE and retrieve it', () => {
+      const safeDriveRootPath = 'drive';
+      let safeDriveToken = null;
+
+      return authUtils.registerAndAuthorise(CONSTANTS.AUTH_PAYLOAD_SAFE_DRIVE)
+        .then(token => (safeDriveToken = token))
+        .then(() => nfsUtils.createDir(safeDriveToken, safeDriveRootPath, dirPath))
+        .should.be.fulfilled()
+        .then(() => nfsUtils.getDir(safeDriveToken, safeDriveRootPath, dirPath))
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data.info.name).be.equal(dirPath);
+        })
+        .then(() => nfsUtils.createFile(safeDriveToken, safeDriveRootPath, filePath, fileContent,
+          { headers: { 'content-type': 'text/plain' } }))
+        .should.be.fulfilled()
+        .then(() => nfsUtils.getFile(safeDriveToken, safeDriveRootPath, filePath))
+        .should.be.fulfilled()
+        .then(res => should(res.data).be.equal(fileContent))
+        .then(() => nfsUtils.deleteDir(safeDriveToken, safeDriveRootPath, dirPath))
+        .should.be.fulfilled()
+        .then(() => authUtils.revokeApp(safeDriveToken));
+    });
   });
 
   describe('Get file', () => {

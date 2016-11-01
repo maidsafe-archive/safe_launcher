@@ -17,6 +17,15 @@ export const CONSTANTS = {
     },
     permissions: ['LOW_LEVEL_API']
   },
+  AUTH_PAYLOAD_SAFE_DRIVE: {
+    app: {
+      name: 'test app name',
+      id: 'test.maidsafe.net',
+      version: '0.0.1',
+      vendor: 'MaidSafe'
+    },
+    permissions: ['SAFE_DRIVE_ACCESS']
+  },
   API: {
     AUTH: 'auth',
     NFS_DIR: 'nfs/directory/',
