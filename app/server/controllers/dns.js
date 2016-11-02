@@ -3,6 +3,7 @@ import sessionManager from '../session_manager';
 import { formatDirectoryResponse, formatResponse, ResponseError, ResponseHandler, parseExpectionMsg } from '../utils';
 import { log } from './../../logger/log';
 import dns from '../../ffi/api/dns';
+import nfs from '../../ffi/api/nfs';
 import { DnsReader } from '../stream/dns_reader';
 import { errorCodeLookup } from './../error_code_lookup';
 import util from 'util';
@@ -15,7 +16,7 @@ const ROOT_PATH = {
   drive: true
 };
 
-const registerOrAddService = (req, res, isRegister, next) => {
+const registerOrAddService = async(req, res, isRegister, next) => {
   log.debug(`DNS - ${req.id} :: ${isRegister ? 'Register' : 'Add Service'}`);
   const sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
@@ -46,6 +47,16 @@ const registerOrAddService = (req, res, isRegister, next) => {
   }
   let isPathShared = ROOT_PATH[reqBody.rootPath.toLowerCase()];
   let responseHandler = new ResponseHandler(req, res);
+
+  try {
+    log.debug(`DNS - ${req.id} :: ${isRegister ? 'Register' : 'Add Service'} 
+      :: Check directory exist`);
+    await nfs.getDirectory(sessionInfo.app, reqBody.serviceHomeDirPath, isPathShared);
+  } catch (e) {
+    log.debug(`DNS - ${req.id} :: ${isRegister ? 'Register' : 'Add Service'} 
+      :: 'Service home directory doesn\'t exist'`);
+    return next(new ResponseError(400, 'Service home directory doesn\'t exist'));
+  }
   if (isRegister) {
     log.debug(`DNS - ${req.id} :: Invoking register API for ${JSON.stringify(reqBody)}`);
     dns.registerService(sessionInfo.app, reqBody.longName, reqBody.serviceName, reqBody.serviceHomeDirPath,
