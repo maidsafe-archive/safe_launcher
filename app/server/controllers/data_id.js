@@ -1,10 +1,8 @@
-'use strict';
-
 import sessionManager from '../session_manager';
 import { ResponseError, ResponseHandler, updateAppActivity, parseExpectionMsg } from '../utils';
 import misc from '../../ffi/api/misc';
 import dataId from '../../ffi/api/data_id';
-import { log } from '../../logger/log';
+import log from '../../logger/log';
 
 const API_ACCESS_NOT_GRANTED = 'Low level api access is not granted';
 const UNAUTHORISED_ACCESS = 'Unauthorised access';
@@ -15,7 +13,8 @@ export const getDataIdForStructuredData = async(req, res) => {
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     const app = sessionInfo ? sessionInfo.app : undefined;
-    log.debug(`DATA ID - ${req.id} :: Structured data - Get data Id handle :: ${ app ? 'Authorised' : 'Unauthorised' } request`);
+    log.debug(`DATA ID - ${req.id} :: Structured data - Get data Id handle 
+      :: ${app ? 'Authorised' : 'Unauthorised'} request`);
     log.debug(`DATA ID - ${req.id} :: Structured data - Get data Id handle for ${JSON.stringify({
       name: req.body.name,
       typeTag: req.body.typeTag
@@ -24,10 +23,11 @@ export const getDataIdForStructuredData = async(req, res) => {
     const handleId = await dataId.getStructuredDataHandle(req.body.typeTag, name);
     log.debug(`DATA ID - ${req.id} :: Structured data - Data Id handle obtained`);
     responseHandler(null, {
-      handleId: handleId
+      handleId
     });
   } catch (e) {
-    log.warn(`DATA ID - ${req.id} :: Structured data - Get data Id handle :: Caught exception - ${e.message}`);
+    log.warn(`DATA ID - ${req.id} :: Structured data - Get data Id handle 
+      :: Caught exception - ${e.message}`);
     responseHandler(e);
   }
 };
@@ -38,7 +38,8 @@ export const getDataIdForAppendableData = async(req, res) => {
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     const app = sessionInfo ? sessionInfo.app : undefined;
-    log.debug(`DATA ID - ${req.id} :: Appendable data - Get data Id handle :: ${ app ? 'Authorised' : 'Unauthorised' } request`);
+    log.debug(`DATA ID - ${req.id} :: Appendable data - Get data Id handle 
+      :: ${app ? 'Authorised' : 'Unauthorised'} request`);
     log.debug(`DATA ID - ${req.id} :: Appendable data - Get data Id handle for ${JSON.stringify({
       name: req.body.name,
       isPrivate: req.body.isPrivate
@@ -46,10 +47,11 @@ export const getDataIdForAppendableData = async(req, res) => {
     const name = new Buffer(req.body.name, 'base64');
     const handleId = await dataId.getAppendableDataHandle(name, req.body.isPrivate);
     responseHandler(null, {
-      handleId: handleId
+      handleId
     });
   } catch (e) {
-    log.warn(`DATA ID - ${req.id} :: Appendable data - Get data Id handle :: Caught exception - ${e.message}`);
+    log.warn(`DATA ID - ${req.id} :: Appendable data - Get data Id handle :: 
+      Caught exception - ${e.message}`);
     responseHandler(e);
   }
 };
@@ -84,7 +86,8 @@ export const deserialise = async(req, res, next) => {
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     const app = sessionInfo ? sessionInfo.app : null;
-    log.debug(`DATA ID - ${req.id} :: Deserialise :: ${ app ? 'Authorised' : 'Unauthorised' } request`);
+    log.debug(`DATA ID - ${req.id} :: Deserialise 
+      :: ${app ? 'Authorised' : 'Unauthorised'} request`);
     if (!req.rawBody || req.rawBody.length === 0) {
       return next(new ResponseError(400, 'Body can not be empty'));
     }
@@ -99,11 +102,10 @@ export const deserialise = async(req, res, next) => {
   }
 };
 
-export const dropHandle = async(req, res, next) => {
+export const dropHandle = async(req, res) => {
   log.debug(`DATA ID - ${req.id} :: Drop handle`);
   const responseHandler = new ResponseHandler(req, res);
   try {
-    const responseHandler = new ResponseHandler(req, res);
     await dataId.dropHandle(req.params.handleId);
     log.debug(`DATA ID - ${req.id} :: Handle dropped`);
     responseHandler();

@@ -1,10 +1,12 @@
-import { log } from './../../logger/log';
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable func-names */
+import { Readable } from 'stream';
+import util from 'util';
+import log from './../../logger/log';
 import immutableData from '../../ffi/api/immutable_data';
 import { ResponseHandler } from './../utils.js';
-var Readable = require('stream').Readable;
-var util = require('util');
 
-export var ImmutableDataReader = function (req, res, readerId, start, end) {
+export const ImmutableDataReader = function (req, res, readerId, start, end) {
   Readable.call(this);
   this.eventEmitter = req.app.get('eventEmitter');
   this.eventType = req.app.get('EVENT_TYPE').DATA_DOWNLOADED;
@@ -19,9 +21,8 @@ export var ImmutableDataReader = function (req, res, readerId, start, end) {
 
 util.inherits(ImmutableDataReader, Readable);
 
-/*jscs:disable disallowDanglingUnderscores*/
+/* eslint-disable no-underscore-dangle */
 ImmutableDataReader.prototype._read = function () {
-  /*jscs:enable disallowDanglingUnderscores*/
   if (this.curOffset === this.end) {
     this.responseHandler();
     return this.push(null);
@@ -42,3 +43,4 @@ ImmutableDataReader.prototype._read = function () {
     log.error(`Stream :: Immutable data reader :: ${e}`);
   });
 };
+/* eslint-enable no-underscore-dangle */

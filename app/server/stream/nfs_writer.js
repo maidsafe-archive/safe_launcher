@@ -1,14 +1,15 @@
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable func-names */
 import util from 'util';
-import nfs from '../../ffi/api/nfs';
 import { Writable } from 'stream';
-import {log} from '../../logger/log';
+import nfs from '../../ffi/api/nfs';
+import log from '../../logger/log';
 
-export var NfsWriter = function (req, writerId, responseHandler, size, offset) {
+export const NfsWriter = function (req, writerId, responseHandler, size, offset) {
   Writable.call(this);
-  var self = this;
   this.req = req;
   this.writerId = writerId;
-  this.curOffset = parseInt(offset || 0);
+  this.curOffset = parseInt(offset || 0, 10);
   this.responseHandler = responseHandler;
   this.isReadStreamClosed = false;
   this.maxSize = size;
@@ -17,11 +18,11 @@ export var NfsWriter = function (req, writerId, responseHandler, size, offset) {
 
 util.inherits(NfsWriter, Writable);
 
-/*jscs:disable disallowDanglingUnderscores*/
+/* eslint-disable no-underscore-dangle */
 NfsWriter.prototype._write = function (data, enc, next) {
-  var self = this;
-  var eventEmitter = self.req.app.get('eventEmitter');
-  var uploadEvent = self.req.app.get('EVENT_TYPE').DATA_UPLOADED;
+  const self = this;
+  const eventEmitter = self.req.app.get('eventEmitter');
+  const uploadEvent = self.req.app.get('EVENT_TYPE').DATA_UPLOADED;
   nfs.writeToFile(this.writerId, data)
     .then(() => {
       eventEmitter.emit(uploadEvent, data.length);
@@ -37,4 +38,4 @@ NfsWriter.prototype._write = function (data, enc, next) {
       log.error(`Stream :: NFS writer :: ${e}`);
     });
 };
-/*jscs:enable disallowDanglingUnderscores*/
+/* eslint-enable no-underscore-dangle */

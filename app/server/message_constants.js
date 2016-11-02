@@ -1,4 +1,5 @@
-let CONSTANTS = {
+/* eslint-disable import/prefer-default-export */
+const CONSTANTS = {
   ERROR_CODE: {
     400: 'Bad request',
     401: 'Unauthorised',
@@ -12,4 +13,4 @@ let CONSTANTS = {
   }
 };
 
-export let MSG_CONSTANTS = CONSTANTS;
+export const MSG_CONSTANTS = CONSTANTS;

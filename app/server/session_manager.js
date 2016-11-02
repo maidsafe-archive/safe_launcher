@@ -1,10 +1,9 @@
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable no-restricted-syntax */
 import _ from 'lodash';
-import Permission from '../ffi/model/permission';
 import appManager from '../ffi/util/app_manager';
-import { log } from '../logger/log';
+import log from '../logger/log';
 import { parseExpectionMsg } from './utils';
-
-let sessionManager = null;
 
 class SessionManager {
 
@@ -40,29 +39,35 @@ class SessionManager {
 
   hasSessionForApp(appData) {
     let app;
-    for (var key in this.sessionPool) {
-      app = this.sessionPool[key].app;
-      if (_.isEqual(app, appData)) {
-        return key;
+    for (const key in this.sessionPool) {
+      if (key) {
+        app = this.sessionPool[key].app;
+        if (_.isEqual(app, appData)) {
+          return key;
+        }
       }
     }
     return null;
   }
 
-  registerApps = () => {
-    return new Promise(async(resolve, reject) => {
+  registerApps = () => (
+    new Promise(async(resolve, reject) => {
+      let app = null;
       try {
-        for (let key in this.sessionPool) {
-          app = this.sessionPool[key].app;
-          await appManager.registerApp(app)
+        for (const key in this.sessionPool) {
+          if (key) {
+            app = this.sessionPool[key].app;
+            await appManager.registerApp(app);
+          }
         }
         resolve();
       } catch (e) {
         log.warn(`Session manager :: Register app error :: ${parseExpectionMsg(e)}`);
         reject(e);
       }
-    });
-  }
+    })
+  )
 }
 
-export default sessionManager = new SessionManager();
+const sessionManager = new SessionManager();
+export default sessionManager;

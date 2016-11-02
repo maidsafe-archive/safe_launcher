@@ -1,5 +1,4 @@
-'use strict';
-
+/* eslint-disable no-underscore-dangle */
 export const availablePermissions = [
   'SAFE_DRIVE_ACCESS',
   'LOW_LEVEL_API'
@@ -10,7 +9,7 @@ export default class Permission {
   constructor(permissionsRequested = []) {
     permissionsRequested.forEach(permission => {
       if (availablePermissions.indexOf(permission) === -1) {
-        throw new Error('Invalid permission - ' + permission);
+        throw new Error(`Invalid permission - ${permission}`);
       }
     });
     this.permissionsRequested = permissionsRequested;
@@ -31,5 +30,5 @@ export default class Permission {
   get list() {
     return this.permissionsRequested;
   }
-
 }
+/* eslint-enable no-underscore-dangle */

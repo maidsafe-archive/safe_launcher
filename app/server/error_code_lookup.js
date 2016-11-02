@@ -1,8 +1,9 @@
-export var errorCodeLookup = function(errCode) {
-  let CLIENT_ERROR_START_RANGE = -1;
-  let NFS_ERROR_START_RANGE = CLIENT_ERROR_START_RANGE - 500;
-  let DNS_ERROR_START_RANGE = NFS_ERROR_START_RANGE - 500;
-  let FFI_ERROR_START_RANGE = DNS_ERROR_START_RANGE - 500;
+/* eslint-disable import/prefer-default-export */
+export const errorCodeLookup = errCode => {
+  const CLIENT_ERROR_START_RANGE = -1;
+  const NFS_ERROR_START_RANGE = CLIENT_ERROR_START_RANGE - 500;
+  const DNS_ERROR_START_RANGE = NFS_ERROR_START_RANGE - 500;
+  const FFI_ERROR_START_RANGE = DNS_ERROR_START_RANGE - 500;
   switch (errCode) {
     case CLIENT_ERROR_START_RANGE:
       return 'CoreError::StructuredDataHeaderSizeProhibitive';
@@ -161,7 +162,7 @@ export var errorCodeLookup = function(errCode) {
     case FFI_ERROR_START_RANGE - 23:
       return 'FfiError::InvalidIndex';
     case FFI_ERROR_START_RANGE - 24:
-      return 'FfiError::UnsupportedOperation';            
+      return 'FfiError::UnsupportedOperation';
     default:
       return 'Unexpected error';
   }

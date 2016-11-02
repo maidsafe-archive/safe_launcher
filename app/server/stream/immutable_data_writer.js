@@ -1,13 +1,16 @@
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable func-names */
 import util from 'util';
 import { Writable } from 'stream';
 import immutableData from '../../ffi/api/immutable_data';
+import log from '../../logger/log';
 
-export var ImmutableDataWriter = function (req, writerId, responseHandler, size, offset) {
+export const ImmutableDataWriter = function (req, writerId, responseHandler, size, offset) {
   Writable.call(this);
   this.eventEmitter = req.app.get('eventEmitter');
   this.uploadEvent = req.app.get('EVENT_TYPE').DATA_UPLOADED;
   this.writerId = writerId;
-  this.curOffset = parseInt(offset || 0);
+  this.curOffset = parseInt(offset || 0, 10);
   this.maxSize = size;
   this.responseHandler = responseHandler;
   return this;
@@ -15,9 +18,8 @@ export var ImmutableDataWriter = function (req, writerId, responseHandler, size,
 
 util.inherits(ImmutableDataWriter, Writable);
 
-/*jscs:disable disallowDanglingUnderscores*/
+/* eslint-disable no-underscore-dangle */
 ImmutableDataWriter.prototype._write = function (data, enc, next) {
-  /*jscs:enable disallowDanglingUnderscores*/
   immutableData.write(this.writerId, data)
     .then(() => {
       this.eventEmitter.emit(this.uploadEvent, data.length);
@@ -32,3 +34,4 @@ ImmutableDataWriter.prototype._write = function (data, enc, next) {
       log.error(`Stream :: Immutable data writer :: ${e}`);
     });
 };
+/* eslint-enable no-underscore-dangle */
