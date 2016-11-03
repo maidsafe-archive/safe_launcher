@@ -112,6 +112,7 @@ class DNS extends FfiApi {
         resolve();
       };
       try {
+        await nfs.getDirectory(app, dirPath, isShared);
         await this.registerLongName(app, longName);
         const longNameBuffer = new Buffer(longName);
         const serviceNameBuffer = new Buffer(serviceName);
