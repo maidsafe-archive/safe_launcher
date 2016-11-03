@@ -404,6 +404,16 @@ describe('DNS', () => {
         })
     ));
 
+    it('Should return 404 if service home directory is invalid', () => (
+      dnsUtils.addService(authToken, longName, serviceName, 'testxxx', rootPath)
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(404);
+          should(err.response.data.errorCode).be.equal(-1502);
+          should(err.response.data.description).be.equal('FfiError::PathNotFound');
+        })
+    ));
+
     it('Should be able to add service', () => (
       dnsUtils.addService(authToken, longName, serviceName, dirPath, rootPath)
         .should.be.fulfilled()
