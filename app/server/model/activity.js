@@ -1,4 +1,4 @@
-export let ActivityStatus = {
+export const ActivityStatus = {
   IN_PROGRESS: 0,
   SUCCESS: 1,
   FAILURE: -1

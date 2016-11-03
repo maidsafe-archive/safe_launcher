@@ -1,10 +1,8 @@
-'use strict';
-
-import FfiApi from '../ffi_api';
 import ffi from 'ffi';
 import ref from 'ref';
+import FfiApi from '../ffi_api';
 import appManager from './app_manager';
-import { log } from '../../logger/log';
+import log from '../../logger/log';
 
 const Void = ref.types.void;
 const int32 = ref.types.int32;
@@ -26,13 +24,13 @@ class SessionManager extends FfiApi {
 
   getFunctionsToRegister() {
     return {
-      'client_issued_deletes': [int64, [SessionHandle]],
-      'client_issued_gets': [int64, [SessionHandle]],
-      'client_issued_posts': [int64, [SessionHandle]],
-      'client_issued_puts': [int64, [SessionHandle]],
-      'drop_session': [Void, [SessionHandle]],
-      'get_account_info': [int32, [SessionHandle, u64Pointer, u64Pointer]],
-      'register_network_event_observer': [int32, [SessionHandle, 'pointer']]
+      client_issued_deletes: [int64, [SessionHandle]],
+      client_issued_gets: [int64, [SessionHandle]],
+      client_issued_posts: [int64, [SessionHandle]],
+      client_issued_puts: [int64, [SessionHandle]],
+      drop_session: [Void, [SessionHandle]],
+      get_account_info: [int32, [SessionHandle, u64Pointer, u64Pointer]],
+      register_network_event_observer: [int32, [SessionHandle, 'pointer']]
     };
   }
 
@@ -128,7 +126,7 @@ class SessionManager extends FfiApi {
     if (self.stateChangeListener) {
       self.stateChangeListener(2);
     }
-  };
+  }
 
   set sessionHandle(handle) {
     log.debug('FFI :: Set session handle');
@@ -137,11 +135,13 @@ class SessionManager extends FfiApi {
         await appManager.revokeAnonymousApp();
         await this.dropSessionHandle();
       }
+      /* eslint-disable new-cap */
       const onStateChange = ffi.Callback(Void, [int32], (state) => {
         if (this.stateChangeListener) {
           this.stateChangeListener(state);
         }
       });
+      /* eslint-enable new-cap */
       if (this.safeCore.register_network_event_observer(handle, onStateChange) !== 0) {
         throw new Error('Failed to set network observer');
       }

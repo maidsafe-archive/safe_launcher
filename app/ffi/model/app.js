@@ -1,7 +1,5 @@
-'use strict';
-
+/* eslint-disable no-underscore-dangle */
 export default class App {
-
   constructor(appName, appId, vendorName, version, permission) {
     if (!appId || !appName || !vendorName || !version) {
       throw new Error('Fields can not be empty');
@@ -32,5 +30,5 @@ export default class App {
   get permission() {
     return this._permission;
   }
-
 }
+/* eslint-enable no-underscore-dangle */

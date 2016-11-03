@@ -1,7 +1,7 @@
 import ref from 'ref';
 
 import FfiApi from '../ffi_api';
-import { log } from '../../logger/log';
+import log from '../../logger/log';
 
 const int32 = ref.types.int32;
 const u64 = ref.types.uint64;
@@ -11,16 +11,11 @@ const u8Pointer = ref.refType(u8);
 const u64Pointer = ref.refType(u64);
 
 class DataId extends FfiApi {
-
-  constructor() {
-    super();
-  }
-
   getFunctionsToRegister() {
     return {
-      'data_id_new_struct_data': [int32, [u64, u8Pointer, u64Pointer]],
-      'data_id_new_appendable_data': [int32, [u8Pointer, bool, u64Pointer]],
-      'data_id_free': [int32, [u64]]
+      data_id_new_struct_data: [int32, [u64, u8Pointer, u64Pointer]],
+      data_id_new_appendable_data: [int32, [u8Pointer, bool, u64Pointer]],
+      data_id_free: [int32, [u64]]
     };
   }
 

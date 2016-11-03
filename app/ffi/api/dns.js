@@ -1,20 +1,22 @@
-'use strict'
-
 import ref from 'ref';
 
 import appManager from '../util/app_manager';
-import { error, consumeStringListHandle, derefFileMetadataStruct,
-         DirectoryMetadata, FileDetails, FileMetadata} from '../util/utils';
+import {
+  error, consumeStringListHandle, derefFileMetadataStruct,
+  FileDetails, FileMetadata
+} from '../util/utils';
 import FfiApi from '../ffi_api';
 import nfs from './nfs';
-import {log} from '../../logger/log';
+import log from '../../logger/log';
 
 const CString = ref.types.CString;
 const int32 = ref.types.int32;
 const int64 = ref.types.int64;
 const u8 = ref.types.uint8;
 const u64 = ref.types.uint64;
+/* eslint-disable camelcase */
 const size_t = ref.types.size_t;
+/* eslint-enable camelcase */
 const bool = ref.types.bool;
 const Void = ref.types.void;
 const PointerHandle = ref.refType(Void);
@@ -26,26 +28,27 @@ const FileDetailsHandle = ref.refType(FileDetails);
 const PointerToFileDetailsPointer = ref.refType(FileDetailsHandle);
 
 class DNS extends FfiApi {
-
-  constructor() {
-    super();
-  }
-
   getFunctionsToRegister() {
-   return {
-     'dns_register_long_name': [int32, [PointerHandle, u8Pointer, u64]],
-     'dns_get_long_names': [int32, [PointerHandle, PointerToVoidPointer]],
-     'dns_delete_long_name': [int32, [PointerHandle, u8Pointer, u64]],
-     'dns_add_service': [int32, [PointerHandle, u8Pointer, size_t, u8Pointer, size_t, u8Pointer, size_t, bool]],
-     'dns_delete_service': [int32, [PointerHandle, u8Pointer, size_t, u8Pointer, size_t]],
-     'dns_get_service_dir': [int32, [PointerHandle, u8Pointer, size_t, u8Pointer, size_t, PointerToVoidPointer]],
-     'dns_get_services': [int32, [PointerHandle, u8Pointer, size_t, PointerToVoidPointer]],
-     'dns_get_file': [int32, [PointerHandle, u8Pointer, size_t, u8Pointer, size_t, u8Pointer, size_t, int64, int64, bool, PointerToFileMetadataPointer]],
-     'dns_get_file_metadata': [int32, [PointerHandle, u8Pointer, size_t, u8Pointer, size_t, u8Pointer, size_t, PointerToFileDetailsPointer]],
-     'string_list_len': [u64, [PointerHandle]],
-     'string_list_at': [CString, [PointerHandle, u64]],
-     'string_list_drop': [Void, [PointerHandle]]
-   };
+    /* eslint-disable camelcase */
+    return {
+      dns_register_long_name: [int32, [PointerHandle, u8Pointer, u64]],
+      dns_get_long_names: [int32, [PointerHandle, PointerToVoidPointer]],
+      dns_delete_long_name: [int32, [PointerHandle, u8Pointer, u64]],
+      dns_add_service: [int32,
+        [PointerHandle, u8Pointer, size_t, u8Pointer, size_t, u8Pointer, size_t, bool]],
+      dns_delete_service: [int32, [PointerHandle, u8Pointer, size_t, u8Pointer, size_t]],
+      dns_get_service_dir: [int32,
+        [PointerHandle, u8Pointer, size_t, u8Pointer, size_t, PointerToVoidPointer]],
+      dns_get_services: [int32, [PointerHandle, u8Pointer, size_t, PointerToVoidPointer]],
+      dns_get_file: [int32, [PointerHandle, u8Pointer, size_t, u8Pointer, size_t, u8Pointer,
+        size_t, int64, int64, bool, PointerToFileMetadataPointer]],
+      dns_get_file_metadata: [int32, [PointerHandle, u8Pointer, size_t, u8Pointer, size_t,
+        u8Pointer, size_t, PointerToFileDetailsPointer]],
+      string_list_len: [u64, [PointerHandle]],
+      string_list_at: [CString, [PointerHandle, u64]],
+      string_list_drop: [Void, [PointerHandle]]
+    };
+    /* eslint-enable camelcase */
   }
 
   registerLongName(app, longName) {
@@ -81,7 +84,8 @@ class DNS extends FfiApi {
         const listHandle = listHandlePointer.deref();
         resolve(consumeStringListHandle(this.safeCore, listHandle));
       };
-      this.safeCore.dns_get_long_names.async(appManager.getHandle(app), listHandlePointer, onResult);
+      this.safeCore.dns_get_long_names.async(appManager.getHandle(app),
+        listHandlePointer, onResult);
     });
   }
 
@@ -98,12 +102,13 @@ class DNS extends FfiApi {
         resolve();
       };
       const buff = new Buffer(longName);
-      this.safeCore.dns_delete_long_name.async(appManager.getHandle(app), buff, buff.length, onResult);
+      this.safeCore.dns_delete_long_name.async(appManager.getHandle(app),
+        buff, buff.length, onResult);
     });
   }
 
   registerService(app, longName, serviceName, dirPath, isShared = false) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
           log.error(`FFI :: DNS :: Register service :: ${err || res}`);
@@ -121,7 +126,7 @@ class DNS extends FfiApi {
           serviceNameBuffer, serviceNameBuffer.length,
           pathBuffer, pathBuffer.length, isShared,
           onResult);
-      } catch(e) {
+      } catch (e) {
         reject(e);
       }
     });
@@ -213,10 +218,11 @@ class DNS extends FfiApi {
           const fileMetadataHandle = fileMetadataRefRef.deref();
           const fileMetadataRef = ref.alloc(FileMetadataHandle, fileMetadataHandle).deref();
           const metadata = derefFileMetadataStruct(fileMetadataRef.deref());
-          this.safeCore.file_metadata_drop.async(fileMetadataHandle, (e) => {});
+          this.safeCore.file_metadata_drop.async(fileMetadataHandle, () => {});
           resolve(metadata);
-        } catch(e) {
-          log.warn(`FFI :: DNS :: Get file metadata :: Caught exception - ${typeof e === 'object' ? JSON.parse(e) : e}`);
+        } catch (e) {
+          log.warn(`FFI :: DNS :: Get file metadata :: Caught exception - 
+            ${typeof e === 'object' ? JSON.parse(e) : e}`);
         }
       };
       const longNameBuffer = new Buffer(longName);

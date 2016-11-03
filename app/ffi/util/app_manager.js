@@ -1,10 +1,8 @@
-'use strict';
-
 import ref from 'ref';
 import FfiApi from '../ffi_api';
 import App from '../model/app';
 import sessionManager from '../util/session_manager';
-import { log } from '../../logger/log';
+import log from '../../logger/log';
 
 const Void = ref.types.void;
 const int32 = ref.types.int32;
@@ -25,9 +23,10 @@ class AppManager extends FfiApi {
 
   getFunctionsToRegister() {
     return {
-      'register_app': [int32, [SessionHandle, CString, u64, CString, u64, CString, u64, bool, AppHandlePointer]],
-      'create_unauthorised_app': [int32, [SessionHandle, AppHandlePointer]],
-      'drop_app': [Void, [AppHandle]]
+      register_app: [int32,
+        [SessionHandle, CString, u64, CString, u64, CString, u64, bool, AppHandlePointer]],
+      create_unauthorised_app: [int32, [SessionHandle, AppHandlePointer]],
+      drop_app: [Void, [AppHandle]]
     };
   }
 
@@ -117,11 +116,13 @@ class AppManager extends FfiApi {
           self.anonymousApp = handle;
           resolve(app);
         } catch (e) {
-          log.warn(`FFI :: Create unregistered app :: Caught exception - ${typeof e === 'object' ? JSON.parse(e) : e}`);
+          log.warn(`FFI :: Create unregistered app :: Caught exception - 
+            ${typeof e === 'object' ? JSON.parse(e) : e}`);
         }
       };
 
-      self.safeCore.create_unauthorised_app.async(sessionManager.sessionHandle, appHandle, onResult);
+      self.safeCore.create_unauthorised_app.async(sessionManager.sessionHandle,
+        appHandle, onResult);
     };
     return new Promise(executor);
   }
@@ -131,12 +132,13 @@ class AppManager extends FfiApi {
     log.debug('FFI :: Drop application handle');
     const exec = async(resolve, reject) => {
       try {
-        for (let app of self.holder.keys()) {
+        for (const app of self.holder.keys()) {
           await self.revokeApp(app);
         }
         resolve();
       } catch (e) {
-        log.warn(`FFI :: Drop application handle :: Caught exception - ${typeof e === 'object' ? JSON.parse(e) : e}`);
+        log.warn(`FFI :: Drop application handle :: Caught exception - 
+          ${typeof e === 'object' ? JSON.parse(e) : e}`);
         reject(e);
       }
     };

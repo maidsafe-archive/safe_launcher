@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+
 export default class SessionInfo {
   constructor(app) {
     this.appSigningKey = crypto.randomBytes(32);
@@ -16,7 +17,7 @@ export default class SessionInfo {
   }
 
   updateActivity(activity) {
-    let index = this.activities.indexOf(activity);
+    const index = this.activities.indexOf(activity);
     if (index < 0) {
       return;
     }

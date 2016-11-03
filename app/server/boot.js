@@ -1,25 +1,26 @@
-/*jslint nomen: true */
-import path from 'path';
 import http from 'http';
 import express from 'express';
 import EventEmitter from 'events';
 import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
-/*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+/* eslint-disable camelcase */
 import { router_0_5 } from './routes/version_0_5';
-/*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
+/* eslint-enable camelcase */
 import { CreateSession } from './controllers/auth';
-import { formatResponse, ResponseError, setSessionHeaderAndParseBody, updateAppActivity } from './utils';
-import { log } from './../logger/log';
+import { ResponseError, setSessionHeaderAndParseBody, updateAppActivity } from './utils';
+import log from './../logger/log';
 
-class ServerEventEmitter extends EventEmitter {}
+class ServerEventEmitter extends EventEmitter {
+}
 
 export default class RESTServer {
   constructor(port, callback) {
     this.port = port;
     this.app = express();
     this.server = null;
-    this.callback = callback || function() {};
+    /* eslint-disable func-names */
+    this.callback = callback || function () {};
+    /* eslint-enable func-names */
     this.EVENT_TYPE = {
       ERROR: 'error',
       STARTED: 'started',
@@ -36,9 +37,10 @@ export default class RESTServer {
     this.app.set('eventEmitter', new ServerEventEmitter());
     this.app.set('EVENT_TYPE', this.EVENT_TYPE);
   }
-  /* jscs:disable disallowDanglingUnderscores*/
+
+  /* eslint-disable no-underscore-dangle */
   _onError(type, eventEmitter) {
-    return function(error) {
+    return (error) => {
       log.error(`API server exited with error :: ${error.message}`);
       if (error.syscall !== 'listen') {
         throw error;
@@ -48,25 +50,24 @@ export default class RESTServer {
   }
 
   _onClose(type, eventEmitter) {
-    return function() {
+    return () => {
       log.warn('API server closed');
       eventEmitter.emit(type);
     };
   }
 
   _onListening(type, eventEmitter) {
-    return function() {
+    return () => {
       log.info('API server started');
       eventEmitter.emit(type);
     };
   }
-  /* jscs:enable disallowDanglingUnderscores*/
+  /* eslint-enable no-underscore-dangle */
 
   start() {
     log.info('Server started');
-    let app = this.app;
-    let EVENT_TYPE = this.app.get('EVENT_TYPE');
-    let eventEmitter = this.app.get('eventEmitter');
+    const app = this.app;
+    const eventEmitter = this.app.get('eventEmitter');
 
     app.use(bodyParser.urlencoded({
       extended: false
@@ -74,26 +75,25 @@ export default class RESTServer {
 
     app.use(setSessionHeaderAndParseBody);
 
-    app.use('/health', function(req, res) {
+    app.use('/health', (req, res) => {
       res.sendStatus(200);
     });
-    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     app.use('/', router_0_5);
     app.use('/0.5', router_0_5);
-    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
 
     // API Error handling
-    app.use(function(err, req, res, next) {
+    app.use((err, req, res, next) => {
       if (!(err instanceof ResponseError)) {
         return next();
       }
       updateAppActivity(req, res);
-      log.warn(`API Error handling :: ${req.id} :: Err ${err.status} - Msg :: ${JSON.stringify(err.msg)}`);
+      log.warn(`API Error handling :: ${req.id} :: Err ${err.status} - Msg 
+        :: ${JSON.stringify(err.msg)}`);
       res.status(err.status).send(err.msg);
     });
 
     // catch 404
-    app.use(function(err, req, res) {
+    app.use((err, req, res) => {
       if (res.headersSent) {
         return;
       }
@@ -109,11 +109,11 @@ export default class RESTServer {
     this.server = http.createServer(app);
     this.server.timeout = 0;
     this.server.listen(this.port, this.callback);
-    /* jscs:disable disallowDanglingUnderscores*/
+    /* eslint-disable no-underscore-dangle */
     this.server.on('error', this._onError(this.EVENT_TYPE.ERROR, eventEmitter));
     this.server.on('close', this._onClose(this.EVENT_TYPE.STOPPED, eventEmitter));
     this.server.on('listening', this._onListening(this.EVENT_TYPE.STARTED, eventEmitter));
-    /* jscs:enable disallowDanglingUnderscores*/
+    /* eslint-enable no-underscore-dangle */
   }
 
   stop() {
@@ -153,13 +153,16 @@ export default class RESTServer {
 
   authApproved(data) {
     log.info('Authorisation approved');
-    log.debug(`Authorisation approved :: ${data.request.id} - App Name :: ${data.payload.app.name}`);
-    new CreateSession(data)
+    log.debug(`Authorisation approved :: ${data.request.id} - App Name 
+      :: ${data.payload.app.name}`);
+    /* eslint-disable no-new */
+    new CreateSession(data);
+    /* eslint-enable no-new */
   }
 
   getAppActivityList(sessionId) {
     log.debug(`Get app activity list for session id :: ${sessionId}`);
-    let sessionInfo = sessionManager.get(sessionId);
+    const sessionInfo = sessionManager.get(sessionId);
     return sessionInfo ? sessionInfo.activityList : null;
   }
 

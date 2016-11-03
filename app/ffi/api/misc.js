@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import ref from 'ref';
 
 import FfiApi from '../ffi_api';
@@ -7,40 +8,41 @@ const Void = ref.types.void;
 const int32 = ref.types.int32;
 const u64 = ref.types.uint64;
 const u8 = ref.types.uint8;
-const bool = ref.types.bool;
 const CString = ref.types.CString;
+/* eslint-disable camelcase */
 const size_t = ref.types.size_t;
+/* eslint-enable camelcase */
 const u8Pointer = ref.refType(u8);
 const u64Pointer = ref.refType(u64);
 const int32Ptr = ref.refType(int32);
+/* eslint-disable camelcase */
 const size_tPointer = ref.refType(size_t);
+/* eslint-enable camelcase */
 const AppHandle = ref.refType(Void);
 
 const PointerToU8Pointer = ref.refType(u8Pointer);
 
 class Misc extends FfiApi {
-
-  constructor() {
-    super();
-  }
-
   getFunctionsToRegister() {
+    /* eslint-disable camelcase */
     return {
-      'init_logging': [int32, []],
-      'misc_encrypt_key_free': [int32, [u64]],
-      'misc_sign_key_free': [int32, [u64]],
-      'misc_serialise_data_id': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
-      'misc_deserialise_data_id': [int32, [u8Pointer, size_t, u64Pointer]],
-      'misc_serialise_appendable_data': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
-      'misc_serialise_struct_data': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
-      'misc_deserialise_appendable_data': [int32, [u8Pointer, size_t, u64Pointer]],
-      'misc_deserialise_struct_data': [int32, [u8Pointer, size_t, u64Pointer]],
-      'misc_serialise_sign_key': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
-      'misc_deserialise_sign_key': [int32, [u8Pointer, size_t, u64Pointer]],
-      'misc_maid_sign_key': [int32, [AppHandle, u64Pointer]],
-      'misc_u8_ptr_free': [Void, [u8Pointer, size_t, size_t]],
-      'output_log_path': [ 'pointer', [ CString, u64, int32Ptr, int32Ptr, int32Ptr ] ]
+      init_logging: [int32, []],
+      misc_encrypt_key_free: [int32, [u64]],
+      misc_sign_key_free: [int32, [u64]],
+      misc_serialise_data_id: [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
+      misc_deserialise_data_id: [int32, [u8Pointer, size_t, u64Pointer]],
+      misc_serialise_appendable_data: [int32,
+        [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
+      misc_serialise_struct_data: [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
+      misc_deserialise_appendable_data: [int32, [u8Pointer, size_t, u64Pointer]],
+      misc_deserialise_struct_data: [int32, [u8Pointer, size_t, u64Pointer]],
+      misc_serialise_sign_key: [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
+      misc_deserialise_sign_key: [int32, [u8Pointer, size_t, u64Pointer]],
+      misc_maid_sign_key: [int32, [AppHandle, u64Pointer]],
+      misc_u8_ptr_free: [Void, [u8Pointer, size_t, size_t]],
+      output_log_path: ['pointer', [CString, u64, int32Ptr, int32Ptr, int32Ptr]]
     };
+    /* eslint-enable camelcase */
   }
 
   getLogFilePath() {
@@ -65,10 +67,11 @@ class Misc extends FfiApi {
         self.dropVector(res, size, capacity);
         resolve(response);
       };
-      self.safeCore.output_log_path.async(outputFile, outputFile.length, sizePtr, capacityPtr, resultPtr, onResult);
+      self.safeCore.output_log_path.async(outputFile, outputFile.length,
+        sizePtr, capacityPtr, resultPtr, onResult);
     };
     return new Promise(executor);
-  };
+  }
 
   dropEncryptKeyHandle(handleId) {
     const self = this;
@@ -100,7 +103,7 @@ class Misc extends FfiApi {
 
   dropVector(dataPointer, size, capacity) {
     const self = this;
-    const executor = (resolve, reject) => {
+    const executor = resolve => {
       const onResult = (err) => {
         if (err) {
           console.error(err);
@@ -109,7 +112,7 @@ class Misc extends FfiApi {
       };
       try {
         self.safeCore.misc_u8_ptr_free.async(dataPointer, size, capacity, onResult);
-      } catch(e) {
+      } catch (e) {
         console.error(e);
       }
     };
@@ -156,7 +159,7 @@ class Misc extends FfiApi {
 
   _deserialise(data, type) {
     return new Promise((resolve, reject) => {
-      let handleRef = ref.alloc(u64);
+      const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
@@ -168,7 +171,8 @@ class Misc extends FfiApi {
           this.safeCore.misc_deserialise_data_id.async(data, data.length, handleRef, onResult);
           break;
         case 1:
-          this.safeCore.misc_deserialise_appendable_data.async(data, data.length, handleRef, onResult);
+          this.safeCore.misc_deserialise_appendable_data.async(data, data.length,
+            handleRef, onResult);
           break;
         case 2:
           this.safeCore.misc_deserialise_struct_data.async(data, data.length, handleRef, onResult);
@@ -230,9 +234,9 @@ class Misc extends FfiApi {
         reject(e);
       }
     };
-    return new Promise(executor)
+    return new Promise(executor);
   }
 }
-
+/* eslint-enable no-underscore-dangle */
 const misc = new Misc();
 export default misc;

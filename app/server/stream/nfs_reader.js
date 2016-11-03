@@ -1,8 +1,9 @@
-import { log } from './../../logger/log';
+import { Readable } from 'stream';
+import log from './../../logger/log';
 import nfs from '../../ffi/api/nfs';
 import { updateAppActivity, parseExpectionMsg } from './../utils.js';
-var Readable = require('stream').Readable;
 
+/* eslint-disable no-underscore-dangle */
 export default class NfsReader extends Readable {
   constructor(req, res, filePath, isPathShared, start, end, app) {
     super();
@@ -18,7 +19,7 @@ export default class NfsReader extends Readable {
     this.MAX_SIZE_TO_READ = 1048576; // 1 MB
   }
 
-  _read = async(next) => {
+  _read = async() => {
     try {
       if (this.curOffset === this.end) {
         this.push(null);
@@ -28,7 +29,7 @@ export default class NfsReader extends Readable {
       const eventEmitter = this.req.app.get('eventEmitter');
       const eventType = this.req.app.get('EVENT_TYPE').DATA_DOWNLOADED;
       this.sizeToRead = diff > this.MAX_SIZE_TO_READ ? this.MAX_SIZE_TO_READ : diff;
-      let data = await nfs.readFile(this.app, this.filePath, this.isPathShared,
+      const data = await nfs.readFile(this.app, this.filePath, this.isPathShared,
         this.curOffset, this.sizeToRead);
       this.curOffset += this.sizeToRead;
       this.push(data);
@@ -41,3 +42,4 @@ export default class NfsReader extends Readable {
     }
   }
 }
+/* eslint-enable no-underscore-dangle */

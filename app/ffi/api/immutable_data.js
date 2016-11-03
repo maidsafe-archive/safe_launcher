@@ -2,39 +2,37 @@ import ref from 'ref';
 
 import misc from './misc';
 import FfiApi from '../ffi_api';
-import cipherOpts from './cipher_opts';
 import appManager from '../util/app_manager';
-import { ENCRYPTION_TYPE } from '../model/enum';
-import { log } from '../../logger/log';
+import log from '../../logger/log';
 
 const int32 = ref.types.int32;
 const u8 = ref.types.uint8;
 const u64 = ref.types.uint64;
 const Void = ref.types.void;
+/* eslint-disable camelcase */
 const size_t = ref.types.size_t;
+/* eslint-disable camelcase */
 
 const VoidPointer = ref.refType(Void);
 const u8Pointer = ref.refType(u8);
 const u64Pointer = ref.refType(u64);
 const PointerToU8Pointer = ref.refType(u8Pointer);
+/* eslint-disable camelcase */
 const size_tPointer = ref.refType(size_t);
+/* eslint-disable camelcase */
 
 class ImmutableData extends FfiApi {
-
-  constructor() {
-    super();
-  }
-
   getFunctionsToRegister() {
     return {
-      'immut_data_new_self_encryptor': [int32, [VoidPointer, u64Pointer]],
-      'immut_data_write_to_self_encryptor': [int32, [u64, u8Pointer, u64]],
-      'immut_data_close_self_encryptor': [int32, [VoidPointer, u64, u64, u64Pointer]],
-      'immut_data_fetch_self_encryptor': [int32, [VoidPointer, u64, u64Pointer]],
-      'immut_data_size': [int32, [u64, u64Pointer]],
-      'immut_data_read_from_self_encryptor': [int32, [u64, u64, u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
-      'immut_data_self_encryptor_writer_free': [int32, [u64]],
-      'immut_data_self_encryptor_reader_free': [int32, [u64]]
+      immut_data_new_self_encryptor: [int32, [VoidPointer, u64Pointer]],
+      immut_data_write_to_self_encryptor: [int32, [u64, u8Pointer, u64]],
+      immut_data_close_self_encryptor: [int32, [VoidPointer, u64, u64, u64Pointer]],
+      immut_data_fetch_self_encryptor: [int32, [VoidPointer, u64, u64Pointer]],
+      immut_data_size: [int32, [u64, u64Pointer]],
+      immut_data_read_from_self_encryptor: [int32,
+        [u64, u64, u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
+      immut_data_self_encryptor_writer_free: [int32, [u64]],
+      immut_data_self_encryptor_reader_free: [int32, [u64]]
     };
   }
 
@@ -52,7 +50,8 @@ class ImmutableData extends FfiApi {
         }
         resolve(handleRef.deref());
       };
-      self.safeCore.immut_data_new_self_encryptor.async(appManager.getHandle(app), handleRef, onResult);
+      self.safeCore.immut_data_new_self_encryptor.async(appManager.getHandle(app),
+        handleRef, onResult);
     };
     return new Promise(executor);
   }
@@ -75,7 +74,6 @@ class ImmutableData extends FfiApi {
   closeWriter(app, writerHandleId, cipherOptsHandle) {
     const self = this;
     const executor = async(resolve, reject) => {
-      const dataIdRef = ref.alloc(u64);
       try {
         const dataIdRef = ref.alloc(u64);
         const onResult = (err, res) => {
@@ -85,8 +83,8 @@ class ImmutableData extends FfiApi {
           }
           resolve(dataIdRef.deref());
         };
-        self.safeCore.immut_data_close_self_encryptor.async(appManager.getHandle(app), writerHandleId,
-          cipherOptsHandle, dataIdRef, onResult);
+        self.safeCore.immut_data_close_self_encryptor.async(appManager.getHandle(app),
+          writerHandleId, cipherOptsHandle, dataIdRef, onResult);
       } catch (e) {
         reject(e);
       }
@@ -105,7 +103,8 @@ class ImmutableData extends FfiApi {
         }
         resolve(handleRef.deref());
       };
-      self.safeCore.immut_data_fetch_self_encryptor.async(appManager.getHandle(app), dataIdHandle, handleRef, onResult);
+      self.safeCore.immut_data_fetch_self_encryptor.async(appManager.getHandle(app),
+        dataIdHandle, handleRef, onResult);
     };
     return new Promise(executor);
   }

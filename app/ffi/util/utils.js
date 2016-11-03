@@ -1,12 +1,9 @@
-'use strict';
-
 import ref from 'ref';
 import StructType from 'ref-struct';
 
-import misc from '../api/misc';
-
 const int64 = ref.types.int64;
 const u64 = ref.types.uint64;
+/* eslint-disable camelcase */
 const size_t = ref.types.size_t;
 const bool = ref.types.bool;
 const u8Pointer = ref.refType(ref.types.uint8);
@@ -46,10 +43,11 @@ export const FileDetails = new StructType({
   content_cap: size_t,
   metadata: ref.refType(FileMetadata)
 });
+/* eslint-enable camelcase */
 
-const computeTime = function(seconds, nanoSeconds) {
-  return new Date((seconds * 1000) + Math.floor(nanoSeconds / 1000000)).toISOString();
-};
+const computeTime = (seconds, nanoSeconds) => (
+  new Date((seconds * 1000) + Math.floor(nanoSeconds / 1000000)).toISOString()
+);
 
 
 export const error = (msg) => {
@@ -60,57 +58,61 @@ export const error = (msg) => {
 };
 
 export const derefFileMetadataStruct = (metadataStruct) => {
-  let name = '';
-  let metadata = '';
+  let fileName = '';
+  let fileMetadata = '';
   if (metadataStruct.name_len > 0) {
-    name = ref.reinterpret(metadataStruct.name, metadataStruct.name_len).toString();
+    fileName = ref.reinterpret(metadataStruct.name, metadataStruct.name_len).toString();
   }
   if (metadataStruct.user_metadata_len > 0) {
-    metadata = ref.reinterpret(metadataStruct.user_metadata, metadataStruct.user_metadata_len).toString();
+    fileMetadata = ref.reinterpret(metadataStruct.user_metadata,
+      metadataStruct.user_metadata_len).toString();
   }
   return {
-    name: name,
-    metadata: metadata,
+    name: fileName,
+    metadata: fileMetadata,
     size: metadataStruct.size,
     createdOn: computeTime(metadataStruct.creation_time_sec, metadataStruct.creation_time_nsec),
-    modifiedOn: computeTime(metadataStruct.modification_time_sec, metadataStruct.modification_time_nsec)
+    modifiedOn: computeTime(metadataStruct.modification_time_sec,
+      metadataStruct.modification_time_nsec)
   };
 };
 
 export const derefDirectoryMetadataStruct = (metadataStruct) => {
-  let name = '';
-  let metadata = '';
+  let dirName = '';
+  let dirMetadata = '';
   if (metadataStruct.name_len > 0) {
-    name = ref.reinterpret(metadataStruct.name, metadataStruct.name_len).toString();
+    dirName = ref.reinterpret(metadataStruct.name, metadataStruct.name_len).toString();
   }
   if (metadataStruct.user_metadata_len > 0) {
-    metadata = ref.reinterpret(metadataStruct.user_metadata, metadataStruct.user_metadata_len).toString();
+    dirMetadata = ref.reinterpret(metadataStruct.user_metadata,
+      metadataStruct.user_metadata_len).toString();
   }
   return {
-    name: name,
-    metadata: metadata,
+    name: dirName,
+    metadata: dirMetadata,
     isPrivate: metadataStruct.is_private,
     isVersioned: metadataStruct.is_versioned,
     createdOn: computeTime(metadataStruct.creation_time_sec, metadataStruct.creation_time_nsec),
-    modifiedOn: computeTime(metadataStruct.modification_time_sec, metadataStruct.modification_time_nsec)
+    modifiedOn: computeTime(metadataStruct.modification_time_sec,
+      metadataStruct.modification_time_nsec)
   };
 };
 
-export const consumeStringListHandle = async (safeCore, handle) => {
-  const executor = (resolve, reject) => {
-    const getItemAt = async (index) => {
-      const executor = (resolve, reject) => {
+export const consumeStringListHandle = async(safeCore, handle) => {
+  const exec = (resolve, reject) => {
+    const getItemAt = async(index) => {
+      const executor = (res, rej) => {
         const onResult = (err, str) => {
           if (err) {
-            return reject(err);
+            return rej(err);
           }
-          resolve(str);
+          res(str);
         };
         safeCore.string_list_at.async(handle, index, onResult);
       };
       return new Promise(executor);
     };
-    const onResult = async (err, length) => {
+    const onResult = async(err, length) => {
       if (err) {
         return reject(err);
       }
@@ -122,10 +124,10 @@ export const consumeStringListHandle = async (safeCore, handle) => {
         list.push(temp);
         i++;
       }
-      safeCore.string_list_drop.async(handle, (e) => {});
+      safeCore.string_list_drop.async(handle, () => {});
       resolve(list);
     };
     safeCore.string_list_len.async(handle, onResult);
   };
-  return new Promise(executor);
+  return new Promise(exec);
 };
