@@ -77,6 +77,17 @@ export const derefFileMetadataStruct = (metadataStruct) => {
   };
 };
 
+export const safeBufferGetter = (obj, ptrFieldName, lenFieldName) => {
+  let computedLenFieldName = lenFieldName;
+  if (!lenFieldName) {
+    computedLenFieldName = `${ptrFieldName}_len`;
+  }
+  if (obj[computedLenFieldName] === 0) {
+    return Buffer.alloc(0);
+  }
+  return Buffer.concat([ref.reinterpret(obj[ptrFieldName], obj[computedLenFieldName])]);
+};
+
 export const derefDirectoryMetadataStruct = (metadataStruct) => {
   let dirName = '';
   let dirMetadata = '';
