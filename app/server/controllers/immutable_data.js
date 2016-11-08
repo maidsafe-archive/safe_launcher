@@ -135,7 +135,8 @@ export const read = async(req, res, next) => {
     }
     const start = parseInt(positions[0], 10);
     const total = size;
-    const end = (positions[1] && total) ? parseInt(positions[1], 10) : total;
+    const end = ((positions[1] && total) && (positions[1] < total)) ?
+      parseInt(positions[1], 10) : total;
     const chunkSize = end - start;
     if (chunkSize < 0 || end > total) {
       return next(new ResponseError(416));
