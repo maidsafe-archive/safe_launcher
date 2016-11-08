@@ -182,6 +182,23 @@ describe('NFS directory', () => {
           should(res.data.info.name).be.equal(dirPath);
         })
     ));
+    it('Should be able to get app root directory, if no path given', () => (
+      utils.getDir(authToken, rootPath, null)
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data).have.keys('info', 'subDirectories', 'files');
+          should(res.data.info).have.keys(
+            'name',
+            'metadata',
+            'isPrivate',
+            'isVersioned',
+            'createdOn',
+            'modifiedOn'
+          );
+          should(res.data.info.name.toLowerCase().indexOf('root-dir')).not.be.equal(-1);
+        })
+    ));
   });
 
   describe('Delete directory', () => {

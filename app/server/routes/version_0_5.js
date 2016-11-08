@@ -35,7 +35,7 @@ router.delete('/auth', new ActivityMiddleware('Revoke app'), Auth.revoke);
 // NFS - DIRECTORY API
 router.post('/nfs/directory/:rootPath/*', jsonParser,
   new ActivityMiddleware('Create directory'), NFS.createDirectory);
-router.get('/nfs/directory/:rootPath/*',
+router.get('/nfs/directory/:rootPath/*?',
   new ActivityMiddleware('Fetch directory'), NFS.getDirectory);
 router.delete('/nfs/directory/:rootPath/*',
   new ActivityMiddleware('Delete directory'), NFS.deleteDirectory);
