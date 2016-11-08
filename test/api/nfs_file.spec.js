@@ -153,7 +153,7 @@ describe('NFS file', () => {
           should(res.data).be.equal(fileContent);
         })
     ));
-    it('Should be able to get file if range end is higher than file size', () => (
+    it('Should be able to get file if range end is greater than file size', () => (
       nfsUtils.getFile(authToken, rootPath, filePath,
         { headers: { range: `bytes=0-${fileContent.length + 10}` } })
         .should.be.fulfilled()

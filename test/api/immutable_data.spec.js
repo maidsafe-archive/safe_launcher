@@ -290,7 +290,7 @@ describe('Immutable data', () => {
         })
         .then(() => dropHandles())
     ));
-    it('Should be able to read immutable data if range end is higher than file size', () => (
+    it('Should be able to read immutable data if range end is greater than file size', () => (
       writeImmutData(CONSTANTS.ENCRYPTION.PLAIN)
         .then(() => immutUtils.read(null, readerHandleId,
           { headers: { range: `bytes=0-${content.length + 10}` } }))
