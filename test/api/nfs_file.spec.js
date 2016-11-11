@@ -151,6 +151,22 @@ describe('NFS file', () => {
         .then(res => {
           should(res.status).be.equal(200);
           should(res.data).be.equal(fileContent);
+          should(res.headers).have.keys(
+            'content-range',
+            'accept-ranges',
+            'created-on',
+            'last-modified',
+            'metadata',
+            'content-type',
+            'content-length'
+          );
+          should(res.headers['content-range']).match(/^bytes\s\d+-\d+\/\d+/);
+          should(res.headers['accept-ranges']).be.equal('bytes');
+          should(new Date(res.headers['created-on'])).be.ok();
+          should(new Date(res.headers['last-modified'])).be.ok();
+          should(res.headers['content-type']).be.String();
+          should(res.headers['content-type'].length).not.be.equal(0);
+          should(isNaN(res.headers['content-length'])).not.be.ok();
         })
     ));
   });
@@ -163,21 +179,13 @@ describe('NFS file', () => {
     it('Should return 401 if authorisation token is not valid', () => (
       nfsUtils.getFileMeta()
         .should.be.rejectedWith(Error)
-        .then(err => {
-          should(err.response.status).be.equal(401);
-          // should(err.response.data.errorCode).be.equal(400);
-          // should(err.response.data.description).be.equal(MESSAGES.UNAUTHORISED);
-        })
+        .then(err => should(err.response.status).be.equal(401))
     ));
 
     it('Should return 400 if rootPath is not found', () => (
       nfsUtils.getFileMeta(authToken)
         .should.be.rejectedWith(Error)
-        .then(err => {
-          should(err.response.status).be.equal(400);
-          // should(err.response.data.errorCode).be.equal(400);
-          // should(err.response.data.description.indexOf('rootPath')).be.not.equal(-1);
-        })
+        .then(err => should(err.response.status).be.equal(400))
     ));
 
     it('Should return 404 if file not found', () => (
@@ -201,6 +209,12 @@ describe('NFS file', () => {
             'content-type',
             'content-length'
           );
+          should(res.headers['accept-ranges']).be.equal('bytes');
+          should(new Date(res.headers['created-on'])).be.ok();
+          should(new Date(res.headers['last-modified'])).be.ok();
+          should(res.headers['content-type']).be.String();
+          should(res.headers['content-type'].length).not.be.equal(0);
+          should(isNaN(res.headers['content-length'])).not.be.ok();
         })
     ));
   });

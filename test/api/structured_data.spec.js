@@ -150,7 +150,7 @@ describe('Structured data', () => {
         .then(res => {
           should(res.status).be.equal(200);
           should(res.data).have.keys('handleId');
-          should(res.data.handleId).be.Number();
+          should(isNaN(res.data.handleId)).not.be.ok();
           sdHandleId = res.data.handleId;
         })
         .then(() => structUtils.dropHandle(authToken, sdHandleId))
@@ -180,7 +180,7 @@ describe('Structured data', () => {
         .then(res => {
           should(res.status).be.equal(200);
           should(res.data).have.keys('isValid');
-          should(res.data.isValid).be.ok();
+          should(res.data.isValid).be.Boolean();
         })
         .then(() => structUtils.put(authToken, sdHandleId))
         .should.be.fulfilled()
@@ -193,14 +193,24 @@ describe('Structured data', () => {
         .should.be.fulfilled()
         .then(res => {
           should(res.status).be.equal(200);
-          should(res.data).have.keys('handleId', 'isOwner', 'version');
+          should(res.data).have.keys(
+            'handleId',
+            'isOwner',
+            'version');
+          should(isNaN(res.data.handleId)).not.be.ok();
+          should(res.data.isOwner).be.Boolean();
+          should(res.data.version).be.Number();
           sdHandleId = res.data.handleId;
         })
         .then(() => structUtils.getMetadata(authToken, sdHandleId))
         .should.be.fulfilled()
         .then(res => {
           should(res.status).be.equal(200);
-          should(res.data).have.keys('isOwner', 'version');
+          should(res.data).have.keys(
+            'isOwner',
+            'version');
+          should(res.data.isOwner).be.Boolean();
+          should(res.data.version).be.Number();
         })
         .then(() => structUtils.read(authToken, sdHandleId))
         .should.be.fulfilled()
@@ -362,7 +372,7 @@ describe('Structured data', () => {
         .should.be.fulfilled()
         .then(res => {
           should(res.status).be.equal(200);
-          should(res.data).be.ok();
+          should(res.data).be.instanceof(Buffer);
           return new Uint8Array(res.data);
         })
         .then(data => structUtils.deserialise(authToken, data,
@@ -370,6 +380,13 @@ describe('Structured data', () => {
         .should.be.fulfilled()
         .then(res => {
           should(res.status).be.equal(200);
+          should(res.data).have.keys(
+            'handleId',
+            'isOwner',
+            'version');
+          should(isNaN(res.data.handleId)).not.be.ok();
+          should(res.data.isOwner).be.Boolean();
+          should(res.data.version).be.Number();
         })
     ));
   });
@@ -462,7 +479,7 @@ describe('Structured data', () => {
         .then(res => {
           should(res.status).be.equal(200);
           should(res.data).have.keys('handleId');
-          should(res.data.handleId).be.Number();
+          should(isNaN(res.data.handleId)).not.be.ok();
           return res.data.handleId;
         })
         .then(handleId => dataIdUtils.dropHandle(authToken, handleId))

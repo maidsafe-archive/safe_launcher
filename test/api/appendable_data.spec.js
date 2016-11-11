@@ -291,6 +291,12 @@ describe('Appendable data', () => {
             'filterLength',
             'dataLength',
             'deletedDataLength');
+          should(isNaN(res.data.handleId)).not.be.ok();
+          should(res.data.isOwner).be.Boolean();
+          should(res.data.version).be.Number();
+          should(res.data.filterLength).be.Number();
+          should(res.data.dataLength).be.Number();
+          should(res.data.deletedDataLength).be.Number();
           should(['blacklist', 'whitelist']).matchAny(res.data.filterType.toLowerCase());
           should(res.data.filterType.toLowerCase()).be.equal('blacklist');
           should(res.data.dataLength).be.equal(sdDataHandles.length);

@@ -44,7 +44,7 @@ describe('Immutable data', () => {
         .then(res => {
           should(res.status).be.equal(200);
           should(res.data).have.keys('handleId');
-          should(res.data.handleId).be.Number();
+          should(isNaN(res.data.handleId)).not.be.ok();
           return res.data.handleId;
         })
         .then(handleId => immutUtils.dropWriter(authToken, handleId))
@@ -157,7 +157,7 @@ describe('Immutable data', () => {
         .then(res => {
           should(res.status).be.equal(200);
           should(res.data).have.keys('handleId');
-          should(res.data.handleId).be.Number();
+          should(isNaN(res.data.handleId)).not.be.ok();
           return res.data.handleId;
         })
         .then(handleId => dataIdUtils.dropHandle(authToken, handleId))
@@ -179,7 +179,7 @@ describe('Immutable data', () => {
         .then(res => {
           should(res.status).be.equal(200);
           should(res.data).have.keys('handleId');
-          should(res.data.handleId).be.Number();
+          should(isNaN(res.data.handleId)).not.be.ok();
           return res.data.handleId;
         })
         .then(handleId => dataIdUtils.dropHandle(authToken, handleId))
@@ -225,7 +225,7 @@ describe('Immutable data', () => {
       .then(res => {
         should(res.status).be.equal(200);
         should(res.data).have.keys('handleId', 'size');
-        should(res.data.handleId).be.Number();
+        should(isNaN(res.data.handleId)).not.be.ok();
         should(res.data.size).be.Number();
         return res.data.handleId;
       })
@@ -277,6 +277,17 @@ describe('Immutable data', () => {
         .then(res => {
           should(res.status).be.equal(200);
           should(res.data).be.equal(content);
+          should(res.headers).have.keys(
+            'accept-ranges',
+            'content-range',
+            'content-type',
+            'content-length'
+          );
+          should(res.headers['accept-ranges']).be.equal('bytes');
+          should(res.headers['content-range']).match(/^bytes\s\d+-\d+\/\d+/);
+          should(res.headers['content-type']).be.String();
+          should(res.headers['content-type'].length).not.be.equal(0);
+          should(isNaN(res.headers['content-length'])).not.be.ok();
         })
         .then(() => dropHandles())
     ));
