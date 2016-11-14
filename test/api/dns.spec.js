@@ -672,5 +672,14 @@ describe('DNS', () => {
           should(res.data).be.equal(fileContent);
         })
     ));
+    it('Should be able to get file if range end is greater than file size', () => (
+      dnsUtils.getFile(authToken, longName, serviceName, fileName,
+        { headers: { range: `bytes=0-${fileContent.length + 10}` } })
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(206);
+          should(res.data).be.equal(fileContent);
+        })
+    ));
   });
 });
