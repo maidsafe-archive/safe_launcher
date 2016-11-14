@@ -131,3 +131,7 @@ export const consumeStringListHandle = async(safeCore, handle) => {
   };
   return new Promise(exec);
 };
+
+export const parseExceptionForLog = e => (
+  (typeof e.message === 'object') ? JSON.stringify(e.message) : e.message
+);

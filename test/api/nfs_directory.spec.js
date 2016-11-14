@@ -171,6 +171,9 @@ describe('NFS directory', () => {
         .then(res => {
           should(res.status).be.equal(200);
           should(res.data).have.keys('info', 'subDirectories', 'files');
+          should(res.data.info).be.Object();
+          should(res.data.subDirectories).be.Array();
+          should(res.data.files).be.Array();
           should(res.data.info).have.keys(
             'name',
             'metadata',
@@ -179,6 +182,13 @@ describe('NFS directory', () => {
             'createdOn',
             'modifiedOn'
           );
+          should(res.data.info.name).be.String();
+          should(res.data.info.name.length).not.be.equal(0);
+          should(res.data.info.metadata).be.String();
+          should(res.data.info.isPrivate).be.Boolean();
+          should(res.data.info.isVersioned).be.Boolean();
+          should(new Date(res.data.info.createdOn)).be.ok();
+          should(new Date(res.data.info.modifiedOn)).be.ok();
           should(res.data.info.name).be.equal(dirPath);
         })
     ));

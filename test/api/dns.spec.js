@@ -670,6 +670,21 @@ describe('DNS', () => {
         .then(res => {
           should(res.status).be.equal(200);
           should(res.data).be.equal(fileContent);
+          should(res.headers).have.keys(
+            'content-range',
+            'accept-ranges',
+            'created-on',
+            'last-modified',
+            'content-type',
+            'content-length'
+          );
+          should(res.headers['content-range']).match(/^bytes\s\d+-\d+\/\d+/);
+          should(res.headers['accept-ranges']).be.equal('bytes');
+          should(new Date(res.headers['created-on'])).be.ok();
+          should(new Date(res.headers['last-modified'])).be.ok();
+          should(res.headers['content-type']).be.String();
+          should(res.headers['content-type'].length).not.be.equal(0);
+          should(isNaN(res.headers['content-length'])).not.be.ok();
         })
     ));
     it('Should be able to get file if range end is greater than file size', () => (

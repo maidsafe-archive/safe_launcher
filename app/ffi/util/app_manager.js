@@ -2,6 +2,7 @@ import ref from 'ref';
 import FfiApi from '../ffi_api';
 import App from '../model/app';
 import sessionManager from '../util/session_manager';
+import { parseExceptionForLog } from './utils';
 import log from '../../logger/log';
 
 const Void = ref.types.void;
@@ -117,7 +118,7 @@ class AppManager extends FfiApi {
           resolve(app);
         } catch (e) {
           log.warn(`FFI :: Create unregistered app :: Caught exception - 
-            ${typeof e === 'object' ? JSON.parse(e) : e}`);
+            ${parseExceptionForLog(e)}`);
         }
       };
 
@@ -138,7 +139,7 @@ class AppManager extends FfiApi {
         resolve();
       } catch (e) {
         log.warn(`FFI :: Drop application handle :: Caught exception - 
-          ${typeof e === 'object' ? JSON.parse(e) : e}`);
+          ${parseExceptionForLog(e)}`);
         reject(e);
       }
     };
