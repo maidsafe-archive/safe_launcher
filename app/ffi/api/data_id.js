@@ -32,7 +32,7 @@ class DataId extends FfiApi {
     });
   }
 
-  getStructuredDataHandle(typeTag = 501, name) {
+  getStructuredDataHandle(typeTag = 500, name) {
     return new Promise((resolve, reject) => {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
