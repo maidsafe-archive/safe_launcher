@@ -3,7 +3,8 @@ import uuid from 'uuid';
 
 import {
   FileMetadata, DirectoryMetadata, FileDetails,
-  error, derefFileMetadataStruct, derefDirectoryMetadataStruct
+  error, derefFileMetadataStruct, derefDirectoryMetadataStruct,
+  parseExceptionForLog
 } from '../util/utils';
 import FfiApi from '../ffi_api';
 import appManager from '../util/app_manager';
@@ -499,7 +500,7 @@ class NFS extends FfiApi {
       /* eslint-enable no-restricted-syntax */
     } catch (e) {
       log.warn(`FFI :: NFS :: Drop writer handle :: Caught exception -
-        ${typeof e === 'object' ? JSON.parse(e) : e}`);
+        ${parseExceptionForLog(e)}`);
     }
   }
 }

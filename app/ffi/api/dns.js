@@ -3,7 +3,7 @@ import ref from 'ref';
 import appManager from '../util/app_manager';
 import {
   error, consumeStringListHandle, derefFileMetadataStruct,
-  FileDetails, FileMetadata
+  FileDetails, FileMetadata, parseExceptionForLog
 } from '../util/utils';
 import FfiApi from '../ffi_api';
 import nfs from './nfs';
@@ -223,7 +223,7 @@ class DNS extends FfiApi {
           resolve(metadata);
         } catch (e) {
           log.warn(`FFI :: DNS :: Get file metadata :: Caught exception - 
-            ${typeof e === 'object' ? JSON.parse(e) : e}`);
+            ${parseExceptionForLog(e)}`);
         }
       };
       const longNameBuffer = new Buffer(longName);
