@@ -290,7 +290,6 @@ describe('Appendable data', () => {
             'filterLength',
             'dataLength',
             'deletedDataLength');
-          should(isNaN(res.data.handleId)).not.be.ok();
           should(res.data.isOwner).be.Boolean();
           should(res.data.version).be.Number();
           should(res.data.filterLength).be.Number();
