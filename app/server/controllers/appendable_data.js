@@ -160,7 +160,6 @@ export const getMetadata = async(req, res) => {
     const deletedDataLength = await appendableData.getLength(handleId, true);
     const filterLength = await appendableData.getFilterLength(handleId);
     const metadata = {
-      handleId,
       isOwner,
       version,
       filterType,

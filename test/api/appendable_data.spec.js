@@ -284,7 +284,6 @@ describe('Appendable data', () => {
         .then(res => {
           should(res.status).be.equal(200);
           should(res.data).have.keys(
-            'handleId',
             'isOwner',
             'version',
             'filterType',

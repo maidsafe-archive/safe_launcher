@@ -330,7 +330,8 @@ export const getFile = (req, res, next) => {
     }
     const start = parseInt(positions[0], 10);
     const total = fileStats.size;
-    const end = (positions[1] && total) ? parseInt(positions[1], 10) : total;
+    const end = ((positions[1] && total) && (positions[1] < total)) ?
+      parseInt(positions[1], 10) : total;
     const chunksize = end - start;
     if (chunksize < 0 || end > total) {
       return next(new ResponseError(416));
