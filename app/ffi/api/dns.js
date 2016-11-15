@@ -209,17 +209,15 @@ class DNS extends FfiApi {
 
   getFileMetadata(app, longName, serviceName, path) {
     return new Promise((resolve, reject) => {
-      const fileMetadataRefRef = ref.alloc(PointerToFileMetadataPointer);
+      const fileMetadataHandle = ref.alloc(FileMetadataHandle);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           log.error(`FFI :: DNS :: Get file metadata :: ${err || res}`);
           return reject(err || res);
         }
         try {
-          const fileMetadataHandle = fileMetadataRefRef.deref();
-          const fileMetadataRef = ref.alloc(FileMetadataHandle, fileMetadataHandle).deref();
-          const metadata = derefFileMetadataStruct(fileMetadataRef.deref());
-          this.safeCore.file_metadata_drop.async(fileMetadataHandle, () => {});
+          const metadata = derefFileMetadataStruct(new FileMetadata(fileMetadataHandle.deref()));
+          this.safeCore.file_metadata_drop.async(fileMetadataHandle.deref(), () => {});
           resolve(metadata);
         } catch (e) {
           log.warn(`FFI :: DNS :: Get file metadata :: Caught exception - 
@@ -233,7 +231,7 @@ class DNS extends FfiApi {
         longNameBuffer, longNameBuffer.length,
         serviceNameBuffer, serviceNameBuffer.length,
         pathBuffer, pathBuffer.length,
-        fileMetadataRefRef, onResult);
+        fileMetadataHandle, onResult);
     });
   }
 
