@@ -238,5 +238,5 @@ router.delete('/sign-key/:handleId', rawBodyParser(),
   AppendableData.dropSigningKeyHandle);
 
 /* eslint-disable camelcase */
-export { router as router_0_5 };
+export { router as router_0_6 };
 /* eslint-disable camelcase */
