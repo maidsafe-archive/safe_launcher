@@ -1,5 +1,11 @@
 # SAFE Launcher Change Log
 
+##[0.10.0]
+- API version updated to 0.6
+- Fixed issues #285, #289, #292, #293
+- Minor nitpicks
+- Tests cases expanded
+
 ##[0.9.3]
 - Requires safe_core 0.22.1
 - Get User's Sign Key API added
