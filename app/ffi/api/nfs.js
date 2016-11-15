@@ -430,7 +430,7 @@ class NFS extends FfiApi {
       return error('Invalid parameters');
     }
     const self = this;
-    const fileMetadataPointerHandle = ref.alloc(PointerToFileMetadataPointer);
+    const fileMetadataHandle = ref.alloc(FileMetadataHandle);
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
@@ -438,10 +438,8 @@ class NFS extends FfiApi {
           return reject(err || res);
         }
         try {
-          const fileMetadataHandle = fileMetadataPointerHandle.deref();
-          const fileMetadataRef = ref.alloc(FileMetadataHandle, fileMetadataHandle).deref();
-          const metadata = derefFileMetadataStruct(fileMetadataRef.deref());
-          self.safeCore.file_metadata_drop.async(fileMetadataHandle, () => {});
+          const metadata = derefFileMetadataStruct(new FileMetadata(fileMetadataHandle.deref()));
+          self.safeCore.file_metadata_drop.async(fileMetadataHandle.deref(), () => {});
           resolve(metadata);
         } catch (e) {
           log.error(`FFI :: NFS :: Get file metadata :: Caught exception - 
@@ -451,7 +449,7 @@ class NFS extends FfiApi {
 
       const pathBuff = new Buffer(path);
       self.safeCore.nfs_get_file_metadata.async(appManager.getHandle(app),
-        pathBuff, pathBuff.length, isShared, fileMetadataPointerHandle, onResult);
+        pathBuff, pathBuff.length, isShared, fileMetadataHandle, onResult);
     };
     return new Promise(executor);
   }
