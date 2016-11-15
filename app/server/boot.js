@@ -4,7 +4,7 @@ import EventEmitter from 'events';
 import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
 /* eslint-disable camelcase */
-import { router_0_5 } from './routes/version_0_5';
+import { router_0_6 } from './routes/version_0_6';
 /* eslint-enable camelcase */
 import { CreateSession } from './controllers/auth';
 import { ResponseError, setSessionHeaderAndParseBody, updateAppActivity } from './utils';
@@ -78,8 +78,9 @@ export default class RESTServer {
     app.use('/health', (req, res) => {
       res.sendStatus(200);
     });
-    app.use('/', router_0_5);
-    app.use('/0.5', router_0_5);
+    app.use('/', router_0_6);
+    app.use('/0.5', router_0_6);
+    app.use('/0.6', router_0_6);
 
     // API Error handling
     app.use((err, req, res, next) => {

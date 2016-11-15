@@ -33,6 +33,7 @@ export default class RegisterAccSecretForm extends Component {
           errMsg = 'Request timed out';
           break;
         case 'CoreError::MutationFailure::MutationError::AccountExists':
+        case 'CoreError::MutationFailure::MutationError::DataExists':
           errMsg = 'This account is already taken.';
           break;
         default:
