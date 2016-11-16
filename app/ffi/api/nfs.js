@@ -445,7 +445,7 @@ class NFS extends FfiApi {
           resolve(metadata);
         } catch (e) {
           log.error(`FFI :: NFS :: Get file metadata :: Caught exception - 
-            ${typeof e === 'object' ? JSON.parse(e) : e}`);
+            ${typeof e === 'object' ? JSON.stringify(e) : e}`);
         }
       };
 
