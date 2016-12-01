@@ -3,7 +3,8 @@ import ref from 'ref';
 import appManager from '../util/app_manager';
 import {
   error, consumeStringListHandle, derefFileMetadataStruct,
-  FileDetails, FileMetadata, parseExceptionForLog
+  FileDetails, FileMetadata, parseExceptionForLog,
+  safeBufferGetter
 } from '../util/utils';
 import FfiApi from '../ffi_api';
 import nfs from './nfs';
@@ -75,17 +76,16 @@ class DNS extends FfiApi {
       return error('Application parameter is mandatory');
     }
     return new Promise((resolve, reject) => {
-      const listHandlePointer = ref.alloc(PointerToVoidPointer);
+      const listHandle = ref.alloc(PointerHandle);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           log.error(`FFI :: DNS :: List longname :: ${err || res}`);
           return reject(err || res);
         }
-        const listHandle = listHandlePointer.deref();
-        resolve(consumeStringListHandle(this.safeCore, listHandle));
+        resolve(consumeStringListHandle(this.safeCore, listHandle.deref()));
       };
       this.safeCore.dns_get_long_names.async(appManager.getHandle(app),
-        listHandlePointer, onResult);
+        listHandle, onResult);
     });
   }
 
@@ -155,7 +155,7 @@ class DNS extends FfiApi {
 
   listServices(app, longName) {
     return new Promise((resolve, reject) => {
-      const listHandle = ref.alloc(PointerToVoidPointer);
+      const listHandle = ref.alloc(PointerHandle);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           log.error(`FFI :: DNS :: List service :: ${err || res}`);
@@ -172,20 +172,20 @@ class DNS extends FfiApi {
 
   getServiceDirectory(app, longName, serviceName) {
     return new Promise((resolve, reject) => {
-      const directoryDetailsHandlePointer = ref.alloc(PointerToVoidPointer);
+      const directoryDetailsHandle = ref.alloc(PointerHandle);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           log.error(`FFI :: DNS :: Get service directory :: ${err || res}`);
           return reject(err || res);
         }
-        resolve(nfs.derefDirectoryDetailsHandle(directoryDetailsHandlePointer.deref()));
+        resolve(nfs.derefDirectoryDetailsHandle(directoryDetailsHandle.deref()));
       };
       const longNameBuffer = new Buffer(longName);
       const serviceNameBuffer = new Buffer(serviceName);
       this.safeCore.dns_get_service_dir.async(appManager.getHandle(app),
         longNameBuffer, longNameBuffer.length,
         serviceNameBuffer, serviceNameBuffer.length,
-        directoryDetailsHandlePointer, onResult);
+        directoryDetailsHandle, onResult);
     });
   }
 
@@ -209,17 +209,15 @@ class DNS extends FfiApi {
 
   getFileMetadata(app, longName, serviceName, path) {
     return new Promise((resolve, reject) => {
-      const fileMetadataRefRef = ref.alloc(PointerToFileMetadataPointer);
+      const fileMetadataHandle = ref.alloc(FileMetadataHandle);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           log.error(`FFI :: DNS :: Get file metadata :: ${err || res}`);
           return reject(err || res);
         }
         try {
-          const fileMetadataHandle = fileMetadataRefRef.deref();
-          const fileMetadataRef = ref.alloc(FileMetadataHandle, fileMetadataHandle).deref();
-          const metadata = derefFileMetadataStruct(fileMetadataRef.deref());
-          this.safeCore.file_metadata_drop.async(fileMetadataHandle, () => {});
+          const metadata = derefFileMetadataStruct(new FileMetadata(fileMetadataHandle.deref()));
+          this.safeCore.file_metadata_drop.async(fileMetadataHandle.deref(), () => {});
           resolve(metadata);
         } catch (e) {
           log.warn(`FFI :: DNS :: Get file metadata :: Caught exception - 
@@ -233,23 +231,21 @@ class DNS extends FfiApi {
         longNameBuffer, longNameBuffer.length,
         serviceNameBuffer, serviceNameBuffer.length,
         pathBuffer, pathBuffer.length,
-        fileMetadataRefRef, onResult);
+        fileMetadataHandle, onResult);
     });
   }
 
   readFile(app, longName, serviceName, path, offset, length) {
     return new Promise((resolve, reject) => {
-      const fileDetailsPointerHandle = ref.alloc(PointerToFileDetailsPointer);
+      const fileDetailsHandle = ref.alloc(FileDetailsHandle);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           log.error(`FFI :: DNS :: Read file :: ${err || res}`);
           return reject(err || res);
         }
-        const fileDetailsHandle = fileDetailsPointerHandle.deref();
-        const handle = ref.alloc(FileDetailsHandle, fileDetailsHandle).deref();
-        const fileDetails = handle.deref();
-        const data = Buffer.concat([ref.reinterpret(fileDetails.content, fileDetails.content_len)]);
-        this.safeCore.file_details_drop.async(handle, (e) => {
+        const fileDetails = new FileDetails(fileDetailsHandle.deref());
+        const data = safeBufferGetter(fileDetails, 'content');
+        this.safeCore.file_details_drop.async(fileDetailsHandle.deref(), (e) => {
           if (e) {
             log.error(`FFI :: DNS :: File details drop :: ${e}`);
           }
@@ -263,7 +259,7 @@ class DNS extends FfiApi {
         longNameBuffer, longNameBuffer.length,
         serviceNameBuffer, serviceNameBuffer.length,
         pathBuffer, pathBuffer.length,
-        offset, length, false, fileDetailsPointerHandle, onResult);
+        offset, length, false, fileDetailsHandle, onResult);
     });
   }
 

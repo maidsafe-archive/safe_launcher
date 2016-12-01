@@ -8,6 +8,7 @@ import { FILTER_TYPE } from '../model/enum';
 import log from '../../logger/log';
 
 const int32 = ref.types.int32;
+const Int = ref.types.int;
 const u8 = ref.types.uint8;
 const u64 = ref.types.uint64;
 const Void = ref.types.void;
@@ -23,8 +24,6 @@ const boolPointer = ref.refType(bool);
 const size_tPointer = ref.refType(size_t);
 
 const Ffi_FilterType = new Enum({ BlackList: 0, WhiteList: 1 });
-
-const filterTypePointer = ref.refType(Ffi_FilterType);
 /* eslint-enable camelcase */
 
 class AppendableData extends FfiApi {
@@ -57,7 +56,7 @@ class AppendableData extends FfiApi {
       appendable_data_clear_deleted_data: [int32, [u64]],
       appendable_data_remove_nth_deleted_data: [int32, [u64, size_t]],
       appendable_data_remove_from_filter: [int32, [u64, u64]],
-      appendable_data_filter_type: [int32, [u64, filterTypePointer]],
+      appendable_data_filter_type: [int32, [u64, ref.refType(Int)]],
       appendable_data_num_of_filter_keys: [int32, [u64, size_tPointer]],
       appendable_data_nth_filter_key: [int32, [u64, size_t, u64Pointer]]
       // 'appendable_data_delete': [int32, [AppHandle, u64]]
