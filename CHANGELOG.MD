@@ -1,5 +1,11 @@
 # SAFE Launcher Change Log
 
+##[0.10.2]
+- Requires safe_core 0.22.3
+
+##[0.10.1]
+- Requires safe_core 0.22.2
+
 ##[0.10.0]
 - API version updated to 0.6
 - Fixed issues #285, #289, #292, #293
