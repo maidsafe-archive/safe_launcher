@@ -1,5 +1,9 @@
 # SAFE Launcher Change Log
 
+##[0.10.4]
+- Requires safe_core 0.22.4
+
+
 ##[0.10.2]
 - Requires safe_core 0.22.3
 
