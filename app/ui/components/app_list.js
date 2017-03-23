@@ -25,7 +25,7 @@ export default class AppList extends Component {
             href={undefined}
             onClick={e => {
               e.preventDefault();
-              openExternal('http://maidsafe.net/alpha.html#demo_app');
+              openExternal('https://maidsafe.net/alpha.html#demo_app');
             }}
           >demo app</a> to store and publish data, as well as create your SAFE public ID.
         </div>
