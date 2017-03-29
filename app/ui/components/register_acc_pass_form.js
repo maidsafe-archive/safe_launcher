@@ -25,14 +25,10 @@ export default class RegisterAccPassForm extends Component {
       this.props.user.accountPassword : '';
     this.accountPassword.value = user;
     this.confirmAccountPassword.value = user;
+    this.accountPassword.dispatchEvent(new Event('keyup', { bubbles: true }));
   }
 
   handleAccPassForm(e) {
-    if (this.props.networkStatus !== 1) {
-      this.props.showToaster(MESSAGES.NETWORK_NOT_CONNECTED, { autoHide: true });
-      console.warn(MESSAGES.NETWORK_NOT_CONNECTED);
-      return;
-    }
     const accountPasswordVal = this.accountPassword.value.trim();
     const confirmAccountPasswordVal = this.confirmAccountPassword.value.trim();
     const accountPasswordMsgEle = $(this.accountPassword).siblings('.msg');
@@ -59,10 +55,15 @@ export default class RegisterAccPassForm extends Component {
       return confirmAccountPasswordMsgEle.text('Entries don\'t match.');
     }
 
-    this.props.userRegister({
+    this.props.stateContinue({
       accountSecret: this.props.user.accountSecret,
       accountPassword: accountPasswordVal
     });
+
+    // this.props.userRegister({
+    //   accountSecret: this.props.user.accountSecret,
+    //   accountPassword: accountPasswordVal
+    // });
   }
 
   resetInput(e) {
@@ -151,7 +152,7 @@ export default class RegisterAccPassForm extends Component {
                 type="password"
                 ref={c => { this.accountPassword = c; }}
                 required="true"
-                onChange={this.handleInputChange}
+                onKeyUp={this.handleInputChange}
                 autoFocus
               />
               <label htmlFor="accountPassword">Account Password</label>
@@ -204,11 +205,11 @@ export default class RegisterAccPassForm extends Component {
           <div className="opt-i">
             <button
               type="submit"
-              className="btn btn-box"
+              className="btn"
               name="continue"
               form="accountPasswordForm"
               onClick={this.handleAccPassForm}
-            >Create Account</button>
+            >Continue</button>
           </div>
         </div>
       </div>

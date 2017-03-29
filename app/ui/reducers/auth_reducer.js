@@ -51,7 +51,14 @@ const auth = (state = initialState, action) => {
           user: { ...state.user, accountSecret: action.user.accountSecret }
         };
       }
-      if (state.registerState === 4) {
+      if (state.registerState === 4 && action.user.accountPassword) {
+        return {
+          ...state,
+          registerState: state.registerState + 1,
+          user: { ...state.user, accountPassword: action.user.accountPassword }
+        };
+      }
+      if (state.registerState === 5) {
         return state;
       }
       return { ...state, registerState: state.registerState + 1 };
