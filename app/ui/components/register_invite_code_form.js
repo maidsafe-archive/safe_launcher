@@ -55,12 +55,16 @@ export default class RegisterVerificationForm extends Component {
       console.log(`message from main: ${res.invite}`);
       self.inviteToken.value = res.invite;
     });
-    let win = new BrowserWindow({width: 750, height: 560});
-    win.webContents.openDevTools();
+    let win = new BrowserWindow({width: 750, height: 560, resizable: false});
+    // win.webContents.openDevTools();
     win.on('close', () => {
       win = null;
     });
     win.loadURL(url);
+    // win.webContents.on('did-finish-load', () => {
+    //   win.show();
+    //   win.focus();
+    // });
     win.show();
   }
 
