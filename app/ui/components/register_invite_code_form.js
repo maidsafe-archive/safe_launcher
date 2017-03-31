@@ -1,54 +1,99 @@
 import React, { Component, PropTypes } from 'react';
-import { openExternal } from '../utils/app_utils';
+import $ from 'jquery';
 
 export default class RegisterVerificationForm extends Component {
   constructor() {
     super();
-    this.inviteCode = null;
+    this.inviteToken = null;
     this.handleAccPassForm = this.handleAccPassForm.bind(this);
+    this.openVerificationWindow = this.openVerificationWindow.bind(this);
+    this.clearErrorMsg = this.clearErrorMsg.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
+  }
+
+  componentDidMount() {
+    const user = ((Object.keys(this.props.user).length > 0) && this.props.user.inviteToken) ?
+      this.props.user.inviteToken : '';
+    this.inviteToken.value = user;
+    this.inviteToken.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
   handleAccPassForm(e) {
-    if (this.props.networkStatus !== 1) {
-      this.props.showToaster(MESSAGES.NETWORK_NOT_CONNECTED, { autoHide: true });
-      console.warn(MESSAGES.NETWORK_NOT_CONNECTED);
-      return;
-    }
-    const verificationCode = this.inviteCode.value.trim();
-    if (!verificationCode) {
+    const inviteToken = this.inviteToken.value.trim();
+    if (!inviteToken) {
       return;
     }
     e.preventDefault();
 
-    this.props.userRegister({
-      accountSecret: this.props.user.accountSecret,
-      accountPassword: this.props.user.accountPassword,
-      inviteCode
+    this.props.stateContinue({
+      inviteToken
     });
   }
 
+  clearErrorMsg() {
+    if (this.props.errorMsg) {
+      this.props.clearErrorMessage();
+    }
+  }
+
+  handleInputChange(e) {
+    if (e.keyCode === 13) {
+      return;
+    }
+    this.clearErrorMsg();
+  }
+
+  openVerificationWindow() {
+    const self = this;
+    const url = 'https://nodejs-sample-163104.appspot.com/';
+    const ipc = require('electron').ipcRenderer;
+    const BrowserWindow = require('electron').remote.BrowserWindow;
+    ipc.on('messageFromMain', (event, res) => {
+      if (res.err) {
+        return self.props.setErrorMessage(res.err);
+      }
+      console.log(`message from main: ${res.invite}`);
+      self.inviteToken.value = res.invite;
+    });
+    let win = new BrowserWindow({width: 750, height: 560});
+    win.webContents.openDevTools();
+    win.on('close', () => {
+      win = null;
+    });
+    win.loadURL(url);
+    win.show();
+  }
+
   render() {
+    const { errorMsg } = this.props;
+
     return (
       <div className="auth-intro-cnt">
-        <h3 className="title">Invite Code</h3>
+        <h3 className="title">Invitation Token</h3>
         <div className="desc">
-          Get invite code from <a href={undefined}
-                                  onClick={e => {
-                                    e.preventDefault();
-                                    openExternal('https://safenetforum.org/');
-                                  }}>SAFE Network Forum<a>, if you don't have an invite
+          Enter an invitation token or click on the "Claim an invitation" button.
         </div>
         <div className="form-b">
-          <form id="inviteCodeForm" className="form" name="inviteCodeForm">
-            <div id="inviteCode" className="inp-grp validate-field light-theme">
+          <form id="inviteTokenForm" className="form" name="inviteTokenForm">
+            <div id="inviteToken" className="inp-grp validate-field light-theme">
               <input
-                id="inviteCode"
+                id="inviteToken"
                 type="test"
-                ref={c => { this.inviteCode = c; }}
+                className="normal-pad"
+                ref={c => { this.inviteToken = c; }}
                 required="true"
+                onChange={this.handleInputChange}
                 autoFocus
               />
-              <label htmlFor="inviteCode">Invite Code</label>
+              <label htmlFor="inviteToken">Invitation Token</label>
+              <div className="msg">{errorMsg}</div>
+            </div>
+            <div className="claim-invite">
+              <div className="separator">Or</div>
+              <button className="btn" type="button" onClick={e => {
+                e.preventDefault();
+                this.openVerificationWindow();
+              }}>Claim an invitation</button>
             </div>
           </form>
         </div>
@@ -66,11 +111,11 @@ export default class RegisterVerificationForm extends Component {
           <div className="opt-i">
             <button
               type="submit"
-              className="btn btn-box"
+              className="btn"
               name="continue"
-              form="accountPasswordForm"
+              form="inviteTokenForm"
               onClick={this.handleAccPassForm}
-            >Create Account</button>
+            >Continue</button>
           </div>
         </div>
       </div>

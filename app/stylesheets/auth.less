@@ -134,6 +134,9 @@
       background-color: transparent;
       position: relative;
       z-index: 1;
+      &.normal-pad {
+        padding-right: 0;
+      }
     }
     input:focus {
       border-color: @primary-blue;
@@ -478,6 +481,20 @@
     .opt-i {
 
     }
+  }
+}
+
+.claim-invite {
+  text-align: center;
+  margin-top: 10px;
+  .separator {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+  .btn {
+    color: @primary-blue;
+    background-color: white;
   }
 }
 

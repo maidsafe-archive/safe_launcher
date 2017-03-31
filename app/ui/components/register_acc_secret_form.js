@@ -45,7 +45,7 @@ export default class RegisterAccSecretForm extends Component {
   }
 
   componentDidMount() {
-    const user = (Object.keys(this.props.user).length > 0) ? this.props.user.accountSecret : '';
+    const user = (Object.keys(this.props.user).length > 0 && this.props.user.accountSecret) ? this.props.user.accountSecret : '';
     this.accountSecret.value = user;
     this.confirmAccountSecret.value = user;
     this.accountSecret.dispatchEvent(new Event('keyup', { bubbles: true }));
@@ -80,6 +80,7 @@ export default class RegisterAccSecretForm extends Component {
     }
 
     this.props.stateContinue({
+      inviteToken: this.props.user.inviteToken,
       accountSecret: accountSecretVal
     });
   }

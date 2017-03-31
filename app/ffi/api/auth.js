@@ -12,7 +12,7 @@ class Auth extends FfiApi {
   getFunctionsToRegister() {
     return {
       create_unregistered_client: [int32, [SessionHandlePointer]],
-      create_account: [int32, [CString, u64, CString, u64, SessionHandlePointer]],
+      create_account: [int32, [CString, u64, CString, u64, CString, u64, SessionHandlePointer]],
       log_in: [int32, [CString, u64, CString, u64, SessionHandlePointer]]
     };
   }
@@ -35,7 +35,7 @@ class Auth extends FfiApi {
     return new Promise(executor);
   }
 
-  register(locator, password) {
+  register(locator, password, inviteToken) {
     const self = this;
     const executor = (resolve, reject) => {
       const sessionHandle = ref.alloc(SessionHandlePointer);
@@ -48,7 +48,7 @@ class Auth extends FfiApi {
         resolve();
       };
       self.safeCore.create_account.async(locator, locator.length,
-        password, password.length, sessionHandle, onResult);
+        password, password.length, inviteToken, inviteToken.length, sessionHandle, onResult);
     };
     return new Promise(executor);
   }

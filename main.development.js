@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, shell } from 'electron';
+import { app, BrowserWindow, Menu, shell, ipcMain } from 'electron';
 import pkg from './package.json';
 
 let menu;
@@ -174,4 +174,8 @@ app.on('ready', async () => {
     menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
   }
+  ipcMain.on('invite', (event, arg) => {
+    console.log('opening child', arg);
+    mainWindow.webContents.send('messageFromMain', arg);
+  });
 });

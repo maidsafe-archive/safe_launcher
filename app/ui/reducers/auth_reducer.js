@@ -31,7 +31,7 @@ const auth = (state = initialState, action) => {
         error: action.error,
         user: Object.assign({}),
         authProcessing: false,
-        registerState: 2
+        registerState: 1
       };
     case ActionTypes.AUTH_PROCESSING:
       return { ...state, authProcessing: true };
@@ -44,18 +44,18 @@ const auth = (state = initialState, action) => {
       return { ...state, errorMsg: '' };
     }
     case ActionTypes.REGISTER_STATE_NEXT:
-      if (state.registerState === 2 && action.user.accountSecret) {
+      if (state.registerState === 1 && action.user.inviteToken) {
+        return {
+          ...state,
+          registerState: state.registerState + 1,
+          user: { ...state.user, inviteToken: action.user.inviteToken }
+        };
+      }
+      if (state.registerState === 3 && action.user.accountSecret) {
         return {
           ...state,
           registerState: state.registerState + 1,
           user: { ...state.user, accountSecret: action.user.accountSecret }
-        };
-      }
-      if (state.registerState === 4 && action.user.accountPassword) {
-        return {
-          ...state,
-          registerState: state.registerState + 1,
-          user: { ...state.user, accountPassword: action.user.accountPassword }
         };
       }
       if (state.registerState === 5) {
@@ -68,7 +68,7 @@ const auth = (state = initialState, action) => {
       }
       return { ...state, registerState: state.registerState - 1 };
     case ActionTypes.SET_REGISTER_STATE:
-      if (action.navState > 2 && !(state.user && state.user.accountSecret)) {
+      if (action.navState > 3 && !(state.user && state.user.accountSecret)) {
         return state;
       }
       return { ...state, registerState: action.navState };

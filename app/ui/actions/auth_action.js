@@ -80,7 +80,7 @@ export const login = payload => (
 export const register = payload => (
   dispatch => {
     dispatch(setAuthProcessing());
-    auth.register(payload.accountSecret, payload.accountPassword)
+    auth.register(payload.accountSecret, payload.accountPassword, payload.inviteToken)
     .then(() => {
       dispatch(registerSuccess(payload));
     }, (err) => {

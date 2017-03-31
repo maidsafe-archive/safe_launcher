@@ -29,6 +29,11 @@ export default class RegisterAccPassForm extends Component {
   }
 
   handleAccPassForm(e) {
+    if (this.props.networkStatus !== 1) {
+      this.props.showToaster(MESSAGES.NETWORK_NOT_CONNECTED, { autoHide: true });
+      console.warn(MESSAGES.NETWORK_NOT_CONNECTED);
+      return;
+    }
     const accountPasswordVal = this.accountPassword.value.trim();
     const confirmAccountPasswordVal = this.confirmAccountPassword.value.trim();
     const accountPasswordMsgEle = $(this.accountPassword).siblings('.msg');
@@ -55,15 +60,11 @@ export default class RegisterAccPassForm extends Component {
       return confirmAccountPasswordMsgEle.text('Entries don\'t match.');
     }
 
-    this.props.stateContinue({
+    this.props.userRegister({
       accountSecret: this.props.user.accountSecret,
+      inviteToken: this.props.user.inviteToken,
       accountPassword: accountPasswordVal
     });
-
-    // this.props.userRegister({
-    //   accountSecret: this.props.user.accountSecret,
-    //   accountPassword: accountPasswordVal
-    // });
   }
 
   resetInput(e) {
@@ -205,11 +206,11 @@ export default class RegisterAccPassForm extends Component {
           <div className="opt-i">
             <button
               type="submit"
-              className="btn"
+              className="btn btn-box"
               name="continue"
               form="accountPasswordForm"
               onClick={this.handleAccPassForm}
-            >Continue</button>
+            >Create Account</button>
           </div>
         </div>
       </div>

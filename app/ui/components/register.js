@@ -69,19 +69,19 @@ export default class Register extends Component {
         currentState = <RegisterWelcome {...this.props} />;
         break;
       case 1:
-        currentState = <RegisterAccSecretInfo {...this.props} />;
+        currentState = <RegisterInviteCodeForm {...this.props} />;
         break;
       case 2:
-        currentState = <RegisterAccSecretForm {...this.props} />;
+        currentState = <RegisterAccSecretInfo {...this.props} />;
         break;
       case 3:
-        currentState = <RegisterAccPassInfo {...this.props} />;
+        currentState = <RegisterAccSecretForm {...this.props} />;
         break;
       case 4:
-        currentState = <RegisterAccPassForm {...this.props} />;
+        currentState = <RegisterAccPassInfo {...this.props} />;
         break;
       case 5:
-        currentState = <RegisterInviteCodeForm {...this.props} />;
+        currentState = <RegisterAccPassForm {...this.props} />;
         break;
       default:
         throw new Error('Unkown Register State');
