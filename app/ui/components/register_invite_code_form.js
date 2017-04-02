@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import $ from 'jquery';
+import className from 'classnames';
 
 export default class RegisterVerificationForm extends Component {
   constructor() {
@@ -9,9 +10,39 @@ export default class RegisterVerificationForm extends Component {
     this.openVerificationWindow = this.openVerificationWindow.bind(this);
     this.clearErrorMsg = this.clearErrorMsg.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.setInvite = this.setInvite.bind(this);
+  }
+
+  componentWillMount() {
+    const { error, showToaster, setErrorMessage } = this.props;
+    let errMsg = null;
+    if (Object.keys(error).length > 0) {
+      errMsg = window.msl.errorCodeLookup(error.errorCode || 0);
+      switch (errMsg) {
+        case 'CoreError::RequestTimeout':
+          errMsg = 'Request timed out';
+          break;
+        case 'CoreError::MutationFailure::MutationError::AccountExists':
+        case 'CoreError::MutationFailure::MutationError::DataExists':
+          errMsg = 'This account is already taken.';
+          break;
+        default:
+          errMsg = errMsg.replace('CoreError::', '');
+      }
+      setErrorMessage(errMsg);
+      showToaster(errMsg, { autoHide: true, error: true });
+    }
   }
 
   componentDidMount() {
+   this.setInvite();
+  }
+
+  componentDidUpdate() {
+    this.setInvite();
+  }
+
+  setInvite() {
     const user = ((Object.keys(this.props.user).length > 0) && this.props.user.inviteToken) ?
       this.props.user.inviteToken : '';
     this.inviteToken.value = user;
@@ -48,28 +79,41 @@ export default class RegisterVerificationForm extends Component {
     const url = 'https://nodejs-sample-163104.appspot.com/';
     const ipc = require('electron').ipcRenderer;
     const BrowserWindow = require('electron').remote.BrowserWindow;
-    ipc.on('messageFromMain', (event, res) => {
-      if (res.err) {
-        return self.props.setErrorMessage(res.err);
-      }
-      console.log(`message from main: ${res.invite}`);
-      self.inviteToken.value = res.invite;
-    });
-    let win = new BrowserWindow({width: 750, height: 560, resizable: false});
-    // win.webContents.openDevTools();
-    win.on('close', () => {
-      win = null;
-    });
-    win.loadURL(url);
-    // win.webContents.on('did-finish-load', () => {
-    //   win.show();
-    //   win.focus();
-    // });
-    win.show();
+    this.clearErrorMsg();
+    try {
+      ipc.on('messageFromMain', (event, res) => {
+        if (res.err) {
+          this.inviteToken.value = '';
+          return self.props.setErrorMessage(res.err);
+        }
+        this.props.setInviteCode(res.invite);
+        console.log(`message from main: ${res.invite}`);
+        self.inviteToken.value = res.invite;
+      });
+      let win = new BrowserWindow({width: 750, height: 560, resizable: false});
+      // win.webContents.openDevTools();
+      win.on('close', () => {
+        win = null;
+      });
+      win.loadURL(url);
+      // win.webContents.on('did-finish-load', () => {
+      //   win.show();
+      //   win.focus();
+      // });
+      win.show();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   render() {
     const { errorMsg } = this.props;
+    const inputGrpClassNames = className(
+      'inp-grp',
+      'validate-field',
+      'light-theme',
+      { error: errorMsg }
+    );
 
     return (
       <div className="auth-intro-cnt">
@@ -79,7 +123,7 @@ export default class RegisterVerificationForm extends Component {
         </div>
         <div className="form-b">
           <form id="inviteTokenForm" className="form" name="inviteTokenForm">
-            <div id="inviteToken" className="inp-grp validate-field light-theme">
+            <div id="inviteToken" className={inputGrpClassNames}>
               <input
                 id="inviteToken"
                 type="test"

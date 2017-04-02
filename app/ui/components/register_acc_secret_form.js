@@ -23,27 +23,6 @@ export default class RegisterAccSecretForm extends Component {
     this.passwordStrengthValid = false;
   }
 
-  componentWillMount() {
-    const { error, showToaster, setErrorMessage } = this.props;
-    let errMsg = null;
-    if (Object.keys(error).length > 0) {
-      errMsg = window.msl.errorCodeLookup(error.errorCode || 0);
-      switch (errMsg) {
-        case 'CoreError::RequestTimeout':
-          errMsg = 'Request timed out';
-          break;
-        case 'CoreError::MutationFailure::MutationError::AccountExists':
-        case 'CoreError::MutationFailure::MutationError::DataExists':
-          errMsg = 'This account is already taken.';
-          break;
-        default:
-          errMsg = errMsg.replace('CoreError::', '');
-      }
-      setErrorMessage(errMsg);
-      showToaster(errMsg, { autoHide: true, error: true });
-    }
-  }
-
   componentDidMount() {
     const user = (Object.keys(this.props.user).length > 0 && this.props.user.accountSecret) ? this.props.user.accountSecret : '';
     this.accountSecret.value = user;

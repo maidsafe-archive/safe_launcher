@@ -62,6 +62,11 @@ export const resetUser = () => ({
   type: ActionTypes.RESET_USER
 });
 
+export const setInviteCode = (invite) => ({
+  type: ActionTypes.SET_INVITE_CODE,
+  invite
+});
+
 export const login = payload => (
   dispatch => {
     dispatch(setAuthProcessing());

@@ -29,7 +29,7 @@ const auth = (state = initialState, action) => {
       return {
         ...state,
         error: action.error,
-        user: Object.assign({}),
+        user: Object.assign({}, { inviteToken: state.user.inviteToken }),
         authProcessing: false,
         registerState: 1
       };
@@ -68,6 +68,9 @@ const auth = (state = initialState, action) => {
       }
       return { ...state, registerState: state.registerState - 1 };
     case ActionTypes.SET_REGISTER_STATE:
+      if (action.navState > 1 && !(state.user && state.user.inviteToken)) {
+        return state;
+      }
       if (action.navState > 3 && !(state.user && state.user.accountSecret)) {
         return state;
       }
@@ -75,11 +78,17 @@ const auth = (state = initialState, action) => {
     case ActionTypes.RESET_USER: {
       return {
         ...state,
-        user: Object.assign({}),
+        user: Object.assign({}, { inviteToken: state.user.inviteToken || '' }),
         registerState: 0,
         error: Object.assign({}),
         errorMsg: ''
       };
+    }
+    case ActionTypes.SET_INVITE_CODE: {
+      if (!action.invite) {
+        return state;
+      }
+      return { ...state, user: Object.assign({}, { inviteToken: action.invite }) };
     }
     case ActionTypes.LOGOUT:
       return initialState;
