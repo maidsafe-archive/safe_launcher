@@ -92,9 +92,9 @@ export default class RegisterVerificationForm extends Component {
       });
       let win = new BrowserWindow({width: 750, height: 560, resizable: false});
       // win.webContents.openDevTools();
-      win.on('close', () => {
-        win = null;
-      });
+      // win.on('close', () => {
+      //   win = null;
+      // });
       win.loadURL(url);
       // win.webContents.on('did-finish-load', () => {
       //   win.show();
