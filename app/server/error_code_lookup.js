@@ -75,6 +75,8 @@ export const errorCodeLookup = errCode => {
       return 'CoreError::GetAccountInfoFailure';
     case CLIENT_ERROR_START_RANGE - 34:
       return 'CoreError::RequestTimeout';
+    case CLIENT_ERROR_START_RANGE - 35:
+      return 'CoreError::InvalidStructuredDataTypeTag';
     case NFS_ERROR_START_RANGE - 1:
       return 'NfsError::DirectoryAlreadyExistsWithSameName';
     case NFS_ERROR_START_RANGE - 2:
@@ -121,14 +123,6 @@ export const errorCodeLookup = errCode => {
       return 'FfiError::InvalidPath';
     case FFI_ERROR_START_RANGE - 3:
       return 'FfiError::PermissionDenied';
-    case FFI_ERROR_START_RANGE - 4:
-      return 'FfiError::JsonParseError';
-    case FFI_ERROR_START_RANGE - 5:
-      return 'FfiError::JsonDecodeError';
-    case FFI_ERROR_START_RANGE - 6:
-      return 'FfiError::SpecificParseError';
-    case FFI_ERROR_START_RANGE - 7:
-      return 'FfiError::JsonEncodeError';
     case FFI_ERROR_START_RANGE - 8:
       return 'FfiError::LocalConfigAccessFailed';
     case FFI_ERROR_START_RANGE - 9:
