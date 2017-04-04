@@ -16,6 +16,9 @@ export default class RegisterVerificationForm extends Component {
   componentWillMount() {
     const { error, showToaster, setErrorMessage } = this.props;
     let errMsg = null;
+    String.prototype.fromCamel = function(){
+      return this.replace(/([A-Z])/g, function($1){return " "+$1.toLowerCase();}).trim();
+    };
     if (Object.keys(error).length > 0) {
       errMsg = window.msl.errorCodeLookup(error.errorCode || 0);
       switch (errMsg) {
@@ -27,7 +30,9 @@ export default class RegisterVerificationForm extends Component {
           errMsg = 'This account is already taken.';
           break;
         default:
-          errMsg = errMsg.replace('CoreError::', '');
+          errMsg = errMsg.split('::').map(t => {
+            return t.fromCamel().replace(/\b\w/g, l => l.toUpperCase())
+          }).slice(-1).join('');
       }
       setErrorMessage(errMsg);
       showToaster(errMsg, { autoHide: true, error: true });
@@ -75,7 +80,6 @@ export default class RegisterVerificationForm extends Component {
   }
 
   openVerificationWindow() {
-    const self = this;
     const url = 'https://nodejs-sample-163104.appspot.com/';
     const ipc = require('electron').ipcRenderer;
     const BrowserWindow = require('electron').remote.BrowserWindow;
@@ -83,12 +87,11 @@ export default class RegisterVerificationForm extends Component {
     try {
       ipc.on('messageFromMain', (event, res) => {
         if (res.err) {
-          this.inviteToken.value = '';
-          return self.props.setErrorMessage(res.err);
+          this.props.setInviteCode('');
+          return this.props.setErrorMessage(res.err);
         }
         this.props.setInviteCode(res.invite);
         console.log(`message from main: ${res.invite}`);
-        self.inviteToken.value = res.invite;
       });
       let win = new BrowserWindow({width: 750, height: 560, resizable: false});
       // win.webContents.openDevTools();
