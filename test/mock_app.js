@@ -45,7 +45,8 @@ class MockApp {
   registerRandomUser() {
     const locator = crypto.randomBytes(20).toString('hex');
     const secret = crypto.randomBytes(20).toString('hex');
-    return auth.register(locator, secret);
+    const invite = crypto.randomBytes(20).toString('hex');
+    return auth.register(locator, secret, invite);
   }
 
   approveAppAuthorisation(app) {

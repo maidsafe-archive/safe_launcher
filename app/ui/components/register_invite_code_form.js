@@ -1,8 +1,19 @@
 import React, { Component, PropTypes } from 'react';
-import $ from 'jquery';
 import className from 'classnames';
 
 export default class RegisterVerificationForm extends Component {
+  static propTypes = {
+    user: PropTypes.object.isRequired,
+    error: PropTypes.object.isRequired,
+    errorMsg: PropTypes.string,
+    showToaster: PropTypes.func.isRequired,
+    stateContinue: PropTypes.func.isRequired,
+    stateBack: PropTypes.func.isRequired,
+    setErrorMessage: PropTypes.func,
+    clearErrorMessage: PropTypes.func,
+    setInviteCode: PropTypes.func
+  };
+
   constructor() {
     super();
     this.inviteToken = null;
@@ -16,9 +27,9 @@ export default class RegisterVerificationForm extends Component {
   componentWillMount() {
     const { error, showToaster, setErrorMessage } = this.props;
     let errMsg = null;
-    String.prototype.fromCamel = function(){
-      return this.replace(/([A-Z])/g, function($1){return " "+$1.toLowerCase();}).trim();
-    };
+    String.prototype.fromCamel = () => (
+      this.replace(/([A-Z])/g, ($1) => (` ${$1.toLowerCase()}`)).trim()
+    );
     if (Object.keys(error).length > 0) {
       errMsg = window.msl.errorCodeLookup(error.errorCode || 0);
       switch (errMsg) {
@@ -30,9 +41,13 @@ export default class RegisterVerificationForm extends Component {
           errMsg = 'This account is already taken.';
           break;
         default:
-          errMsg = errMsg.split('::').map(t => {
-            return t.fromCamel().replace(/\b\w/g, l => l.toUpperCase())
-          }).slice(-1).join('');
+          errMsg = errMsg
+            .split('::')
+            .map(t => (t
+              .fromCamel()
+              .replace(/\b\w/g, l => l.toUpperCase())))
+            .slice(-1)
+            .join('');
       }
       setErrorMessage(errMsg);
       showToaster(errMsg, { autoHide: true, error: true });
@@ -40,7 +55,7 @@ export default class RegisterVerificationForm extends Component {
   }
 
   componentDidMount() {
-   this.setInvite();
+    this.setInvite();
   }
 
   componentDidUpdate() {
@@ -83,6 +98,7 @@ export default class RegisterVerificationForm extends Component {
     const url = 'https://testnet-invite-manager.appspot.com/';
     const ipc = require('electron').ipcRenderer;
     const BrowserWindow = require('electron').remote.BrowserWindow;
+    
     this.clearErrorMsg();
     try {
       ipc.on('messageFromMain', (event, res) => {
@@ -91,20 +107,13 @@ export default class RegisterVerificationForm extends Component {
           return this.props.setErrorMessage(res.err);
         }
         this.props.setInviteCode(res.invite);
-        console.log(`message from main: ${res.invite}`);
+        console.warn(`message from main: ${res.invite}`);
       });
-      let win = new BrowserWindow({
-        width: 750, 
-        height: 560, 
-        resizable: false, 
-        // webPreferences: {
-        //   nodeIntegration: false
-        // }
-      });
+      let win = new BrowserWindow({ width: 750, height: 560, resizable: false });
       // win.webContents.openDevTools();
-      // win.on('close', () => {
-      //   win = null;
-      // });
+      win.on('close', () => {
+        win = null;
+      });
       win.loadURL(url);
       // win.webContents.on('did-finish-load', () => {
       //   win.show();
@@ -138,7 +147,9 @@ export default class RegisterVerificationForm extends Component {
                 id="inviteToken"
                 type="test"
                 className="normal-pad"
-                ref={c => { this.inviteToken = c; }}
+                ref={c => {
+                  this.inviteToken = c;
+                }}
                 required="true"
                 onChange={this.handleInputChange}
                 autoFocus
@@ -148,10 +159,15 @@ export default class RegisterVerificationForm extends Component {
             </div>
             <div className="claim-invite">
               <div className="separator">Or</div>
-              <button className="btn" type="button" onClick={e => {
-                e.preventDefault();
-                this.openVerificationWindow();
-              }}>Claim an invitation</button>
+              <button
+                className="btn"
+                type="button"
+                onClick={e => {
+                  e.preventDefault();
+                  this.openVerificationWindow();
+                }}
+              >Claim an invitation
+              </button>
             </div>
           </form>
         </div>
@@ -164,7 +180,8 @@ export default class RegisterVerificationForm extends Component {
               onClick={() => {
                 this.props.stateBack();
               }}
-            >Back</button>
+            >Back
+            </button>
           </div>
           <div className="opt-i">
             <button
@@ -173,7 +190,8 @@ export default class RegisterVerificationForm extends Component {
               name="continue"
               form="inviteTokenForm"
               onClick={this.handleAccPassForm}
-            >Continue</button>
+            >Continue
+            </button>
           </div>
         </div>
       </div>
