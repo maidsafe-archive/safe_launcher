@@ -175,7 +175,6 @@ app.on('ready', async () => {
     Menu.setApplicationMenu(menu);
   }
   ipcMain.on('invite', (event, arg) => {
-    console.log('opening child', arg);
     mainWindow.webContents.send('messageFromMain', arg);
   });
 });
