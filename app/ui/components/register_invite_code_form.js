@@ -93,7 +93,14 @@ export default class RegisterVerificationForm extends Component {
         this.props.setInviteCode(res.invite);
         console.log(`message from main: ${res.invite}`);
       });
-      let win = new BrowserWindow({width: 750, height: 560, resizable: false});
+      let win = new BrowserWindow({
+        width: 750, 
+        height: 560, 
+        resizable: false, 
+        // webPreferences: {
+        //   nodeIntegration: false
+        // }
+      });
       // win.webContents.openDevTools();
       // win.on('close', () => {
       //   win = null;
