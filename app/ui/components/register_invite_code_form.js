@@ -80,7 +80,7 @@ export default class RegisterVerificationForm extends Component {
   }
 
   openVerificationWindow() {
-    const url = 'https://nodejs-sample-163104.appspot.com/';
+    const url = 'https://testnet-invite-manager.appspot.com/';
     const ipc = require('electron').ipcRenderer;
     const BrowserWindow = require('electron').remote.BrowserWindow;
     this.clearErrorMsg();
