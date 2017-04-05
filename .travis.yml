@@ -43,7 +43,7 @@ before_script:
 script:
   - cd $TRAVIS_BUILD_DIR
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
-  - cargo build --release --verbose --features use-mock-routing
+  - travis_wait 30 cargo build --release --verbose --features use-mock-routing
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libgconf-2-4; fi
