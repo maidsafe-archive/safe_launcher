@@ -88,9 +88,8 @@ export default class RESTServer {
 
     app.use(setSessionHeaderAndParseBody);
 
-    app.get('/inviteToken', cors(corsOptions), (req, res) => {
-      // req.params
-      eventEmitter.emit(this.EVENT_TYPE.INVITE_TOKEN, req.params.msg);
+    app.get('/inviteToken', cors(), (req, res) => {
+      eventEmitter.emit(this.EVENT_TYPE.INVITE_TOKEN, req.param('token'));
       res.sendStatus(200);
     });
 

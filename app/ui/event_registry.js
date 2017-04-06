@@ -20,6 +20,7 @@ import {
   updateAccountStorage,
   hideSpinner
 } from './actions/app_action';
+import { setInviteCode } from './actions/auth_action';
 import sessionManager from '../ffi/util/session_manager';
 import { CONSTANT, MESSAGES } from './constant';
 
@@ -63,7 +64,7 @@ export default class EventRegistry {
   fetchStatsForUnauthorisedClient() {
     const self = this;
     self.intervals.push(window.setInterval(() => {
-      const updateGetsCount = async () => {
+      const updateGetsCount = async() => {
         try {
           const count = await sessionManager.getClientGetsCount();
           self.dispatch(setUnAuthStateData(count));
@@ -78,7 +79,7 @@ export default class EventRegistry {
   fetchStatsForAuthorisedClient() {
     const self = this;
     self.intervals.push(window.setInterval(() => {
-      const fetchCounts = async () => {
+      const fetchCounts = async() => {
         try {
           console.warn('Update Client stats');
           const getsCount = await sessionManager.getClientGetsCount();
@@ -233,6 +234,15 @@ export default class EventRegistry {
     });
   }
 
+  inviteTokenEvents() {
+    window.msl.onInviteToken(data => {
+      if (!data) {
+        return;
+      }
+      this.dispatch(setInviteCode(data));
+    });
+  }
+
   run() {
     this.handleNetworkEvents();
     this.handleAPIServer();
@@ -240,6 +250,6 @@ export default class EventRegistry {
     this.handleDataTransfer();
     this.handleActivityEvents();
     this.handleAuthRequest();
-    this.iniviteTokenEvents();
+    this.inviteTokenEvents();
   }
 }
