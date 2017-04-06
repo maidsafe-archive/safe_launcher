@@ -14,6 +14,17 @@ import log from './../logger/log';
 class ServerEventEmitter extends EventEmitter {
 }
 
+const whitelist = ['https://testnet-invite-manager.appspot.com/', 'http://localhost:8080'];
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+
 export default class RESTServer {
   constructor(port, callback) {
     this.port = port;
@@ -77,10 +88,19 @@ export default class RESTServer {
 
     app.use(setSessionHeaderAndParseBody);
 
-    app.get('/inviteToken', cors(), (req, res) => {
+    app.get('/inviteToken', cors(corsOptions), (req, res) => {
       // req.params
       eventEmitter.emit(this.EVENT_TYPE.INVITE_TOKEN, req.params.msg);
       res.sendStatus(200);
+    });
+
+    app.get('/openExternal', cors(corsOptions), (req, res) => {
+      let status = 400;
+      if (req.params.ref) {
+        require('electron').shell.openExternal(req.params.ref);
+        status = 200;
+      }
+      return res.sendStatus(status);
     });
 
     app.use('/health', (req, res) => {
