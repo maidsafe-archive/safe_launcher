@@ -8,8 +8,8 @@
 |:----------------------------------------:|:-------------------------------------------:|:----------------------------------------------:|
 
 ## Installation
-The development dependency of this project is [Node.js v6.0 or above](https://nodejs.org/download/release/v6.0.0/).
-Build [safe_core version 0.22.4](https://github.com/maidsafe/safe_core) with the mock Routing feature:
+The development dependency of this project is [Node.js v6.5.0](https://nodejs.org/download/release/v6.0.0/).
+Build [safe_core version 0.23.0](https://github.com/maidsafe/safe_client_libs) with the mock Routing feature:
  
 ```
 cargo build --release --features use-mock-routing

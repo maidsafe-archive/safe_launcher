@@ -1,5 +1,10 @@
 # SAFE Launcher Change Log
 
+##[0.11.0]
+- Invitation based create account
+- Requires safe_core 0.23.0
+
+
 ##[0.10.3]
 - Requires safe_core 0.22.4
 
