@@ -61,6 +61,10 @@ export default class Settings extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.props.clearErrorMessage();
+  }
+
   checkAuthenticated(props, onInit) {
     if (props.authenticated) {
       return this.context.router.push('/account_app_list');

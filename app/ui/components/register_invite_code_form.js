@@ -27,9 +27,11 @@ export default class RegisterVerificationForm extends Component {
   componentWillMount() {
     const { error, showToaster, setErrorMessage } = this.props;
     let errMsg = null;
-    String.prototype.fromCamel = () => (
-      this.replace(/([A-Z])/g, ($1) => (` ${$1.toLowerCase()}`)).trim()
-    );
+    /* eslint-disable func-names */
+    String.prototype.fromCamel = function () {
+      /* eslint-enable func-names */
+      return this.replace(/([A-Z])/g, ($1) => (` ${$1.toLowerCase()}`)).trim();
+    };
     if (Object.keys(error).length > 0) {
       errMsg = window.msl.errorCodeLookup(error.errorCode || 0);
       switch (errMsg) {
