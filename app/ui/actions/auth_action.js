@@ -9,7 +9,6 @@ export const loginSuccess = (res) => (
   }
 );
 
-
 export const setErrorMessage = (msg) => ({
   type: ActionTypes.SET_ERROR_MESSAGE,
   msg
@@ -62,6 +61,11 @@ export const resetUser = () => ({
   type: ActionTypes.RESET_USER
 });
 
+export const setInviteCode = (invite) => ({
+  type: ActionTypes.SET_INVITE_CODE,
+  invite
+});
+
 export const login = payload => (
   dispatch => {
     dispatch(setAuthProcessing());
@@ -80,7 +84,7 @@ export const login = payload => (
 export const register = payload => (
   dispatch => {
     dispatch(setAuthProcessing());
-    auth.register(payload.accountSecret, payload.accountPassword)
+    auth.register(payload.accountSecret, payload.accountPassword, payload.inviteToken)
     .then(() => {
       dispatch(registerSuccess(payload));
     }, (err) => {

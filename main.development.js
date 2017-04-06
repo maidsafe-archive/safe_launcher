@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, shell } from 'electron';
+import { app, BrowserWindow, Menu, shell, ipcMain } from 'electron';
 import pkg from './package.json';
 
 let menu;
@@ -22,7 +22,7 @@ app.on('window-all-closed', () => {
 });
 
 
-const installExtensions = async () => {
+const installExtensions = async() => {
   if (process.env.NODE_ENV === 'development') {
     const installer = require('electron-devtools-installer'); // eslint-disable-line global-require
 
@@ -34,12 +34,14 @@ const installExtensions = async () => {
     for (const name of extensions) {
       try {
         await installer.default(installer[name], forceDownload);
-      } catch (e) {} // eslint-disable-line
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 };
 
-app.on('ready', async () => {
+app.on('ready', async() => {
   await installExtensions();
 
   mainWindow = new BrowserWindow({
@@ -174,4 +176,7 @@ app.on('ready', async () => {
     menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
   }
+  ipcMain.on('invite', (event, arg) => {
+    mainWindow.webContents.send('messageFromMain', arg);
+  });
 });

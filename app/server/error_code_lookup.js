@@ -64,17 +64,23 @@ export const errorCodeLookup = errCode => {
     case CLIENT_ERROR_START_RANGE - 28:
       return 'CoreError::MutationFailure::MutationError::DataTooLarge';
     case CLIENT_ERROR_START_RANGE - 29:
-      return 'SelfEncryptionError::Compression::<SelfEncryptionStorageError>)';
+      return 'CoreError::MutationFailure::MutationError::InvalidInvitation';
     case CLIENT_ERROR_START_RANGE - 30:
-      return 'SelfEncryptionError::Decryption::<SelfEncryptionStorageError>)';
+      return 'CoreError::MutationFailure::MutationError::InvitationAlreadyClaimed';
     case CLIENT_ERROR_START_RANGE - 31:
-      return 'CoreError::SelfEncryption(SelfEncryptionError::Io::<SelfEncryptionStorageError>)';
+      return 'CoreError::SelfEncryption::SelfEncryptionCompressionError';
     case CLIENT_ERROR_START_RANGE - 32:
-      return 'CoreError::GetAccountInfoFailure::GetError::NoSuchAccount';
+      return 'CoreError::SelfEncryption::SelfEncryptionDecryptionError';
     case CLIENT_ERROR_START_RANGE - 33:
-      return 'CoreError::GetAccountInfoFailure';
+      return 'CoreError::GetAccountInfoFailure::SelfEncryptionIoError';
     case CLIENT_ERROR_START_RANGE - 34:
+      return 'CoreError::GetAccountInfoFailure::GetError::NoSuchAccount';
+    case CLIENT_ERROR_START_RANGE - 35:
+      return 'CoreError::GetAccountInfoFailure';
+    case CLIENT_ERROR_START_RANGE - 36:
       return 'CoreError::RequestTimeout';
+    case CLIENT_ERROR_START_RANGE - 37:
+      return 'CoreError::InvalidStructuredDataTypeTag';
     case NFS_ERROR_START_RANGE - 1:
       return 'NfsError::DirectoryAlreadyExistsWithSameName';
     case NFS_ERROR_START_RANGE - 2:
@@ -96,11 +102,11 @@ export const errorCodeLookup = errCode => {
     case NFS_ERROR_START_RANGE - 10:
       return 'NfsError::UnsuccessfulEncodeDecode';
     case NFS_ERROR_START_RANGE - 11:
-      return '::Compression::<SelfEncryptionStorageError>)';
+      return 'NfsError::SelfEncryption::SelfEncryptionCompressionError';
     case NFS_ERROR_START_RANGE - 12:
-      return '::Decryption::<SelfEncryptionStorageError>)';
+      return 'NfsError::SelfEncryption::SelfEncryptionDecryptionError';
     case NFS_ERROR_START_RANGE - 13:
-      return 'NfsError::SelfEncryption(SelfEncryptionError::Io::<SelfEncryptionStorageError>)';
+      return 'NfsError::SelfEncryption::SelfEncryptionIoError';
     case DNS_ERROR_START_RANGE:
       return 'DnsError::DnsNameAlreadyRegistered';
     case DNS_ERROR_START_RANGE - 1:
@@ -121,14 +127,6 @@ export const errorCodeLookup = errCode => {
       return 'FfiError::InvalidPath';
     case FFI_ERROR_START_RANGE - 3:
       return 'FfiError::PermissionDenied';
-    case FFI_ERROR_START_RANGE - 4:
-      return 'FfiError::JsonParseError';
-    case FFI_ERROR_START_RANGE - 5:
-      return 'FfiError::JsonDecodeError';
-    case FFI_ERROR_START_RANGE - 6:
-      return 'FfiError::SpecificParseError';
-    case FFI_ERROR_START_RANGE - 7:
-      return 'FfiError::JsonEncodeError';
     case FFI_ERROR_START_RANGE - 8:
       return 'FfiError::LocalConfigAccessFailed';
     case FFI_ERROR_START_RANGE - 9:

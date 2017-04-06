@@ -5,6 +5,7 @@ import RegisterAccSecretInfo from './register_acc_secret_info.js';
 import RegisterAccSecretForm from './register_acc_secret_form.js';
 import RegisterAccPassInfo from './register_acc_pass_info.js';
 import RegisterAccPassForm from './register_acc_pass_form.js';
+import RegisterInviteCodeForm from './register_invite_code_form.js';
 import AuthLoader from './auth_loader';
 import {
   appVersion,
@@ -62,21 +63,24 @@ export default class Register extends Component {
     }
 
     let currentState = null;
-    const TOTAL_STATES = 5;
+    const TOTAL_STATES = 6;
     switch (registerState) {
       case 0:
         currentState = <RegisterWelcome {...this.props} />;
         break;
       case 1:
-        currentState = <RegisterAccSecretInfo {...this.props} />;
+        currentState = <RegisterInviteCodeForm {...this.props} />;
         break;
       case 2:
-        currentState = <RegisterAccSecretForm {...this.props} />;
+        currentState = <RegisterAccSecretInfo {...this.props} />;
         break;
       case 3:
-        currentState = <RegisterAccPassInfo {...this.props} />;
+        currentState = <RegisterAccSecretForm {...this.props} />;
         break;
       case 4:
+        currentState = <RegisterAccPassInfo {...this.props} />;
+        break;
+      case 5:
         currentState = <RegisterAccPassForm {...this.props} />;
         break;
       default:

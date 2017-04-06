@@ -7,7 +7,8 @@ import {
   register,
   cancelAuthReq,
   setErrorMessage,
-  clearErrorMessage
+  clearErrorMessage,
+  setInviteCode
 } from '../actions/auth_action';
 import { showToaster } from '../actions/toaster_action';
 
@@ -32,7 +33,8 @@ const mapDispatchToProps = dispatch => (
     cancelAuthReq: () => (dispatch(cancelAuthReq())),
     setErrorMessage: msg => (dispatch(setErrorMessage(msg))),
     clearErrorMessage: () => (dispatch(clearErrorMessage())),
-    showToaster: (message, options) => (dispatch(showToaster(message, options)))
+    showToaster: (message, options) => (dispatch(showToaster(message, options))),
+    setInviteCode: (message, options) => (dispatch(setInviteCode(message, options)))
   }
 );
 

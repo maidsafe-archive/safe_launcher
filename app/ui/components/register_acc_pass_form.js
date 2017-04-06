@@ -25,6 +25,7 @@ export default class RegisterAccPassForm extends Component {
       this.props.user.accountPassword : '';
     this.accountPassword.value = user;
     this.confirmAccountPassword.value = user;
+    this.accountPassword.dispatchEvent(new Event('keyup', { bubbles: true }));
   }
 
   handleAccPassForm(e) {
@@ -61,6 +62,7 @@ export default class RegisterAccPassForm extends Component {
 
     this.props.userRegister({
       accountSecret: this.props.user.accountSecret,
+      inviteToken: this.props.user.inviteToken,
       accountPassword: accountPasswordVal
     });
   }
@@ -151,7 +153,7 @@ export default class RegisterAccPassForm extends Component {
                 type="password"
                 ref={c => { this.accountPassword = c; }}
                 required="true"
-                onChange={this.handleInputChange}
+                onKeyUp={this.handleInputChange}
                 autoFocus
               />
               <label htmlFor="accountPassword">Account Password</label>

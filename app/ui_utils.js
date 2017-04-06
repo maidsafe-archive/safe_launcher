@@ -85,6 +85,10 @@ export default class UIUtils {
     return status ? this.restServer.authApproved(payload) : this.restServer.authRejected(payload);
   }
 
+  onInviteToken(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.INVITE_TOKEN, callback);
+  }
+
   // remove session
   removeSession(id) {
     this.restServer.removeSession(id);

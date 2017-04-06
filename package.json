@@ -7,7 +7,7 @@
   "main": "dist/main.js",
   "identifier": "net.maidsafe.safelauncher",
   "scripts": {
-    "test": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha -t 5000 --compilers js:babel-register --recursive --require ./test/setup.js test/**/*.spec.js",
+    "test": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha -t 15000 --compilers js:babel-register --recursive --require ./test/setup.js test/**/*.spec.js",
     "test-watch": "npm test -- --watch",
     "test-e2e": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --compilers js:babel-register --require ./test/setup.js ./test/e2e.js",
     "lint": "eslint app test *.js",
@@ -102,6 +102,7 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "classnames": "^2.2.5",
+    "cors": "^2.8.3",
     "d3": "3.5.17",
     "enum": "^2.3.0",
     "ffi": "^2.1.0",

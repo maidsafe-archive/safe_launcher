@@ -29,9 +29,9 @@ const auth = (state = initialState, action) => {
       return {
         ...state,
         error: action.error,
-        user: Object.assign({}),
+        user: Object.assign({}, { inviteToken: state.user.inviteToken }),
         authProcessing: false,
-        registerState: 2
+        registerState: 1
       };
     case ActionTypes.AUTH_PROCESSING:
       return { ...state, authProcessing: true };
@@ -44,14 +44,21 @@ const auth = (state = initialState, action) => {
       return { ...state, errorMsg: '' };
     }
     case ActionTypes.REGISTER_STATE_NEXT:
-      if (state.registerState === 2 && action.user.accountSecret) {
+      if (state.registerState === 1 && action.user.inviteToken) {
+        return {
+          ...state,
+          registerState: state.registerState + 1,
+          user: { ...state.user, inviteToken: action.user.inviteToken }
+        };
+      }
+      if (state.registerState === 3 && action.user.accountSecret) {
         return {
           ...state,
           registerState: state.registerState + 1,
           user: { ...state.user, accountSecret: action.user.accountSecret }
         };
       }
-      if (state.registerState === 4) {
+      if (state.registerState === 5) {
         return state;
       }
       return { ...state, registerState: state.registerState + 1 };
@@ -61,18 +68,27 @@ const auth = (state = initialState, action) => {
       }
       return { ...state, registerState: state.registerState - 1 };
     case ActionTypes.SET_REGISTER_STATE:
-      if (action.navState > 2 && !(state.user && state.user.accountSecret)) {
+      if (action.navState > 1 && !(state.user && state.user.inviteToken)) {
+        return state;
+      }
+      if (action.navState > 3 && !(state.user && state.user.accountSecret)) {
         return state;
       }
       return { ...state, registerState: action.navState };
     case ActionTypes.RESET_USER: {
       return {
         ...state,
-        user: Object.assign({}),
+        user: Object.assign({}, { inviteToken: state.user.inviteToken || '' }),
         registerState: 0,
         error: Object.assign({}),
         errorMsg: ''
       };
+    }
+    case ActionTypes.SET_INVITE_CODE: {
+      if (!action.invite) {
+        return state;
+      }
+      return { ...state, user: Object.assign({}, { inviteToken: action.invite }) };
     }
     case ActionTypes.LOGOUT:
       return initialState;
