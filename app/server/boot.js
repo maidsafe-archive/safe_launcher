@@ -88,15 +88,17 @@ export default class RESTServer {
 
     app.use(setSessionHeaderAndParseBody);
 
-    app.get('/inviteToken', cors(), (req, res) => {
-      eventEmitter.emit(this.EVENT_TYPE.INVITE_TOKEN, req.param('token'));
+    app.get('/inviteToken', cors(), (req, res) => {      
+      const err = req.param('err');
+      const token = req.param('token');
+      eventEmitter.emit(this.EVENT_TYPE.INVITE_TOKEN, {err, token});
       res.sendStatus(200);
     });
 
     app.get('/openExternal', cors(corsOptions), (req, res) => {
       let status = 400;
-      if (req.params.ref) {
-        require('electron').shell.openExternal(req.params.ref);
+      if (req.param('ref')) {
+        require('electron').shell.openExternal(req.param('ref'));
         status = 200;
       }
       return res.sendStatus(status);

@@ -20,7 +20,7 @@ import {
   updateAccountStorage,
   hideSpinner
 } from './actions/app_action';
-import { setInviteCode } from './actions/auth_action';
+import { setInviteCode, setErrorMessage } from './actions/auth_action';
 import sessionManager from '../ffi/util/session_manager';
 import { CONSTANT, MESSAGES } from './constant';
 
@@ -228,18 +228,16 @@ export default class EventRegistry {
     });  
   }
 
-  iniviteTokenEvents() {
-    window.msl.onInviteToken(data => {
-      console.log('Invite token response', data);
-    });
-  }
-
   inviteTokenEvents() {
     window.msl.onInviteToken(data => {
       if (!data) {
         return;
       }
-      this.dispatch(setInviteCode(data));
+      if (data.err) {
+        this.dispatch(setErrorMessage(data.err));
+      } else {
+        this.dispatch(setInviteCode(data.token));
+      }
     });
   }
 

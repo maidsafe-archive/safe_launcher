@@ -95,7 +95,7 @@ export default class RegisterVerificationForm extends Component {
   }
 
   openVerificationWindow() {
-    const url = 'http://localhost:8080/';//'https://testnet-invite-manager.appspot.com/';
+    const url = 'https://testnet-invite-manager.appspot.com/';
     const ipc = require('electron').ipcRenderer;
     const BrowserWindow = require('electron').remote.BrowserWindow;
 
@@ -109,8 +109,15 @@ export default class RegisterVerificationForm extends Component {
         this.props.setInviteCode(res.invite);
         console.warn(`message from main: ${res.invite}`);
       });
-      let win = new BrowserWindow({ width: 750, height: 560, resizable: false });
-      win.webContents.openDevTools();
+      let win = new BrowserWindow({ 
+        width: 750, 
+        height: 560, 
+        resizable: false,
+        webPreferences: {
+          nodeIntegration: false
+        }
+      });
+      // win.webContents.openDevTools();
       win.on('close', () => {
         win = null;
       });
