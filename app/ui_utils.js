@@ -80,6 +80,12 @@ export default class UIUtils {
     this.restServer.addEventListener(this.restServer.EVENT_TYPE.AUTH_REQUEST, callback);
   }
 
+
+  // on auth request
+  onInviteToken(callback) {
+    this.restServer.addEventListener(this.restServer.EVENT_TYPE.INVITE_TOKEN, callback);
+  }
+
   // handle auth response
   authResponse(payload, status) {
     return status ? this.restServer.authApproved(payload) : this.restServer.authRejected(payload);

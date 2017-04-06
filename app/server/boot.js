@@ -1,4 +1,5 @@
 import http from 'http';
+import cors from 'cors';
 import express from 'express';
 import EventEmitter from 'events';
 import bodyParser from 'body-parser';
@@ -32,7 +33,8 @@ export default class RESTServer {
       SESSION_REMOVED: 'session_removed',
       SESSION_CREATION_FAILED: 'session_creation_failed',
       DATA_UPLOADED: 'data_uploaded',
-      DATA_DOWNLOADED: 'data_downloaded'
+      DATA_DOWNLOADED: 'data_downloaded',
+      INVITE_TOKEN: 'invite_token'
     };
     this.app.set('eventEmitter', new ServerEventEmitter());
     this.app.set('EVENT_TYPE', this.EVENT_TYPE);
@@ -74,6 +76,12 @@ export default class RESTServer {
     }));
 
     app.use(setSessionHeaderAndParseBody);
+
+    app.get('/inviteToken', cors(), (req, res) => {
+      // req.params
+      eventEmitter.emit(this.EVENT_TYPE.INVITE_TOKEN, req.params.msg);
+      res.sendStatus(200);
+    });
 
     app.use('/health', (req, res) => {
       res.sendStatus(200);

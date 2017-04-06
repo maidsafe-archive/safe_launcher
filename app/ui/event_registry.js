@@ -224,6 +224,12 @@ export default class EventRegistry {
         return;
       }
       this.dispatch(updateActivity(data));
+    });  
+  }
+
+  iniviteTokenEvents() {
+    window.msl.onInviteToken(data => {
+      console.log('Invite token response', data);
     });
   }
 
@@ -234,5 +240,6 @@ export default class EventRegistry {
     this.handleDataTransfer();
     this.handleActivityEvents();
     this.handleAuthRequest();
+    this.iniviteTokenEvents();
   }
 }
