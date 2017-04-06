@@ -14,16 +14,16 @@ import log from './../logger/log';
 class ServerEventEmitter extends EventEmitter {
 }
 
-const whitelist = ['https://testnet-invite-manager.appspot.com/', 'http://localhost:8080'];
+const whitelist = ['http://testnet-invite-manager.appspot.com', 'http://localhost:8080'];
 const corsOptions = {
   origin: (origin, callback) => {
     if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
+      callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'))
+      callback(new Error('Not allowed by CORS'));
     }
   }
-}
+};
 
 export default class RESTServer {
   constructor(port, callback) {
@@ -88,10 +88,10 @@ export default class RESTServer {
 
     app.use(setSessionHeaderAndParseBody);
 
-    app.get('/inviteToken', cors(), (req, res) => {      
+    app.get('/inviteToken', cors(), (req, res) => {
       const err = req.param('err');
       const token = req.param('token');
-      eventEmitter.emit(this.EVENT_TYPE.INVITE_TOKEN, {err, token});
+      eventEmitter.emit(this.EVENT_TYPE.INVITE_TOKEN, { err, token });
       res.sendStatus(200);
     });
 
@@ -99,6 +99,7 @@ export default class RESTServer {
       let status = 400;
       if (req.param('ref')) {
         require('electron').shell.openExternal(req.param('ref'));
+
         status = 200;
       }
       return res.sendStatus(status);

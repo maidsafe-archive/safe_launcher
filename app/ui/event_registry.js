@@ -225,7 +225,7 @@ export default class EventRegistry {
         return;
       }
       this.dispatch(updateActivity(data));
-    });  
+    });
   }
 
   inviteTokenEvents() {
