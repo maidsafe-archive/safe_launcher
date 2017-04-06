@@ -123,7 +123,9 @@ export default class RegisterVerificationForm extends Component {
       win.on('close', () => {
         win = null;
       });
-      win.loadURL(url);
+      win.webContents.session.clearStorageData(['cookies'], () => {
+        win.loadURL(url);
+      });
       // win.webContents.on('did-finish-load', () => {
       //   win.show();
       //   win.focus();
