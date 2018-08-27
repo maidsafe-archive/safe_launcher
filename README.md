@@ -1,4 +1,4 @@
-# safe_launcher
+﻿# safe_launcher
 
 |Linux/OS X|Windows|
 |:--------:|:-----:|
@@ -55,12 +55,7 @@ this will generate the package files in the `release` folder.
 
 # License
 
-Licensed under either of
-
-* the MaidSafe.net Commercial License, version 1.0 or later ([LICENSE](LICENSE))
-* the General Public License (GPL), version 3 ([COPYING](COPYING) or http://www.gnu.org/licenses/gpl-3.0.en.html)
-
-at your option.
+This SAFE Network library is licensed under the General Public License (GPL), version 3 ([LICENSE](LICENSE) http://www.gnu.org/licenses/gpl-3.0.en.html).
 
 # Contribution
 
